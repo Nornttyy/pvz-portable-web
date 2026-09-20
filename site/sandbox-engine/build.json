@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "GitHub Pages integrated main menu sandbox; resources imported locally",
+  "mode": "GitHub Pages integrated Chinese sandbox with automatically loaded full resources",
   "files": [
     {
       "name": "pvz-portable.js",
       "size": 276052,
-      "sha256": "8ce2e13c9c4e2d4f41c1d07ba46574f5b646b5b199a95aa308ad5964ddedbd4b"
+      "sha256": "e8fb62485df932ffc57ac7154d1a82a7731a2322de05eb783fd1ffa56eccd7ef"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7319944,
-      "sha256": "eb0ceb58b8024af604202a8e2bf143ef0aa48937e5db7ca4effc3b15e040452e"
+      "size": 7325918,
+      "sha256": "f1d1b36ee0469cd4bad937ce259e9544f0f1e954c5deeff467f13d806b8c3968"
     }
   ]
 }

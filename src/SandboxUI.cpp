@@ -5,6 +5,7 @@
 #include "SandboxUIRules.h"
 #include "SandboxPlants.h"
 #include "SandboxButton.h"
+#include "SandboxFonts.h"
 #include "LawnApp.h"
 #include "Resources.h"
 #include "Lawn/Board.h"
@@ -128,6 +129,7 @@ void SandboxUIReset() {
     selectedPlant=0;selectedZombie=0;plantSlot=zombieSlot=0;lastCell=-1;lastPlantCount=0;messageTicks=0;
     plants={0,1,2,3,5,7};zombies={0,2,4,7,23,24};
     PvzpLoadResources("DelayLoad_Almanac");
+    SandboxRepairFonts();
     for(int i=0;i<48;++i)Plant::PreloadPlantResources(static_cast<SeedType>(i));
     for(int type:Zombies)Zombie::PreloadZombieResources(static_cast<ZombieType>(type));
 }

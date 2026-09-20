@@ -3,6 +3,7 @@ import './runtime-pages.test.mjs';
 import './sandbox-pages.test.mjs';
 import './website-loading.test.mjs';
 import './automatic-resources.test.mjs';
+import './font-repair.test.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile, readdir, stat } from 'node:fs/promises';
