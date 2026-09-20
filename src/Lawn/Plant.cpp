@@ -30,6 +30,7 @@
 #include "Projectile.h"
 #include "SeedPacket.h"
 #include "../LawnApp.h"
+#include "../SandboxPlants.h"
 #include "CursorObject.h"
 #include "../GameConstants.h"
 #include "System/PlayerInfo.h"
@@ -107,6 +108,7 @@ Plant::Plant()
 
 void Plant::PlantInitialize(int theGridX, int theGridY, SeedType theSeedType, SeedType theImitaterType)
 {
+    SandboxPlants::Forget(this);
 	mPlantCol = theGridX;
 	mRow = theGridY;
 	if (mBoard)
@@ -2889,6 +2891,7 @@ bool Plant::NotOnGround()
 
 Reanimation* Plant::AttachBlinkAnim(Reanimation* theReanimBody)
 {
+    if (SandboxPlants::IsCustom(this)) return nullptr; // Separate generated blink frame, driven by sandbox tick.
 	const PlantDefinition& aPlantDef = GetPlantDefinition(mSeedType);
 	LawnApp* aApp = (LawnApp*)gSexyAppBase;
 	Reanimation* aAnimToAttach = theReanimBody;
@@ -4675,7 +4678,10 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
 		mApp->AddPvzpParticle(aOriginX + 27, aOriginY + 13, aRenderPosition, ParticleEffect::PARTICLE_PUFFSHROOM_MUZZLE);
 	}
 
+    const int sandboxShot = SandboxPlants::NextShot(this);
+    if (sandboxShot == 1) aProjectileType = ProjectileType::PROJECTILE_SNOWPEA;
 	Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder - 1, theRow, aProjectileType);
+    if (sandboxShot == 2) aProjectile->ConvertToFireball(mPlantCol);
 	aProjectile->mDamageRangeFlags = GetDamageRangeFlags(thePlantWeapon);
 
 	if (mSeedType == SeedType::SEED_CABBAGEPULT || mSeedType == SeedType::SEED_KERNELPULT ||

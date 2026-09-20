@@ -27,6 +27,9 @@
 #include "../ZenGarden.h"
 #include "GameSelector.h"
 #include "../../LawnApp.h"
+#include "../../Sandbox.h"
+#include "../../SandboxUIRules.h"
+#include "../../SandboxButton.h"
 #include "AlmanacDialog.h"
 #include "../../Resources.h"
 #include "../System/Music.h"
@@ -59,6 +62,18 @@ GameSelectorOverlay::GameSelectorOverlay(GameSelector* theGameSelector)
 	mMouseVisible = false;
 	mHasAlpha = true;
 }
+
+// Prominent native menu button. Stretch only the existing stone slices, not the label.
+class SandboxMenuButton final : public LawnStoneButton {
+public:
+	SandboxMenuButton(int id, ButtonListener* listener) : LawnStoneButton(nullptr, id, listener) {
+		SetLabel("沙盒模式"); mHasAlpha = true;
+	}
+	void Draw(Graphics* g) override {
+		const bool down = mIsDown && mIsOver && !mDisabled;
+		SandboxDrawButton(g,{0,0,mWidth,mHeight},mLabel,down,mIsOver,true);
+	}
+};
 
 GameSelector::GameSelector(LawnApp* theApp)
 {
@@ -254,6 +269,13 @@ GameSelector::GameSelector(LawnApp* theApp)
 	mOverlayWidget = new GameSelectorOverlay(this);
 	mOverlayWidget->Resize(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
 
+	// Native menu option, using the same stone button and bitmap fonts as the game.
+	mSandboxButton = new SandboxMenuButton(GameSelector_Sandbox, this);
+	const auto sandboxEntry = SandboxUIRules::MenuEntry;
+	mSandboxButton->Resize(sandboxEntry.x, sandboxEntry.y, sandboxEntry.w, sandboxEntry.h);
+	mSandboxButton->mVisible = false;
+	mSandboxButton->mMouseVisible = false;
+
 	mStoreButton = MakeNewButton(
 		GameSelector::GameSelector_Store,
 		this,
@@ -362,6 +384,7 @@ GameSelector::GameSelector(LawnApp* theApp)
 	AddWidget(mHelpButton);
 	AddWidget(mStoreButton);
 	AddWidget(mAlmanacButton);
+	AddWidget(mSandboxButton);
 	AddWidget(mOverlayWidget);
 }
 
@@ -735,6 +758,9 @@ void GameSelector::UpdateTooltip()
 
 void GameSelector::Update()
 {
+	mSandboxButton->SetVisible(mSelectorState == SELECTOR_IDLE && !mStartingGame);
+	mSandboxButton->mMouseVisible = mSandboxButton->mVisible;
+	mSandboxButton->SetDisabled(mStartingGame || mSlideCounter > 0);
 	Widget::Update();
 	MarkDirty();
 	UpdateTooltip();
@@ -1158,6 +1184,7 @@ void GameSelector::ClickedAdventure()
 	mZenGardenButton->SetDisabled(true);
 	mZombatarButton->SetDisabled(true);
 	mAchievementsButton->SetDisabled(true);
+	mSandboxButton->SetDisabled(true);
 
 	Reanimation* aHandReanim = mApp->AddReanimation(-70.0f, 10.0f, 0, ReanimationType::REANIM_ZOMBIE_HAND);
 	aHandReanim->mLoopType = ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD;
@@ -1196,6 +1223,9 @@ void GameSelector::ButtonDepress(int theId)
 
 	switch (theId)
 	{
+	case GameSelector::GameSelector_Sandbox:
+		if (!mStartingGame && mSelectorState == SELECTOR_IDLE) SandboxEnter();
+		break;
 	case GameSelector::GameSelector_Adventure:
 		ClickedAdventure();
 		break;

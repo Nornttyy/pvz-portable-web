@@ -1,5 +1,5 @@
-// Website packaging only. The upstream C++ engine and WASM are unmodified.
-import { readFile, writeFile } from 'node:fs/promises';
+// Retain the legacy resource importer; publish the integrated sandbox as the default.
+import { readFile, writeFile, copyFile, readdir } from 'node:fs/promises';
 
 const root = new URL('../', import.meta.url);
 let html = await readFile(new URL('wasm/shell.html', root), 'utf8');
@@ -74,5 +74,8 @@ body, #upload-screen { min-height: 100dvh; }
 #upload-screen { padding-bottom: max(2rem, env(safe-area-inset-bottom)); }
 </style>`);
 replace('</body>', '<script src="runtime-status.js"></script>\n</body>');
-await writeFile(new URL('site/index.html', root), html);
-console.log('Built site/index.html from pinned upstream shell. No game resources included.');
+await writeFile(new URL('site/classic.html', root), html);
+for (const name of await readdir(new URL('web/', root))) {
+  if (/\.(html|css|js|mjs)$/.test(name)) await copyFile(new URL('web/' + name, root), new URL('site/' + name, root));
+}
+console.log('Built Chinese integrated sandbox and preserved classic importer. No original game resource packs included.');

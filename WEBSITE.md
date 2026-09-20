@@ -1,40 +1,50 @@
-# 独立 GitHub Pages 网站
+# GitHub Pages · 中文沙盒
 
 网址：https://nornttyy.github.io/pvz-portable-web/
 
-这是 PvZ-Portable 0.2.3 的独立静态部署，不涉及《海边寿司店》的目录、仓库、网址或存档。
+默认入口已接入当前中文版的原生主菜单沙盒、8 种原创植物、分件动画与按钮居中修复。保留原 800 × 600 画布和游戏内 UI，不跳转到另一套沙盒画面。
 
-## 资源要求
+## 首次游玩
 
-引擎需要用户自行导入正版年度版 `main.pak` 和 `properties/`。本站不附带这套资源，也不上传用户选择的文件。手机可使用包含两项内容的 ZIP。存档保存于浏览器，换设备请先导出。
+1. 点击「选择本机资源包」，选择本地中文版修复加载问题后的 `resources/local-resources.zip`，约 50.5 MB，无需解压。
+2. 完成校验后点击「开始游戏」，从本体主菜单进入「沙盒模式」。
+3. 浏览器允许时会记住资源，下次自动读取；无痕或存储受限时需要重新选择。
 
-`art-preview.html` 展示最新生成的静态分件图，不包含骨骼动画，不是完整替代素材包，不参与引擎加载。
+公开网站只托管代码、引擎、资源校验清单及现有生成样张，不上传或提供原版图片、字体、音乐包。选择的资源只在你的浏览器中读取。资源清单锁定已修复字体注释格式的版本，旧资源包会显示版本提示，不会进入有问题的加载过程。
 
-## 构建与自动发布
+`classic.html` 保留之前的年度版 `main.pak` + `properties/` 导入流程和固定上游引擎。
 
-无需 npm 依赖，Node.js 22 或以上即可：
+本地网址和 GitHub 网址使用不同的存档空间。迁移进度：先在本地游戏的「工具 → 备份存档」导出，再在新网站的「工具 → 恢复存档」导入；阵型另用游戏内沙盒菜单导出/导入。不要清除网站数据。仅更换资源缓存不会清除存档。
+
+## 构建与发布
+
+需要 Node.js 22+，无需安装 npm 依赖：
 
 ```sh
 node scripts/build-site.mjs
 node --test tests/pages.test.mjs
-python3 -m http.server 8793 --bind 127.0.0.1 --directory site
 ```
 
-推送到本仓库 `main` 后，`Publish PvZ website` 工作流会自动构建中文入口、验证引擎完整性与静态链接，再发布 `site/`。所有资源 URL 相对当前目录，适配 GitHub Pages 项目子路径。原上游多平台编译任务改为手动触发，避免每次改网页触发整套原生编译。
+`web/` 是默认网页源码，构建复制到 `site/`；旧入口由 `wasm/shell.html` 生成到 `site/classic.html`。全部网页资源使用相对路径，支持 GitHub Pages 项目子目录。
 
-## 上游与修改
+推送 `main` 后由 `Publish PvZ website` 自动验证并发布 `site/`。工作流不会读取本地资源包、存档、个人目录或密钥。
 
-- 上游：https://github.com/wszqkzqk/PvZ-Portable
-- 版本：0.2.3 / `147ce06c5ad08ac7975c4cc20e90978c724be8c4`
-- `src/`、`wasm/shell.html` 和构建脚本保留对应上游源代码。重新编译引擎见原 README 与 `wasm/build-wasm.sh`。
-- `site/pvz-portable.js`、`.wasm`、`.html` 直接来自上游版本发行包，未修改；散列见 `site/upstream-release.json`。
-- 中文入口由上游 `wasm/shell.html` 派生，只修改页面文案、资源引用和状态提示，不修改 C++ 或 WASM。
-- JSZip 固定为本地 3.10.1，中文入口不依赖外部 CDN。
-- 许可与署名保留，网站提供源代码与许可证入口。
-- 新增文件日期：2026-09-20。
+## 引擎源码和重建
 
-## 检查范围
+- 上游基线：PvZ-Portable 0.2.3，`147ce06c5ad08ac7975c4cc20e90978c724be8c4`。
+- `src/` 包含发布的完整修改源码：`Sandbox*` 及 Board / Plant / GameSelector / PlayerInfo / SaveGame / LawnApp 的集成点。
+- `site/sandbox-engine/` 是对应的编译结果，散列见 `build.json`。已在发布前与本机已验证版本逐字节比对。
+- 工具链：Emscripten 4.0.16、CMake 3.31.6、Ninja 1.11.1.4、libopenmpt 0.8.4。使用上游 `wasm/build-wasm.sh` 或在配置好 Emscripten 和 openmpt 的环境执行：
 
-自动测试覆盖静态资源、链接、脚本语法、WASM 编译、发行文件散列、入口状态提示和无资源自动启动保护。不代表完整游戏已实机通关；当前没有导入用户正版资源，也没有可连接的浏览器进行视觉与交互验收。
+```sh
+emcmake cmake -S . -B build-wasm -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_ROOT_PATH=/path/to/openmpt-prefix
+cmake --build build-wasm
+```
 
-网站为公开 Pages 页面；noindex 仅用于减少搜索索引，不提供访问控制。
+将 `build-wasm/pvz-portable.js` 与 `.wasm` 放入 `site/sandbox-engine/`，更新构建散列后验证。许可和署名入口保留在 `site/credits.html`；旧引擎文件与散列保持不变。
+
+## 验证范围
+
+自动测试覆盖真实 WASM 初始化及沙盒接口、构建散列、GitHub 子路径引用、原版资源不随站点发布、首次导入/错误重试/再次读取、缓存禁用和超时、存档路径保护与加载状态转换。
+
+自动测试不是浏览器画面或通关验收；本次环境无可连接浏览器。部署后另外检查公网入口与 JS / WASM / 资源清单的实际 HTTP 响应及散列。

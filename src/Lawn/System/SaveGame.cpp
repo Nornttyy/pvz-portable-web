@@ -25,6 +25,7 @@
 #include "../Challenge.h"
 #include "../SeedPacket.h"
 #include "../../LawnApp.h"
+#include "../../Sandbox.h"
 #include "../CursorObject.h"
 #include "../../Resources.h"
 #include "../../ConstEnums.h"
@@ -2792,6 +2793,7 @@ bool LawnLoadGame(Board* theBoard, const std::string& theFilePath)
 
 bool LawnSaveGame(Board* theBoard, const std::string& theFilePath)
 {
+	if (gSandboxEnabled) return false;
 	std::vector<unsigned char> aPayload;
 	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_BOARD_BASE, theBoard)) return false;
 	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_ZOMBIES, theBoard)) return false;

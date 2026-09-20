@@ -25,6 +25,7 @@
 #include "DataSync.h"
 #include <algorithm>
 #include "PlayerInfo.h"
+#include "../../Sandbox.h"
 #include "../LawnCommon.h"
 #include "../Widget/ChallengeScreen.h"
 #include "../../PvzpLib/PvzpDebug.h"
@@ -237,6 +238,7 @@ void PlayerInfo::LoadDetails()
 
 void PlayerInfo::SaveDetails()
 {
+	if (SandboxOwnsProfile(this)) return;
 	DataWriter aWriter;
 	aWriter.OpenMemory();
 	DataSync aSync(aWriter);
@@ -249,6 +251,7 @@ void PlayerInfo::SaveDetails()
 
 void PlayerInfo::DeleteUserFiles()
 {
+	if (SandboxOwnsProfile(this)) return;
 	std::string aFilename = GetAppDataPath(std::format("userdata/user{}.dat", mId));
 	gSexyAppBase->EraseFile(aFilename);
 

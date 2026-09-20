@@ -1,0 +1,18 @@
+{
+  "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
+  "emscripten": "4.0.16",
+  "openmpt": "0.8.4",
+  "mode": "GitHub Pages integrated main menu sandbox; resources imported locally",
+  "files": [
+    {
+      "name": "pvz-portable.js",
+      "size": 276052,
+      "sha256": "8ce2e13c9c4e2d4f41c1d07ba46574f5b646b5b199a95aa308ad5964ddedbd4b"
+    },
+    {
+      "name": "pvz-portable.wasm",
+      "size": 7319944,
+      "sha256": "eb0ceb58b8024af604202a8e2bf143ef0aa48937e5db7ca4effc3b15e040452e"
+    }
+  ]
+}

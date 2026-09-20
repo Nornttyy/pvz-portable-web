@@ -1,4 +1,6 @@
 import test from 'node:test';
+import './runtime-pages.test.mjs';
+import './sandbox-pages.test.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile, readdir, stat } from 'node:fs/promises';
@@ -7,7 +9,7 @@ import { resolve, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const site = fileURLToPath(new URL('../site/', import.meta.url));
-const entry = await readFile(resolve(site, 'index.html'), 'utf8');
+const entry = await readFile(resolve(site, 'classic.html'), 'utf8');
 const provenance = JSON.parse(await readFile(resolve(site, 'upstream-release.json'), 'utf8'));
 const hash = (data) => createHash('sha256').update(data).digest('hex');
 
@@ -44,7 +46,7 @@ test('inline JavaScript and local runtime scripts parse', async () => {
   }
 });
 
-for (const filename of ['index.html', 'art-preview.html', 'credits.html']) {
+for (const filename of ['index.html', 'classic.html', 'art-preview.html', 'credits.html']) {
   test(`local links resolve under the project subpath: ${filename}`, async () => {
     const html = await readFile(resolve(site, filename), 'utf8');
     for (const [, url] of html.matchAll(/(?:src|href)="([^"<>]+)"/g)) {

@@ -24,6 +24,7 @@
 #include <cstdio>
 #include <format>
 #include "LawnApp.h"
+#include "Sandbox.h"
 #include "Resources.h"
 #include "Lawn/LawnCommon.h"
 #include "Lawn/Board.h"
@@ -255,7 +256,7 @@ void LawnApp::KillBoard()
 	KillSeedChooserScreen();
 	if (mBoard)
 	{
-		if (mPlayerInfo && (
+		if (!gSandboxEnabled && mPlayerInfo && (
 			mBoardResult == BoardResult::BOARDRESULT_WON ||
 			mBoardResult == BoardResult::BOARDRESULT_LOST ||
 			mBoardResult == BoardResult::BOARDRESULT_RESTART ||
@@ -312,7 +313,7 @@ void LawnApp::LostFocus()
 
 void LawnApp::WriteToRegistry()
 {
-	if (mPlayerInfo)
+	if (mPlayerInfo && !SandboxOwnsProfile(mPlayerInfo))
 	{
 		RegistryWriteString("CurUser", mPlayerInfo->mName);
 		mPlayerInfo->SaveDetails();
@@ -1395,6 +1396,7 @@ bool LawnApp::UpdatePlayerProfileForFinishingLevel()
 
 void LawnApp::CheckForGameEnd()
 {
+	if (gSandboxEnabled) return;
 	if (mBoard == nullptr || !mBoard->mLevelComplete)
 		return;
 

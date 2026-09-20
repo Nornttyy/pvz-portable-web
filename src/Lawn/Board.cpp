@@ -25,6 +25,7 @@
 #include <format>
 #include "ZenGarden.h"
 #include "BoardInclude.h"
+#include "../Sandbox.h"
 #include "LawnCommon.h"
 #include "System/Music.h"
 #include "System/SaveGame.h"
@@ -315,6 +316,7 @@ int Board::CountUntriggerLawnMowers()
 
 void Board::TryToSaveGame()
 {
+	if (gSandboxEnabled) return;
 	std::string aFileName = GetSavedGameName(mApp->mGameMode, mApp->mPlayerInfo->mId);
 
 	if (NeedSaveGame())
@@ -346,6 +348,7 @@ bool Board::NeedSaveGame()
 
 void Board::SaveGame(const std::string& theFileName)
 {
+	if (gSandboxEnabled) return;
 	LawnSaveGame(this, theFileName);
 }
 
@@ -3008,6 +3011,7 @@ void Board::MouseMove(int x, int y)
 
 void Board::MouseDrag(int x, int y)
 {
+	if (SandboxMouseDrag(x, y)) return;
 	Widget::MouseDrag(x, y);
 	mChallenge->MouseMove(x, y);
 }
@@ -4362,6 +4366,7 @@ void Board::PickUpTool(GameObjectType theObjectType)
 
 void Board::MouseDown(int x, int y, int theClickCount)
 {
+	if (SandboxMouseDown(x, y, theClickCount)) return;
 	UpdateMousePosition();
 	Widget::MouseDown(x, y, theClickCount);
 	mIgnoreMouseUp = !CanInteractWithBoardButtons();
@@ -4580,6 +4585,7 @@ bool Board::CanInteractWithBoardButtons()
 
 void Board::MouseUp(int x, int y, int theClickCount)
 {
+	if (SandboxMouseUp()) return;
 	Widget::MouseUp(x, y, theClickCount);
 	if (mIgnoreMouseUp)
 	{
@@ -5048,6 +5054,7 @@ void Board::PuzzleSaveStreak()
 
 void Board::ZombiesWon(Zombie* theZombie)
 {
+	if (gSandboxEnabled) { SandboxEscaped(); theZombie->DieNoLoot(); return; }
 	if (mApp->mGameScene == GameScenes::SCENE_ZOMBIES_WON)
 		return;
 
@@ -5176,6 +5183,7 @@ bool Board::HasLevelAwardDropped()
 
 void Board::UpdateSunSpawning()
 {
+	if (gSandboxEnabled) return;
 	if (StageIsNight() ||
 		HasLevelAwardDropped() ||
 		mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_RAINING_SEEDS ||
@@ -5234,6 +5242,7 @@ void Board::NextWaveComing()
 
 void Board::UpdateZombieSpawning()
 {
+	if (gSandboxEnabled) return;
 	if (mApp->mGameMode == GameMode::GAMEMODE_UPSELL || mApp->mGameMode == GameMode::GAMEMODE_INTRO)
 		return;
 
@@ -5418,6 +5427,7 @@ void Board::UpdateIce()
 
 void Board::UpdateProgressMeter()
 {
+	if (gSandboxEnabled) return;
 	if (mApp->IsFinalBossLevel())
 	{
 		Zombie* aBoss = GetBossZombie();
@@ -5692,6 +5702,7 @@ void Board::UpdateGame()
 
 void Board::Update()
 {
+	SandboxTick(this);
 	PvzpHesitationBracket aHesitation("Board::Update");
 
 	Widget::Update();
@@ -7175,7 +7186,7 @@ void Board::DrawUIBottom(Graphics* g)
 
 	if (mApp->mGameScene != GameScenes::SCENE_ZOMBIES_WON)
 	{
-		if (mSeedBank->BeginDraw(g))
+		if (!gSandboxEnabled && mSeedBank->BeginDraw(g))
 		{
 			mSeedBank->Draw(g);
 			mSeedBank->EndDraw(g);
@@ -7372,6 +7383,7 @@ bool Board::IsScaryPotterDaveTalking()
 
 void Board::DrawUITop(Graphics* g)
 {
+	if (gSandboxEnabled) { SandboxDrawUI(g); return; }
 	if (StageHasFog())
 	{
 		DrawTopRightUI(g);
@@ -7627,6 +7639,7 @@ void Board::DoTypingCheck(KeyCode theKey)
 
 void Board::KeyDown(KeyCode theKey)
 {
+	if (gSandboxEnabled) { SandboxKeyDown(theKey); return; }
 	DoTypingCheck(theKey);
 
 	if (mApp->mGameScene == GameScenes::SCENE_LEVEL_INTRO &&

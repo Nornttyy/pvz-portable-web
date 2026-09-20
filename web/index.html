@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>植物大战僵尸 · 中文沙盒</title>
+  <link rel="stylesheet" href="game.css">
+</head>
+<body>
+  <main id="loader" aria-label="游戏加载">
+    <div id="title-art" aria-hidden="true"></div>
+    <section id="loading-panel">
+      <p class="eyebrow">中文沙盒 · 非官方试玩</p>
+      <h1>植物大战僵尸</h1>
+      <p id="status" role="status" aria-live="polite">正在准备引擎…</p>
+      <progress id="progress" max="100" value="0" aria-label="加载进度"></progress>
+      <section id="resource-picker" hidden>
+        <button id="choose-resource" type="button">选择本机资源包</button>
+        <input id="resource-file" type="file" accept=".zip,application/zip" hidden>
+        <p id="resource-hint" role="status">选择当前本地版的 local-resources.zip（约 50.5 MB）。文件不会上传。</p>
+      </section>
+      <button id="start" disabled>正在加载</button>
+      <button id="reload" hidden>重新加载</button>
+      <p id="loader-note">本站不附带原版游戏素材。资源与存档仅保存在你的浏览器。<br><a href="classic.html">旧版资源导入入口</a> · <a href="credits.html">来源与许可</a></p>
+      <details id="diagnostics" hidden><summary>查看错误详情</summary><pre id="error-detail"></pre></details>
+      <noscript>请启用浏览器 JavaScript 后重新打开。</noscript>
+    </section>
+  </main>
+  <div id="canvas-container" hidden>
+    <canvas id="canvas" width="800" height="600" tabindex="0" aria-label="植物大战僵尸游戏画面"></canvas>
+  </div>
+  <details id="tools" hidden>
+    <summary aria-label="本地工具">工具</summary>
+    <div id="tool-panel">
+      <button id="fullscreen">全屏</button>
+      <button id="export-save">备份存档</button>
+      <button id="import-save">恢复存档</button>
+      <button id="return">返回启动页</button>
+      <small id="save-status" role="status">存档保存在此浏览器</small>
+    </div>
+  </details>
+  <input id="save-file" type="file" accept=".zip,application/zip" hidden>
+  <input id="layout-file" type="file" accept=".json,application/json" hidden>
+  <textarea id="pvz-soft-keyboard" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="游戏文字输入"></textarea>
+  <script src="bootstrap.js"></script>
+  <script src="vendor/jszip-3.10.1.min.js"></script>
+  <script async src="sandbox-engine/pvz-portable.js"></script>
+  <script type="module" src="runtime.mjs"></script>
+  <script type="module" src="sandbox.mjs"></script>
+</body>
+</html>
