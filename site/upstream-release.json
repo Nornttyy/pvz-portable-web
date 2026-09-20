@@ -8,6 +8,7 @@
     "pvz-portable.js": "c4b6a4928cbf3d06824b75771907d556b0f49a8b61bb23ec17a77be2d9fffadd",
     "pvz-portable.wasm": "851072d991cc7f5770244b9be7204ed03ff5ee769101446987bbd3e1329ec3a6",
     "pvz-portable.html": "4d04b5ebaf333f30e5168aab51c2e7032c31187360e3f2e5fa32bda0d72adc4d",
-    "vendor/jszip-3.10.1.min.js": "acc7e41455a80765b5fd9c7ee1b8078a6d160bbbca455aeae854de65c947d59e"
+    "vendor/jszip-3.10.1.min.js": "acc7e41455a80765b5fd9c7ee1b8078a6d160bbbca455aeae854de65c947d59e",
+    "licenses/SDL-Mixer-X.txt": "4969cea2facfff6704908121f1610e9dc0c0c1541b5ac79059916192b8c4a06d"
   }
 }
