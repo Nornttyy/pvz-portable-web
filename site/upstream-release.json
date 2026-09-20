@@ -1,0 +1,13 @@
+{
+  "project": "https://github.com/wszqkzqk/PvZ-Portable",
+  "tag": "0.2.3",
+  "commit": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
+  "release": "https://github.com/wszqkzqk/PvZ-Portable/releases/tag/0.2.3",
+  "archiveSha256": "ee9bf969216261d67b8911cefa8d8e6c3908fe9cff12504bf8e39311d1a3ec69",
+  "files": {
+    "pvz-portable.js": "c4b6a4928cbf3d06824b75771907d556b0f49a8b61bb23ec17a77be2d9fffadd",
+    "pvz-portable.wasm": "851072d991cc7f5770244b9be7204ed03ff5ee769101446987bbd3e1329ec3a6",
+    "pvz-portable.html": "4d04b5ebaf333f30e5168aab51c2e7032c31187360e3f2e5fa32bda0d72adc4d",
+    "vendor/jszip-3.10.1.min.js": "acc7e41455a80765b5fd9c7ee1b8078a6d160bbbca455aeae854de65c947d59e"
+  }
+}

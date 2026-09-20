@@ -1,5 +1,8 @@
 # PvZ-Portable
 
+> 本仓库为独立 GitHub Pages 部署：[打开网站](https://nornttyy.github.io/pvz-portable-web/) · [分件样张](https://nornttyy.github.io/pvz-portable-web/art-preview.html) · [网站构建说明](WEBSITE.md)。
+> 游玩需要自行导入正版年度版资源，生成样张不是完整替代资源包。下方保留上游项目说明。
+
 <div align="center">
   <img src="icon-readme.png" alt="PvZ-Portable" width="450">
 </div>

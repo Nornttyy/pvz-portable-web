@@ -1,1 +1,6 @@
 * text=auto eol=lf
+
+# Preserve upstream distribution files and license notices byte-for-byte.
+site/pvz-portable.* -text
+site/vendor/* -text
+site/licenses/* -text -whitespace
