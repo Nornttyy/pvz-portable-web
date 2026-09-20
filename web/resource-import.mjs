@@ -9,10 +9,10 @@ export async function verifyResourceBytes(value, manifest) {
 }
 
 // This flow only reads a local file; no upload, fetch or remote storage operation.
-export async function importResourceBundle(manifest, setStatus) {
+export async function importResourceBundle(manifest, setStatus, { skipCache = false } = {}) {
   const $ = id => document.getElementById(id);
   setStatus('检查此浏览器中已保存的资源…', 8);
-  const cached = await cacheResource('get', manifest.bundle.sha256);
+  const cached = skipCache ? null : await cacheResource('get', manifest.bundle.sha256);
   if (cached) {
     try {
       const bytes = await verifyResourceBytes(cached, manifest);
@@ -22,7 +22,7 @@ export async function importResourceBundle(manifest, setStatus) {
   }
   $('resource-picker').hidden = false;
   $('start').hidden = true;
-  setStatus('首次游玩，请选择本机资源包', 8);
+  setStatus(skipCache ? '请选择资源包，已有存档会保留' : '请选择本机资源包', 8);
   const fileInput = $('resource-file'), choose = $('choose-resource');
   return new Promise(resolve => {
     const open = () => fileInput.click();
@@ -30,7 +30,7 @@ export async function importResourceBundle(manifest, setStatus) {
     const select = async () => {
       const file = fileInput.files?.[0];
       fileInput.value = '';
-      if (!file) return;
+      if (!file || choose.disabled) return;
       choose.disabled = true;
       try {
         if (file.size !== manifest.bundle.size) throw Error('请选修复后的 local-resources.zip（约 50.5 MB），不是存档 ZIP 或原版 main.pak。');

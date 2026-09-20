@@ -7,6 +7,7 @@
 /site/bootstrap.js
 /site/runtime.mjs
 /site/resource-utils.mjs
+/site/loading-utils.mjs
 /site/resource-cache.mjs
 /site/resource-import.mjs
 /site/sandbox.mjs

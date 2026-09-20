@@ -1,5 +1,6 @@
 // Retain the legacy resource importer; publish the integrated sandbox as the default.
-import { readFile, writeFile, copyFile, readdir } from 'node:fs/promises';
+import { readFile, writeFile, readdir } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 
 const root = new URL('../', import.meta.url);
 let html = await readFile(new URL('wasm/shell.html', root), 'utf8');
@@ -75,7 +76,20 @@ body, #upload-screen { min-height: 100dvh; }
 </style>`);
 replace('</body>', '<script src="runtime-status.js"></script>\n</body>');
 await writeFile(new URL('site/classic.html', root), html);
-for (const name of await readdir(new URL('web/', root))) {
-  if (/\.(html|css|js|mjs)$/.test(name)) await copyFile(new URL('web/' + name, root), new URL('site/' + name, root));
+const names = (await readdir(new URL('web/', root))).filter(name => /\.(html|css|js|mjs)$/.test(name)).sort();
+const sources = new Map(await Promise.all(names.map(async name => [name, await readFile(new URL('web/' + name, root), 'utf8')])));
+const buildHash = createHash('sha256');
+for (const [name, source] of sources) buildHash.update(name).update('\0').update(source);
+buildHash.update(await readFile(new URL('site/sandbox-engine/build.json', root)));
+const version = buildHash.digest('hex').slice(0, 12);
+for (const [name, source] of sources) {
+  let output = source;
+  if (name.endsWith('.html')) {
+    output = output.replace('<html lang="zh-CN">', `<html lang="zh-CN" data-version="${version}">`)
+      .replace(/((?:src|href)=")([^"?#]+\.(?:js|mjs|css))"/g, `$1$2?v=${version}"`);
+  } else if (/\.(?:js|mjs)$/.test(name)) {
+    output = output.replace(/(from\s+['"])(\.\/[^'"?]+\.mjs)(['"])/g, `$1$2?v=${version}$3`);
+  }
+  await writeFile(new URL('site/' + name, root), output);
 }
 console.log('Built Chinese integrated sandbox and preserved classic importer. No original game resource packs included.');

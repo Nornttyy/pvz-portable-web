@@ -1,5 +1,6 @@
 import { validateManifest, sha256, writeVirtualFile, normalizeSavePath, listVirtualFiles, createPakBuilder, LIMITS } from './resource-utils.mjs';
 import { importResourceBundle } from './resource-import.mjs';
+import { syncFileSystem, fitCanvas } from './loading-utils.mjs';
 
 const $ = id => document.getElementById(id);
 const status = $('status');
@@ -15,6 +16,7 @@ let readyTimeout;
 const waitFrame = () => new Promise(resolve => setTimeout(resolve, 0));
 
 function setStatus(message, value) {
+  if (phase === 'error') return;
   status.textContent = message;
   if (value !== undefined) progress.value = value;
 }
@@ -28,15 +30,17 @@ function reportError(error) {
   $('tools').hidden = true;
   $('resource-picker').hidden = true;
   start.hidden = true;
+  start.disabled = true;
   $('reload').hidden = false;
   $('diagnostics').hidden = false;
-  setStatus('未能启动，请查看错误详情后重新加载。');
-  $('error-detail').textContent = String(error?.message || error) + '\n\n' + window.pvzEngineLog.join('\n');
+  status.textContent = String(error?.message || '未能启动，请重新加载。');
+  $('error-detail').textContent = String(error?.message || error) + '\n网站版本：' + (document.documentElement?.dataset?.version || 'dev') + '\n\n' + window.pvzEngineLog.join('\n');
   console.error(error);
 }
 
 async function fetchBundle(manifest) {
-  return importResourceBundle(manifest, setStatus);
+  const skipCache = new URLSearchParams(location.search).get('choose-resources') === '1';
+  return importResourceBundle(manifest, setStatus, {skipCache});
 }
 
 async function setupSaves() {
@@ -45,12 +49,13 @@ async function setupSaves() {
   try {
     FS.mount(FS.filesystems.IDBFS, {}, '/saves');
     saveMounted = true;
-    await new Promise((resolve, reject) => FS.syncfs(true, error => error ? reject(error) : resolve()));
+    await syncFileSystem(FS, true);
     persistentSaves = true;
     lastSaved = Date.now();
     $('save-status').textContent = '自动保存已开启';
   } catch (error) {
     persistentSaves = false;
+    if (error.name === 'TimeoutError') throw error;
     $('save-status').textContent = '浏览器未允许存档，请用“备份存档”保存。';
     console.warn('Local save persistence unavailable', error);
   }
@@ -59,10 +64,12 @@ async function setupSaves() {
 async function syncSaves() {
   if (!saveMounted || !persistentSaves) return false;
   if (syncPromise) return syncPromise;
-  syncPromise = new Promise(resolve => Module.FS.syncfs(false, error => {
-    if (error) { $('save-status').textContent = '自动保存失败，请手动备份'; console.warn(error); resolve(false); }
-    else { lastSaved = Date.now(); $('save-status').textContent = '已自动保存'; resolve(true); }
-  }));
+  syncPromise = syncFileSystem(Module.FS, false).then(() => {
+    lastSaved = Date.now(); $('save-status').textContent = '已自动保存'; return true;
+  }, error => {
+    if (error.name === 'TimeoutError') persistentSaves = false;
+    $('save-status').textContent = '自动保存失败，请手动备份'; console.warn(error); return false;
+  });
   try { return await syncPromise; } finally { syncPromise = null; }
 }
 
@@ -71,9 +78,12 @@ async function prepareGame() {
   if (!window.JSZip) throw Error('本地解压组件没有加载成功');
   readyTimeout = setTimeout(() => reportError(new Error('引擎准备超时。请确认浏览器支持 WebAssembly，并重新加载。')), 60000);
   setStatus('读取资源清单…', 4);
-  const response = await fetch('resource-manifest.json', { cache: 'no-store', signal: AbortSignal.timeout(10000) });
-  if (!response.ok) throw Error('没有找到本地资源清单。');
+  let response;
+  try { response = await fetch('resource-manifest.json', { cache: 'no-store', signal: AbortSignal.timeout(10000) }); }
+  catch { throw Error('资源清单下载失败，请检查网络后重新加载。'); }
+  if (!response.ok) throw Error('资源清单暂时不可用，请稍后重新加载。');
   const manifest = validateManifest(await response.json());
+  setStatus('正在下载并准备游戏引擎…', 6);
   await window.pvzEngineReady;
   if (phase === 'error') return;
   clearTimeout(readyTimeout);
@@ -86,6 +96,7 @@ async function prepareGame() {
   if (entries.length !== manifest.files.length) throw Error('资源包内的文件数与清单不符');
   const nativePak = createPakBuilder(manifest.files);
   for (let i = 0; i < manifest.files.length; i++) {
+    if (phase === 'error') return;
     const expected = manifest.files[i];
     const entry = archive.file(expected.path);
     if (!entry || (entry.unsafeOriginalName && entry.unsafeOriginalName !== expected.path)) throw Error('资源包路径校验失败');
@@ -113,11 +124,15 @@ async function prepareGame() {
 
 function resizeCanvas() {
   const canvas = Module.canvas;
-  const availableWidth = $('canvas-container').clientWidth;
-  const availableHeight = $('canvas-container').clientHeight;
-  const scale = Math.min(availableWidth / canvas.width, availableHeight / canvas.height);
-  canvas.style.width = Math.floor(canvas.width * scale) + 'px';
-  canvas.style.height = Math.floor(canvas.height * scale) + 'px';
+  const container = $('canvas-container');
+  const style = window.getComputedStyle?.(container);
+  const padding = name => parseFloat(style?.[name]) || 0;
+  const size = fitCanvas(canvas.width, canvas.height,
+    container.clientWidth - padding('paddingLeft') - padding('paddingRight'),
+    container.clientHeight - padding('paddingTop') - padding('paddingBottom'));
+  if (!size) return;
+  canvas.style.width = size.width + 'px';
+  canvas.style.height = size.height + 'px';
 }
 
 start.addEventListener('click', () => {
@@ -234,6 +249,8 @@ $('return').addEventListener('click', async () => {
 });
 $('reload').addEventListener('click', () => location.reload());
 window.addEventListener('resize', resizeCanvas);
+window.visualViewport?.addEventListener('resize', resizeCanvas);
+window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 100));
 document.addEventListener('fullscreenchange', resizeCanvas);
 document.addEventListener('visibilitychange', () => { if (document.hidden) void syncSaves(); });
 window.addEventListener('pagehide', () => { void syncSaves(); });
@@ -251,4 +268,7 @@ window.onGameExit = async () => {
   location.reload();
 };
 
-prepareGame().catch(reportError);
+window.pvzLoaderAttached = true;
+clearTimeout(window.pvzBootWatchdog);
+if (window.pvzEarlyFailure) reportError(new Error(window.pvzEarlyFailure));
+else prepareGame().catch(reportError);

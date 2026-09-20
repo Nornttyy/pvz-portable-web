@@ -1,7 +1,8 @@
 // Dedicated resource cache. Never opens, clears or migrates the save database.
 const DB_NAME = 'pvz.pages.resource-cache.v1';
 const STORE = 'bundles';
-export function cacheResource(mode, key, bytes, factory = globalThis.indexedDB, timeoutMs = 10000) {
+export function cacheResource(mode, key, bytes, factory, timeoutMs = 10000) {
+  try { if (factory === undefined) factory = globalThis.indexedDB; } catch { return Promise.resolve(null); }
   if (!factory) return Promise.resolve(null);
   return new Promise(resolve => {
     let db, transaction, done = false, value = null;

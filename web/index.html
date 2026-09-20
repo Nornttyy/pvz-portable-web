@@ -14,6 +14,7 @@
       <p class="eyebrow">中文沙盒 · 非官方试玩</p>
       <h1>植物大战僵尸</h1>
       <p id="status" role="status" aria-live="polite">正在准备引擎…</p>
+      <p id="connection-status" role="status" hidden>网络已断开，重新联网后可重试。</p>
       <progress id="progress" max="100" value="0" aria-label="加载进度"></progress>
       <section id="resource-picker" hidden>
         <button id="choose-resource" type="button">选择本机资源包</button>
@@ -22,12 +23,25 @@
       </section>
       <button id="start" disabled>正在加载</button>
       <button id="reload" hidden>重新加载</button>
+      <nav id="entry-actions" aria-label="启动页工具">
+        <button id="share-site" type="button">分享网址</button>
+        <a href="index.html?choose-resources=1">重新选择资源</a>
+      </nav>
+      <input id="share-link" aria-label="游戏网址，长按复制" readonly hidden>
+      <p id="share-status" role="status" hidden></p>
+      <details id="start-help">
+        <summary>第一次玩？</summary>
+        <p>此入口需要与当前版本匹配的 <code>local-resources.zip</code>。选择文件后无需解压；允许缓存时，下次自动读取。</p>
+        <p>只有原版 <code>main.pak</code>？请用<a href="classic.html">旧版入口</a>。仅有网址、没有资源包，目前还不能直接开始游戏。</p>
+        <p>手机可从「文件」中选择 ZIP，游玩建议横屏。微信内打不开时，可在系统浏览器中打开。</p>
+      </details>
       <p id="loader-note">本站不附带原版游戏素材。资源与存档仅保存在你的浏览器。<br><a href="classic.html">旧版资源导入入口</a> · <a href="credits.html">来源与许可</a></p>
       <details id="diagnostics" hidden><summary>查看错误详情</summary><pre id="error-detail"></pre></details>
       <noscript>请启用浏览器 JavaScript 后重新打开。</noscript>
     </section>
   </main>
   <div id="canvas-container" hidden>
+    <p id="orientation-hint">横屏可获得更大的游戏画面</p>
     <canvas id="canvas" width="800" height="600" tabindex="0" aria-label="植物大战僵尸游戏画面"></canvas>
   </div>
   <details id="tools" hidden>

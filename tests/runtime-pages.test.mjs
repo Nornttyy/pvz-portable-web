@@ -6,6 +6,7 @@ import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { webcrypto } from 'node:crypto';
 import * as resourceUtils from '../web/resource-utils.mjs';
+import { syncFileSystem, fitCanvas } from '../web/loading-utils.mjs';
 
 const JSZip = createRequire(import.meta.url)('../site/vendor/jszip-3.10.1.min.js');
 
@@ -39,7 +40,7 @@ function memoryFS(failSync) {
   };
 }
 
-function harness(t, { corruptBundle = false, failSync = false, engineFailure = false } = {}) {
+function harness(t, { corruptBundle = false, failSync = false, engineFailure = false, hangSync = false, offline = false, earlyFailure = '' } = {}) {
   const timers = new Set();
   const elements = new Map();
   const makeTarget = () => {
@@ -58,25 +59,28 @@ function harness(t, { corruptBundle = false, failSync = false, engineFailure = f
   element('reload').hidden = true;
   const calls = [];
   const Module = { FS: memoryFS(failSync), canvas: element('canvas'), callMain: args => calls.push([...args]), pauseMainLoop() {}, resumeMainLoop() {} };
+  let delayedRestore;
+  if (hangSync) Module.FS.syncfs = (_populate, callback) => { delayedRestore = callback; };
   const document = { ...makeTarget(), getElementById: element, createElement: makeTarget };
   const ready = engineFailure ? Promise.reject(Error('WASM test failure')) : Promise.resolve();
   ready.catch(() => {});
-  const window = { ...makeTarget(), JSZip, pvzEngineReady: ready, pvzEngineLog: [] };
+  const window = { ...makeTarget(), JSZip, pvzEngineReady: ready, pvzEngineLog: [], pvzEarlyFailure: earlyFailure };
   const location = { hostname: 'nornttyy.github.io', reload: () => calls.push('reload') };
   const context = vm.createContext({
+    syncFileSystem: (fs, populate) => syncFileSystem(fs, populate, hangSync ? 10 : 15000), fitCanvas,
     ...resourceUtils, importResourceBundle: async () => { if (corruptBundle) throw Error('资源包校验失败'); return bundle; }, window, document, Module, JSZip, location, crypto: webcrypto,
-    AbortSignal, Blob, URL, WebAssembly, Uint8Array, console: { error() {}, warn() {} },
+    AbortSignal, Blob, URL, URLSearchParams, WebAssembly, Uint8Array, console: { error() {}, warn() {} },
     confirm: () => false,
     setTimeout: (fn, ms) => { const timer = setTimeout(fn, ms); timers.add(timer); return timer; },
     clearTimeout,
     setInterval: () => 1, clearInterval() {},
-    fetch: async path => path === 'resource-manifest.json'
+    fetch: async path => offline ? Promise.reject(Error('Network unavailable')) : path === 'resource-manifest.json'
       ? new Response(JSON.stringify(manifest), { headers: { 'Content-Type': 'application/json' } })
       : Promise.reject(Error('Unexpected network request: ' + path)),
   });
   t.after(() => { for (const timer of timers) clearTimeout(timer); });
   vm.runInContext(source, context, { filename: 'runtime.mjs' });
-  return { element, Module, calls, window };
+  return { element, Module, calls, window, finishRestore: () => delayedRestore?.(null) };
 }
 
 async function waitFor(check) {
@@ -150,4 +154,35 @@ test('save restore rejects traversal before changing the virtual filesystem', { 
   assert.match(app.element('save-status').textContent, /恢复失败/);
   assert.equal(app.Module.FS.analyzePath('/saves/userdata/user1.dat').exists, false);
   assert.equal(app.calls.length, 0);
+});
+
+test('hung save restore stops safely and a late callback cannot enable a new game', async t => {
+  const app = harness(t, {hangSync: true});
+  await waitFor(() => !app.element('reload').hidden);
+  assert.match(app.element('status').textContent, /读取存档超时/);
+  app.finishRestore();
+  await new Promise(setImmediate);
+  assert.equal(app.element('start').disabled, true);
+  await app.element('start').dispatch('click');
+  assert.equal(app.calls.length, 0);
+});
+
+test('network and early module failures expose a retry instead of leaving an endless loader', async t => {
+  for (const args of [{offline: true}, {earlyFailure: '网页组件下载失败'}]) {
+    const app = harness(t, args);
+    await waitFor(() => !app.element('reload').hidden);
+    assert.match(app.element('status').textContent, /下载失败/);
+    assert.equal(app.calls.length, 0);
+  }
+});
+
+test('resize preserves aspect ratio and subtracts phone safe-area padding', async t => {
+  const app = harness(t);
+  await waitFor(() => !app.element('start').disabled);
+  app.element('canvas-container').clientWidth = 844;
+  app.element('canvas-container').clientHeight = 390;
+  app.window.getComputedStyle = () => ({paddingLeft:'44px', paddingRight:'44px', paddingTop:'0px', paddingBottom:'21px'});
+  await app.element('start').dispatch('click');
+  assert.equal(app.Module.canvas.style.height, '369px');
+  assert.equal(app.Module.canvas.style.width, '492px');
 });
