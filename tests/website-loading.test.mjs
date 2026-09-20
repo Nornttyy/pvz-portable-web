@@ -50,7 +50,7 @@ test('sharing strips resource-selection parameters and has a clipboard-denied fa
     await app.element('share-site').dispatch('click');
     const actual = works ? app.copied[0] : app.element('share-link').value;
     assert.equal(actual,'https://nornttyy.github.io/pvz-portable-web/');
-    assert.match(app.element('share-status').textContent, works ? /仍需自行导入/ : /不会包含资源和存档/);
+    assert.match(app.element('share-status').textContent, works ? /打开即可加载游玩/ : /不会分享你的存档/);
   }
 });
 test('bootstrap reports offline state and loads the same-version WASM under the project path', async () => {
@@ -65,7 +65,7 @@ test('built entry and module dependencies carry one version, preventing mixed ca
   const read = name => readFile(new URL('../site/'+name,import.meta.url),'utf8');
   const html = await read('index.html'), version=html.match(/data-version="([a-f0-9]{12})"/)[1];
   for(const [,src] of html.matchAll(/(?:src|href)="([^"?#]+\.(?:js|mjs|css)[^"]*)"/g)) assert.ok(src.endsWith('?v='+version),src);
-  for(const file of ['runtime.mjs','resource-import.mjs','sandbox.mjs']){
+  for(const file of ['runtime.mjs','resource-loader.mjs','sandbox.mjs']){
     const code=await read(file);
     for(const [,src] of code.matchAll(/from ['"]([^'"]+)['"]/g))assert.ok(src.endsWith('?v='+version),src);
   }

@@ -2,6 +2,7 @@ import test from 'node:test';
 import './runtime-pages.test.mjs';
 import './sandbox-pages.test.mjs';
 import './website-loading.test.mjs';
+import './automatic-resources.test.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile, readdir, stat } from 'node:fs/promises';
@@ -29,7 +30,7 @@ test('WebAssembly validates and compiles without game resources', async () => {
 
 test('entry is localized and does not start the game without resources', () => {
   assert.match(entry, /<html lang="zh-CN">/);
-  assert.match(entry, /本站不附带原版游戏素材/);
+  assert.match(entry, /返回自动加载的中文沙盒/);
   assert.match(entry, /生成的分件样张不能代替这套资源/);
   assert.match(entry, /noInitialRun:\s*true/);
   assert.match(entry, /const allReady = hasPak && hasProperties/);
@@ -85,12 +86,14 @@ test('engine licenses and source links are retained', async () => {
   }
 });
 
-test('published directory contains no game resource packs or player saves', async () => {
+test('published directory allows only the audited game ZIP, never player saves or secrets', async () => {
+  const manifest = JSON.parse(await readFile(resolve(site, 'resource-manifest.json')));
   async function walk(path) {
     for (const file of await readdir(path, { withFileTypes: true })) {
       assert.ok(!file.isSymbolicLink());
       assert.doesNotMatch(file.name, /^(main\.pak|properties|userdata|\.env|\.git)$/i);
-      assert.doesNotMatch(file.name, /\.(?:pak|dat|v4|zip)$/i);
+      if (file.name.endsWith('.zip')) assert.equal(relative(site, resolve(path,file.name)), manifest.bundle.url);
+      else assert.doesNotMatch(file.name, /\.(?:pak|dat|v4)$/i);
       if (file.isDirectory()) await walk(resolve(path, file.name));
     }
   }

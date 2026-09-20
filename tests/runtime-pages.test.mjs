@@ -7,6 +7,7 @@ import { createRequire } from 'node:module';
 import { webcrypto } from 'node:crypto';
 import * as resourceUtils from '../web/resource-utils.mjs';
 import { syncFileSystem, fitCanvas } from '../web/loading-utils.mjs';
+import { loadResourceBundle } from '../web/resource-loader.mjs';
 
 const JSZip = createRequire(import.meta.url)('../site/vendor/jszip-3.10.1.min.js');
 
@@ -20,7 +21,8 @@ for (const path of fixturePaths) {
   files.push({path, size: bytes.length, sha256: await resourceUtils.sha256(bytes)});
 }
 const bundle = await zipFixture.generateAsync({type: 'uint8array'});
-const manifest = {schema: 1, localOnly: true, files, totalFiles: files.length, totalBytes: files.reduce((n, f) => n + f.size, 0), bundle: {url: '/local-resources.zip', size: bundle.length, sha256: await resourceUtils.sha256(bundle)}};
+const bundleHash = await resourceUtils.sha256(bundle);
+const manifest = {schema: 1, delivery: 'bundled', files, totalFiles: files.length, totalBytes: files.reduce((n, f) => n + f.size, 0), bundle: {url: `resources/game-${bundleHash.slice(0,12)}.zip`, size: bundle.length, sha256: bundleHash}};
 const source = (await readFile(new URL('../web/runtime.mjs', import.meta.url), 'utf8')).replace(/^import [^;]+;/gm, '');
 
 function memoryFS(failSync) {
@@ -68,7 +70,10 @@ function harness(t, { corruptBundle = false, failSync = false, engineFailure = f
   const location = { hostname: 'nornttyy.github.io', reload: () => calls.push('reload') };
   const context = vm.createContext({
     syncFileSystem: (fs, populate) => syncFileSystem(fs, populate, hangSync ? 10 : 15000), fitCanvas,
-    ...resourceUtils, importResourceBundle: async () => { if (corruptBundle) throw Error('资源包校验失败'); return bundle; }, window, document, Module, JSZip, location, crypto: webcrypto,
+    ...resourceUtils, loadResourceBundle: (m,s) => loadResourceBundle(m,s,{
+      cache:async()=>null,
+      fetcher:async path=>{assert.equal(path,manifest.bundle.url);return new Response(corruptBundle?new Uint8Array(bundle.length):bundle);},
+    }), window, document, Module, JSZip, location, crypto: webcrypto,
     AbortSignal, Blob, URL, URLSearchParams, WebAssembly, Uint8Array, console: { error() {}, warn() {} },
     confirm: () => false,
     setTimeout: (fn, ms) => { const timer = setTimeout(fn, ms); timers.add(timer); return timer; },
@@ -91,7 +96,7 @@ async function waitFor(check) {
   }
 }
 
-test('Pages loader mounts imported resources and calls the engine entry only after user click', { timeout: 20000 }, async t => {
+test('Pages loader downloads without any file selection and starts the engine after the play click', { timeout: 20000 }, async t => {
   const app = harness(t);
   await waitFor(() => !app.element('start').disabled);
   assert.equal(app.element('status').textContent, '准备好了');
@@ -111,7 +116,7 @@ test('Pages loader mounts imported resources and calls the engine entry only aft
 test('corrupt assets never start the game and show a recoverable error', async t => {
   const app = harness(t, { corruptBundle: true });
   await waitFor(() => !app.element('reload').hidden);
-  assert.match(app.element('error-detail').textContent, /资源包校验失败/);
+  assert.match(app.element('error-detail').textContent, /游戏文件下载不完整/);
   assert.equal(app.element('start').hidden, true);
   assert.equal(app.calls.length, 0);
 });

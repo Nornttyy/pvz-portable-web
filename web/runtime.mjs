@@ -1,5 +1,5 @@
 import { validateManifest, sha256, writeVirtualFile, normalizeSavePath, listVirtualFiles, createPakBuilder, LIMITS } from './resource-utils.mjs';
-import { importResourceBundle } from './resource-import.mjs';
+import { loadResourceBundle } from './resource-loader.mjs';
 import { syncFileSystem, fitCanvas } from './loading-utils.mjs';
 
 const $ = id => document.getElementById(id);
@@ -28,7 +28,6 @@ function reportError(error) {
   $('loader').hidden = false;
   $('canvas-container').hidden = true;
   $('tools').hidden = true;
-  $('resource-picker').hidden = true;
   start.hidden = true;
   start.disabled = true;
   $('reload').hidden = false;
@@ -39,8 +38,7 @@ function reportError(error) {
 }
 
 async function fetchBundle(manifest) {
-  const skipCache = new URLSearchParams(location.search).get('choose-resources') === '1';
-  return importResourceBundle(manifest, setStatus, {skipCache});
+  return loadResourceBundle(manifest, setStatus);
 }
 
 async function setupSaves() {
@@ -87,7 +85,7 @@ async function prepareGame() {
   await window.pvzEngineReady;
   if (phase === 'error') return;
   clearTimeout(readyTimeout);
-  // Waiting for a user to choose a local file is not an engine timeout.
+  // The streamed resource download has its own timeout and progress reporting.
   const bytes = await fetchBundle(manifest);
   if (phase === 'error') return;
   readyTimeout = setTimeout(() => reportError(new Error('资源或存档载入超时，请刷新重试；已有存档不会删除。')), 120000);

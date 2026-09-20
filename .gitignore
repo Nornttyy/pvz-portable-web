@@ -10,6 +10,8 @@
 /site/loading-utils.mjs
 /site/resource-cache.mjs
 /site/resource-import.mjs
+/site/resource-loader.mjs
+/site/resources/game-*.zip
 /site/sandbox.mjs
 /site/sandbox-data.mjs
 

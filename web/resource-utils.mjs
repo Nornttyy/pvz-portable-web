@@ -8,9 +8,10 @@ export function safeRelativePath(path) {
 }
 
 export function validateManifest(manifest) {
-  if (manifest?.schema !== 1 || manifest.localOnly !== true || !Array.isArray(manifest.files)) throw Error('资源清单格式不正确');
+  if (manifest?.schema !== 1 || (manifest.delivery !== 'bundled' && manifest.localOnly !== true) || !Array.isArray(manifest.files)) throw Error('资源清单格式不正确');
   if (manifest.files.length < 1 || manifest.files.length > LIMITS.files || manifest.totalFiles !== manifest.files.length) throw Error('资源文件数量不正确');
-  if (manifest.bundle?.url !== '/local-resources.zip' || !/^[a-f0-9]{64}$/.test(manifest.bundle?.sha256 || '')) throw Error('资源包地址或校验值不正确');
+  const bundleUrl = manifest.delivery === 'bundled' ? `resources/game-${manifest.bundle?.sha256?.slice(0,12)}.zip` : '/local-resources.zip';
+  if (manifest.bundle?.url !== bundleUrl || !/^[a-f0-9]{64}$/.test(manifest.bundle?.sha256 || '')) throw Error('资源包地址或校验值不正确');
   if (!Number.isSafeInteger(manifest.bundle.size) || manifest.bundle.size < 1 || manifest.bundle.size > LIMITS.totalBytes) throw Error('资源包大小不正确');
   const seen = new Set();
   let size = 0;

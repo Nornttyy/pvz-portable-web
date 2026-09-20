@@ -15,14 +15,15 @@ const read = name => readFile(new URL('../' + name, import.meta.url));
 test('default page uses integrated sandbox and project-relative paths, not loopback resources', async () => {
   const html = (await read('site/index.html')).toString();
   assert.match(html, /sandbox-engine\/pvz-portable.js/);
-  assert.match(html, /id="choose-resource"/);
-  assert.match(html, /文件不会上传/);
+  assert.doesNotMatch(html, /id="(?:choose-resource|resource-file|resource-picker)"/);
+  assert.match(html, /游戏自动加载/);
   const bootstrap = (await read('site/bootstrap.js')).toString();
   assert.match(bootstrap, /noInitialRun: true/);
   assert.match(bootstrap, /new URL\('sandbox-engine\//);
   const runtime = (await read('site/runtime.mjs')).toString();
   assert.match(runtime, /fetch\('resource-manifest.json'/);
-  assert.doesNotMatch(runtime, /location.hostname|fetch\(manifest.bundle.url/);
+  assert.match(runtime, /loadResourceBundle\(manifest, setStatus\)/);
+  assert.doesNotMatch(runtime, /importResourceBundle|choose-resources/);
   for (const name of ['bootstrap.js', 'runtime.mjs', 'resource-import.mjs', 'resource-cache.mjs', 'game.css']) {
     const code = (await read('site/' + name)).toString();
     assert.doesNotMatch(code, /https?:\/\/127\.0\.0\.1|https?:\/\/localhost|url\('title.jpg'\)/);
@@ -61,7 +62,7 @@ test('sandbox source and all eight custom plant IDs are included', async () => {
   assert.match((await read('src/Lawn/System/SaveGame.cpp')).toString(), /if \(gSandboxEnabled\) return false/);
 });
 
-test('import accepts only the exact validated resource pack, including font-loading fix', async () => {
+test('legacy import verification and bundled entry retain the exact complete resource pack', async () => {
   const bytes = new Uint8Array([1, 2, 3]);
   const manifest = {bundle: {size: 3, sha256: await sha256(bytes)}};
   assert.deepEqual(await verifyResourceBytes(bytes.buffer, manifest), bytes);

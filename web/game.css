@@ -21,9 +21,6 @@ progress::-moz-progress-bar { background: #92b548; }
 #start, #reload { width: 100%; min-height: 44px; background: #426224; border-color: #8bad45; }
 #loader-note { color: #b8b6a3; font-size: 11px; margin: 16px 0 0; }
 #loader-note a { color: #d2db9f; }
-#resource-picker { margin: 12px 0; }
-#choose-resource { width: 100%; min-height: 44px; }
-#resource-hint { font-size: 12px; line-height: 1.5; color: #d2cfb6; overflow-wrap: anywhere; }
 #loading-panel { max-width: 100%; max-height: calc(100dvh - max(12px,env(safe-area-inset-top)) - max(12px,env(safe-area-inset-bottom))); overflow-y: auto; overscroll-behavior: contain; }
 #connection-status { font-size: 12px; color: #f3c383; }
 #entry-actions { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 8px; flex-wrap: wrap; }

@@ -1,12 +1,11 @@
 {
   "schema": 1,
-  "localOnly": true,
   "resourceMount": "native-pak-with-loose-fallback",
   "source": "https://github.com/FregD156/PvZ_Assets",
   "revision": "8ba94e95cfe7d0de5682f8258d3b932dbdac885c",
   "sourceArchiveSha256": "ae862d48a42dc3c99fbc5fbd7b9d18a01bd088843ee82f0673cd486d31a754e2",
   "bundle": {
-    "url": "/local-resources.zip",
+    "url": "resources/game-6520aa03a514.zip",
     "size": 52979066,
     "sha256": "6520aa03a514157ebae8db7fac0ec753011a65ff4cf0d01e26c1f0e399a339e6"
   },
@@ -14786,5 +14785,6 @@
       "size": 47199,
       "sha256": "29b374bccb5485caf49f55dce198dfc53432daa24a4e61f56d82ef3a9364696f"
     }
-  ]
+  ],
+  "delivery": "bundled"
 }

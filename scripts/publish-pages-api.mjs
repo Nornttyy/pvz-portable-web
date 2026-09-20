@@ -12,7 +12,7 @@ async function api(endpoint, body) {
     const args=['api',`repos/${repo}/${endpoint}`, ...(body ? ['--method',endpoint.startsWith('git/refs/')?'PATCH':'POST','--input','-'] : [])];
     const child=spawn('gh',args,{stdio:['pipe','pipe','pipe']});
     let output='', error='';
-    const timeout=setTimeout(() => {child.kill('SIGTERM');reject(Error('GitHub request timed out: '+endpoint));},90000);
+    const timeout=setTimeout(() => {child.kill('SIGTERM');reject(Error('GitHub request timed out: '+endpoint));},180000);
     child.stdout.on('data',d=>output+=d); child.stderr.on('data',d=>error+=d);
     child.on('error',e=>{clearTimeout(timeout);reject(e);});
     child.on('close',code=>{clearTimeout(timeout);if(code!==0)reject(Error(endpoint+': '+error));else {try {resolve(JSON.parse(output));}catch(e){reject(e);}}});
@@ -31,7 +31,7 @@ let next=0;
 await Promise.all(Array.from({length:4},async()=>{
   while(next<entries.length) {
     const entry=entries[next++];
-    const bytes=execFileSync('git',['show',head+':'+entry.path],{maxBuffer:32*1024*1024});
+    const bytes=execFileSync('git',['show',head+':'+entry.path],{maxBuffer:100*1024*1024});
     const blob=await api('git/blobs',{content:bytes.toString('base64'),encoding:'base64'});
     assert.equal(blob.sha,entry.sha,entry.path);
   }

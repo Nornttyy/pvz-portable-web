@@ -17,7 +17,6 @@ function failStartup(message) {
     document.getElementById('status').textContent = String(message);
     document.getElementById('start').hidden = true;
     document.getElementById('reload').hidden = false;
-    document.getElementById('resource-picker').hidden = true;
   }
   window.dispatchEvent(new CustomEvent('pvz-fatal', { detail: String(message) }));
 }
@@ -39,11 +38,11 @@ document.getElementById('share-site').addEventListener('click', async () => {
   status.hidden = false;
   try {
     await navigator.clipboard.writeText(url);
-    status.textContent = '网址已复制；对方仍需自行导入资源包。';
+    status.textContent = '网址已复制，打开即可加载游玩。';
   } catch {
     const input = document.getElementById('share-link');
     input.value = url; input.hidden = false; input.focus(); input.select();
-    status.textContent = '长按上方网址复制；分享不会包含资源和存档。';
+    status.textContent = '长按上方网址复制；不会分享你的存档。';
   }
 });
 var Module = {

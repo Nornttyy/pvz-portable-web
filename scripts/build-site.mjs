@@ -1,8 +1,10 @@
 // Retain the legacy resource importer; publish the integrated sandbox as the default.
 import { readFile, writeFile, readdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
+import { assembleResourceBundle } from './resource-bundle.mjs';
 
 const root = new URL('../', import.meta.url);
+await assembleResourceBundle(root);
 let html = await readFile(new URL('wasm/shell.html', root), 'utf8');
 function replace(before, after) {
   if (!html.includes(before)) throw new Error(`Upstream shell changed: ${before.slice(0, 80)}`);
@@ -19,7 +21,7 @@ replace('    <p id="project-links">', '    <p id="engine-status" role="status" a
 replace('>GitHub</a>', '>上游项目</a>');
 replace('>Issues</a>', '>上游反馈</a>');
 replace('>Releases</a>', '>上游下载</a>\n        <a href="art-preview.html">分件样张</a>\n        <a href="credits.html">来源与许可</a>');
-replace('Community-driven re-implementation for <strong>all desktop, mobile, and web</strong>. Play instantly in your browser with no installation. <strong>No game resources are included.</strong>', '社区重实现引擎 · 独立网页部署。<strong>本站不附带原版游戏素材。</strong>');
+replace('Community-driven re-implementation for <strong>all desktop, mobile, and web</strong>. Play instantly in your browser with no installation. <strong>No game resources are included.</strong>', '旧版兼容入口 · <a href="index.html">返回自动加载的中文沙盒</a>。此旧入口仍需自行选择资源。');
 replace('To use this engine, you <strong>MUST</strong> legally purchase the original game on', '请先通过');
 replace('Steam</a> or ', 'Steam</a> 或 ');
 replace("EA's official website</a>.<br>", 'EA 官方网站</a>购买原版游戏。<br>');
@@ -92,4 +94,4 @@ for (const [name, source] of sources) {
   }
   await writeFile(new URL('site/' + name, root), output);
 }
-console.log('Built Chinese integrated sandbox and preserved classic importer. No original game resource packs included.');
+console.log('Built automatically loaded Chinese sandbox and preserved the legacy compatibility entry.');
