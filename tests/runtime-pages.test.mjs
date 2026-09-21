@@ -191,3 +191,17 @@ test('resize preserves aspect ratio and subtracts phone safe-area padding', asyn
   assert.equal(app.Module.canvas.style.height, '369px');
   assert.equal(app.Module.canvas.style.width, '492px');
 });
+
+test('native sandbox width changes fit without stretching and restore for the main menu', async (t) => {
+  const app=harness(t);
+  await waitFor(() => !app.element('start').disabled);
+  app.element('canvas-container').clientWidth=1024;
+  app.element('canvas-container').clientHeight=600;
+  await app.element('start').dispatch('click');
+  app.Module.canvas.width=1024;app.Module.canvas.height=600;
+  await app.window.dispatch('resize');
+  assert.equal(app.Module.canvas.style.width,'1024px');assert.equal(app.Module.canvas.style.height,'600px');
+  app.Module.canvas.width=800;
+  await app.window.dispatch('resize');
+  assert.equal(app.Module.canvas.style.width,'800px');assert.equal(app.Module.canvas.style.height,'600px');
+});

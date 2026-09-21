@@ -6,6 +6,7 @@ import {promisify} from 'node:util';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {fileURLToPath} from 'node:url';
+import {createHash} from 'node:crypto';
 import {ORIGINAL_PLANTS,ORIGINAL_ZOMBIES,ZOMBIES,validateLayout} from '../web/sandbox-data.mjs';
 const run=promisify(execFile),root=fileURLToPath(new URL('../',import.meta.url));
 const read=name=>readFile(join(root,name));
@@ -27,8 +28,21 @@ test('10 new plants plus existing eight and 10 zombies are available in native a
  assert.doesNotThrow(()=>validateLayout({schema:1,map:0,plants:[{type:111,col:0,row:0},{type:35,col:0,row:0}]}));
 });
 test('generated production parts preserve native bone canvases and exclude empty sprites',async()=>{
- const parts=JSON.parse(await read('art/expansion/parts.json'));assert.equal(parts.length,84);
+ const parts=JSON.parse(await read('art/expansion/parts.json'));assert.equal(parts.length,98);
  for(const part of parts){const png=await read('art/expansion/parts/'+part.file);assert.equal(png.readUInt32BE(16),part.width);assert.equal(png.readUInt32BE(20),part.height);assert.equal(png[25],6);const[x,y,w,h]=part.ink;assert.ok(w>0&&h>0&&x>=0&&y>=0&&x+w<=part.width&&y+h<=part.height,part.file);}
+});
+test('persistent native sidebar fits both rosters and keeps the lawn in original units',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'pvz-sidebar-')),binary=join(dir,'sidebar');
+ await run(process.env.CXX||'c++',['-std=c++20','-Isrc','tests/sidebar-layout.cpp','-o',binary],{cwd:root});
+ assert.match((await run(binary)).stdout,/99 grass\/pool cell mappings passed/);
+ const ui=(await read('src/SandboxUI.cpp')).toString();assert.match(ui,/class SandboxOverlay final : public Widget/);assert.doesNotMatch(ui,/showZombies|OpenPanel\(1\)|OpenPanel\(2\)/);
+});
+test('reused lips and Gatling hardware are byte-identical to native source artwork',async()=>{
+ const manifest=JSON.parse(await read('site/resource-manifest.json'));
+ const parts=JSON.parse(await read('art/expansion/parts.json'));
+ const reused=parts.filter(p=>/^(?:fire|ice)-gatling-(?:mouth|barrel|overlay)\.png$/.test(p.file)||/^(?:tiny|heavy|scatter|seeker|acid)-pea-mouth\.png$/.test(p.file));
+ assert.equal(reused.length,11);
+ for(const p of reused){const hash=createHash('sha256').update(await read('art/expansion/parts/'+p.file)).digest('hex');assert.equal(hash,manifest.files.find(f=>f.path==='reanim/'+p.native).sha256,p.file);}
 });
 test('actual projectile/effect draw code preserves bone and world coordinate contracts',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'pvz-visual-contracts-')),binary=join(dir,'visual');

@@ -28,7 +28,7 @@ int main(){
  assert(SandboxPlants::Definitions.size()==18);assert(SandboxZombies::Definitions.size()==10);
  for(int i=108;i<118;++i)assert(SandboxRules::ValidPlant(i));assert(!SandboxRules::ValidPlant(118));
  for(int i=200;i<210;++i)assert(SandboxRules::ValidZombie(i));assert(!SandboxRules::ValidZombie(210));
- for(int i=0;i<18;++i){auto b=SandboxUIRules::CustomPlantCard(i);assert(b.x>=185&&b.x+b.w<=633&&b.y+b.h<=370);}
+ for(int i=0;i<18;++i){auto b=SandboxUIRules::SidebarPlant(i);assert(b.x>=0&&b.x+b.w<=SandboxUIRules::SidebarWidth&&b.y+b.h<520);}
  {World w;auto* p=w.add(107);assert(SandboxPlants::NextShot(p)==1);assert(SandboxPlants::NextShot(p)==2);assert(SandboxPlants::NextShot(p)==1);}
  {World w;auto* p=w.add(113);assert(p->mLaunchRate==75);assert(SandboxPlants::NextShot(p)==0);float x=0,y=0,sx=1,sy=1;SandboxPlants::AdjustScale(p,x,y,sx,sy);assert(std::abs(sx-0.72)<0.001&&std::abs(y-18.2)<0.01);auto* z=w.enemy();auto* shot=w.fire(p,z);assert(SandboxPlants::Impact(shot,z));assert(z->mBodyHealth==990);SandboxPlants::ForgetShot(shot);assert(!SandboxPlants::Impact(shot,z));}
  {World w;auto* p=w.add(114);auto* z=w.enemy();SandboxPlants::Impact(w.fire(p,z),z);assert(z->mBodyHealth==935&&z->mPosX==535);}

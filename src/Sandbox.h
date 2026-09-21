@@ -11,6 +11,7 @@ void SandboxTick(Board* board);
 void SandboxEscaped();
 extern "C" int pvz_sandbox_command(int command, int type, int col, int row);
 void SandboxUIReset();
+void SandboxUIDetach();
 void SandboxUITick(Board* board);
 bool SandboxUIHasUnsaved();
 void SandboxUIFeedback(int code);

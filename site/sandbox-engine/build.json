@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "public integrated sandbox; 18 plants, 10 zombies, 40 generated projectile/VFX sprites and bone-aligned rendering",
+  "mode": "integrated Chinese sandbox; native-derived plant parts and persistent wide-canvas catalog",
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 277179,
-      "sha256": "fa70a519b3438417c84ed4e51699f140703ade1ab177ee5b245d3f5261f03640"
+      "size": 277234,
+      "sha256": "7a3a2a9b06a6b3b5588a050e10736ab0d8dea7c4056523852422e58effb83025"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7362913,
-      "sha256": "365446cb506857224ebcd6aa36adc67cb6bcacc143144ba4259cbf615a572c33"
+      "size": 7364205,
+      "sha256": "8bad8d4f2a97724f2f64eb6e6643461d051ff93be6b96bf9aa601c1db53a67a1"
     }
   ]
 }

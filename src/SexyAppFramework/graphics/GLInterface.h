@@ -218,6 +218,7 @@ public:
 
 	GLImage*				GetScreenImage();
 	void					UpdateViewport();
+	void                    ResizeLogicalCanvas(int width, int height);
 	int						Init(bool IsWindowed);
 	bool					Redraw(Rect* theClipRect = nullptr);
 	void					SetVideoOnlyDraw(bool videoOnly);

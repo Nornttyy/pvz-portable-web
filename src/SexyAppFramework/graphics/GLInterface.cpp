@@ -1149,6 +1149,20 @@ void GLInterface::Remove3DData(MemoryImage* theImage)
 
 GLImage* GLInterface::GetScreenImage() { return mScreenImage.get(); }
 
+void GLInterface::ResizeLogicalCanvas(int width, int height)
+{
+	if (width <= 0 || height <= 0 || (width == mWidth && height == mHeight)) return;
+	Flush();
+	mWidth = width;
+	mHeight = height;
+	if (mScreenImage) { mScreenImage->mWidth = width; mScreenImage->mHeight = height; }
+	float ortho[16];
+	MakeOrthoMatrix(0, (float)width, (float)height, 0, -10, 10, ortho);
+	glUseProgram(gProgram);
+	glUniformMatrix4fv(gUfViewProjMtx, 1, GL_FALSE, ortho);
+	UpdateViewport();
+}
+
 void GLInterface::UpdateViewport()
 {
 	int vx = 0, vy = 0, vw, vh;
@@ -1162,15 +1176,15 @@ void GLInterface::UpdateViewport()
 
 	vw = width; vh = height;
 
-	// Letterbox to 4:3
-	if (width * 3 > height * 4)
+	// Match the active logical canvas (adventure 4:3, sandbox 128:75).
+	if (width * mHeight > height * mWidth)
 	{
-		vw = height * 4 / 3;
+		vw = height * mWidth / mHeight;
 		vx = (width - vw) / 2;
 	}
-	else if (width * 3 < height * 4)
+	else if (width * mHeight < height * mWidth)
 	{
-		vh = width * 3 / 4;
+		vh = width * mHeight / mWidth;
 		vy = (height - vh) / 2;
 	}
 

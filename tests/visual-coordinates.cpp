@@ -11,6 +11,19 @@
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
+ // Actual production Skin() is exercised through Assign, including stale override removal.
+ Board skinBoard;
+ Track tracks[]={{"anim_face"},{"GatlingPea_mouth"},{"GatlingPea_barrel1"},{"GatlingPea_barrel2"},{"GatlingPea_barrel3"},{"GatlingPea_barrel4"},{"GatlingPea_mouth_overlay"},{"GatlingPea_helmet"},{"unrelated_mouth_decoration"}};
+ TrackInstance instances[9];Reanimation skin;skin.def.mTracks={9,tracks};skin.mTrackInstances=instances;
+ Sexy::Image stale;for(auto& t:instances){t.mImageOverride=&stale;t.mRenderGroup=7;}
+ app.reanims[90]=&skin;auto* gatling=skinBoard.plant(0,0);gatling->mHeadReanimID=90;
+ SandboxPlants::Assign(gatling,106);
+ assert(instances[0].mImageOverride->path.ends_with("fire-gatling-head.png"));
+ for(int i=1;i<=6;++i){assert(instances[i].mImageOverride==nullptr);assert(instances[i].mRenderGroup==7);}
+ assert(instances[7].mImageOverride==&stale&&instances[8].mImageOverride==&stale);
+ gatling->mBlinkCountdown=4;SandboxPlants::Tick(&skinBoard);
+ assert(instances[0].mImageOverride->path.ends_with("fire-gatling-blink.png"));
+ SandboxPlants::Reset();app.reanims.clear();
  Sexy::Graphics g(nullptr);g.mTransX=170;g.mTransY=250;
  SandboxArt::Sprite(&g,"fire",12,12,30,22);near(testBlits.back().matrix.m02,182);near(testBlits.back().matrix.m12,262);
  Reanimation a;a.track="idle_mouth";a.matrix={0,-0.72f,60,0.72f,0,40};float x,y;
@@ -27,6 +40,11 @@ int main(){
  three->mHeadReanimID=2;three->mHeadReanimID2=3;three->mHeadReanimID3=4;
  float ys[3];for(int row=1;row<=3;++row){auto* s=board.AddProjectile(0,0,0,row,PROJECTILE_PEA);s->mProjectileType=PROJECTILE_SNOWPEA;SandboxPlants::OnFired(three,s,nullptr);ys[row-1]=s->mPosY;assert(SandboxPlants::HasShot(s));}
  assert(ys[0]<ys[1]&&ys[1]<ys[2]);near(ys[1]-ys[0],23);near(ys[2]-ys[1],23);
+ // Gatling projectiles leave the front barrel, never from behind its front plate.
+ Reanimation barrel;barrel.track="GatlingPea_barrel3";barrel.matrix.m00=0.55f;barrel.matrix.m11=0.55f;barrel.matrix.m02=70.125f;barrel.matrix.m12=27.525f;app.reanims[5]=&barrel;
+ auto* gun=board.plant(2,1);SandboxPlants::Assign(gun,105);gun->mHeadReanimID=5;
+ auto* gunShot=board.AddProjectile(0,0,0,1,PROJECTILE_PEA);SandboxPlants::OnFired(gun,gunShot,nullptr);
+ near(gunShot->mPosX+12,gun->mX+80.30f);near(gunShot->mPosY+12,gun->mY+27.525f);
  // All eight original variants get custom art without overriding native splash/slow damage.
  for(int id=100;id<=107;++id){auto* p=board.plant(1,1);SandboxPlants::Assign(p,id);auto* s=board.AddProjectile(40,40,0,1,PROJECTILE_PEA);SandboxPlants::OnFired(p,s,nullptr);assert(SandboxPlants::HasShot(s));assert(!SandboxPlants::Impact(s,nullptr));}
  SandboxPlants::Reset();app.reanims.clear();testBlits.clear();auto* acid=board.plant(1,2);SandboxPlants::Assign(acid,117);auto* s=board.AddProjectile(200,230,0,2,PROJECTILE_PEA);SandboxPlants::OnFired(acid,s,nullptr);

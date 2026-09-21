@@ -676,7 +676,7 @@ bool Reanimation::DrawTrack(Graphics* g, int theTrackIndex, [[maybe_unused]] int
 	Rect aClipRect = g->mClipRect;
 	if (aTrackInstance->mIgnoreClipRect)
 	{
-		aClipRect = Rect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
+		aClipRect = Rect(0, 0, gSexyAppBase->mWidth, gSexyAppBase->mHeight);
 	}
 
 	Image* aImage = aTransform.mImage;

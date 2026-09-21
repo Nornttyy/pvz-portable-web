@@ -68,5 +68,5 @@ test('deployed ZIP contains every original manifest entry, including animations 
     assert.equal(actual.length,entry.size,entry.path);assert.equal(await sha256(actual),entry.sha256,entry.path);
   }
   for(const prefix of ['reanim/','sounds/','data/','images/','particles/'])assert.ok(plan.files.some(f=>f.path.startsWith(prefix)),prefix);
-  assert.equal(plan.totalFiles,3046);
+  assert.equal(plan.totalFiles,3050);
 });

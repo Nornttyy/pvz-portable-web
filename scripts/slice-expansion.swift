@@ -70,3 +70,9 @@ let all=["echo-lily","spring-nut","rhythm-flower","relay-mushroom"]+Array(peas.d
 for (i,name) in all.enumerated(){let a=load(repo.appendingPathComponent("art/expansion/generated/"+name+".png"));sheet.draw(a,in:CGRect(x:(i%4)*300,y:1500-(i/4+1)*300,width:300,height:300))}
 save(sheet.makeImage()!,repo.appendingPathComponent("art/expansion/atlas-proof.png"))
 print("Prepared \(records.count) native-sized transparent parts")
+// Keep the approved native-derived replacements authoritative on rebuilds.
+if FileManager.default.fileExists(atPath:repo.appendingPathComponent("art/expansion/generated/native-blink.png").path){
+ let registration=Process();registration.executableURL=URL(fileURLWithPath:"/usr/bin/swift")
+ registration.arguments=[repo.appendingPathComponent("scripts/register-native-redraw.swift").path,repo.path,native.deletingLastPathComponent().path]
+ try registration.run();registration.waitUntilExit();precondition(registration.terminationStatus==0)
+}

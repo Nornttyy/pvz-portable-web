@@ -30,7 +30,7 @@ test('default page uses integrated sandbox and project-relative paths, not loopb
   }
   assert.doesNotMatch((await read('site/resource-import.mjs')).toString(), /\bfetch\s*\(|XMLHttpRequest|sendBeacon/);
   const manifest = validateManifest(JSON.parse(await read('site/resource-manifest.json')));
-  assert.equal(manifest.totalFiles, 3046);
+  assert.equal(manifest.totalFiles, 3050);
 });
 
 test('published sandbox engine matches the recorded build and really initializes its exported API', async () => {

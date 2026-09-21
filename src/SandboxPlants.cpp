@@ -48,7 +48,7 @@ bool Muzzle(const Plant* p,int row,float& x,float& y){
   const int head=SandboxVisualRules::HeadForRow(p->mRow,row);
   reanim=head==1?p->mHeadReanimID:head==2?p->mHeadReanimID2:p->mHeadReanimID3;
   track=head==1?"ThreePeater_mouth1":head==2?"ThreePeater_mouth2":"ThreePeater_mouth3";w=19;h=43;
- }else if(d->base==40){track="GatlingPea_mouth_overlay";w=38;h=60;}
+ }else if(d->base==40){track="GatlingPea_barrel3";w=43;h=27;} // Front barrel, not the rear green housing.
  float localX,localY;
  if(!SandboxArt::TrackPoint(gLawnApp->ReanimationTryToGet(reanim),track,w,h,w-3,h*0.5f,localX,localY))return false;
  x=p->mX+localX;y=p->mY+localY;return true;
@@ -77,12 +77,14 @@ void Skin(Reanimation* anim,int id,bool closed,int health=4000){
    if(name=="PuffShroom_stem")t.mImageOverride=SandboxArt::Image(family,"stem");
    if(name=="PuffShroom_eyes"||name.find("blink")!=name.npos)t.mRenderGroup=RENDER_GROUP_HIDDEN;
   }else{
-   if(name.starts_with("anim_face"))t.mImageOverride=SandboxArt::Image(family,triple?(closed?"small-blink":"small-head"):(closed?"blink":"head"));
-   else if(name.find("mouth")!=name.npos&&def->base!=40)t.mImageOverride=SandboxArt::Image(def->element==Element::Alternating?"fire":family,triple?"small-mouth":"mouth");
-   // Gatling's mouth, barrel and overlay are separate original bones. All three keep native dimensions.
-   else if(def->base==40&&name=="GatlingPea_mouth")t.mImageOverride=SandboxArt::Image(family,"gatling-mouth");
-   else if(def->base==40&&name.starts_with("GatlingPea_barrel"))t.mImageOverride=SandboxArt::Image(family,"gatling-barrel");
-   else if(def->base==40&&name=="GatlingPea_mouth_overlay")t.mImageOverride=SandboxArt::Image(family,"gatling-overlay");
+   if(name=="anim_face"||name=="anim_face1"||name=="anim_face2"||name=="anim_face3")
+    t.mImageOverride=SandboxArt::Image(family,def->base==40?(closed?"gatling-blink":"gatling-head"):triple?(closed?"small-blink":"small-head"):(closed?"blink":"head"));
+   else if(name=="idle_mouth"||name=="ThreePeater_mouth1"||name=="ThreePeater_mouth2"||name=="ThreePeater_mouth3")
+    t.mImageOverride=SandboxArt::Image(def->element==Element::Alternating?"fire":family,triple?"small-mouth":"mouth");
+   // Keep all original Gatling hardware and its native painter order. The rear
+   // housing, four rotating barrels and front occluder are NOT interchangeable.
+   else if(def->base==40&&(name=="GatlingPea_mouth"||name.starts_with("GatlingPea_barrel")||name=="GatlingPea_mouth_overlay"))
+    t.mImageOverride=nullptr;
    else if(name.find("blink")!=name.npos)t.mRenderGroup=RENDER_GROUP_HIDDEN;
   }
  }

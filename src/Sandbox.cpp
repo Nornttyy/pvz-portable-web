@@ -1,6 +1,7 @@
 // Original local sandbox extension. SPDX-License-Identifier: LGPL-3.0-or-later
 #include "Sandbox.h"
 #include "SandboxRules.h"
+#include "SandboxUIRules.h"
 #include "LawnApp.h"
 #include "Lawn/Board.h"
 #include "Lawn/Plant.h"
@@ -14,6 +15,9 @@
 #include "Lawn/System/PlayerInfo.h"
 #include "Lawn/Widget/GameButton.h"
 #include "Lawn/System/Music.h"
+#include "graphics/GLInterface.h"
+#include "widget/WidgetManager.h"
+#include <SDL.h>
 #include <algorithm>
 #include <memory>
 #ifdef __EMSCRIPTEN__
@@ -32,6 +36,18 @@ static GameMode previousMode = GAMEMODE_ADVENTURE;
 static bool previousEasyPlanting = false;
 static double previousSpeed = 1;
 
+static void CanvasSize(int width) {
+    auto* app=gLawnApp;
+    app->mWidth=width;app->mHeight=600;
+    app->mScreenBounds=Sexy::Rect(0,0,width,600);
+    SDL_SetWindowSize(static_cast<SDL_Window*>(app->mWindow),width,600);
+    app->mGLInterface->ResizeLogicalCanvas(width,600);
+    app->mWidgetManager->Resize(app->mScreenBounds,app->mGLInterface->mPresentationRect);
+#ifdef __EMSCRIPTEN__
+    EM_ASM({ window.dispatchEvent(new Event('resize')); });
+#endif
+}
+
 bool SandboxOwnsProfile(const PlayerInfo* profile) {
     return profile && profile == sandboxProfile.get();
 }
@@ -47,6 +63,7 @@ bool SandboxEnter() {
     sandboxProfile = std::make_unique<PlayerInfo>();
     gSandboxEnabled = true;
     awake = true;
+    CanvasSize(SandboxUIRules::CanvasWidth);
     SandboxStart(0);
     return true;
 }
@@ -56,6 +73,7 @@ bool SandboxExit() {
     if (!app || !gSandboxEnabled) return false;
     // Dispose the sandbox while save/delete guards are still active.
     app->mBoardResult = BOARDRESULT_NONE;
+    SandboxUIDetach();
     app->KillBoard();
     SandboxPlants::Reset();
     SandboxZombies::Reset();
@@ -65,6 +83,7 @@ bool SandboxExit() {
     app->mEasyPlantingCheat = previousEasyPlanting;
     app->mUpdateMultiplier = previousSpeed;
     gSandboxEnabled = false;
+    CanvasSize(800);
     app->ShowGameSelector();
     return true;
 }
@@ -79,6 +98,7 @@ void SandboxStart(int map) {
     app->mBoardResult = BOARDRESULT_NONE;
     app->KillGameSelector();
     app->KillSeedChooserScreen();
+    SandboxUIDetach();
     app->KillBoard();
     SandboxPlants::Reset();
     SandboxZombies::Reset();
@@ -109,7 +129,9 @@ void SandboxStart(int map) {
     board->mSunMoney = 9999;
     board->mTutorialState = TUTORIAL_OFF;
     board->mEnableGraveStones = false;
-    board->Move(0, 0);
+    // Native world remains 800 x 600. Only its widget origin moves; physics,
+    // projectile transforms, mouse coordinates and saves stay in native units.
+    board->Resize(SandboxUIRules::WorldOffset,0,800,600);
     board->ClearAdvice(ADVICE_NONE);
     app->mGameScene = SCENE_PLAYING;
     app->mBoardResult = BOARDRESULT_NONE;

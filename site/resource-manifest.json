@@ -5,12 +5,12 @@
   "revision": "8ba94e95cfe7d0de5682f8258d3b932dbdac885c",
   "sourceArchiveSha256": "ae862d48a42dc3c99fbc5fbd7b9d18a01bd088843ee82f0673cd486d31a754e2",
   "bundle": {
-    "url": "resources/game-c815ab733f8d.zip",
-    "size": 53707338,
-    "sha256": "c815ab733f8d44f8dc6a7f8b38cef8c5a5648ac16a0cfec0bce9e05b4edb4a3b"
+    "url": "resources/game-1380bfbbf301.zip",
+    "size": 53745563,
+    "sha256": "1380bfbbf301dda3bde966bdcd6facee712c6d57e42c65540b685b4a62df29d1"
   },
-  "totalFiles": 3046,
-  "totalBytes": 65463169,
+  "totalFiles": 3050,
+  "totalBytes": 65500782,
   "compatibility": [
     {
       "path": "properties/partner_logo_.gif",
@@ -50,6 +50,8 @@
       "images/sandbox/electric-pea-mouth.png",
       "images/sandbox/fire-blink.png",
       "images/sandbox/fire-gatling-barrel.png",
+      "images/sandbox/fire-gatling-blink.png",
+      "images/sandbox/fire-gatling-head.png",
       "images/sandbox/fire-gatling-mouth.png",
       "images/sandbox/fire-gatling-overlay.png",
       "images/sandbox/fire-head.png",
@@ -71,6 +73,8 @@
       "images/sandbox/ice-bucket-zombie-jaw.png",
       "images/sandbox/ice-bucket-zombie-prop.png",
       "images/sandbox/ice-gatling-barrel.png",
+      "images/sandbox/ice-gatling-blink.png",
+      "images/sandbox/ice-gatling-head.png",
       "images/sandbox/ice-gatling-mouth.png",
       "images/sandbox/ice-gatling-overlay.png",
       "images/sandbox/ice-head.png",
@@ -14859,8 +14863,8 @@
     },
     {
       "path": "images/sandbox/acid-pea-mouth.png",
-      "size": 3649,
-      "sha256": "174155d6aa642b711a065092d4916a82117ca0e1f9d58bd446864de03f317afb"
+      "size": 3452,
+      "sha256": "7a082be48362876ea6e1173af02d5a8825d77f874f5007b2b7d3eadd28a4d3a6"
     },
     {
       "path": "images/sandbox/armored-cone-zombie-body.png",
@@ -14944,63 +14948,73 @@
     },
     {
       "path": "images/sandbox/electric-pea-blink.png",
-      "size": 8127,
-      "sha256": "8edd2a7c50d23b90793ddaa4e237d02735857787e836e23ba41d2bdaf18b357c"
+      "size": 8171,
+      "sha256": "fe7c20537b3725674663fccef51235233c63c115d9cc9c3b9933143af4237dd3"
     },
     {
       "path": "images/sandbox/electric-pea-head.png",
-      "size": 8369,
-      "sha256": "a4f1d0047c55b524f20e8fa178438e94fb382968392cc4e17b00edff1784fe52"
+      "size": 8539,
+      "sha256": "622b6e0e41ac6c662b89323aac0f9d0b5b76ec43c1c4e1918cbc73bfbfcedf9a"
     },
     {
       "path": "images/sandbox/electric-pea-mouth.png",
-      "size": 3628,
-      "sha256": "62915cba53fa166710d835d6b6d9070060c6a7e058f069f114aad822994d7944"
+      "size": 4116,
+      "sha256": "59fa54777fe13ff0b00593051358ad05877c85cf6eaa1d2d364dda0ad1b24296"
     },
     {
       "path": "images/sandbox/fire-blink.png",
-      "size": 7683,
-      "sha256": "94f7cb67fae5811a4ff69c0f95836264a8c87344e1a2f166a709ad44ecdfd9b4"
+      "size": 8035,
+      "sha256": "ddaabbe1dd0c5a9a33e0050a02baa7ad93e41952959766df2adaba2d72bb4671"
     },
     {
       "path": "images/sandbox/fire-gatling-barrel.png",
-      "size": 1505,
-      "sha256": "df8f2b38b64b6708ee80cc9a68278a822f94eb9ad62549333229d359cb09bcbc"
+      "size": 1798,
+      "sha256": "f875acb059c8f577e80aa59a15a605530d15136aa35c6a0edeb2570663fb70de"
+    },
+    {
+      "path": "images/sandbox/fire-gatling-blink.png",
+      "size": 8303,
+      "sha256": "9b4283fab132a56f358056a31f4e375eab353278613fb361ecd9e6c38ee07a37"
+    },
+    {
+      "path": "images/sandbox/fire-gatling-head.png",
+      "size": 8530,
+      "sha256": "a31eeb9a00239fdaf436bc43d87f97325d3c61e50fee60bae9fb9413f84cfd43"
     },
     {
       "path": "images/sandbox/fire-gatling-mouth.png",
-      "size": 5062,
-      "sha256": "1e36d24e53eac7d3210000e6624acf5cc8cb55fef50d33a42bae0cafa252c222"
+      "size": 5245,
+      "sha256": "61e1fb114f31677913a68330d292ab14c01a6f36f6691eda8fd0e799d6ea57ea"
     },
     {
       "path": "images/sandbox/fire-gatling-overlay.png",
-      "size": 3557,
-      "sha256": "2d16333eec765f9e6c6e75ab4ca817098c6874c8b598275f3984d3786032e239"
+      "size": 4060,
+      "sha256": "88b118ee7aa0ceaf41d1b0faf631bb0efde964639bb97fd026a5575b87977677"
     },
     {
       "path": "images/sandbox/fire-head.png",
-      "size": 7898,
-      "sha256": "69d0bf5c53f847dc84d250ed57d311a487bd773eaf55ea645ff7c3c8d351bff7"
+      "size": 8423,
+      "sha256": "7a37482328c7c1eaf0133a110c5ff80243fc28fffadabb3ab6d46fc3884a11f5"
     },
     {
       "path": "images/sandbox/fire-mouth.png",
-      "size": 3587,
-      "sha256": "6cc3f6eb3b693a1f5c0771cb815143218f0f3276f2ce4b5fdb9a780da3103431"
+      "size": 3911,
+      "sha256": "4a0a648e1f75b56e7f152fd18c8b45d7b46ad3c81523d6144a24b444f04c9974"
     },
     {
       "path": "images/sandbox/fire-small-blink.png",
-      "size": 2081,
-      "sha256": "7a445f658216a173875fc3f16a47e357ca363f1694e79eceb95877d2a03cb469"
+      "size": 2229,
+      "sha256": "7324eb215daca60720b335991dc389f798a33707cf2624c961b213c4ac125d6f"
     },
     {
       "path": "images/sandbox/fire-small-head.png",
-      "size": 2134,
-      "sha256": "ec0b3343839ca34842291f7c522174e9adc7fb3938f8a119bb504d7a3ed31510"
+      "size": 2249,
+      "sha256": "b25224647b0a2a4ef0f685bc7b6ca0264684c65a92f50faaf743b9abf1046792"
     },
     {
       "path": "images/sandbox/fire-small-mouth.png",
-      "size": 2022,
-      "sha256": "78e59d9ef59af4b75e6edecc6864fc9b3fa6fe0f69aef5739eb9b346222b5395"
+      "size": 2186,
+      "sha256": "20504ca3ad0596c5d96688a0a3c444842a19d66bf1abd29b1417914d924d1200"
     },
     {
       "path": "images/sandbox/gum-zombie-body.png",
@@ -15039,13 +15053,13 @@
     },
     {
       "path": "images/sandbox/heavy-pea-mouth.png",
-      "size": 3387,
-      "sha256": "951d2824d953cd1b76373fd5a6310c418fe6907deb2df7bcb9fb4152c38ea80f"
+      "size": 3452,
+      "sha256": "7a082be48362876ea6e1173af02d5a8825d77f874f5007b2b7d3eadd28a4d3a6"
     },
     {
       "path": "images/sandbox/ice-blink.png",
-      "size": 8523,
-      "sha256": "64c27729154f50122ee2d60d8be18397185e5b9b71ae7e416370ee07143fc342"
+      "size": 8270,
+      "sha256": "50ebfd1b2d36130e0f2c5b368250d3a61d3b03e8816d50e858a952a09d1813e3"
     },
     {
       "path": "images/sandbox/ice-bucket-zombie-body.png",
@@ -15069,43 +15083,53 @@
     },
     {
       "path": "images/sandbox/ice-gatling-barrel.png",
-      "size": 1596,
-      "sha256": "75dbd343a0c066db0a4fa61634ae5c4662cb9d64dba65549b48f58445964c527"
+      "size": 1798,
+      "sha256": "f875acb059c8f577e80aa59a15a605530d15136aa35c6a0edeb2570663fb70de"
+    },
+    {
+      "path": "images/sandbox/ice-gatling-blink.png",
+      "size": 8540,
+      "sha256": "4252725f1412f07562ffc9bf23f963c07797eb4b88a160be82ccc5f0ec5e1d40"
+    },
+    {
+      "path": "images/sandbox/ice-gatling-head.png",
+      "size": 8831,
+      "sha256": "c7112e6e5db078ab40e093bdf2eb013ed489986f0199e1bcccf073d042fd2571"
     },
     {
       "path": "images/sandbox/ice-gatling-mouth.png",
-      "size": 5152,
-      "sha256": "46b2aa607c07e1b5104427df23da3fde41c2212a4c194fb266e8bfcc389c97e6"
+      "size": 5245,
+      "sha256": "61e1fb114f31677913a68330d292ab14c01a6f36f6691eda8fd0e799d6ea57ea"
     },
     {
       "path": "images/sandbox/ice-gatling-overlay.png",
-      "size": 3561,
-      "sha256": "edce198d7cd46f927f7661f9be59dcd434b4579281791098f59beae36b591363"
+      "size": 4060,
+      "sha256": "88b118ee7aa0ceaf41d1b0faf631bb0efde964639bb97fd026a5575b87977677"
     },
     {
       "path": "images/sandbox/ice-head.png",
-      "size": 8727,
-      "sha256": "a52c157eefb097ea584871467b22de2fa5203d94183d8642d345ed6b78d18712"
+      "size": 8576,
+      "sha256": "54ba84e4460b14793c447f4b9562927746d82fc5b3ba6b8ff4ae4a8e7dddaec7"
     },
     {
       "path": "images/sandbox/ice-mouth.png",
-      "size": 4017,
-      "sha256": "63d329c24a317029029941f69f13fcf8dfab3f5eb8d94afffb3407a6db9e919f"
+      "size": 4092,
+      "sha256": "695ea8f76815f46e9b5d1f3f9fe840298af504ec4a5aef5b15039812c3f6ae73"
     },
     {
       "path": "images/sandbox/ice-small-blink.png",
-      "size": 2231,
-      "sha256": "93f349717bedcfab0adec7d25687e3395be1b396f19cea3bdab186cb8cda51a9"
+      "size": 2308,
+      "sha256": "2d77aa0fbccf009bc26a9aa9535d249b6bdb249543468e5c0e8e2072925d74f9"
     },
     {
       "path": "images/sandbox/ice-small-head.png",
-      "size": 2309,
-      "sha256": "c6fa5ddd6774dda8d21f11cdb9fa51310e81afbfd0a7399a8c0584ac2b51c0d4"
+      "size": 2326,
+      "sha256": "9d6b4918d64bb75d4d98661de5c8a7e4c7283f1a3ac147d2c941acaab01f58b8"
     },
     {
       "path": "images/sandbox/ice-small-mouth.png",
-      "size": 2167,
-      "sha256": "87ae28ec9f24dca4fee1ec070c6fb506cd25127663f4aedb30b4cadcbd8dc77c"
+      "size": 2275,
+      "sha256": "f07bcf298b93b8ffc877635db54dc416aff8f3358f2776502c98c34a36261909"
     },
     {
       "path": "images/sandbox/light-zombie-body.png",
@@ -15214,8 +15238,8 @@
     },
     {
       "path": "images/sandbox/scatter-pea-mouth.png",
-      "size": 3512,
-      "sha256": "3e368f16786752a3768664440664313ea47cc4af87a3965845e7732af5e6fd51"
+      "size": 3452,
+      "sha256": "7a082be48362876ea6e1173af02d5a8825d77f874f5007b2b7d3eadd28a4d3a6"
     },
     {
       "path": "images/sandbox/seeker-pea-blink.png",
@@ -15229,8 +15253,8 @@
     },
     {
       "path": "images/sandbox/seeker-pea-mouth.png",
-      "size": 3577,
-      "sha256": "43761a3b87f10216ea7b5b6afe5ef93b39f677622a05bd2c3f3435b9a6b44939"
+      "size": 3452,
+      "sha256": "7a082be48362876ea6e1173af02d5a8825d77f874f5007b2b7d3eadd28a4d3a6"
     },
     {
       "path": "images/sandbox/smoke-zombie-body.png",
@@ -15289,8 +15313,8 @@
     },
     {
       "path": "images/sandbox/tiny-pea-mouth.png",
-      "size": 3702,
-      "sha256": "09c979cdedee3c455fac1685c3a7149944f018ae777fb196f25e1403d8c7d495"
+      "size": 3452,
+      "sha256": "7a082be48362876ea6e1173af02d5a8825d77f874f5007b2b7d3eadd28a4d3a6"
     },
     {
       "path": "images/sandbox/twin-zombie-body.png",
@@ -15524,8 +15548,8 @@
     "addedZombies": 10,
     "totalCustomPlants": 18,
     "totalCustomZombies": 10,
-    "parts": 124,
+    "parts": 138,
     "vfxParts": 40,
-    "source": "Built-in image_gen; separate rig parts and 40 projectile/VFX sprites; prompts and source atlases in art/expansion"
+    "source": "Built-in image_gen edits of native sprite parts; original Gatling hardware and green mouths reused unchanged; separate rig parts and 40 projectile/VFX sprites; prompts in art/expansion"
   }
 }

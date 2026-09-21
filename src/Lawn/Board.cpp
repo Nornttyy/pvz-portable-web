@@ -26,6 +26,7 @@
 #include "ZenGarden.h"
 #include "BoardInclude.h"
 #include "../Sandbox.h"
+#include "../SandboxUIRules.h"
 #include "../SandboxPlants.h"
 #include "../SandboxZombies.h"
 #include "LawnCommon.h"
@@ -3013,7 +3014,7 @@ void Board::MouseMove(int x, int y)
 
 void Board::MouseDrag(int x, int y)
 {
-	if (SandboxMouseDrag(x, y)) return;
+	if (SandboxMouseDrag(x + (gSandboxEnabled ? SandboxUIRules::WorldOffset : 0), y)) return;
 	Widget::MouseDrag(x, y);
 	mChallenge->MouseMove(x, y);
 }
@@ -4368,7 +4369,7 @@ void Board::PickUpTool(GameObjectType theObjectType)
 
 void Board::MouseDown(int x, int y, int theClickCount)
 {
-	if (SandboxMouseDown(x, y, theClickCount)) return;
+	if (SandboxMouseDown(x + (gSandboxEnabled ? SandboxUIRules::WorldOffset : 0), y, theClickCount)) return;
 	UpdateMousePosition();
 	Widget::MouseDown(x, y, theClickCount);
 	mIgnoreMouseUp = !CanInteractWithBoardButtons();
@@ -7396,7 +7397,7 @@ bool Board::IsScaryPotterDaveTalking()
 
 void Board::DrawUITop(Graphics* g)
 {
-	if (gSandboxEnabled) { SandboxDrawUI(g); return; }
+	if (gSandboxEnabled) return; // Dedicated native overlay owns the top bar and sidebar.
 	if (StageHasFog())
 	{
 		DrawTopRightUI(g);
