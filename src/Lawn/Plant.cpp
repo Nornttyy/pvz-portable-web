@@ -3928,6 +3928,7 @@ void Plant::DrawShadow(Sexy::Graphics* g, float theOffsetX, float theOffsetY)
 			return;
 	}
 
+    SandboxPlants::AdjustShadow(this,aShadowOffsetX,aShadowOffsetY,aScale);
 	if (aShadowType == 0)
 	{
 		PvzpDrawImageCelCenterScaledF(g, IMAGE_PLANTSHADOW, theOffsetX + aShadowOffsetX, theOffsetY + aShadowOffsetY, 0, aScale, aScale);

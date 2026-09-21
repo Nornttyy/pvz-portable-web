@@ -8,7 +8,7 @@ const target=new URL('file://'+local.replace(/\/$/,'')+'/');
 const manifest=JSON.parse(await readFile(new URL('site/resource-manifest.json',root)));
 const bytes=await readFile(new URL('resources/expansion-resources.zip',target));
 assert.equal(createHash('sha256').update(bytes).digest('hex'),manifest.bundle.sha256);
-const parts=JSON.parse(await readFile(new URL('art/expansion/parts.json',root)));
+const parts=[...JSON.parse(await readFile(new URL('art/expansion/parts.json',root))),...JSON.parse(await readFile(new URL('art/expansion/vfx-parts.json',root)))];
 await mkdir(new URL('resources/source/images/sandbox/',target),{recursive:true});
 for(const part of parts)await copyFile(new URL('art/expansion/parts/'+part.file,root),new URL('resources/source/images/sandbox/'+part.file,target));
 const backup=new URL('resources/pre-expansion-resources.zip',target);

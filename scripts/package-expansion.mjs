@@ -13,7 +13,7 @@ const baseline=JSON.parse(await readFile(new URL('tests/baseline-assets.json',ro
 const original=await readFile(resolve(base));assert.equal(hash(original),baseline.baseBundle.sha256);
 const zip=await JSZip.loadAsync(original,{checkCRC32:true});
 const manifest=JSON.parse(await readFile(new URL('site/resource-manifest.json',root)));
-const parts=JSON.parse(await readFile(new URL('art/expansion/parts.json',root)));
+const parts=[...JSON.parse(await readFile(new URL('art/expansion/parts.json',root))),...JSON.parse(await readFile(new URL('art/expansion/vfx-parts.json',root)))];
 for(const part of parts){
  assert.match(part.file,/^[a-z0-9-]+\.png$/);
  const bytes=await readFile(new URL('art/expansion/parts/'+part.file,root));
@@ -34,7 +34,7 @@ const bytes=await zip.generateAsync({type:'nodebuffer',compression:'DEFLATE',com
 manifest.bundle={url:`resources/game-${hash(bytes).slice(0,12)}.zip`,size:bytes.length,sha256:hash(bytes)};
 manifest.totalFiles=manifest.files.length;manifest.totalBytes=manifest.files.reduce((n,f)=>n+f.size,0);
 manifest.originalPlants.files=manifest.files.filter(f=>f.path.startsWith('images/sandbox/')).map(f=>f.path);
-manifest.sandboxExpansion={addedPlants:10,addedZombies:10,totalCustomPlants:18,totalCustomZombies:10,parts:parts.length,source:'Built-in image_gen; native-sized separate rig parts; prompts and source atlases in art/expansion'};
+manifest.sandboxExpansion={addedPlants:10,addedZombies:10,totalCustomPlants:18,totalCustomZombies:10,parts:parts.length,vfxParts:40,source:'Built-in image_gen; separate rig parts and 40 projectile/VFX sprites; prompts and source atlases in art/expansion'};
 manifest.delivery='bundled';delete manifest.localOnly;validateManifest(manifest);
 await writeFile(resolve(target),bytes);
 await writeFile(new URL('site/resource-manifest.json',root),JSON.stringify(manifest,null,2)+'\n');

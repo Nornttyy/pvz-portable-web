@@ -49,7 +49,11 @@ void OnFired(Plant* plant,Projectile* shot,Zombie* target);
 bool Impact(Projectile* shot,Zombie* target);
 void ForgetShot(Projectile* shot);
 void UpdateShot(Projectile* shot);
-void DrawEffects(Sexy::Graphics* g,Board* board);
+void DrawEffects(Sexy::Graphics* g,Board* board,int row);
 void AdjustScale(const Plant* plant,float& x,float& y,float& sx,float& sy);
-void DrawShot(Sexy::Graphics* g,const Projectile* shot);
+void AdjustShadow(const Plant* plant,float& x,float& y,float& scale);
+bool DrawShot(Sexy::Graphics* g,const Projectile* shot);
+bool HasShot(const Projectile* shot);
+float ShotScale(const Projectile* shot);
+int ShotRadius(const Projectile* shot);
 }

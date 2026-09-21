@@ -30,6 +30,19 @@ test('generated production parts preserve native bone canvases and exclude empty
  const parts=JSON.parse(await read('art/expansion/parts.json'));assert.equal(parts.length,84);
  for(const part of parts){const png=await read('art/expansion/parts/'+part.file);assert.equal(png.readUInt32BE(16),part.width);assert.equal(png.readUInt32BE(20),part.height);assert.equal(png[25],6);const[x,y,w,h]=part.ink;assert.ok(w>0&&h>0&&x>=0&&y>=0&&x+w<=part.width&&y+h<=part.height,part.file);}
 });
+test('actual projectile/effect draw code preserves bone and world coordinate contracts',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'pvz-visual-contracts-')),binary=join(dir,'visual');
+ for(const f of ['SandboxPlants.cpp','SandboxZombies.cpp','SandboxArt.cpp'])await copyFile(join(root,'src',f),join(dir,f));
+ await run(process.env.CXX||'c++',['-std=c++20','-Itests/combat-stubs','-Isrc',...['SandboxPlants.cpp','SandboxZombies.cpp','SandboxArt.cpp'].map(f=>join(dir,f)),'tests/visual-coordinates.cpp','-o',binary],{cwd:root});
+ assert.match((await run(binary)).stdout,/Visual coordinate contracts passed/);
+});
+test('40 generated VFX sprites ship with transparent alpha and no placeholder drawing',async()=>{
+ const parts=JSON.parse(await read('art/expansion/vfx-parts.json'));assert.equal(parts.length,40);
+ for(const p of parts){const png=await read('art/expansion/parts/'+p.file);assert.equal(png.readUInt32BE(16),p.width);assert.equal(png.readUInt32BE(20),p.height);assert.equal(png[25],6);}
+ for(const f of ['SandboxPlants.cpp','SandboxZombies.cpp'])assert.doesNotMatch((await read('src/'+f)).toString(),/DrawLine\(|FillRect\(/);
+ const ui=(await read('src/SandboxUI.cpp')).toString();assert.doesNotMatch(ui,/DrawEffects/);
+ assert.match((await read('src/Lawn/Board.cpp')).toString(),/MakeRenderOrder\(RENDER_LAYER_PARTICLE,row,1\)/);
+});
 test('expansion is sandbox-only and stepping/clear operations clean up special state',async()=>{
  const cpp=(await read('src/Sandbox.cpp')).toString();assert.ok(cpp.indexOf('board->mPaused = paused && !stepOnce')<cpp.indexOf('SandboxPlants::Tick(board)'));
  assert.match(cpp,/SandboxZombies::Reset\(\)/);assert.match(cpp,/SandboxZombies::Base\(type\)/);

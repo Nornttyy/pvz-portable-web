@@ -21,7 +21,7 @@
 #include <string_view>
 namespace SandboxZombies {
 namespace {
-struct State {int id,age=0,burst=0;bool hadArmor=true,charged=false,split=false;};
+struct State {int id,age=0,burst=0;bool hadArmor=true,charged=false,split=false;int repairFlash=0;};
 struct Birth {int row;float x;};
 std::map<const Zombie*,State> states;
 std::map<const Zombie*,float> auras;
@@ -33,7 +33,7 @@ void Skin(Reanimation* a,int id){
   const std::string_view n=a->mDefinition->mTracks.tracks[i].mName;auto& t=a->mTrackInstances[i];
   if(n=="anim_head1")t.mImageOverride=SandboxArt::Image(d->art,"head");
   else if(n=="Zombie_body")t.mImageOverride=SandboxArt::Image(d->art,"body");
-  else if(n=="anim_head2")t.mImageOverride=SandboxArt::Image(d->art,id==202?"gum":"jaw");
+  else if(n=="anim_head2")t.mImageOverride=SandboxArt::Image(d->art,"jaw");
   else if(n=="anim_cone"&&d->base==2)t.mImageOverride=SandboxArt::Image(d->art,"prop");
   else if(n=="anim_bucket"&&d->base==4)t.mImageOverride=SandboxArt::Image(d->art,"prop");
   else if(n=="Zombie_tie"&&id==204)t.mImageOverride=SandboxArt::Image(d->art,"battery");
@@ -45,6 +45,11 @@ void SkinFlag(Reanimation* a,int id){
  if(a->TrackExists("Zombie_flag"))a->SetImageOverride("Zombie_flag",SandboxArt::Image(Find(id)->art,"prop"));
 }
 bool Alive(Zombie* z){return !z->mMindControlled&&!z->IsDeadOrDying()&&z->mHasHead;}
+void Point(Zombie* z,const char* bone,float w,float h,float& x,float& y){
+ float px,py;if(SandboxArt::TrackPoint(gLawnApp->ReanimationTryToGet(z->mBodyReanimID),bone,w,h,w*0.5f,h*0.5f,px,py)){
+  x=z->mX+px;y=z->mY+py;
+ }
+}
 }
 void Reset(){states.clear();auras.clear();births.clear();}
 void Forget(Zombie* z){states.erase(z);auras.erase(z);}
@@ -54,7 +59,7 @@ void Assign(Zombie* z,int id){
  if(d->armor)z->mHelmHealth=z->mHelmMaxHealth=d->armor;
  z->mScaleZombie=SandboxCombatRules::Scale(id);
  auto* a=gLawnApp->ReanimationTryToGet(z->mBodyReanimID);Skin(a,id);
- if(a)SkinFlag(a->FindSubReanim(REANIM_FLAG),id);
+ if(id==201)SkinFlag(gLawnApp->ReanimationTryToGet(z->mSpecialHeadReanimID),id);
  z->UpdateReanim();
 }
 float Speed(const Zombie* z){
@@ -89,6 +94,7 @@ void Tick(Board* b){
  births.clear();
  for(auto* z:b->mZombies){
   auto it=states.find(z);if(it==states.end())continue;if(!Alive(z))continue;auto& s=it->second;++s.age;
+  if(s.repairFlash>0)--s.repairFlash;
   if(s.burst>0)--s.burst;
   if(s.id==200&&s.hadArmor&&z->mHelmHealth<=0){s.hadArmor=false;s.burst=300;}
   if(s.id==201&&s.age%600<220){
@@ -100,7 +106,7 @@ void Tick(Board* b){
    for(auto* other:b->mZombies)if(other!=z&&Alive(other)&&std::abs(other->mRow-z->mRow)<=1&&std::abs(other->mPosX-z->mPosX)<160&&other->mHelmHealth>0){
     const int need=other->mHelmMaxHealth-other->mHelmHealth;if(need>missing){missing=need;repair=other;}
    }
-   if(repair)repair->mHelmHealth=SandboxCombatRules::Repair(repair->mHelmHealth,repair->mHelmMaxHealth);
+   if(repair){repair->mHelmHealth=SandboxCombatRules::Repair(repair->mHelmHealth,repair->mHelmMaxHealth);s.repairFlash=35;}
   }
  }
  // One slow per plant; several gum zombies cannot freeze a launch counter forever.
@@ -113,18 +119,28 @@ void DrawPortrait(Sexy::Graphics* g,int x,int y,int w,int h,int id){
  if(!image){
   image=gLawnApp->mReanimatorCache->MakeBlankMemoryImage(220,240);Sexy::Graphics canvas(image.get());canvas.SetLinearBlend(true);
   Reanimation a;a.ReanimationInitializeType(50,50,REANIM_ZOMBIE);a.SetFramesForLayer("anim_idle");Zombie::SetupReanimLayers(&a,static_cast<ZombieType>(d->base));Skin(&a,id);
-  if(d->base==1){Reanimation flag;flag.ReanimationInitializeType(50,50,REANIM_FLAG);flag.SetFramesForLayer("Zombie_flag");SkinFlag(&flag,id);flag.Draw(&canvas);}
+  if(d->base==1&&a.TrackExists("Zombie_flaghand")){
+   Reanimation flag;flag.ReanimationInitializeType(0,0,REANIM_FLAG);flag.SetFramesForLayer("Zombie_flag");SkinFlag(&flag,id);
+   a.mFrameBasePose=0;a.GetAttachmentOverlayMatrix(a.FindTrackIndex("Zombie_flaghand"),flag.mOverlayMatrix);flag.Draw(&canvas);
+  }
   a.Draw(&canvas);
+  if(id==202){float px,py;if(SandboxArt::TrackPoint(&a,"anim_head2",32,15,4,7,px,py))SandboxArt::Sprite(&canvas,"gum",px-4,py,18,18);}
  }
  SandboxArt::DrawFit(g,image.get(),x+5,y+3,w-10,h-6,id==205?0.86f:1.0f);
 }
-void DrawEffects(Sexy::Graphics* g,Board* b){
- for(const auto& [z,s]:states)if(!z->mDead&&z->mHasHead){
+void DrawEffects(Sexy::Graphics* graphics,Board* b,int row){
+ Sexy::Graphics clipped(*graphics);clipped.ClipRect(0,82,800,518);auto* g=&clipped;
+ for(const auto& [z,s]:states)if(!z->mDead&&z->mHasHead&&z->mRow==row&&z->mBodyHealth>0){
+  float hx=z->mX+45,hy=z->mY+30;Point(const_cast<Zombie*>(z),"anim_head1",53,48,hx,hy);
+  float bx=z->mX+45,by=z->mY+65;Point(const_cast<Zombie*>(z),"Zombie_body",53,63,bx,by);
   if(s.id==208&&s.age%700<240){
-   g->SetColor(Sexy::Color(95,93,91,90));
-   for(int i=0;i<3;++i){int offset=(s.age/4+i*12)%36;g->DrawLine(z->mPosX+25,z->mPosY+100-offset,z->mPosX+70,z->mPosY+95-offset);}
+   const int phase=s.age%60,frame=phase/20;const char* art=frame==0?"smoke-0":frame==1?"smoke-1":"smoke-2";
+   SandboxArt::Sprite(g,art,bx,by-phase*0.3f,65*z->mScaleZombie,65*z->mScaleZombie,0,120);
   }
-  if(s.id==201&&s.age%600<220){g->SetColor(Sexy::Color(232,206,92,170));g->DrawLine(z->mPosX+22,z->mPosY+10,z->mPosX+16,z->mPosY+4);g->DrawLine(z->mPosX+15,z->mPosY+20,z->mPosX+7,z->mPosY+18);}
+  if(s.id==201&&s.age%600<220)SandboxArt::Sprite(g,"notes",hx-20,hy-34-(s.age%40)*0.2f,18,23,0,200);
+  if(s.id==202){float x=hx-12,y=hy+20;Point(const_cast<Zombie*>(z),"anim_head2",32,15,x,y);const float size=(17+2*std::sin(s.age*0.08f))*z->mScaleZombie;SandboxArt::Sprite(g,"gum",x-14*z->mScaleZombie,y,size,size,0,230);}
+  if(s.id==204&&s.charged)SandboxArt::Sprite(g,"charge",bx,by,26,26,0,155);
+  if(s.repairFlash>0)SandboxArt::Sprite(g,"repair",hx+20,hy-8,22,22,0,std::min(230,s.repairFlash*18));
  }
 }
 }

@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "public integrated main menu sandbox; 18 original plants and 10 original zombies",
+  "mode": "public integrated sandbox; 18 plants, 10 zombies, 40 generated projectile/VFX sprites and bone-aligned rendering",
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 276326,
-      "sha256": "7df85fb101362787b477d407496053511d332ce029d47f5f38530998fb084cf8"
+      "size": 277179,
+      "sha256": "fa70a519b3438417c84ed4e51699f140703ade1ab177ee5b245d3f5261f03640"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7353202,
-      "sha256": "87147dfb8ac04b7164b4ff14af914eab0fd07fd2c55a82ccdce8787ffe9020f4"
+      "size": 7362913,
+      "sha256": "365446cb506857224ebcd6aa36adc67cb6bcacc143144ba4259cbf615a572c33"
     }
   ]
 }

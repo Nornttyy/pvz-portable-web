@@ -11,19 +11,24 @@ enum SeedType {SEED_PEASHOOTER=0,SEED_NONE=-1};
 enum ZombieType {ZOMBIE_NORMAL=0,ZOMBIE_IMP=24,ZOMBIE_GARGANTUAR=23,ZOMBIE_REDEYE_GARGANTUAR=32,ZOMBIE_ZAMBONI=12};
 enum ZombieID : unsigned { ZOMBIEID_NULL=0 };
 enum ReanimationType {REANIM_ZOMBIE,REANIM_FLAG};
-enum ProjectileType {PROJECTILE_PEA};
+enum ProjectileType {PROJECTILE_PEA,PROJECTILE_SNOWPEA,PROJECTILE_FIREBALL};
 enum ProjectileMotion {MOTION_STRAIGHT,MOTION_STAR,MOTION_HOMING,MOTION_THREEPEATER};
 enum PlantWeapon {WEAPON_PRIMARY};
 enum PlantSubClass {SUBCLASS_NORMAL,SUBCLASS_SHOOTER};
 constexpr int RENDER_GROUP_HIDDEN=-1,DS_ALIGN_CENTER=0;
 namespace Sexy {
-struct Color{Color(int=0,int=0,int=0,int=255){}};
+struct Color{int mAlpha;Color(int=0,int=0,int=0,int a=255):mAlpha(a){}};
+struct SexyTransform2D{float m00=1,m01=0,m02=0,m10=0,m11=1,m12=0;void LoadIdentity(){*this={};}};
 struct Rect{int mX,mY,mWidth,mHeight;Rect(int x=0,int y=0,int w=0,int h=0):mX(x),mY(y),mWidth(w),mHeight(h){}};
-struct Image{virtual~Image()=default;};
-struct MemoryImage:Image{};
+struct Image{int mWidth=80,mHeight=80;std::string path;virtual~Image()=default;};
+struct MemoryImage:Image{std::vector<uint32_t> bits=std::vector<uint32_t>(6400,0xffffffff);uint32_t* GetBits(){return bits.data();}};
+struct GLImage:MemoryImage{};
 struct Graphics{
+ float mTransX=0,mTransY=0;Rect mClipRect;int mDrawMode=0;
  Graphics(MemoryImage*){};Graphics(const Graphics&)=default;
  void SetLinearBlend(bool){};void SetColor(Color){};void DrawLine(int,int,int,int){};void FillRect(int,int,int,int){};void SetClipRect(int,int,int,int){};
+ void ClipRect(int,int,int,int){};
+ void DrawImage(Image*,Rect,Rect){};
 };
 inline Image* IMAGE_SEEDS=nullptr;inline int FONT_BRIANNETOD12=0;
 }
@@ -31,13 +36,17 @@ struct Track{const char* mName="";};
 struct TrackGroup{int count=0;Track* tracks=nullptr;};
 struct Definition{TrackGroup mTracks;};
 struct TrackInstance{Sexy::Image* mImageOverride=nullptr;int mRenderGroup=0;};
+struct ReanimatorTransform{float mFrame=0,mAlpha=1;};
 struct Reanimation{
  Definition def;Definition* mDefinition=&def;TrackInstance* mTrackInstances=nullptr;float mAnimTime=0;
- void ReanimationInitializeType(int,int,ReanimationType){};bool TrackExists(const char*){return false;}
+ std::string track;Sexy::SexyTransform2D matrix;ReanimatorTransform pose;
+ void ReanimationInitializeType(int,int,ReanimationType){};bool TrackExists(const char* name){return track==name;}
  void SetFramesForLayer(const char*){};void Draw(Sexy::Graphics*){};void SetImageOverride(const char*,Sexy::Image*){};Reanimation* FindSubReanim(ReanimationType){return nullptr;}
+ int mFrameBasePose=0;Sexy::SexyTransform2D mOverlayMatrix;int FindTrackIndex(const char*){return 0;}void GetAttachmentOverlayMatrix(int,Sexy::SexyTransform2D&){};
+ void GetTrackMatrix(int,Sexy::SexyTransform2D& out){out=matrix;}void GetCurrentTransform(int,ReanimatorTransform* out){*out=pose;}
 };
 struct ReanimatorCache{std::unique_ptr<Sexy::MemoryImage> MakeBlankMemoryImage(int,int){return std::make_unique<Sexy::MemoryImage>();}};
-struct LawnApp{ReanimatorCache cache;ReanimatorCache* mReanimatorCache=&cache;Reanimation* ReanimationTryToGet(int){return nullptr;}};
+struct LawnApp{ReanimatorCache cache;ReanimatorCache* mReanimatorCache=&cache;std::map<int,Reanimation*> reanims;Reanimation* ReanimationTryToGet(int id){return reanims.contains(id)?reanims.at(id):nullptr;}Sexy::GLImage* GetImage(std::string file){auto* im=new Sexy::GLImage;im->path=file;return im;}};
 extern LawnApp* gLawnApp;
 class Board;
 class Zombie{
@@ -46,6 +55,7 @@ public:
  Board* mBoard=nullptr;ZombieType mZombieType=ZOMBIE_NORMAL;ZombieID id=ZOMBIEID_NULL;
  float mPosX=0,mPosY=0,mScaleZombie=1;int mX=0,mY=0,mRow=0,mBodyReanimID=0,mBodyHealth=1000,mBodyMaxHealth=1000,mHelmHealth=0,mHelmMaxHealth=0;
  bool mDead=false,mMindControlled=false,mHasHead=true;int chill=0;
+ int mSpecialHeadReanimID=0;
  bool IsDeadOrDying(){return mDead||mBodyHealth<=0;};bool EffectedByDamage(unsigned){return !IsDeadOrDying();}
  void TakeDamage(int n,unsigned){int armor=std::min(n,mHelmHealth);mHelmHealth-=armor;mBodyHealth-=n-armor;}
  void UpdateReanim(){};void RemoveColdEffects(){chill=0;}
@@ -64,6 +74,7 @@ public:
  Board* mBoard=nullptr;bool mDead=false;ProjectileMotion mMotionType=MOTION_STRAIGHT;ZombieID mTargetZombieID=ZOMBIEID_NULL;
  float mPosX=0,mPosY=0,mPosZ=0,mVelX=3.3,mVelY=0,mShadowY=0;
  int mX=0,mY=0,mRow=0,mRenderOrder=0,mDamageRangeFlags=0;
+ ProjectileType mProjectileType=PROJECTILE_PEA;
  int GetDamageFlags(Zombie*){return 0;}
 };
 template<class T>struct Array{
@@ -94,3 +105,6 @@ inline PlantDefinition GetPlantDefinition(SeedType type){return {REANIM_ZOMBIE,i
 inline void DrawSeedPacket(Sexy::Graphics*,int,int,SeedType,SeedType,int,int,bool,bool){}
 inline void PvzpDrawImageCelScaledF(Sexy::Graphics*,Sexy::Image*,int,int,int,int,int,int){}
 inline void PvzpDrawString(Sexy::Graphics*,const char*,int,int,int,Sexy::Color,int){}
+struct Blit{std::string path;Sexy::SexyTransform2D matrix;int alpha;};
+inline std::vector<Blit> testBlits;
+inline void PvzpBltMatrix(Sexy::Graphics*,Sexy::Image* im,const Sexy::SexyTransform2D& mat,Sexy::Rect,Sexy::Color color,int,Sexy::Rect){testBlits.push_back({im->path,mat,color.mAlpha});}

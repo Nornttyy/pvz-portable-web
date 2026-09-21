@@ -22,5 +22,5 @@ void Reset();void Forget(Zombie* zombie);void Assign(Zombie* zombie,int id);
 void Tick(Board* board);void DrawPortrait(Sexy::Graphics* g,int x,int y,int w,int h,int id);
 float Speed(const Zombie* zombie);int Damage(const Zombie* zombie,int damage);
 bool ElectricHit(Zombie* zombie);void CombatDeath(Zombie* zombie);
-void DrawEffects(Sexy::Graphics* g,Board* board);
+void DrawEffects(Sexy::Graphics* g,Board* board,int row);
 }

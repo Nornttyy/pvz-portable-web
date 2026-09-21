@@ -1,16 +1,32 @@
+diff --git a/src/ConstEnums.h b/src/ConstEnums.h
+index c263ab4..e613ef3 100644
+--- a/src/ConstEnums.h
++++ b/src/ConstEnums.h
+@@ -1018,7 +1018,8 @@ enum RenderObjectType : int32_t
+ 	RENDER_ITEM_SCREEN_FADE,
+ 	RENDER_ITEM_BOSS_PART,
+ 	RENDER_ITEM_GRID_ITEM,
+-	RENDER_ITEM_GRID_ITEM_OVERLAY
++	RENDER_ITEM_GRID_ITEM_OVERLAY,
++	RENDER_ITEM_SANDBOX_EFFECTS
+ };
+ enum ScaryPotType : int32_t
+ {
 diff --git a/src/Lawn/Board.cpp b/src/Lawn/Board.cpp
-index 665fcca..0c219ce 100644
+index 665fcca..a3a996b 100644
 --- a/src/Lawn/Board.cpp
 +++ b/src/Lawn/Board.cpp
-@@ -25,6 +25,7 @@
+@@ -25,6 +25,9 @@
  #include <format>
  #include "ZenGarden.h"
  #include "BoardInclude.h"
 +#include "../Sandbox.h"
++#include "../SandboxPlants.h"
++#include "../SandboxZombies.h"
  #include "LawnCommon.h"
  #include "System/Music.h"
  #include "System/SaveGame.h"
-@@ -315,6 +316,7 @@ int Board::CountUntriggerLawnMowers()
+@@ -315,6 +318,7 @@ int Board::CountUntriggerLawnMowers()
  
  void Board::TryToSaveGame()
  {
@@ -18,7 +34,7 @@ index 665fcca..0c219ce 100644
  	std::string aFileName = GetSavedGameName(mApp->mGameMode, mApp->mPlayerInfo->mId);
  
  	if (NeedSaveGame())
-@@ -346,6 +348,7 @@ bool Board::NeedSaveGame()
+@@ -346,6 +350,7 @@ bool Board::NeedSaveGame()
  
  void Board::SaveGame(const std::string& theFileName)
  {
@@ -26,7 +42,7 @@ index 665fcca..0c219ce 100644
  	LawnSaveGame(this, theFileName);
  }
  
-@@ -3008,6 +3011,7 @@ void Board::MouseMove(int x, int y)
+@@ -3008,6 +3013,7 @@ void Board::MouseMove(int x, int y)
  
  void Board::MouseDrag(int x, int y)
  {
@@ -34,7 +50,7 @@ index 665fcca..0c219ce 100644
  	Widget::MouseDrag(x, y);
  	mChallenge->MouseMove(x, y);
  }
-@@ -4362,6 +4366,7 @@ void Board::PickUpTool(GameObjectType theObjectType)
+@@ -4362,6 +4368,7 @@ void Board::PickUpTool(GameObjectType theObjectType)
  
  void Board::MouseDown(int x, int y, int theClickCount)
  {
@@ -42,7 +58,7 @@ index 665fcca..0c219ce 100644
  	UpdateMousePosition();
  	Widget::MouseDown(x, y, theClickCount);
  	mIgnoreMouseUp = !CanInteractWithBoardButtons();
-@@ -4580,6 +4585,7 @@ bool Board::CanInteractWithBoardButtons()
+@@ -4580,6 +4587,7 @@ bool Board::CanInteractWithBoardButtons()
  
  void Board::MouseUp(int x, int y, int theClickCount)
  {
@@ -50,7 +66,7 @@ index 665fcca..0c219ce 100644
  	Widget::MouseUp(x, y, theClickCount);
  	if (mIgnoreMouseUp)
  	{
-@@ -5048,6 +5054,7 @@ void Board::PuzzleSaveStreak()
+@@ -5048,6 +5056,7 @@ void Board::PuzzleSaveStreak()
  
  void Board::ZombiesWon(Zombie* theZombie)
  {
@@ -58,7 +74,7 @@ index 665fcca..0c219ce 100644
  	if (mApp->mGameScene == GameScenes::SCENE_ZOMBIES_WON)
  		return;
  
-@@ -5176,6 +5183,7 @@ bool Board::HasLevelAwardDropped()
+@@ -5176,6 +5185,7 @@ bool Board::HasLevelAwardDropped()
  
  void Board::UpdateSunSpawning()
  {
@@ -66,7 +82,7 @@ index 665fcca..0c219ce 100644
  	if (StageIsNight() ||
  		HasLevelAwardDropped() ||
  		mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_RAINING_SEEDS ||
-@@ -5234,6 +5242,7 @@ void Board::NextWaveComing()
+@@ -5234,6 +5244,7 @@ void Board::NextWaveComing()
  
  void Board::UpdateZombieSpawning()
  {
@@ -74,7 +90,7 @@ index 665fcca..0c219ce 100644
  	if (mApp->mGameMode == GameMode::GAMEMODE_UPSELL || mApp->mGameMode == GameMode::GAMEMODE_INTRO)
  		return;
  
-@@ -5418,6 +5427,7 @@ void Board::UpdateIce()
+@@ -5418,6 +5429,7 @@ void Board::UpdateIce()
  
  void Board::UpdateProgressMeter()
  {
@@ -82,7 +98,7 @@ index 665fcca..0c219ce 100644
  	if (mApp->IsFinalBossLevel())
  	{
  		Zombie* aBoss = GetBossZombie();
-@@ -5692,6 +5702,7 @@ void Board::UpdateGame()
+@@ -5692,6 +5704,7 @@ void Board::UpdateGame()
  
  void Board::Update()
  {
@@ -90,7 +106,32 @@ index 665fcca..0c219ce 100644
  	PvzpHesitationBracket aHesitation("Board::Update");
  
  	Widget::Update();
-@@ -7175,7 +7186,7 @@ void Board::DrawUIBottom(Graphics* g)
+@@ -6282,6 +6295,13 @@ void Board::DrawGameObjects(Graphics* g)
+ 	}
+ 	AddGameObjectRenderItemCursorPreview(aRenderList, aRenderItemCount, RenderObjectType::RENDER_ITEM_CURSOR_PREVIEW, mCursorPreview.get());
+ 
++    // Effects join the native row-sorted world pass, never the UI overlay.
++    if(gSandboxEnabled) for(int row=0;row<(StageHasPool()?6:5);++row){
++        RenderItem& effect=aRenderList[aRenderItemCount++];
++        effect.mRenderObjectType=RENDER_ITEM_SANDBOX_EFFECTS;
++        effect.mBoardGridY=row;
++        effect.mZPos=MakeRenderOrder(RENDER_LAYER_PARTICLE,row,1);
++    }
+ 	std::sort(aRenderList, aRenderList + aRenderItemCount, RenderItemSortFunc);
+ 
+ 	for (int i = 0; i < aRenderItemCount; i++)
+@@ -6289,6 +6309,10 @@ void Board::DrawGameObjects(Graphics* g)
+ 		RenderItem& aRenderItem = aRenderList[i];
+ 		switch (aRenderItem.mRenderObjectType)
+ 		{
++        case RENDER_ITEM_SANDBOX_EFFECTS:
++            SandboxPlants::DrawEffects(g,this,aRenderItem.mBoardGridY);
++            SandboxZombies::DrawEffects(g,this,aRenderItem.mBoardGridY);
++            break;
+ 		case RenderObjectType::RENDER_ITEM_PLANT:
+ 		{
+ 			Plant* aPlant = aRenderItem.mPlant;
+@@ -7175,7 +7199,7 @@ void Board::DrawUIBottom(Graphics* g)
  
  	if (mApp->mGameScene != GameScenes::SCENE_ZOMBIES_WON)
  	{
@@ -99,7 +140,7 @@ index 665fcca..0c219ce 100644
  		{
  			mSeedBank->Draw(g);
  			mSeedBank->EndDraw(g);
-@@ -7372,6 +7383,7 @@ bool Board::IsScaryPotterDaveTalking()
+@@ -7372,6 +7396,7 @@ bool Board::IsScaryPotterDaveTalking()
  
  void Board::DrawUITop(Graphics* g)
  {
@@ -107,7 +148,7 @@ index 665fcca..0c219ce 100644
  	if (StageHasFog())
  	{
  		DrawTopRightUI(g);
-@@ -7627,6 +7639,7 @@ void Board::DoTypingCheck(KeyCode theKey)
+@@ -7627,6 +7652,7 @@ void Board::DoTypingCheck(KeyCode theKey)
  
  void Board::KeyDown(KeyCode theKey)
  {
@@ -116,7 +157,7 @@ index 665fcca..0c219ce 100644
  
  	if (mApp->mGameScene == GameScenes::SCENE_LEVEL_INTRO &&
 diff --git a/src/Lawn/Plant.cpp b/src/Lawn/Plant.cpp
-index c934659..3d7ee79 100644
+index c934659..06c9612 100644
 --- a/src/Lawn/Plant.cpp
 +++ b/src/Lawn/Plant.cpp
 @@ -30,6 +30,7 @@
@@ -151,7 +192,15 @@ index c934659..3d7ee79 100644
  	const PlantDefinition& aPlantDef = GetPlantDefinition(mSeedType);
  	LawnApp* aApp = (LawnApp*)gSexyAppBase;
  	Reanimation* aAnimToAttach = theReanimBody;
-@@ -4675,7 +4679,10 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
+@@ -3924,6 +3928,7 @@ void Plant::DrawShadow(Sexy::Graphics* g, float theOffsetX, float theOffsetY)
+ 			return;
+ 	}
+ 
++    SandboxPlants::AdjustShadow(this,aShadowOffsetX,aShadowOffsetY,aScale);
+ 	if (aShadowType == 0)
+ 	{
+ 		PvzpDrawImageCelCenterScaledF(g, IMAGE_PLANTSHADOW, theOffsetX + aShadowOffsetX, theOffsetY + aShadowOffsetY, 0, aScale, aScale);
+@@ -4675,7 +4680,10 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
  		mApp->AddPvzpParticle(aOriginX + 27, aOriginY + 13, aRenderPosition, ParticleEffect::PARTICLE_PUFFSHROOM_MUZZLE);
  	}
  
@@ -162,7 +211,7 @@ index c934659..3d7ee79 100644
  	aProjectile->mDamageRangeFlags = GetDamageRangeFlags(thePlantWeapon);
  
  	if (mSeedType == SeedType::SEED_CABBAGEPULT || mSeedType == SeedType::SEED_KERNELPULT ||
-@@ -4765,6 +4772,7 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
+@@ -4765,6 +4773,7 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
  		aProjectile->mCobTargetX = mTargetX - 40;
  		aProjectile->mCobTargetRow = mBoard->PixelToGridYKeepOnBoard(mTargetX, mTargetY);
  	}
@@ -171,7 +220,7 @@ index c934659..3d7ee79 100644
  
  Zombie* Plant::FindTargetZombie(int theRow, PlantWeapon thePlantWeapon)
 diff --git a/src/Lawn/Projectile.cpp b/src/Lawn/Projectile.cpp
-index 4500f46..cda6d5a 100644
+index 4500f46..b317f75 100644
 --- a/src/Lawn/Projectile.cpp
 +++ b/src/Lawn/Projectile.cpp
 @@ -25,6 +25,7 @@
@@ -192,7 +241,7 @@ index 4500f46..cda6d5a 100644
  	{
  		if (mProjectileType == ProjectileType::PROJECTILE_FIREBALL && theZombie)
  		{
-@@ -833,7 +835,7 @@ void Projectile::DoImpact(Zombie* theZombie)
+@@ -833,12 +835,13 @@ void Projectile::DoImpact(Zombie* theZombie)
  
  		DoSplashDamage(theZombie);
  	}
@@ -201,7 +250,13 @@ index 4500f46..cda6d5a 100644
  	{
  		unsigned int aDamageFlags = GetDamageFlags(theZombie);
  		theZombie->TakeDamage(GetProjectileDef().mDamage, aDamageFlags);
-@@ -939,6 +941,7 @@ void Projectile::DoImpact(Zombie* theZombie)
+ 	}
+ 
++    if (SandboxPlants::HasShot(this)) { Die(); return; }
+ 	float aLastPosX = mPosX - mVelX;
+ 	float aLastPosY = mPosY + mPosZ - mVelY - mVelZ;
+ 	ParticleEffect aEffect = ParticleEffect::PARTICLE_NONE;
+@@ -939,6 +942,7 @@ void Projectile::DoImpact(Zombie* theZombie)
  
  void Projectile::Update()
  {
@@ -209,15 +264,21 @@ index 4500f46..cda6d5a 100644
  	mProjectileAge++;
  	if (mApp->mGameScene != GameScenes::SCENE_PLAYING && !mBoard->mCutScene->ShouldRunUpsellBoard())
  		return;
-@@ -974,6 +977,7 @@ void Projectile::Update()
+@@ -974,6 +978,7 @@ void Projectile::Update()
  
  void Projectile::Draw(Graphics* g)
  {
-+    SandboxPlants::DrawShot(g,this);
++    if (SandboxPlants::DrawShot(g,this)) return;
  	const ProjectileDefinition& aProjectileDef = GetProjectileDef();
  
  	Image* aImage = nullptr;
-@@ -1151,6 +1155,7 @@ void Projectile::DrawShadow(Graphics* g)
+@@ -1146,11 +1151,13 @@ void Projectile::DrawShadow(Graphics* g)
+ 		aScale *= 200.0f / (aHeight + 200.0f);
+ 	}
+ 
++    aScale *= SandboxPlants::ShotScale(this);
+ 	PvzpDrawImageCelScaledF(g, IMAGE_PEA_SHADOWS, aOffsetX, (mShadowY - mPosY + aOffsetY), aCelCol, 0, aScale * aStretch, aScale);
+ }
  
  void Projectile::Die()
  {
@@ -225,6 +286,17 @@ index 4500f46..cda6d5a 100644
  	mDead = true;
  
  	if (mProjectileType == ProjectileType::PROJECTILE_PUFF || mProjectileType == ProjectileType::PROJECTILE_SNOWPEA)
+@@ -1166,6 +1173,10 @@ void Projectile::Die()
+ 
+ Rect Projectile::GetProjectileRect()
+ {
++    if(SandboxPlants::HasShot(this)){
++        const int radius=SandboxPlants::ShotRadius(this);
++        return Rect(mX+12-radius,mY+12-radius,radius*2,radius*2);
++    }
+ 	if (mProjectileType == ProjectileType::PROJECTILE_PEA ||
+ 		mProjectileType == ProjectileType::PROJECTILE_SNOWPEA ||
+ 		mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_PEA)
 diff --git a/src/Lawn/System/PlayerInfo.cpp b/src/Lawn/System/PlayerInfo.cpp
 index 4f5e541..2e3c40d 100644
 --- a/src/Lawn/System/PlayerInfo.cpp

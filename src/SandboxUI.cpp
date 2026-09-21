@@ -161,8 +161,6 @@ void SandboxUIFeedback(int code) {
 void SandboxDrawUI(Graphics* g) {
     const int flags=Command(0);
     if(flags<0)return;
-    SandboxPlants::DrawEffects(g,gLawnApp->mBoard);
-    SandboxZombies::DrawEffects(g,gLawnApp->mBoard);
     g->DrawImage(IMAGE_SEEDBANK,0,0);
     PvzpDrawString(g,"9999",34,78,FONT_CONTINUUMBOLD14,Color::Black,DS_ALIGN_CENTER);
     for(int i=0;i<6;++i){

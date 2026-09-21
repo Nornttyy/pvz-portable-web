@@ -32,7 +32,11 @@ var records=[Record]()
 func fit(_ part:CGImage,_ filename:String,_ reference:String){
  let ref=load(native.appendingPathComponent(reference));let ink=bounds(ref),w=ref.width,h=ref.height
  let c=context(w,h);c.interpolationQuality = .high
- let s=min(ink.width/CGFloat(part.width),ink.height/CGFloat(part.height));let dw=CGFloat(part.width)*s,dh=CGFloat(part.height)*s
+ let s=min(ink.width/CGFloat(part.width),ink.height/CGFloat(part.height))
+ // Bone-bound pieces reach the native joint envelope on BOTH axes. Aspect-fit
+ // caused narrow mouths and gaps between head/jaw/body. Loose props keep their aspect.
+ let boneBound = !["-prop","-hat","-battery","-gum"].contains(where:filename.hasSuffix)
+ let dw=boneBound ? ink.width : CGFloat(part.width)*s,dh=boneBound ? ink.height : CGFloat(part.height)*s
  let x=ink.minX+(ink.width-dw)/2,y=CGFloat(h)-ink.maxY+(ink.height-dh)/2
  c.draw(part,in:CGRect(x:x,y:y,width:dw,height:dh));let image=c.makeImage()!
  save(image,output.appendingPathComponent(filename+".png"));let b=bounds(image)

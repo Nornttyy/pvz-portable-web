@@ -27,27 +27,32 @@ func override(_ family:String,_ part:String)->CGImage?{
  let generated=repo.appendingPathComponent("art/expansion/parts/"+family+"-"+part+".png")
  return image(FileManager.default.fileExists(atPath:generated.path) ? generated : source.appendingPathComponent("images/sandbox/"+family+"-"+part+".png"))
 }
-func draw(_ name:String,_ family:String,_ layer:String,_ x:Double,_ y:Double,_ scale:Double=1,_ base:Int=0,_ poseIndex:Int=0){
+func matrix(_ p:Pose)->CGAffineTransform{let kx=p.kx*Double.pi/180,ky=p.ky*Double.pi/180;return CGAffineTransform(a:cos(kx)*p.sx,b:sin(kx)*p.sx,c:-sin(ky)*p.sy,d:cos(ky)*p.sy,tx:p.x,ty:p.y)}
+func draw(_ name:String,_ family:String,_ layer:String,_ x:Double,_ y:Double,_ scale:Double=1,_ base:Int=0,_ poseIndex:Int=0,_ overlay:CGAffineTransform = .identity){
  let tracks=rig(name);guard let marker=tracks.first(where:{$0.name==layer}),let first=marker.frames.firstIndex(where:{$0.f>=0})else{return}
  let index=min(first+poseIndex,marker.frames.count-1)
- ctx.saveGState();ctx.translateBy(x:x,y:Double(h)-y);ctx.scaleBy(x:scale,y:-scale)
+ if name=="Zombie"&&base==1,let hand=tracks.first(where:{$0.name=="Zombie_flaghand"}){
+  let attach=matrix(hand.frames[0]).inverted().concatenating(matrix(hand.frames[index]));draw("Zombie_flagpole",family,"Zombie_flag",x,y,scale,base,0,attach)
+ }
+ ctx.saveGState();ctx.translateBy(x:x,y:Double(h)-y);ctx.scaleBy(x:scale,y:-scale);ctx.concatenate(overlay)
  for t in tracks where index<t.frames.count{
   let p=t.frames[index];if p.f<0 || p.a<=0 || p.image.isEmpty{continue}
   guard let url=nativePaths[key(p.image)],let original=image(url)else{continue};var selected=original
   let n=t.name
   if name=="Zombie"{
    let forbidden=["anim_screendoor","Zombie_screendoor","anim_tongue","Zombie_mustache"]
-   if forbidden.contains(n)||n.contains("screendoor")||n.contains("duckytube")||n.contains("whitewater")||(n=="Zombie_flaghand"&&base != 1){continue}
+   if forbidden.contains(n)||(n.contains("screendoor") && !(base==1&&n=="Zombie_innerarm_screendoor"))||n.contains("duckytube")||n.contains("whitewater")||(n=="Zombie_flaghand"&&base != 1)||(n=="anim_innerarm"&&base==1){continue}
    if n=="anim_cone" && base != 2{continue};if n=="anim_bucket" && base != 4{continue}
    if !family.isEmpty{
     if n=="anim_head1"{selected=override(family,"head")!}
-    if n=="anim_head2"{selected=override(family,family=="gum-zombie" ? "gum":"jaw")!}
+    if n=="anim_head2"{selected=override(family,"jaw")!}
     if n=="Zombie_body"{selected=override(family,"body")!}
     if n=="anim_cone"||n=="anim_bucket"{selected=override(family,"prop")!}
     if n=="anim_hair" && ["light-zombie","smoke-zombie","twin-zombie"].contains(family){selected=override(family,"hat")!}
     if n=="Zombie_tie" && family=="battery-zombie"{selected=override(family,"battery")!}
    }
-  }else if !family.isEmpty{
+  }else if name=="Zombie_flagpole"{if n=="Zombie_flag"{selected=override(family,"prop")!}}
+  else if !family.isEmpty{
    if n.lowercased().contains("blink") || (name=="PuffShroom" && n=="PuffShroom_eyes"){continue}
    if name=="SunFlower"{if n=="anim_idle"{selected=override(family,"head")!}}
    else if name=="PuffShroom"{if n=="anim_face"{selected=override(family,"head")!};if n=="PuffShroom_head"{selected=override(family,"cap")!};if n=="PuffShroom_stem"{selected=override(family,"stem")!}}
@@ -59,6 +64,9 @@ func draw(_ name:String,_ family:String,_ layer:String,_ x:Double,_ y:Double,_ s
   ctx.saveGState();ctx.setAlpha(p.a);ctx.concatenate(CGAffineTransform(a:cos(kx)*p.sx,b:sin(kx)*p.sx,c:-sin(ky)*p.sy,d:cos(ky)*p.sy,tx:p.x,ty:p.y))
   ctx.translateBy(x:Double(original.width-selected.width)/2,y:Double(original.height-selected.height)/2+Double(selected.height));ctx.scaleBy(x:1,y:-1)
   ctx.draw(selected,in:CGRect(x:0,y:0,width:selected.width,height:selected.height));ctx.restoreGState()
+  if family=="gum-zombie"&&n=="anim_head2",let bubble=override("vfx","gum"){
+   ctx.saveGState();ctx.concatenate(matrix(p));ctx.translateBy(x:-7,y:17);ctx.scaleBy(x:1,y:-1);ctx.draw(bubble,in:CGRect(x:0,y:0,width:18,height:18));ctx.restoreGState()
+  }
  }
  ctx.restoreGState()
 }

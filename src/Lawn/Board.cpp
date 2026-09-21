@@ -26,6 +26,8 @@
 #include "ZenGarden.h"
 #include "BoardInclude.h"
 #include "../Sandbox.h"
+#include "../SandboxPlants.h"
+#include "../SandboxZombies.h"
 #include "LawnCommon.h"
 #include "System/Music.h"
 #include "System/SaveGame.h"
@@ -6293,6 +6295,13 @@ void Board::DrawGameObjects(Graphics* g)
 	}
 	AddGameObjectRenderItemCursorPreview(aRenderList, aRenderItemCount, RenderObjectType::RENDER_ITEM_CURSOR_PREVIEW, mCursorPreview.get());
 
+    // Effects join the native row-sorted world pass, never the UI overlay.
+    if(gSandboxEnabled) for(int row=0;row<(StageHasPool()?6:5);++row){
+        RenderItem& effect=aRenderList[aRenderItemCount++];
+        effect.mRenderObjectType=RENDER_ITEM_SANDBOX_EFFECTS;
+        effect.mBoardGridY=row;
+        effect.mZPos=MakeRenderOrder(RENDER_LAYER_PARTICLE,row,1);
+    }
 	std::sort(aRenderList, aRenderList + aRenderItemCount, RenderItemSortFunc);
 
 	for (int i = 0; i < aRenderItemCount; i++)
@@ -6300,6 +6309,10 @@ void Board::DrawGameObjects(Graphics* g)
 		RenderItem& aRenderItem = aRenderList[i];
 		switch (aRenderItem.mRenderObjectType)
 		{
+        case RENDER_ITEM_SANDBOX_EFFECTS:
+            SandboxPlants::DrawEffects(g,this,aRenderItem.mBoardGridY);
+            SandboxZombies::DrawEffects(g,this,aRenderItem.mBoardGridY);
+            break;
 		case RenderObjectType::RENDER_ITEM_PLANT:
 		{
 			Plant* aPlant = aRenderItem.mPlant;

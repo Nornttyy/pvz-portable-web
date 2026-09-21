@@ -841,6 +841,7 @@ void Projectile::DoImpact(Zombie* theZombie)
 		theZombie->TakeDamage(GetProjectileDef().mDamage, aDamageFlags);
 	}
 
+    if (SandboxPlants::HasShot(this)) { Die(); return; }
 	float aLastPosX = mPosX - mVelX;
 	float aLastPosY = mPosY + mPosZ - mVelY - mVelZ;
 	ParticleEffect aEffect = ParticleEffect::PARTICLE_NONE;
@@ -977,7 +978,7 @@ void Projectile::Update()
 
 void Projectile::Draw(Graphics* g)
 {
-    SandboxPlants::DrawShot(g,this);
+    if (SandboxPlants::DrawShot(g,this)) return;
 	const ProjectileDefinition& aProjectileDef = GetProjectileDef();
 
 	Image* aImage = nullptr;
@@ -1150,6 +1151,7 @@ void Projectile::DrawShadow(Graphics* g)
 		aScale *= 200.0f / (aHeight + 200.0f);
 	}
 
+    aScale *= SandboxPlants::ShotScale(this);
 	PvzpDrawImageCelScaledF(g, IMAGE_PEA_SHADOWS, aOffsetX, (mShadowY - mPosY + aOffsetY), aCelCol, 0, aScale * aStretch, aScale);
 }
 
@@ -1171,6 +1173,10 @@ void Projectile::Die()
 
 Rect Projectile::GetProjectileRect()
 {
+    if(SandboxPlants::HasShot(this)){
+        const int radius=SandboxPlants::ShotRadius(this);
+        return Rect(mX+12-radius,mY+12-radius,radius*2,radius*2);
+    }
 	if (mProjectileType == ProjectileType::PROJECTILE_PEA ||
 		mProjectileType == ProjectileType::PROJECTILE_SNOWPEA ||
 		mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_PEA)

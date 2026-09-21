@@ -5,12 +5,12 @@
   "revision": "8ba94e95cfe7d0de5682f8258d3b932dbdac885c",
   "sourceArchiveSha256": "ae862d48a42dc3c99fbc5fbd7b9d18a01bd088843ee82f0673cd486d31a754e2",
   "bundle": {
-    "url": "resources/game-7ec0ae8de03b.zip",
-    "size": 53409693,
-    "sha256": "7ec0ae8de03b510cce356c2d4534b92dca0ed652972ad0f093e8437d0524ab0d"
+    "url": "resources/game-c815ab733f8d.zip",
+    "size": 53707338,
+    "sha256": "c815ab733f8d44f8dc6a7f8b38cef8c5a5648ac16a0cfec0bce9e05b4edb4a3b"
   },
-  "totalFiles": 3006,
-  "totalBytes": 65171200,
+  "totalFiles": 3046,
+  "totalBytes": 65463169,
   "compatibility": [
     {
       "path": "properties/partner_logo_.gif",
@@ -119,7 +119,47 @@
       "images/sandbox/twin-zombie-hat.png",
       "images/sandbox/twin-zombie-head.png",
       "images/sandbox/twin-zombie-jaw.png",
-      "images/sandbox/twin-zombie-prop.png"
+      "images/sandbox/twin-zombie-prop.png",
+      "images/sandbox/vfx-acid-hit-0.png",
+      "images/sandbox/vfx-acid-hit-1.png",
+      "images/sandbox/vfx-acid.png",
+      "images/sandbox/vfx-charge.png",
+      "images/sandbox/vfx-electric-hit-0.png",
+      "images/sandbox/vfx-electric-hit-1.png",
+      "images/sandbox/vfx-electric.png",
+      "images/sandbox/vfx-fire-hit-0.png",
+      "images/sandbox/vfx-fire-hit-1.png",
+      "images/sandbox/vfx-fire.png",
+      "images/sandbox/vfx-gum.png",
+      "images/sandbox/vfx-heavy-hit-0.png",
+      "images/sandbox/vfx-heavy-hit-1.png",
+      "images/sandbox/vfx-heavy.png",
+      "images/sandbox/vfx-ice-hit-0.png",
+      "images/sandbox/vfx-ice-hit-1.png",
+      "images/sandbox/vfx-ice.png",
+      "images/sandbox/vfx-link-0.png",
+      "images/sandbox/vfx-link-1.png",
+      "images/sandbox/vfx-muzzle-ice.png",
+      "images/sandbox/vfx-muzzle-warm.png",
+      "images/sandbox/vfx-notes.png",
+      "images/sandbox/vfx-poison.png",
+      "images/sandbox/vfx-repair.png",
+      "images/sandbox/vfx-scatter-hit-0.png",
+      "images/sandbox/vfx-scatter-hit-1.png",
+      "images/sandbox/vfx-scatter.png",
+      "images/sandbox/vfx-seeker-hit-0.png",
+      "images/sandbox/vfx-seeker-hit-1.png",
+      "images/sandbox/vfx-seeker.png",
+      "images/sandbox/vfx-smoke-0.png",
+      "images/sandbox/vfx-smoke-1.png",
+      "images/sandbox/vfx-smoke-2.png",
+      "images/sandbox/vfx-sonic-0.png",
+      "images/sandbox/vfx-sonic-1.png",
+      "images/sandbox/vfx-spring-0.png",
+      "images/sandbox/vfx-spring-1.png",
+      "images/sandbox/vfx-tiny-hit-0.png",
+      "images/sandbox/vfx-tiny-hit-1.png",
+      "images/sandbox/vfx-tiny.png"
     ]
   },
   "localization": {
@@ -14809,33 +14849,33 @@
     },
     {
       "path": "images/sandbox/acid-pea-blink.png",
-      "size": 7463,
-      "sha256": "67cec69b78a7d72a750887e5ee6ddfbf4a1b2110fd11c4532aa39b11149dd04a"
+      "size": 7890,
+      "sha256": "df37105d4d9c79630a2b539cff36429040ece31ce90d3c8ad268e70ddcdee48b"
     },
     {
       "path": "images/sandbox/acid-pea-head.png",
-      "size": 7663,
-      "sha256": "c3da46f1ba693504491585277cc175b252dde13d7b4a028600693201dd7145fc"
+      "size": 8093,
+      "sha256": "f4bca73b23aebe4ad39624222ed2b86318bd6dbf112794fc92e8c5f008973ef6"
     },
     {
       "path": "images/sandbox/acid-pea-mouth.png",
-      "size": 2969,
-      "sha256": "6aca773f46dbf5c439ffc9f12b999c4fe41adc9217bd9689e6dfef0c411d7a25"
+      "size": 3649,
+      "sha256": "174155d6aa642b711a065092d4916a82117ca0e1f9d58bd446864de03f317afb"
     },
     {
       "path": "images/sandbox/armored-cone-zombie-body.png",
-      "size": 5567,
-      "sha256": "6fa4930ac85633ae395fb605d6e1415dba03b963d1d91937439b4f49e5575027"
+      "size": 5758,
+      "sha256": "124bcd75288c93a8ae72ea17f1669b0e2645f0095eef824793cc65418b33fb28"
     },
     {
       "path": "images/sandbox/armored-cone-zombie-head.png",
-      "size": 5147,
-      "sha256": "23f0d73f76eeb04cffebd33320e7f0578b53f25e666453074cdbb08291a0fca1"
+      "size": 5178,
+      "sha256": "afb67346cccdb8f57a9da1214726f835343c2ddaa2e892eb2205092483942a65"
     },
     {
       "path": "images/sandbox/armored-cone-zombie-jaw.png",
-      "size": 1224,
-      "sha256": "58203b4cc229c3197fb61abd69c422337a7a991ab6bae4e8e6463d58eb3232d1"
+      "size": 1195,
+      "sha256": "8253f771df38b47741ed9d2d9ac753bd3cd0d3cc3b6ccd6ef54eb2d1c315e543"
     },
     {
       "path": "images/sandbox/armored-cone-zombie-prop.png",
@@ -14849,18 +14889,18 @@
     },
     {
       "path": "images/sandbox/battery-zombie-body.png",
-      "size": 6195,
-      "sha256": "04be7a77c369064c547a09b6c7de3e8c30dc703699f33f782e93ead9c519578b"
+      "size": 6501,
+      "sha256": "2fe50b1b939e23b0b8e3fbb73b3ec5018993ef44fa0e79d5a6e33915f5db8063"
     },
     {
       "path": "images/sandbox/battery-zombie-head.png",
-      "size": 5582,
-      "sha256": "1626bd06b4362f060d65c16f83a1aa362eaf71386911939d35c9d4411e2bb210"
+      "size": 5743,
+      "sha256": "59e7d47eb483a3adbd0f54d5e45aee4660ac7997d54c3f045eb79e2102414a8f"
     },
     {
       "path": "images/sandbox/battery-zombie-jaw.png",
-      "size": 1270,
-      "sha256": "da77f5480871ed43fbe10e5410092e3e1dddbb1dbd5a63640de900e0be7a3cec"
+      "size": 1277,
+      "sha256": "e5d70cade1c4a28eeb55b97f26368b03c10100f327e39fb910b9331f3c8fa1f6"
     },
     {
       "path": "images/sandbox/battery-zombie-prop.png",
@@ -14869,18 +14909,18 @@
     },
     {
       "path": "images/sandbox/bell-zombie-body.png",
-      "size": 6180,
-      "sha256": "78d4073449b1c9da32622fdf673a1a26d8efa3d2d6ccf53e025f08186eb73ff1"
+      "size": 6262,
+      "sha256": "825d5f01c91baf63960074665a290492746fa892a7b2ec258c4c9a32826baaae"
     },
     {
       "path": "images/sandbox/bell-zombie-head.png",
-      "size": 5513,
-      "sha256": "cb4a27502da58f05b3e5ce933c4ad9517a9d2f3025db358c7e96269499cba702"
+      "size": 5469,
+      "sha256": "bcdd86cccd9bbdfb10d7ec9de8ea4dee38ac46052605255eb3e192b58278be55"
     },
     {
       "path": "images/sandbox/bell-zombie-jaw.png",
-      "size": 1103,
-      "sha256": "f12be56fa509900f46d9407c26eb297ca9462c0d311d431b76b77689c76d2c2a"
+      "size": 1132,
+      "sha256": "4292eae577e65f1a9c696aa3b3614904d8c011081708177d8f3bc6071f7dcd13"
     },
     {
       "path": "images/sandbox/bell-zombie-prop.png",
@@ -14889,33 +14929,33 @@
     },
     {
       "path": "images/sandbox/echo-lily-blink.png",
-      "size": 8096,
-      "sha256": "7978c1e276fe6a0390d0610b75befe11e5c42b23deca9eeb17ddd928344bee8f"
+      "size": 8198,
+      "sha256": "6fc649ac24dc76b805acad6440fcb3ae67d950968ef91ef12921829e735df647"
     },
     {
       "path": "images/sandbox/echo-lily-head.png",
-      "size": 8162,
-      "sha256": "49f2fd7c5b703e471d615dfc16ead38f390ff952f5ed280fc6815d243823b05f"
+      "size": 8242,
+      "sha256": "a721db420ad5e9ab071916fcbf64322ba23a3ce422fd543f4a5d24992b366778"
     },
     {
       "path": "images/sandbox/echo-lily-mouth.png",
-      "size": 4059,
-      "sha256": "b592ef3078b9625411a1dbcc1f9f19136c99b12e14d2f49c8d835039feaa40cc"
+      "size": 4184,
+      "sha256": "cb694cc73cbbc066cde17c396b3df2978d943d9cc550b7a097ddc515fa95635b"
     },
     {
       "path": "images/sandbox/electric-pea-blink.png",
-      "size": 7241,
-      "sha256": "18cc27df0ae74f3367e3e1c8ee5b9022c52729da81c8c13b3b1493972f751f62"
+      "size": 8127,
+      "sha256": "8edd2a7c50d23b90793ddaa4e237d02735857787e836e23ba41d2bdaf18b357c"
     },
     {
       "path": "images/sandbox/electric-pea-head.png",
-      "size": 7357,
-      "sha256": "bb6160ab8f6a1b5b270165236e79f6bef0aae85e36933b49eca6bdc9959ab328"
+      "size": 8369,
+      "sha256": "a4f1d0047c55b524f20e8fa178438e94fb382968392cc4e17b00edff1784fe52"
     },
     {
       "path": "images/sandbox/electric-pea-mouth.png",
-      "size": 2985,
-      "sha256": "fa1ec50a6343de3d2c5b4a205d105f7222a1b5371f06f01e7936b56b0f63b1a6"
+      "size": 3628,
+      "sha256": "62915cba53fa166710d835d6b6d9070060c6a7e058f069f114aad822994d7944"
     },
     {
       "path": "images/sandbox/fire-blink.png",
@@ -14924,18 +14964,18 @@
     },
     {
       "path": "images/sandbox/fire-gatling-barrel.png",
-      "size": 1456,
-      "sha256": "2969b3385a339c0573a4f72fcf24fc449741566867d78bc4bc36b3d84fcc89bc"
+      "size": 1505,
+      "sha256": "df8f2b38b64b6708ee80cc9a68278a822f94eb9ad62549333229d359cb09bcbc"
     },
     {
       "path": "images/sandbox/fire-gatling-mouth.png",
-      "size": 4820,
-      "sha256": "1dc541d6ec002867ef57d4f8b74928814999d0ed09b333a52d42228cb2449672"
+      "size": 5062,
+      "sha256": "1e36d24e53eac7d3210000e6624acf5cc8cb55fef50d33a42bae0cafa252c222"
     },
     {
       "path": "images/sandbox/fire-gatling-overlay.png",
-      "size": 3119,
-      "sha256": "015243ddd939fabef357d44afa4a4c1fa2d5ee0b0754070f8910120933436955"
+      "size": 3557,
+      "sha256": "2d16333eec765f9e6c6e75ab4ca817098c6874c8b598275f3984d3786032e239"
     },
     {
       "path": "images/sandbox/fire-head.png",
@@ -14959,13 +14999,13 @@
     },
     {
       "path": "images/sandbox/fire-small-mouth.png",
-      "size": 1754,
-      "sha256": "321eb2a8cab002bb27700d5c08a140905eee2c547d88fa1291858115e300dbc2"
+      "size": 2022,
+      "sha256": "78e59d9ef59af4b75e6edecc6864fc9b3fa6fe0f69aef5739eb9b346222b5395"
     },
     {
       "path": "images/sandbox/gum-zombie-body.png",
-      "size": 6181,
-      "sha256": "dc7440e491facd58261a4181c7443cf2ae3d7ec4d74843a36c608b8fa72987b8"
+      "size": 6152,
+      "sha256": "412190674a121b2b3105f2496e5003d2c629c439130706f89863767d3cc2bba8"
     },
     {
       "path": "images/sandbox/gum-zombie-gum.png",
@@ -14974,13 +15014,13 @@
     },
     {
       "path": "images/sandbox/gum-zombie-head.png",
-      "size": 5567,
-      "sha256": "3496b8ef3f28441367af8835010c58668cdb371cd0db091d27275d8988e5fcd6"
+      "size": 5514,
+      "sha256": "1ac30fd751b9e678d99962e9e28b98f2e9930799a0cfaa7108db827e46d98c56"
     },
     {
       "path": "images/sandbox/gum-zombie-jaw.png",
-      "size": 1329,
-      "sha256": "2f8792ef9ef60acd2a4c5b12cdfe2551c2b79858d3b7c99b270add9abe268812"
+      "size": 1327,
+      "sha256": "05f87ae5bc42f183d817bcac8dd4e2c4ab74c966d812880c1717ac3e32a297e1"
     },
     {
       "path": "images/sandbox/gum-zombie-prop.png",
@@ -14989,18 +15029,18 @@
     },
     {
       "path": "images/sandbox/heavy-pea-blink.png",
-      "size": 7472,
-      "sha256": "0f253c8cbb15fe4824bed490d27f6c954743b28742cc6b683d228e06e3bc990e"
+      "size": 7765,
+      "sha256": "8d017ff733a5b6eb9f80e76cf68f3025d45cd8297528d24c3a861fb1a9b1bef4"
     },
     {
       "path": "images/sandbox/heavy-pea-head.png",
-      "size": 7497,
-      "sha256": "64a74e8614f508d36936fe8cf28a193a451d6cb7866b909e691b206a7c0e7a87"
+      "size": 7748,
+      "sha256": "578c4f3762ed5390e6d5643b81c629f014c187c52a9ea93808f62330750b2728"
     },
     {
       "path": "images/sandbox/heavy-pea-mouth.png",
-      "size": 2805,
-      "sha256": "edbbb0944f3c3c0cdbfd037799196ec8e5df567db7b91fee279f4bd9325a9fba"
+      "size": 3387,
+      "sha256": "951d2824d953cd1b76373fd5a6310c418fe6907deb2df7bcb9fb4152c38ea80f"
     },
     {
       "path": "images/sandbox/ice-blink.png",
@@ -15009,18 +15049,18 @@
     },
     {
       "path": "images/sandbox/ice-bucket-zombie-body.png",
-      "size": 6201,
-      "sha256": "6ab2b0e316e7fba71ad99023504704407eb18aedb3aab2a010adf7ba7cae9e9e"
+      "size": 6158,
+      "sha256": "29cf991fa6db0568cfa240ff837d0b07a622eaeb3c47b6bee75028a83f038e15"
     },
     {
       "path": "images/sandbox/ice-bucket-zombie-head.png",
-      "size": 5257,
-      "sha256": "4b1c830a10b5e59bf1a531bf0a9d4693072324052a9c9e8c61e776aa79d2cddd"
+      "size": 5587,
+      "sha256": "25ebfe8491c31ae83be49ca4e1027ed710d3f8401aeba9f898d29d2350077dde"
     },
     {
       "path": "images/sandbox/ice-bucket-zombie-jaw.png",
-      "size": 1290,
-      "sha256": "5401560a925dbd8f09ba9a4e1d263c491fc2fc2f03810ffb7e25667c2dc5154b"
+      "size": 1275,
+      "sha256": "27ca84c573d9e9012e6bca4f4201293b6e2a630ac2e27bf0211a23b89a8b690d"
     },
     {
       "path": "images/sandbox/ice-bucket-zombie-prop.png",
@@ -15029,18 +15069,18 @@
     },
     {
       "path": "images/sandbox/ice-gatling-barrel.png",
-      "size": 1545,
-      "sha256": "43e5894aac9619b9ec87698a45dd077e4545ca5c44f2d910dcdbef1bbe077229"
+      "size": 1596,
+      "sha256": "75dbd343a0c066db0a4fa61634ae5c4662cb9d64dba65549b48f58445964c527"
     },
     {
       "path": "images/sandbox/ice-gatling-mouth.png",
-      "size": 4749,
-      "sha256": "ec61417f7c764694c463a35da40dbf734175f1b7bab2b9c3466ed92a54ff50b8"
+      "size": 5152,
+      "sha256": "46b2aa607c07e1b5104427df23da3fde41c2212a4c194fb266e8bfcc389c97e6"
     },
     {
       "path": "images/sandbox/ice-gatling-overlay.png",
-      "size": 3147,
-      "sha256": "67aab73409cee196340d73234a46f47aea93dcec8fe2d52d9f81d75dee56df14"
+      "size": 3561,
+      "sha256": "edce198d7cd46f927f7661f9be59dcd434b4579281791098f59beae36b591363"
     },
     {
       "path": "images/sandbox/ice-head.png",
@@ -15064,13 +15104,13 @@
     },
     {
       "path": "images/sandbox/ice-small-mouth.png",
-      "size": 2098,
-      "sha256": "e7fad1d2ec6ba550480af22bda3c471cab41fb81607991c33ea208df75f3fb42"
+      "size": 2167,
+      "sha256": "87ae28ec9f24dca4fee1ec070c6fb506cd25127663f4aedb30b4cadcbd8dc77c"
     },
     {
       "path": "images/sandbox/light-zombie-body.png",
-      "size": 6343,
-      "sha256": "29675980d626ab96edc95fce987774121163d94348d9c4bb3e01295fef39e88d"
+      "size": 6832,
+      "sha256": "8ad199c7855be8e77e219e7fd7ee2d88e69645ce16b7f0208622d03560442047"
     },
     {
       "path": "images/sandbox/light-zombie-hat.png",
@@ -15079,13 +15119,13 @@
     },
     {
       "path": "images/sandbox/light-zombie-head.png",
-      "size": 4302,
-      "sha256": "3f8fc7b5f3d8154047f0e266a0d815f510583e8424b819402bdfbbb8cfe5e12d"
+      "size": 4817,
+      "sha256": "5dac0e1daf7d35df1f6ffe493948f9d5fd57a1de1f9a0c78fcf702a483928af5"
     },
     {
       "path": "images/sandbox/light-zombie-jaw.png",
-      "size": 1208,
-      "sha256": "aea5ee782d7750c19911ea30c71165df1a75f2070126dbad217c761c9bb1aa62"
+      "size": 1227,
+      "sha256": "a2dbec4a7f92aafd0b21dc0aeccdde993e89d0faaec024620454f02d2b633a16"
     },
     {
       "path": "images/sandbox/light-zombie-prop.png",
@@ -15094,18 +15134,18 @@
     },
     {
       "path": "images/sandbox/parcel-zombie-body.png",
-      "size": 5911,
-      "sha256": "1a8b0d96d7387fead72bea50ea7971601e5665d4703b5875ebe8d541cd658f8f"
+      "size": 6020,
+      "sha256": "8482bc1ec7431c66c36cc3724c4f4cd29383534b197f3ae4d2217fb1e5f7bdca"
     },
     {
       "path": "images/sandbox/parcel-zombie-head.png",
-      "size": 5312,
-      "sha256": "ca255de15287eb25309505d827c20950006f92f09f79e1c9446a390bbe76f5da"
+      "size": 5292,
+      "sha256": "e9fceb3e2c8c9418c3775f8f7b153f534acb4507c2434ab3a66fe2ff863135f2"
     },
     {
       "path": "images/sandbox/parcel-zombie-jaw.png",
-      "size": 1205,
-      "sha256": "9a9fc2db5bf278841806748201da1c1e343096a8c993077f16123825feb75387"
+      "size": 1185,
+      "sha256": "fd592e1634cae9fbc91a39f117d6c64f722af33178d57d09273f96499e8fe6c7"
     },
     {
       "path": "images/sandbox/parcel-zombie-prop.png",
@@ -15114,38 +15154,38 @@
     },
     {
       "path": "images/sandbox/relay-mushroom-blink.png",
-      "size": 3505,
-      "sha256": "9f921d79b504ff05443e9fbc412a9c014c452fd6174f96eb5f9d612b6c0ef20a"
+      "size": 3776,
+      "sha256": "c71a6ad34b87e94bef2f663f690fd76d584fc3a420595c7ff34f0d2788ec9682"
     },
     {
       "path": "images/sandbox/relay-mushroom-cap.png",
-      "size": 7178,
-      "sha256": "99b44d2a75f70b0154110f23183465418bb5da84e0debf4468b7efa8bb95e190"
+      "size": 8099,
+      "sha256": "b59c554e5a9417f944663ade98c1cf9ffcaaf051cab4502b2fb08c6534e9a6e3"
     },
     {
       "path": "images/sandbox/relay-mushroom-head.png",
-      "size": 3540,
-      "sha256": "b6a9a1e8eaf24e284f5372e8160e80406204bc264e2f10e12237d05d206ae267"
+      "size": 3814,
+      "sha256": "c66df030c7216ead54f30e1c89f510b47c689ad0f083d65a16ea89423d8fef2e"
     },
     {
       "path": "images/sandbox/relay-mushroom-stem.png",
-      "size": 195,
-      "sha256": "b7e5dff5f91a302fb553af62baabf27f834a4e25f6dbbce6d96116977a442bd0"
+      "size": 310,
+      "sha256": "c99bf9914dd8613e69ca160fb06a9274a5661fe7678290eb145f0f7dc51de8c2"
     },
     {
       "path": "images/sandbox/repair-zombie-body.png",
-      "size": 5981,
-      "sha256": "71a41a643e9aaa53e6d5f7419f53d67ad0208b15cb7bf275ce84a309f3a57600"
+      "size": 5913,
+      "sha256": "e032c094dbd414110b3809a00d67de9e78a22cb63fa860dee4002b319a3d72b6"
     },
     {
       "path": "images/sandbox/repair-zombie-head.png",
-      "size": 5311,
-      "sha256": "955613db61413aa4c572485f5055349e12b1fb9898cfa12dc5cbfd40c82a6ac8"
+      "size": 5441,
+      "sha256": "d8af6883bcd97659175e55297269371ac01094df1c63087f72b06c55fa413f03"
     },
     {
       "path": "images/sandbox/repair-zombie-jaw.png",
-      "size": 1308,
-      "sha256": "ae83520b6b6e78d3b37af4dd349dc0b8ac40d55729f8cddad750d3fdaef94b32"
+      "size": 1269,
+      "sha256": "0116f13e5a7b7711c1c1f34247c77f04cc98b04e230f000f0d0e309f8d388244"
     },
     {
       "path": "images/sandbox/repair-zombie-prop.png",
@@ -15154,48 +15194,48 @@
     },
     {
       "path": "images/sandbox/rhythm-flower-blink.png",
-      "size": 4982,
-      "sha256": "e44fb7d1869300317828df6a969ac11af0e0303bba623a673144f174a0fd3554"
+      "size": 5892,
+      "sha256": "69b612b2cdfba0dfaf2df8bc942f53c8092e6ad6a5e0f12f44efba5e3d2b1336"
     },
     {
       "path": "images/sandbox/rhythm-flower-head.png",
-      "size": 5034,
-      "sha256": "6d0ad8e6b8ba489f1de002f23b0b87477dbc479fc7044b9ccf95d8e096eec6f1"
+      "size": 5908,
+      "sha256": "8b4f8bb347fde1ee0fc00dfcb787baf6586d4227a0cb2cb27a340eeca9c257f5"
     },
     {
       "path": "images/sandbox/scatter-pea-blink.png",
-      "size": 6946,
-      "sha256": "07c8a92928992244380946aaac8573e615e61b190a0623720fc89ea2ccead14f"
+      "size": 8645,
+      "sha256": "86bad850019a841d5c6dfbf52e0e9638e0f2a704841bba1312f4ba37b7d81189"
     },
     {
       "path": "images/sandbox/scatter-pea-head.png",
-      "size": 6865,
-      "sha256": "4aaf45721378d62c00041ce727b4e98e6e398a76f92b11d270c692293175a56f"
+      "size": 8839,
+      "sha256": "9505fe5a8461180f542db01a2fb5365be44c0e75d527f72dff9e21495716aefe"
     },
     {
       "path": "images/sandbox/scatter-pea-mouth.png",
-      "size": 3033,
-      "sha256": "613f4026f6306016440831008e6ebd06cd743177eba0296d1ef40ed4cf3f82f4"
+      "size": 3512,
+      "sha256": "3e368f16786752a3768664440664313ea47cc4af87a3965845e7732af5e6fd51"
     },
     {
       "path": "images/sandbox/seeker-pea-blink.png",
-      "size": 7681,
-      "sha256": "b6cc02235bca37cca54b7820c2675ded2ab673e6319174c426650fcafc2eed80"
+      "size": 8025,
+      "sha256": "b5bceb7cb3db1a1a0ddc51ac6ca5f4d5a679d8663eb76db91b7f494bf4c8651e"
     },
     {
       "path": "images/sandbox/seeker-pea-head.png",
-      "size": 7828,
-      "sha256": "b4374fc7de12da65d7b84c22fcb3670ad5304a8c74c3760ffc8ace2b914fb766"
+      "size": 8098,
+      "sha256": "9b7b990a140ddb177ee05321ae204d86e904c73d238c07a8d97aa996742a8fee"
     },
     {
       "path": "images/sandbox/seeker-pea-mouth.png",
-      "size": 2778,
-      "sha256": "1f6864aaa8492bfd3b32ce504a135cf00125bc68bfd934a8384cbe4435322d8a"
+      "size": 3577,
+      "sha256": "43761a3b87f10216ea7b5b6afe5ef93b39f677622a05bd2c3f3435b9a6b44939"
     },
     {
       "path": "images/sandbox/smoke-zombie-body.png",
-      "size": 5490,
-      "sha256": "4ca08ed78edb71c9eb7836b9e076e053cde5d6259aaa18b57e0c402285d0149e"
+      "size": 5500,
+      "sha256": "4d56ab50e45ed4a023929aaa8e3d22ba1ddc4dd5d7e415c7f90f3b62176ffa84"
     },
     {
       "path": "images/sandbox/smoke-zombie-hat.png",
@@ -15204,13 +15244,13 @@
     },
     {
       "path": "images/sandbox/smoke-zombie-head.png",
-      "size": 5635,
-      "sha256": "b8b43a9461b8cc725c0699d68f49d6d78c3749cc6c966e09c134b293f56dfffe"
+      "size": 5794,
+      "sha256": "5583208038984a159e7afb3d7b897350c636b92d90f20b7bf404e7cb60c68c25"
     },
     {
       "path": "images/sandbox/smoke-zombie-jaw.png",
-      "size": 1303,
-      "sha256": "e2752dd7693b419c7bd15feb5c9f0190b63c00045743f3b365b569accaea7474"
+      "size": 1286,
+      "sha256": "bcd1e0b1b98758b4f45b20b72cb48cff642dfc36357a879754e21a7ea255e3dc"
     },
     {
       "path": "images/sandbox/smoke-zombie-prop.png",
@@ -15219,43 +15259,43 @@
     },
     {
       "path": "images/sandbox/spring-nut-blink.png",
-      "size": 14176,
-      "sha256": "81c12ae72d9e67e1b5679404175245a70d4d554c66373d69b23c39650644cb1b"
+      "size": 16591,
+      "sha256": "038d67c4927f3edafc3f3442db1943c6a516fc6b05633773babd186abd1660ad"
     },
     {
       "path": "images/sandbox/spring-nut-cracked1.png",
-      "size": 14647,
-      "sha256": "ce21e29897e40a873817300336cb6e253b73c82539910b5f67671c10f1b18d06"
+      "size": 17104,
+      "sha256": "b76846b0d7c22546802263e064a2e31a18da48468f55d4c5917cd48146449424"
     },
     {
       "path": "images/sandbox/spring-nut-cracked2.png",
-      "size": 13647,
-      "sha256": "b3c7a6c068fa72eba97715c652997de8aac1d0b657a80db1367a3508263d2b0d"
+      "size": 16755,
+      "sha256": "90c12e02fe5685f65e9387c48d1a06bae3ca4c0788701862a9e9c25685654f43"
     },
     {
       "path": "images/sandbox/spring-nut-head.png",
-      "size": 14430,
-      "sha256": "3315bd2420f83feea384d0019c9c386700e7d0c36f39209c7f06fea6fc82bfbc"
+      "size": 16757,
+      "sha256": "986d5e8ee01850bedb59e93a63e25f869e2585deb2b9bb179385236eb01594e6"
     },
     {
       "path": "images/sandbox/tiny-pea-blink.png",
-      "size": 8265,
-      "sha256": "6edb2f72f193f97b01dcc3d3b2b1ffaea26efde7ed32de120d08045733733d0f"
+      "size": 8177,
+      "sha256": "53c69e754f9a380d55de50598d521c5c3d610eb0900259ea6da3e66b7e703b31"
     },
     {
       "path": "images/sandbox/tiny-pea-head.png",
-      "size": 8363,
-      "sha256": "545f607e99db813dd2cffeb89461742d0601d98625e056186421c0b4766b8de2"
+      "size": 8294,
+      "sha256": "25714b2c51a8fd018fdf1d8964d2479e076a555605f7f7db75990f398c93d029"
     },
     {
       "path": "images/sandbox/tiny-pea-mouth.png",
-      "size": 3265,
-      "sha256": "7ccdb938a52388a88180004e11f266b1abfdbfec69be27850dd6df3d990186f9"
+      "size": 3702,
+      "sha256": "09c979cdedee3c455fac1685c3a7149944f018ae777fb196f25e1403d8c7d495"
     },
     {
       "path": "images/sandbox/twin-zombie-body.png",
-      "size": 5924,
-      "sha256": "76a428fae79978d0278b11135f9877b74e4b0f0fd93e9b59ab0293c04ba9fd46"
+      "size": 6141,
+      "sha256": "35fa8e51f9a611e873bf258dab40f1dbde9331ac0b16e501c46b1d9b197c2613"
     },
     {
       "path": "images/sandbox/twin-zombie-hat.png",
@@ -15264,18 +15304,218 @@
     },
     {
       "path": "images/sandbox/twin-zombie-head.png",
-      "size": 5650,
-      "sha256": "9f4348c3c2c7e8f68e0a1aaa3ef3ccf2b9d559c3152f50a923bbf0b507f1fcfe"
+      "size": 5874,
+      "sha256": "117d8510005d981312a2fa536e081335864b24310dff5cbd9f6bfb0d8f6a73a3"
     },
     {
       "path": "images/sandbox/twin-zombie-jaw.png",
-      "size": 1233,
-      "sha256": "fcfc24dac5db58320b5bc5262dd6b4be8aa17a287a67f053fe0df4f2fb96359d"
+      "size": 1352,
+      "sha256": "c4fa308eb6bf7bb0956b23a05cefdc280c4c674b25c0e4be08fb5d7d2f06d232"
     },
     {
       "path": "images/sandbox/twin-zombie-prop.png",
       "size": 3456,
       "sha256": "c6e1a118adf08760430413a3a1ea164f81d6db59e7899b518981d6c6fe5b0dc9"
+    },
+    {
+      "path": "images/sandbox/vfx-acid-hit-0.png",
+      "size": 8894,
+      "sha256": "ce36fc26d69e8f8599903f949be6367fea53398737ef1413d31648087bd45e41"
+    },
+    {
+      "path": "images/sandbox/vfx-acid-hit-1.png",
+      "size": 11336,
+      "sha256": "c5cf402e58511bed8fc0fec7d8a463d3be2e9f01bd5ec0a08d7ac457f9b1ede3"
+    },
+    {
+      "path": "images/sandbox/vfx-acid.png",
+      "size": 4114,
+      "sha256": "f0e67c358349f72f7c1292c0f0bc78e9d0617f1e1d0b23afd386421ed0bd36d2"
+    },
+    {
+      "path": "images/sandbox/vfx-charge.png",
+      "size": 6919,
+      "sha256": "4ab13c404d744557d8ac3f278c06cb763fa2cb94249a4472dde3d9bab96ae614"
+    },
+    {
+      "path": "images/sandbox/vfx-electric-hit-0.png",
+      "size": 7685,
+      "sha256": "25776d4fca5b16432c836e3954120931155827a0690ecb9faea4a66ce3ee1749"
+    },
+    {
+      "path": "images/sandbox/vfx-electric-hit-1.png",
+      "size": 11393,
+      "sha256": "b34e6f1c9a473999072bdc20494f5bb26bda9c88e933ab717f1d6215b7ccf684"
+    },
+    {
+      "path": "images/sandbox/vfx-electric.png",
+      "size": 4211,
+      "sha256": "aa7ea63d0e1019fc3b972c466c2015260ed80f066e427ca346c8f36517d4578f"
+    },
+    {
+      "path": "images/sandbox/vfx-fire-hit-0.png",
+      "size": 5454,
+      "sha256": "d6bb90d2e568c9cf9dc4d9f5f21e04a2c43af5c3de9be06ad1052b3873a09838"
+    },
+    {
+      "path": "images/sandbox/vfx-fire-hit-1.png",
+      "size": 10991,
+      "sha256": "51ea42e87fe6c0012b34edd857ab33f83d4c31bb7eb2c1837f094ef4120724a9"
+    },
+    {
+      "path": "images/sandbox/vfx-fire.png",
+      "size": 4822,
+      "sha256": "e1165474dca02ae2e4727a26ff528eba05d26d3f38b46c96d25d561bd7fd21c3"
+    },
+    {
+      "path": "images/sandbox/vfx-gum.png",
+      "size": 5204,
+      "sha256": "342ef173ce8cb3f68223c6fb43cb5245dc674f2a3ecca049c1ae17e8fead6d62"
+    },
+    {
+      "path": "images/sandbox/vfx-heavy-hit-0.png",
+      "size": 8968,
+      "sha256": "dc4149b2a0571da8c7eee16bdbf05997c6d616ce4ab29eb8df6115debdcc3ccd"
+    },
+    {
+      "path": "images/sandbox/vfx-heavy-hit-1.png",
+      "size": 12175,
+      "sha256": "416540a14eecace56a5967abe24f1747ed345a443adefb29007078d01e858d0a"
+    },
+    {
+      "path": "images/sandbox/vfx-heavy.png",
+      "size": 4138,
+      "sha256": "405dde5fbbf582cb4bbbdf230c53f27f1ed6c82ad0e42680b3f159f24b6fc773"
+    },
+    {
+      "path": "images/sandbox/vfx-ice-hit-0.png",
+      "size": 6724,
+      "sha256": "dc21502d920ed4dd39cb12673c7e707a45c312e8e00c2bb727d04d8a8052244f"
+    },
+    {
+      "path": "images/sandbox/vfx-ice-hit-1.png",
+      "size": 11607,
+      "sha256": "805afc0bdb7d3c2bb41ee13ff1d10f7a1e4d34683db304ab582dda8dd7fc44cb"
+    },
+    {
+      "path": "images/sandbox/vfx-ice.png",
+      "size": 4147,
+      "sha256": "694d4ff190ee8d9828fede29faf3316ecec0112fc0e70975f7fb57a3479e6f58"
+    },
+    {
+      "path": "images/sandbox/vfx-link-0.png",
+      "size": 3141,
+      "sha256": "6aedafb78ab090c37a5c55324b7759ddeaec7a71777395548778f46234b75e89"
+    },
+    {
+      "path": "images/sandbox/vfx-link-1.png",
+      "size": 3688,
+      "sha256": "af5a4f3586485b9a9956e2f5ea4ad8ea7674358afbfa42e7879c7788fa0b43b7"
+    },
+    {
+      "path": "images/sandbox/vfx-muzzle-ice.png",
+      "size": 2464,
+      "sha256": "6544c8181a2268c6eb5cfffc585ba040cb14a10f9231f62dc0c4b9f5c327b3d4"
+    },
+    {
+      "path": "images/sandbox/vfx-muzzle-warm.png",
+      "size": 2559,
+      "sha256": "020b1810db656e7e0a3e40679130fca413a947b67109dd2b094112b8bef771fe"
+    },
+    {
+      "path": "images/sandbox/vfx-notes.png",
+      "size": 3166,
+      "sha256": "6780e1d9ce591b62bd80ff34467393da362253757224019bc6863ab3d20560e7"
+    },
+    {
+      "path": "images/sandbox/vfx-poison.png",
+      "size": 3375,
+      "sha256": "ab533c9648b4664e54deab4bb12747af98e479db72d27bdc91ff7ce1d7cfd773"
+    },
+    {
+      "path": "images/sandbox/vfx-repair.png",
+      "size": 3108,
+      "sha256": "dc19e8eff49e2d1522d949d92894d746b4f8fc40df05cf7f43d8c3af9877eb32"
+    },
+    {
+      "path": "images/sandbox/vfx-scatter-hit-0.png",
+      "size": 8006,
+      "sha256": "2fe37abccd5472ce5df6426be9298060363357b29b2162308292253b157c1a90"
+    },
+    {
+      "path": "images/sandbox/vfx-scatter-hit-1.png",
+      "size": 11013,
+      "sha256": "15f433c9df20e795a4d3e920e94bc72b9c319abd3a421df65bba76b0dec360e6"
+    },
+    {
+      "path": "images/sandbox/vfx-scatter.png",
+      "size": 1581,
+      "sha256": "ace76d668436b66888112efe5ca4ffa7d2d0390820f3757dd6cc5442a9447431"
+    },
+    {
+      "path": "images/sandbox/vfx-seeker-hit-0.png",
+      "size": 7930,
+      "sha256": "f514c86b1444f6d45c8a4f6ad6951b175bd26ae8b7c923096b34a0ee6d291c2d"
+    },
+    {
+      "path": "images/sandbox/vfx-seeker-hit-1.png",
+      "size": 10978,
+      "sha256": "a290942071e7f2ee5d33107f2e90862df85f8ccab59e22beda9563790fa70c4f"
+    },
+    {
+      "path": "images/sandbox/vfx-seeker.png",
+      "size": 3881,
+      "sha256": "f590796c26d6f30f260efcca90623f56cb06035d20bc4a87af9a200f590e46ae"
+    },
+    {
+      "path": "images/sandbox/vfx-smoke-0.png",
+      "size": 6532,
+      "sha256": "f0cdd4f85ba1882ac7fa8078b639ba2c2be8910ff014a1b57a151b4ac37496ce"
+    },
+    {
+      "path": "images/sandbox/vfx-smoke-1.png",
+      "size": 12865,
+      "sha256": "b1cf47f86e53bda15cc4ad13cce5f4caa0d8e8822b16c13187ee077bc246f01f"
+    },
+    {
+      "path": "images/sandbox/vfx-smoke-2.png",
+      "size": 8347,
+      "sha256": "a75ca68e3f6959cc797e3efef67820bf316ac63d7690ae8379a88294c74f8d0f"
+    },
+    {
+      "path": "images/sandbox/vfx-sonic-0.png",
+      "size": 3373,
+      "sha256": "9483ac5c8729c620121bb17eefc538e6d6702672b99b5ee32b2eb8116b047cdb"
+    },
+    {
+      "path": "images/sandbox/vfx-sonic-1.png",
+      "size": 5580,
+      "sha256": "f8c51dde40dc589ede2abccaeec00f2c96f2907cdfc0036b35042aee8f25fb60"
+    },
+    {
+      "path": "images/sandbox/vfx-spring-0.png",
+      "size": 6359,
+      "sha256": "7a88b4fadf1216a7fe3c449b6cb706bd1a86745725c396a34429bcb5e464cf11"
+    },
+    {
+      "path": "images/sandbox/vfx-spring-1.png",
+      "size": 5988,
+      "sha256": "ed91274882e4297523f9e5f5a08932af5ca22c6ecb3b9aa858e016baceac3a36"
+    },
+    {
+      "path": "images/sandbox/vfx-tiny-hit-0.png",
+      "size": 7269,
+      "sha256": "0bfe8e1942177d26f351621bd518cedcf6f12a5eb9a72199c7615b51ae8bb688"
+    },
+    {
+      "path": "images/sandbox/vfx-tiny-hit-1.png",
+      "size": 11174,
+      "sha256": "efdebeebe20d148539730093edb3c424a2ae71bb10e17819839757ea044f4116"
+    },
+    {
+      "path": "images/sandbox/vfx-tiny.png",
+      "size": 1099,
+      "sha256": "072fc72207261894f2e0fbe0f473dba652074c90225006923b1f61d4e145e1a5"
     }
   ],
   "delivery": "bundled",
@@ -15284,7 +15524,8 @@
     "addedZombies": 10,
     "totalCustomPlants": 18,
     "totalCustomZombies": 10,
-    "parts": 84,
-    "source": "Built-in image_gen; native-sized separate rig parts; prompts and source atlases in art/expansion"
+    "parts": 124,
+    "vfxParts": 40,
+    "source": "Built-in image_gen; separate rig parts and 40 projectile/VFX sprites; prompts and source atlases in art/expansion"
   }
 }
