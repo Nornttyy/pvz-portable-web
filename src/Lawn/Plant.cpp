@@ -2850,6 +2850,7 @@ void Plant::UpdateReanim()
 		aOffsetY += mApp->mZenGarden->PlantPottedDrawHeightOffset(mSeedType, aScaleY);
 	}
 
+    SandboxPlants::AdjustScale(this,aOffsetX,aOffsetY,aScaleX,aScaleY);
 	aBodyReanim->SetPosition(aOffsetX, aOffsetY);
 	aBodyReanim->OverrideScale(aScaleX, aScaleY);
 }
@@ -4771,6 +4772,7 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
 		aProjectile->mCobTargetX = mTargetX - 40;
 		aProjectile->mCobTargetRow = mBoard->PixelToGridYKeepOnBoard(mTargetX, mTargetY);
 	}
+    SandboxPlants::OnFired(this,aProjectile,theTargetZombie);
 }
 
 Zombie* Plant::FindTargetZombie(int theRow, PlantWeapon thePlantWeapon)

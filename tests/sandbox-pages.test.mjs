@@ -30,7 +30,7 @@ test('default page uses integrated sandbox and project-relative paths, not loopb
   }
   assert.doesNotMatch((await read('site/resource-import.mjs')).toString(), /\bfetch\s*\(|XMLHttpRequest|sendBeacon/);
   const manifest = validateManifest(JSON.parse(await read('site/resource-manifest.json')));
-  assert.equal(manifest.totalFiles, 2924);
+  assert.equal(manifest.totalFiles, 3006);
 });
 
 test('published sandbox engine matches the recorded build and really initializes its exported API', async () => {
@@ -53,8 +53,8 @@ test('published sandbox engine matches the recorded build and really initializes
   assert.equal(Module._pvz_sandbox_plant_data(0, 0), -1);
 });
 
-test('sandbox source and all eight custom plant IDs are included', async () => {
-  assert.deepEqual(ORIGINAL_PLANTS.map(p => p.id), [100, 101, 102, 103, 104, 105, 106, 107]);
+test('sandbox source and all eighteen custom plant IDs are included', async () => {
+  assert.deepEqual(ORIGINAL_PLANTS.map(p => p.id), Array.from({length:18},(_,i)=>100+i));
   const layout = {schema: 1, map: 0, plants: [{type: 100, col: 2, row: 2}]};
   assert.deepEqual(validateLayout(layout), layout);
   for (const file of ['Sandbox.cpp', 'SandboxUI.cpp', 'SandboxPlants.cpp', 'SandboxButton.cpp']) assert.ok((await read('src/' + file)).length > 1000);
@@ -69,7 +69,10 @@ test('legacy import verification and bundled entry retain the exact complete res
   await assert.rejects(verifyResourceBytes(new Uint8Array([1]), manifest), /版本不匹配/);
   await assert.rejects(verifyResourceBytes(new Uint8Array([3, 2, 1]), manifest), /校验失败/);
   const deployed = JSON.parse(await read('site/resource-manifest.json'));
-  assert.equal(deployed.bundle.sha256, '6520aa03a514157ebae8db7fac0ec753011a65ff4cf0d01e26c1f0e399a339e6');
+  const baseline=JSON.parse(await read('tests/baseline-assets.json'));
+  const original=deployed.files.filter(f=>!f.path.startsWith('images/sandbox/'));
+  assert.equal(original.length,baseline.fileCount);
+  assert.equal(createHash('sha256').update(original.map(f=>`${f.path}:${f.size}:${f.sha256}`).join('\n')).digest('hex'),baseline.sha256);
 });
 
 test('cache blocked, denied and hanging cases fail open without touching save databases', async () => {

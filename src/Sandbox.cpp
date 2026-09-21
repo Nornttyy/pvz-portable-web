@@ -58,6 +58,7 @@ bool SandboxExit() {
     app->mBoardResult = BOARDRESULT_NONE;
     app->KillBoard();
     SandboxPlants::Reset();
+    SandboxZombies::Reset();
     app->mPlayerInfo = adventureProfile;
     adventureProfile = nullptr;
     app->mGameMode = previousMode;
@@ -80,6 +81,7 @@ void SandboxStart(int map) {
     app->KillSeedChooserScreen();
     app->KillBoard();
     SandboxPlants::Reset();
+    SandboxZombies::Reset();
     if (!sandboxProfile) sandboxProfile = std::make_unique<PlayerInfo>();
     auto* profile = sandboxProfile.get();
     profile->mName = "Sandbox";
@@ -126,9 +128,10 @@ void SandboxStart(int map) {
 void SandboxTick(Board* board) {
     if (!gSandboxEnabled) return;
     SandboxUITick(board);
-    SandboxPlants::Tick(board);
     board->mSunMoney = 9999;
     board->mPaused = paused && !stepOnce;
+    SandboxPlants::Tick(board);
+    SandboxZombies::Tick(board);
     stepOnce = false;
 }
 void SandboxEscaped() { ++escaped; }
@@ -146,6 +149,7 @@ static void ClearEnemies(Board* board) {
     for (auto* zombie : board->mZombies) if (!zombie->mDead) zombie->DieNoLoot();
     for (auto* shot : board->mProjectiles) if (!shot->mDead) shot->Die();
     board->ProcessDeleteQueue();
+    SandboxZombies::Reset();
 }
 static int PlacePlant(Board* board, int type, int col, int row) {
     if (!SandboxRules::ValidPlant(type) || !SandboxRules::ValidCell(col, row, mapType == 1)) return -2;
@@ -175,7 +179,7 @@ static int PlacePlant(Board* board, int type, int col, int row) {
 static int Spawn(Board* board, int type, int col, int row) {
     if (!SandboxRules::ValidZombie(type) || !SandboxRules::ValidCell(col, row, mapType == 1)) return -2;
     if (ZombieCount(board) >= SandboxRules::MaxZombies || board->mZombies.mSize >= board->mZombies.mMaxSize - 8) return -3;
-    auto zombieType = static_cast<ZombieType>(type);
+    auto zombieType = static_cast<ZombieType>(SandboxZombies::Base(type));
     const bool water = board->IsPoolSquare(col, row);
     if (water && !Zombie::ZombieTypeCanGoInPool(zombieType) && zombieType != ZOMBIE_BALLOON) return -5;
     if (!water && (zombieType == ZOMBIE_SNORKEL || zombieType == ZOMBIE_DOLPHIN_RIDER || zombieType == ZOMBIE_DUCKY_TUBE)) return -5;
@@ -184,6 +188,7 @@ static int Spawn(Board* board, int type, int col, int row) {
     if (!zombie) return -3;
     zombie->mPosX = static_cast<float>(board->GridToPixelX(col, row) + 10);
     zombie->mX = static_cast<int>(zombie->mPosX);
+    SandboxZombies::Assign(zombie,type);
     zombie->UpdateReanim();
     board->MarkAllDirty();
     return 1;

@@ -4,6 +4,7 @@
 #include "SandboxRules.h"
 #include "SandboxUIRules.h"
 #include "SandboxPlants.h"
+#include "SandboxZombies.h"
 #include "SandboxButton.h"
 #include "SandboxFonts.h"
 #include "LawnApp.h"
@@ -29,7 +30,7 @@ using namespace Sexy;
 using namespace SandboxUIRules;
 namespace {
 enum Tool { PlantTool, ZombieTool, EraseTool, InteractTool };
-int panel=0, plantPage=0, selectedPlant=0, selectedZombie=0, plantSlot=0, zombieSlot=0;
+int panel=0, plantPage=0, zombiePage=0, selectedPlant=0, selectedZombie=0, plantSlot=0, zombieSlot=0;
 Tool tool=PlantTool;
 std::array<int,6> plants{0,1,2,3,5,7}, zombies{0,2,4,7,23,24};
 bool wasPaused=true, painting=false, dirty=false, showZombies=false;
@@ -63,6 +64,11 @@ void StorageAction(int action) {
 void Portrait(Graphics* g, Box b, int type) {
     const float scale=b.w/76.0f;
     g->DrawImage(IMAGE_ALMANAC_ZOMBIEWINDOW,b.x,b.y,b.w,b.h);
+    if(SandboxZombies::Find(type)){
+        Graphics clipped(*g);clipped.SetClipRect(b.x+2,b.y+2,b.w-4,b.h-4);
+        SandboxZombies::DrawPortrait(&clipped,b.x,b.y,b.w,b.h,type);
+        g->DrawImage(IMAGE_ALMANAC_ZOMBIEWINDOW2,b.x,b.y,b.w,b.h);return;
+    }
     Graphics z(*g);
     z.SetClipRect(b.x+2,b.y+2,b.w-4,b.h-4);
     z.TranslateF(b.x+scale,b.y-6*scale);
@@ -91,6 +97,7 @@ std::string SelectedName() {
     if(tool==EraseTool)return "铲除";
     if(tool==InteractTool)return "操作场地";
     if(tool==PlantTool){const auto* custom=SandboxPlants::Find(selectedPlant);return custom?custom->name:Plant::GetNameString(static_cast<SeedType>(selectedPlant));}
+    if(auto* custom=SandboxZombies::Find(selectedZombie))return custom->name;
     return std::string(PvzpStringTranslate(std::string("[")+GetZombieDefinition(static_cast<ZombieType>(selectedZombie)).mZombieName+"]"));
 }
 void Place(int cell, bool erase=false) {
@@ -125,7 +132,7 @@ void Action(int index) {
 }
 
 void SandboxUIReset() {
-    panel=0;plantPage=0;tool=PlantTool;showZombies=false;painting=false;dirty=false;wasPaused=true;
+    panel=0;plantPage=zombiePage=0;tool=PlantTool;showZombies=false;painting=false;dirty=false;wasPaused=true;
     selectedPlant=0;selectedZombie=0;plantSlot=zombieSlot=0;lastCell=-1;lastPlantCount=0;messageTicks=0;
     plants={0,1,2,3,5,7};zombies={0,2,4,7,23,24};
     PvzpLoadResources("DelayLoad_Almanac");
@@ -154,6 +161,8 @@ void SandboxUIFeedback(int code) {
 void SandboxDrawUI(Graphics* g) {
     const int flags=Command(0);
     if(flags<0)return;
+    SandboxPlants::DrawEffects(g,gLawnApp->mBoard);
+    SandboxZombies::DrawEffects(g,gLawnApp->mBoard);
     g->DrawImage(IMAGE_SEEDBANK,0,0);
     PvzpDrawString(g,"9999",34,78,FONT_CONTINUUMBOLD14,Color::Black,DS_ALIGN_CENTER);
     for(int i=0;i<6;++i){
@@ -185,8 +194,8 @@ void SandboxDrawUI(Graphics* g) {
     if(panel==1) {
         title=plantPage?"原创植物":"选择植物";
         std::string note=plantPage?"选择卡片后，点击草地种植":"";
-        for(int i=0;i<(plantPage?8:48);++i){
-            const int id=plantPage?100+i:i;auto b=PlantCard(i);
+        for(int i=0;i<(plantPage?int(SandboxPlants::Definitions.size()):48);++i){
+            const int id=plantPage?100+i:i;auto b=plantPage?CustomPlantCard(i):PlantCard(i);
             SandboxPlants::DrawCard(g,b.x,b.y,id);
             if(Hover(b)){
                 Outline(g,b);
@@ -196,18 +205,31 @@ void SandboxDrawUI(Graphics* g) {
             }
         }
         if(plantPage){
-            PvzpDrawString(g,note,400,245,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
-            for(int i=0;i<8;++i){
-                const auto b=PlantCard(i);
-                PvzpDrawString(g,std::to_string(i+1),b.x+25,218,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
+            PvzpDrawString(g,note,400,538,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
+            for(int i=0;i<int(SandboxPlants::Definitions.size());++i){
+                const auto b=CustomPlantCard(i);
+                PvzpDrawString(g,std::to_string(i+1),b.x+25,b.y+80,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
                 const auto& d=SandboxPlants::Definitions[i];
-                PvzpDrawString(g,std::format("{}. {}",i+1,d.name),205+(i%2)*210,290+(i/2)*48,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_LEFT);
+                PvzpDrawString(g,std::format("{}. {}",i+1,d.name),190+(i%3)*144,390+(i/3)*24,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_LEFT);
             }
         }
         Button(g,OriginalPage,"原版植物",plantPage==0);
         Button(g,CustomPage,"原创植物",plantPage==1);
     } else if(panel==2) {
-        for(int i=0;i<static_cast<int>(Zombies.size());++i){auto b=ZombieCard(i);Portrait(g,b,Zombies[i]);if(Hover(b)){Outline(g,b);title=PvzpStringTranslate(std::string("[")+GetZombieDefinition(static_cast<ZombieType>(Zombies[i])).mZombieName+"]");}}
+        std::string note="选择卡片后，点击草地放置";
+        title=zombiePage?"原创僵尸":"选择僵尸";
+        const int count=zombiePage?int(SandboxZombies::Definitions.size()):int(Zombies.size());
+        for(int i=0;i<count;++i){
+            auto b=ZombieCard(i);const int id=zombiePage?200+i:Zombies[i];Portrait(g,b,id);
+            if(Hover(b)){Outline(g,b);if(auto* d=SandboxZombies::Find(id)){title=d->name;note=d->note;}else title=PvzpStringTranslate(std::string("[")+GetZombieDefinition(static_cast<ZombieType>(id)).mZombieName+"]");}
+            if(zombiePage)PvzpDrawString(g,std::to_string(i+1),b.x+38,b.y+82,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
+        }
+        if(zombiePage){
+            for(int i=0;i<count;++i)PvzpDrawString(g,std::format("{}. {}",i+1,SandboxZombies::Definitions[i].name),205+(i%2)*210,332+(i/2)*38,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_LEFT);
+            PvzpDrawString(g,note,400,530,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
+        }
+        Button(g,OriginalPage,"原版僵尸",zombiePage==0);
+        Button(g,CustomPage,"原创僵尸",zombiePage==1);
     } else {
         const std::array<std::string,14> labels{"白天草地","白天泳池","清除僵尸","清空场地","保存阵型","读取阵型","导出阵型","导入阵型",flags&8?"蘑菇免唤醒":"蘑菇正常睡眠","单步","每路一只","操作场地","全屏","返回主菜单"};
         for(int i=0;i<14;++i)Button(g,MenuAction(i),labels[i],i==(flags&4?1:0));
@@ -245,11 +267,12 @@ bool SandboxMouseDown(int x,int y,int clicks) {
     if(panel){
         if(Close.Contains(x,y)){ClosePanel();return true;}
         if(panel==1&&(OriginalPage.Contains(x,y)||CustomPage.Contains(x,y))){plantPage=CustomPage.Contains(x,y)?1:0;gLawnApp->PlaySample(SOUND_GRAVEBUTTON);return true;}
-        if(panel==1)for(int i=0;i<(plantPage?8:48);++i)if(PlantCard(i).Contains(x,y)){
+        if(panel==2&&(OriginalPage.Contains(x,y)||CustomPage.Contains(x,y))){zombiePage=CustomPage.Contains(x,y)?1:0;gLawnApp->PlaySample(SOUND_GRAVEBUTTON);return true;}
+        if(panel==1)for(int i=0;i<(plantPage?int(SandboxPlants::Definitions.size()):48);++i)if((plantPage?CustomPlantCard(i):PlantCard(i)).Contains(x,y)){
             selectedPlant=plantPage?100+i:i;plants[plantSlot]=selectedPlant;tool=PlantTool;showZombies=false;ClosePanel();gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;
         }
-        if(panel==2)for(int i=0;i<static_cast<int>(Zombies.size());++i)if(ZombieCard(i).Contains(x,y)){
-            selectedZombie=Zombies[i];zombies[zombieSlot]=selectedZombie;tool=ZombieTool;showZombies=true;ClosePanel();gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;
+        if(panel==2)for(int i=0;i<(zombiePage?int(SandboxZombies::Definitions.size()):int(Zombies.size()));++i)if(ZombieCard(i).Contains(x,y)){
+            selectedZombie=zombiePage?200+i:Zombies[i];zombies[zombieSlot]=selectedZombie;tool=ZombieTool;showZombies=true;ClosePanel();gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;
         }
         if(panel==3)for(int i=0;i<14;++i)if(MenuAction(i).Contains(x,y)){gLawnApp->PlaySample(SOUND_GRAVEBUTTON);Action(i);return true;}
         // The panel owns all pointer input, including the dimmed lawn.

@@ -2,11 +2,13 @@
 #include <array>
 class Plant;
 class Board;
+class Projectile;
+class Zombie;
 namespace Sexy { class Graphics; }
 namespace SandboxPlants {
-enum class Element { Fire, Ice, Alternating };
-struct Definition { int id, base; Element element; const char* name; const char* note; };
-inline constexpr std::array<Definition,8> Definitions{{
+enum class Element { Fire, Ice, Alternating, Native };
+struct Definition { int id, base; Element element; const char* name; const char* note; const char* art=nullptr; int rate=0,damage=20; float scale=1.0f; };
+inline constexpr std::array<Definition,18> Definitions{{
     {100,0,Element::Fire,"火焰豌豆","火球攻击 · 小范围伤害"},
     {101,7,Element::Ice,"双发寒冰","连续两发 · 寒冰减速"},
     {102,7,Element::Fire,"双发火焰","连续两发 · 火球攻击"},
@@ -15,9 +17,19 @@ inline constexpr std::array<Definition,8> Definitions{{
     {105,40,Element::Ice,"寒冰机枪","连续四发 · 寒冰减速"},
     {106,40,Element::Fire,"火焰机枪","连续四发 · 火球攻击"},
     {107,7,Element::Alternating,"冰火双发","冰火交替 · 火焰会解除减速"},
+    {108,0,Element::Native,"回声花","两次声波 · 穿过整路敌人","echo-lily",240,18},
+    {109,3,Element::Native,"弹簧坚果","受到攻击后弹开敌人 · 需要恢复","spring-nut"},
+    {110,1,Element::Native,"节拍花","生产阳光 · 加快周围植物攻击","rhythm-flower"},
+    {111,8,Element::Native,"雷网蘑菇","同列两株连成电网 · 需要配对","relay-mushroom"},
+    {112,0,Element::Native,"电能豌豆","电击跳向附近两只敌人","electric-pea",160,20},
+    {113,0,Element::Native,"小豌豆","体型小 · 攻速快 · 单发伤害低","tiny-pea",75,10,0.72f},
+    {114,0,Element::Native,"重炮豌豆","慢速重击 · 推退敌人","heavy-pea",360,65,1.04f},
+    {115,0,Element::Native,"散射豌豆","三发散射 · 攻击相邻三路","scatter-pea",180,14},
+    {116,0,Element::Native,"追击豌豆","子弹转向 · 自动追击敌人","seeker-pea",180,18},
+    {117,0,Element::Native,"腐化豌豆","命中后持续伤害 · 再次命中刷新","acid-pea",180,12},
 }};
 constexpr const Definition* Find(int id) {
-    return id>=100 && id<108 ? &Definitions[id-100] : nullptr;
+    return id>=100 && id<100+static_cast<int>(Definitions.size()) ? &Definitions[id-100] : nullptr;
 }
 constexpr int Base(int id) { const auto* d=Find(id);return d?d->base:id; }
 constexpr Element ShotElement(int id,int shot) {
@@ -33,4 +45,11 @@ bool IsCustom(const Plant* plant);
 int NextShot(Plant* plant);
 void Tick(Board* board);
 void DrawCard(Sexy::Graphics* g,int x,int y,int id);
+void OnFired(Plant* plant,Projectile* shot,Zombie* target);
+bool Impact(Projectile* shot,Zombie* target);
+void ForgetShot(Projectile* shot);
+void UpdateShot(Projectile* shot);
+void DrawEffects(Sexy::Graphics* g,Board* board);
+void AdjustScale(const Plant* plant,float& x,float& y,float& sx,float& sy);
+void DrawShot(Sexy::Graphics* g,const Projectile* shot);
 }

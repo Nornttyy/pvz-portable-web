@@ -32,6 +32,7 @@
 #include "Challenge.h"
 #include "Projectile.h"
 #include "../LawnApp.h"
+#include "../SandboxZombies.h"
 #include "../Resources.h"
 #include "System/PlayerInfo.h"
 #include "System/Zombatar.h"
@@ -4137,6 +4138,7 @@ void Zombie::UpdateZombieWalking()
 			}
 		}
 
+        aSpeed *= SandboxZombies::Speed(this);
 		if (IsWalkingBackwards() || mZombiePhase == ZombiePhase::PHASE_DANCER_DANCING_IN)
 		{
 			mPosX += aSpeed;
@@ -7276,6 +7278,7 @@ bool Zombie::TrySpawnLevelAward()
 
 void Zombie::DropLoot()
 {
+    SandboxZombies::CombatDeath(this);
 	if (!IsOnBoard())
 		return;
 
@@ -7969,6 +7972,7 @@ void Zombie::TakeBodyDamage(int theDamage, unsigned int theDamageFlags)
 
 void Zombie::TakeDamage(int theDamage, unsigned int theDamageFlags)
 {
+    theDamage=SandboxZombies::Damage(this,theDamage);
 	if (mZombiePhase == ZombiePhase::PHASE_JACK_IN_THE_BOX_POPPING || IsDeadOrDying())
 		return;
 
@@ -8025,6 +8029,7 @@ float Zombie::GetPosYBasedOnRow(int theRow)
 
 Zombie::~Zombie()
 {
+    SandboxZombies::Forget(this);
 	AttachmentDie(mAttachmentID);
 	StopZombieSound();
 }

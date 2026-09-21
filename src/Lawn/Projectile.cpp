@@ -25,6 +25,7 @@
 #include "Cutscene.h"
 #include "Projectile.h"
 #include "../LawnApp.h"
+#include "../SandboxPlants.h"
 #include "../Resources.h"
 #include "../GameConstants.h"
 #include "../PvzpLib/PvzpFoley.h"
@@ -824,7 +825,8 @@ void Projectile::DoImpact(Zombie* theZombie)
 {
 	PlayImpactSound(theZombie);
 
-	if (IsSplashDamage(theZombie))
+    const bool sandboxImpact=SandboxPlants::Impact(this,theZombie);
+	if (!sandboxImpact && IsSplashDamage(theZombie))
 	{
 		if (mProjectileType == ProjectileType::PROJECTILE_FIREBALL && theZombie)
 		{
@@ -833,7 +835,7 @@ void Projectile::DoImpact(Zombie* theZombie)
 
 		DoSplashDamage(theZombie);
 	}
-	else if (theZombie)
+	else if (!sandboxImpact && theZombie)
 	{
 		unsigned int aDamageFlags = GetDamageFlags(theZombie);
 		theZombie->TakeDamage(GetProjectileDef().mDamage, aDamageFlags);
@@ -939,6 +941,7 @@ void Projectile::DoImpact(Zombie* theZombie)
 
 void Projectile::Update()
 {
+    SandboxPlants::UpdateShot(this);
 	mProjectileAge++;
 	if (mApp->mGameScene != GameScenes::SCENE_PLAYING && !mBoard->mCutScene->ShouldRunUpsellBoard())
 		return;
@@ -974,6 +977,7 @@ void Projectile::Update()
 
 void Projectile::Draw(Graphics* g)
 {
+    SandboxPlants::DrawShot(g,this);
 	const ProjectileDefinition& aProjectileDef = GetProjectileDef();
 
 	Image* aImage = nullptr;
@@ -1151,6 +1155,7 @@ void Projectile::DrawShadow(Graphics* g)
 
 void Projectile::Die()
 {
+    SandboxPlants::ForgetShot(this);
 	mDead = true;
 
 	if (mProjectileType == ProjectileType::PROJECTILE_PUFF || mProjectileType == ProjectileType::PROJECTILE_SNOWPEA)

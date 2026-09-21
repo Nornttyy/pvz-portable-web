@@ -1,5 +1,6 @@
 #pragma once
 #include "SandboxPlants.h"
+#include "SandboxZombies.h"
 namespace SandboxRules {
 inline constexpr int MaxPlants = 180;
 inline constexpr int MaxZombies = 160;
@@ -8,6 +9,6 @@ constexpr bool ValidCell(int col, int row, bool pool) { return col >= 0 && col <
 constexpr bool ValidPlant(int type) { return (type >= 0 && type < 48) || SandboxPlants::Find(type); }
 constexpr bool ValidSpeed(int speed) { return speed == 1 || speed == 2 || speed == 4; }
 constexpr bool ValidZombie(int type) {
-    return (type >= 0 && type <= 24 && type != 9 && type != 13 && type != 20) || type == 32;
+    return (type >= 0 && type <= 24 && type != 9 && type != 13 && type != 20) || type == 32 || SandboxZombies::Find(type);
 }
 }

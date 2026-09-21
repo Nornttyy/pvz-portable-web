@@ -1,0 +1,22 @@
+[
+  {
+    "key": "fire-hardware",
+    "prompt": "Use case: precise-object-edit. A transparent 2 by 2 sprite atlas for classic 2009 Plants vs Zombies. Four provided input images are exact geometry references, one per quadrant in their input order. Preserve the silhouette, rough original ink lines, simple flat painted shading, holes and projection of each input; only change GREEN botanical surfaces to warm orange-red with pale yellow edging while retaining dark charcoal outlines and dark hollow tube interiors. Output top left: GatlingPea mouth; top right: GatlingPea one barrel; bottom left: GatlingPea mouth overlay; bottom right: tall narrow ThreePeater mouth. Independent detached rigging parts, never a whole plant, no head, no leaves. Match these four exact shapes and relative aspect ratios 52:60, 43:27, 38:60, 19:43, each centered in its own equal quadrant with generous transparent margins. No extra flames, ice crystals, text, shadows, shine or modern redesign. Actual transparent alpha background.",
+    "refs": [
+      "GatlingPea_mouth.png",
+      "GatlingPea_barrel.png",
+      "GatlingPea_mouth_overlay.png",
+      "ThreePeater_mouth.png"
+    ]
+  },
+  {
+    "key": "ice-hardware",
+    "prompt": "Use case: precise-object-edit. A transparent 2 by 2 sprite atlas for classic 2009 Plants vs Zombies. Four provided input images are exact geometry references, one per quadrant in their input order. Preserve the silhouette, rough original ink lines, simple flat painted shading, holes and projection of each input; only change GREEN botanical surfaces to muted icy cyan-blue while retaining dark charcoal outlines and dark hollow tube interiors. Output top left: GatlingPea mouth; top right: GatlingPea one barrel; bottom left: GatlingPea mouth overlay; bottom right: tall narrow ThreePeater mouth. Independent detached rigging parts, never a whole plant, no head, no leaves. Match these four exact shapes and relative aspect ratios 52:60, 43:27, 38:60, 19:43, each centered in its own equal quadrant with generous transparent margins. No extra flames, ice crystals, text, shadows, shine or modern redesign. Actual transparent alpha background.",
+    "refs": [
+      "GatlingPea_mouth.png",
+      "GatlingPea_barrel.png",
+      "GatlingPea_mouth_overlay.png",
+      "ThreePeater_mouth.png"
+    ]
+  }
+]

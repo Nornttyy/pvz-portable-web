@@ -1,0 +1,150 @@
+[
+  {
+    "key": "electric-pea",
+    "prompt": "Use case: stylized-concept. Production transparent PNG skeletal game sprite part atlas. Match the provided classic 2009 Plants vs. Zombies PC sprite references in outline thickness, irregular ink, muted painted flat shading and silhouette simplicity. These are reference images for style/geometry, not images to modify. Must read naturally when downsampled to 50 pixels. No 3D, no realistic textures, no glossy mobile art, no text/labels/grid/ground/shadow. Exactly four detached isolated parts on a 2-by-2 evenly spaced transparent square atlas, each within its own quadrant with at least 15 percent clear padding. True transparent alpha. Subject: A blue-violet pea with tiny yellow lightning eyebrow markings and two short pale yellow leaf-shaped electric tips at the back of the head. Top left: isolated head WITHOUT any muzzle or stem, facing right, eyes open. Top right: EXACT SAME isolated head with eyes shut in blink, identical size, contour and position in its quadrant. Bottom left: detached RIGHT-FACING muzzle only; a short flared oval tube, side view, no face attached. Bottom right: one detached simple green leaf. Preserve classic round pea silhouette and black oval eyes.",
+    "refs": [
+      "PeaShooter_Head.png",
+      "PeaShooter_mouth.png"
+    ]
+  },
+  {
+    "key": "tiny-pea",
+    "prompt": "Use case: stylized-concept. Production transparent PNG skeletal game sprite part atlas. Match the provided classic 2009 Plants vs. Zombies PC sprite references in outline thickness, irregular ink, muted painted flat shading and silhouette simplicity. These are reference images for style/geometry, not images to modify. Must read naturally when downsampled to 50 pixels. No 3D, no realistic textures, no glossy mobile art, no text/labels/grid/ground/shadow. Exactly four detached isolated parts on a 2-by-2 evenly spaced transparent square atlas, each within its own quadrant with at least 15 percent clear padding. True transparent alpha. Subject: A young light apple-green pea, simple round juvenile silhouette, one tiny leaf sprout, friendly two black oval eyes, small natural snout. Small peashooter variant, not anime. Top left: isolated head WITHOUT any muzzle or stem, facing right, eyes open. Top right: EXACT SAME isolated head with eyes shut in blink, identical size, contour and position in its quadrant. Bottom left: detached RIGHT-FACING muzzle only; a short flared oval tube, side view, no face attached. Bottom right: one detached simple green leaf. Preserve classic round pea silhouette and black oval eyes.",
+    "refs": [
+      "PeaShooter_Head.png",
+      "PeaShooter_mouth.png"
+    ]
+  },
+  {
+    "key": "heavy-pea",
+    "prompt": "Use case: stylized-concept. Production transparent PNG skeletal game sprite part atlas. Match the provided classic 2009 Plants vs. Zombies PC sprite references in outline thickness, irregular ink, muted painted flat shading and silhouette simplicity. These are reference images for style/geometry, not images to modify. Must read naturally when downsampled to 50 pixels. No 3D, no realistic textures, no glossy mobile art, no text/labels/grid/ground/shadow. Exactly four detached isolated parts on a 2-by-2 evenly spaced transparent square atlas, each within its own quadrant with at least 15 percent clear padding. True transparent alpha. Subject: A stout dark olive pea with thick brow and a squat broad cannon-shaped botanical muzzle, two small dark leaf ridges on the back. No steel or machines. Top left: isolated head WITHOUT any muzzle or stem, facing right, eyes open. Top right: EXACT SAME isolated head with eyes shut in blink, identical size, contour and position in its quadrant. Bottom left: detached RIGHT-FACING muzzle only; a short flared oval tube, side view, no face attached. Bottom right: one detached simple green leaf. Preserve classic round pea silhouette and black oval eyes.",
+    "refs": [
+      "PeaShooter_Head.png",
+      "PeaShooter_mouth.png"
+    ]
+  },
+  {
+    "key": "scatter-pea",
+    "prompt": "Use case: stylized-concept. Production transparent PNG skeletal game sprite part atlas. Match the provided classic 2009 Plants vs. Zombies PC sprite references in outline thickness, irregular ink, muted painted flat shading and silhouette simplicity. These are reference images for style/geometry, not images to modify. Must read naturally when downsampled to 50 pixels. No 3D, no realistic textures, no glossy mobile art, no text/labels/grid/ground/shadow. Exactly four detached isolated parts on a 2-by-2 evenly spaced transparent square atlas, each within its own quadrant with at least 15 percent clear padding. True transparent alpha. Subject: A golden yellow pea with a three-lobed petal muzzle opening, three short olive back leaves. Clearly still a simple peashooter, no mechanical weapon. Top left: isolated head WITHOUT any muzzle or stem, facing right, eyes open. Top right: EXACT SAME isolated head with eyes shut in blink, identical size, contour and position in its quadrant. Bottom left: detached RIGHT-FACING muzzle only; a short flared oval tube, side view, no face attached. Bottom right: one detached simple green leaf. Preserve classic round pea silhouette and black oval eyes.",
+    "refs": [
+      "PeaShooter_Head.png",
+      "PeaShooter_mouth.png"
+    ]
+  },
+  {
+    "key": "seeker-pea",
+    "prompt": "Use case: stylized-concept. Production transparent PNG skeletal game sprite part atlas. Match the provided classic 2009 Plants vs. Zombies PC sprite references in outline thickness, irregular ink, muted painted flat shading and silhouette simplicity. These are reference images for style/geometry, not images to modify. Must read naturally when downsampled to 50 pixels. No 3D, no realistic textures, no glossy mobile art, no text/labels/grid/ground/shadow. Exactly four detached isolated parts on a 2-by-2 evenly spaced transparent square atlas, each within its own quadrant with at least 15 percent clear padding. True transparent alpha. Subject: A mint-green pea with one large eye and one small eye and a curled leaf shaped like a gentle antenna, narrow trumpet muzzle. Quirky plant, no electronics. Top left: isolated head WITHOUT any muzzle or stem, facing right, eyes open. Top right: EXACT SAME isolated head with eyes shut in blink, identical size, contour and position in its quadrant. Bottom left: detached RIGHT-FACING muzzle only; a short flared oval tube, side view, no face attached. Bottom right: one detached simple green leaf. Preserve classic round pea silhouette and black oval eyes.",
+    "refs": [
+      "PeaShooter_Head.png",
+      "PeaShooter_mouth.png"
+    ]
+  },
+  {
+    "key": "acid-pea",
+    "prompt": "Use case: stylized-concept. Production transparent PNG skeletal game sprite part atlas. Match the provided classic 2009 Plants vs. Zombies PC sprite references in outline thickness, irregular ink, muted painted flat shading and silhouette simplicity. These are reference images for style/geometry, not images to modify. Must read naturally when downsampled to 50 pixels. No 3D, no realistic textures, no glossy mobile art, no text/labels/grid/ground/shadow. Exactly four detached isolated parts on a 2-by-2 evenly spaced transparent square atlas, each within its own quadrant with at least 15 percent clear padding. True transparent alpha. Subject: A muted violet plum pea with pale yellow-green small spots, sleepy black oval eyes, soft olive green lip at the muzzle rim; venom botanical theme, no liquid trails. Top left: isolated head WITHOUT any muzzle or stem, facing right, eyes open. Top right: EXACT SAME isolated head with eyes shut in blink, identical size, contour and position in its quadrant. Bottom left: detached RIGHT-FACING muzzle only; a short flared oval tube, side view, no face attached. Bottom right: one detached simple green leaf. Preserve classic round pea silhouette and black oval eyes.",
+    "refs": [
+      "PeaShooter_Head.png",
+      "PeaShooter_mouth.png"
+    ]
+  },
+  {
+    "key": "parcel-zombie",
+    "base": 2,
+    "prompt": "Use case: stylized-concept. Production transparent PNG skeletal game sprite part atlas. Match the provided classic 2009 Plants vs. Zombies PC sprite references in outline thickness, irregular ink, muted painted flat shading and silhouette simplicity. These are reference images for style/geometry, not images to modify. Must read naturally when downsampled to 50 pixels. No 3D, no realistic textures, no glossy mobile art, no text/labels/grid/ground/shadow. Exactly four detached isolated parts on a 2-by-2 evenly spaced transparent square atlas, each within its own quadrant with at least 15 percent clear padding. True transparent alpha. Subject: a humorous original zombie variant, shabby ochre delivery jacket and a dented brown cardboard box helmet with a strip of beige tape; gray green skin. Prop is the box helmet. All parts face LEFT in the same three-quarter profile as reference. Top left: isolated upper head, gray green skin, bulging white eyes and crooked upper teeth; NO lower jaw, no neck, no hat. Top right: isolated jacket torso, NO arms/head/legs. Bottom left: isolated lower jaw with few crooked teeth matching the head; no head attached. Bottom right: isolated named PROP, not attached to any body part. Head aspect about 53:48, torso 53:63, jaw 32:15. Classic lanky zombie, not muscular, no gore.",
+    "refs": [
+      "Zombie_head.png",
+      "Zombie_body.png",
+      "Zombie_jaw.png"
+    ]
+  },
+  {
+    "key": "bell-zombie",
+    "base": 1,
+    "prompt": "Use case: stylized-concept. Production transparent PNG skeletal game sprite part atlas. Match the provided classic 2009 Plants vs. Zombies PC sprite references in outline thickness, irregular ink, muted painted flat shading and silhouette simplicity. These are reference images for style/geometry, not images to modify. Must read naturally when downsampled to 50 pixels. No 3D, no realistic textures, no glossy mobile art, no text/labels/grid/ground/shadow. Exactly four detached isolated parts on a 2-by-2 evenly spaced transparent square atlas, each within its own quadrant with at least 15 percent clear padding. True transparent alpha. Subject: a humorous original zombie variant, faded burgundy usher jacket and a tiny brass bell attached to a short wood handle. Prop is the bell alone, large enough to replace a hand-held flag. Gray green skin. All parts face LEFT in the same three-quarter profile as reference. Top left: isolated upper head, gray green skin, bulging white eyes and crooked upper teeth; NO lower jaw, no neck, no hat. Top right: isolated jacket torso, NO arms/head/legs. Bottom left: isolated lower jaw with few crooked teeth matching the head; no head attached. Bottom right: isolated named PROP, not attached to any body part. Head aspect about 53:48, torso 53:63, jaw 32:15. Classic lanky zombie, not muscular, no gore.",
+    "refs": [
+      "Zombie_head.png",
+      "Zombie_body.png",
+      "Zombie_jaw.png"
+    ]
+  },
+  {
+    "key": "gum-zombie",
+    "base": 0,
+    "prompt": "Use case: stylized-concept. Production transparent PNG skeletal game sprite part atlas. Match the provided classic 2009 Plants vs. Zombies PC sprite references in outline thickness, irregular ink, muted painted flat shading and silhouette simplicity. These are reference images for style/geometry, not images to modify. Must read naturally when downsampled to 50 pixels. No 3D, no realistic textures, no glossy mobile art, no text/labels/grid/ground/shadow. Exactly four detached isolated parts on a 2-by-2 evenly spaced transparent square atlas, each within its own quadrant with at least 15 percent clear padding. True transparent alpha. Subject: a humorous original zombie variant, faded rose jacket and a sticky pink bubble-gum bubble, slightly stuck-on pink cheek speck; gray green skin. Prop is one translucent pink gum bubble, separate from head. All parts face LEFT in the same three-quarter profile as reference. Top left: isolated upper head, gray green skin, bulging white eyes and crooked upper teeth; NO lower jaw, no neck, no hat. Top right: isolated jacket torso, NO arms/head/legs. Bottom left: isolated lower jaw with few crooked teeth matching the head; no head attached. Bottom right: isolated named PROP, not attached to any body part. Head aspect about 53:48, torso 53:63, jaw 32:15. Classic lanky zombie, not muscular, no gore.",
+    "refs": [
+      "Zombie_head.png",
+      "Zombie_body.png",
+      "Zombie_jaw.png"
+    ]
+  },
+  {
+    "key": "ice-bucket-zombie",
+    "base": 4,
+    "prompt": "Use case: stylized-concept. Production transparent PNG skeletal game sprite part atlas. Match the provided classic 2009 Plants vs. Zombies PC sprite references in outline thickness, irregular ink, muted painted flat shading and silhouette simplicity. These are reference images for style/geometry, not images to modify. Must read naturally when downsampled to 50 pixels. No 3D, no realistic textures, no glossy mobile art, no text/labels/grid/ground/shadow. Exactly four detached isolated parts on a 2-by-2 evenly spaced transparent square atlas, each within its own quadrant with at least 15 percent clear padding. True transparent alpha. Subject: a humorous original zombie variant, faded blue gray coat and a dented metal bucket lightly frosted around its lower edge, light blue details not giant ice crystals; gray green skin. Prop is bucket helmet. All parts face LEFT in the same three-quarter profile as reference. Top left: isolated upper head, gray green skin, bulging white eyes and crooked upper teeth; NO lower jaw, no neck, no hat. Top right: isolated jacket torso, NO arms/head/legs. Bottom left: isolated lower jaw with few crooked teeth matching the head; no head attached. Bottom right: isolated named PROP, not attached to any body part. Head aspect about 53:48, torso 53:63, jaw 32:15. Classic lanky zombie, not muscular, no gore.",
+    "refs": [
+      "Zombie_head.png",
+      "Zombie_body.png",
+      "Zombie_jaw.png"
+    ]
+  },
+  {
+    "key": "battery-zombie",
+    "base": 0,
+    "prompt": "Use case: stylized-concept. Production transparent PNG skeletal game sprite part atlas. Match the provided classic 2009 Plants vs. Zombies PC sprite references in outline thickness, irregular ink, muted painted flat shading and silhouette simplicity. These are reference images for style/geometry, not images to modify. Must read naturally when downsampled to 50 pixels. No 3D, no realistic textures, no glossy mobile art, no text/labels/grid/ground/shadow. Exactly four detached isolated parts on a 2-by-2 evenly spaced transparent square atlas, each within its own quadrant with at least 15 percent clear padding. True transparent alpha. Subject: a humorous original zombie variant, dusty teal brown work jacket with a little yellow lightning patch, two short copper hair pins, normal gray green skin. Prop is a small old square battery with two terminals, no glow. All parts face LEFT in the same three-quarter profile as reference. Top left: isolated upper head, gray green skin, bulging white eyes and crooked upper teeth; NO lower jaw, no neck, no hat. Top right: isolated jacket torso, NO arms/head/legs. Bottom left: isolated lower jaw with few crooked teeth matching the head; no head attached. Bottom right: isolated named PROP, not attached to any body part. Head aspect about 53:48, torso 53:63, jaw 32:15. Classic lanky zombie, not muscular, no gore.",
+    "refs": [
+      "Zombie_head.png",
+      "Zombie_body.png",
+      "Zombie_jaw.png"
+    ]
+  },
+  {
+    "key": "light-zombie",
+    "base": 0,
+    "prompt": "Use case: stylized-concept. Production transparent PNG skeletal game sprite part atlas. Match the provided classic 2009 Plants vs. Zombies PC sprite references in outline thickness, irregular ink, muted painted flat shading and silhouette simplicity. These are reference images for style/geometry, not images to modify. Must read naturally when downsampled to 50 pixels. No 3D, no realistic textures, no glossy mobile art, no text/labels/grid/ground/shadow. Exactly four detached isolated parts on a 2-by-2 evenly spaced transparent square atlas, each within its own quadrant with at least 15 percent clear padding. True transparent alpha. Subject: a humorous original zombie variant, short-sleeved faded beige shirt with torn collar, wiry face with just three hairs, gray green skin. Prop is a light olive cloth cap. All parts face LEFT in the same three-quarter profile as reference. Top left: isolated upper head, gray green skin, bulging white eyes and crooked upper teeth; NO lower jaw, no neck, no hat. Top right: isolated jacket torso, NO arms/head/legs. Bottom left: isolated lower jaw with few crooked teeth matching the head; no head attached. Bottom right: isolated named PROP, not attached to any body part. Head aspect about 53:48, torso 53:63, jaw 32:15. Classic lanky zombie, not muscular, no gore.",
+    "refs": [
+      "Zombie_head.png",
+      "Zombie_body.png",
+      "Zombie_jaw.png"
+    ]
+  },
+  {
+    "key": "armored-cone-zombie",
+    "base": 2,
+    "prompt": "Use case: stylized-concept. Production transparent PNG skeletal game sprite part atlas. Match the provided classic 2009 Plants vs. Zombies PC sprite references in outline thickness, irregular ink, muted painted flat shading and silhouette simplicity. These are reference images for style/geometry, not images to modify. Must read naturally when downsampled to 50 pixels. No 3D, no realistic textures, no glossy mobile art, no text/labels/grid/ground/shadow. Exactly four detached isolated parts on a 2-by-2 evenly spaced transparent square atlas, each within its own quadrant with at least 15 percent clear padding. True transparent alpha. Subject: a humorous original zombie variant, faded brown work coat reinforced by two cloth patches, wary eyes, gray green skin. Prop is an old traffic cone wrapped with two dull gray metal straps. All parts face LEFT in the same three-quarter profile as reference. Top left: isolated upper head, gray green skin, bulging white eyes and crooked upper teeth; NO lower jaw, no neck, no hat. Top right: isolated jacket torso, NO arms/head/legs. Bottom left: isolated lower jaw with few crooked teeth matching the head; no head attached. Bottom right: isolated named PROP, not attached to any body part. Head aspect about 53:48, torso 53:63, jaw 32:15. Classic lanky zombie, not muscular, no gore.",
+    "refs": [
+      "Zombie_head.png",
+      "Zombie_body.png",
+      "Zombie_jaw.png"
+    ]
+  },
+  {
+    "key": "repair-zombie",
+    "base": 4,
+    "prompt": "Use case: stylized-concept. Production transparent PNG skeletal game sprite part atlas. Match the provided classic 2009 Plants vs. Zombies PC sprite references in outline thickness, irregular ink, muted painted flat shading and silhouette simplicity. These are reference images for style/geometry, not images to modify. Must read naturally when downsampled to 50 pixels. No 3D, no realistic textures, no glossy mobile art, no text/labels/grid/ground/shadow. Exactly four detached isolated parts on a 2-by-2 evenly spaced transparent square atlas, each within its own quadrant with at least 15 percent clear padding. True transparent alpha. Subject: a humorous original zombie variant, old olive repairman's jacket with stitched pockets, gray green skin. Prop is a dented steel bucket helmet with a small side wrench tucked under its rim. All parts face LEFT in the same three-quarter profile as reference. Top left: isolated upper head, gray green skin, bulging white eyes and crooked upper teeth; NO lower jaw, no neck, no hat. Top right: isolated jacket torso, NO arms/head/legs. Bottom left: isolated lower jaw with few crooked teeth matching the head; no head attached. Bottom right: isolated named PROP, not attached to any body part. Head aspect about 53:48, torso 53:63, jaw 32:15. Classic lanky zombie, not muscular, no gore.",
+    "refs": [
+      "Zombie_head.png",
+      "Zombie_body.png",
+      "Zombie_jaw.png"
+    ]
+  },
+  {
+    "key": "smoke-zombie",
+    "base": 0,
+    "prompt": "Use case: stylized-concept. Production transparent PNG skeletal game sprite part atlas. Match the provided classic 2009 Plants vs. Zombies PC sprite references in outline thickness, irregular ink, muted painted flat shading and silhouette simplicity. These are reference images for style/geometry, not images to modify. Must read naturally when downsampled to 50 pixels. No 3D, no realistic textures, no glossy mobile art, no text/labels/grid/ground/shadow. Exactly four detached isolated parts on a 2-by-2 evenly spaced transparent square atlas, each within its own quadrant with at least 15 percent clear padding. True transparent alpha. Subject: a humorous original zombie variant, soot-stained dark gray jacket and a sooty flat cap, gray green skin, half-lidded eyes. Prop is a compact dark cloth cap with no surrounding smoke. All parts face LEFT in the same three-quarter profile as reference. Top left: isolated upper head, gray green skin, bulging white eyes and crooked upper teeth; NO lower jaw, no neck, no hat. Top right: isolated jacket torso, NO arms/head/legs. Bottom left: isolated lower jaw with few crooked teeth matching the head; no head attached. Bottom right: isolated named PROP, not attached to any body part. Head aspect about 53:48, torso 53:63, jaw 32:15. Classic lanky zombie, not muscular, no gore.",
+    "refs": [
+      "Zombie_head.png",
+      "Zombie_body.png",
+      "Zombie_jaw.png"
+    ]
+  },
+  {
+    "key": "twin-zombie",
+    "base": 0,
+    "prompt": "Use case: stylized-concept. Production transparent PNG skeletal game sprite part atlas. Match the provided classic 2009 Plants vs. Zombies PC sprite references in outline thickness, irregular ink, muted painted flat shading and silhouette simplicity. These are reference images for style/geometry, not images to modify. Must read naturally when downsampled to 50 pixels. No 3D, no realistic textures, no glossy mobile art, no text/labels/grid/ground/shadow. Exactly four detached isolated parts on a 2-by-2 evenly spaced transparent square atlas, each within its own quadrant with at least 15 percent clear padding. True transparent alpha. Subject: a humorous original zombie variant, faded purple jacket with two crooked buttons and vertical stitched seam, gray green skin, slightly cross-eyed. Prop is a small purple cloth beret with stitched seam. All parts face LEFT in the same three-quarter profile as reference. Top left: isolated upper head, gray green skin, bulging white eyes and crooked upper teeth; NO lower jaw, no neck, no hat. Top right: isolated jacket torso, NO arms/head/legs. Bottom left: isolated lower jaw with few crooked teeth matching the head; no head attached. Bottom right: isolated named PROP, not attached to any body part. Head aspect about 53:48, torso 53:63, jaw 32:15. Classic lanky zombie, not muscular, no gore.",
+    "refs": [
+      "Zombie_head.png",
+      "Zombie_body.png",
+      "Zombie_jaw.png"
+    ]
+  }
+]

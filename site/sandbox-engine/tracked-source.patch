@@ -1,0 +1,462 @@
+diff --git a/src/Lawn/Board.cpp b/src/Lawn/Board.cpp
+index 665fcca..0c219ce 100644
+--- a/src/Lawn/Board.cpp
++++ b/src/Lawn/Board.cpp
+@@ -25,6 +25,7 @@
+ #include <format>
+ #include "ZenGarden.h"
+ #include "BoardInclude.h"
++#include "../Sandbox.h"
+ #include "LawnCommon.h"
+ #include "System/Music.h"
+ #include "System/SaveGame.h"
+@@ -315,6 +316,7 @@ int Board::CountUntriggerLawnMowers()
+ 
+ void Board::TryToSaveGame()
+ {
++	if (gSandboxEnabled) return;
+ 	std::string aFileName = GetSavedGameName(mApp->mGameMode, mApp->mPlayerInfo->mId);
+ 
+ 	if (NeedSaveGame())
+@@ -346,6 +348,7 @@ bool Board::NeedSaveGame()
+ 
+ void Board::SaveGame(const std::string& theFileName)
+ {
++	if (gSandboxEnabled) return;
+ 	LawnSaveGame(this, theFileName);
+ }
+ 
+@@ -3008,6 +3011,7 @@ void Board::MouseMove(int x, int y)
+ 
+ void Board::MouseDrag(int x, int y)
+ {
++	if (SandboxMouseDrag(x, y)) return;
+ 	Widget::MouseDrag(x, y);
+ 	mChallenge->MouseMove(x, y);
+ }
+@@ -4362,6 +4366,7 @@ void Board::PickUpTool(GameObjectType theObjectType)
+ 
+ void Board::MouseDown(int x, int y, int theClickCount)
+ {
++	if (SandboxMouseDown(x, y, theClickCount)) return;
+ 	UpdateMousePosition();
+ 	Widget::MouseDown(x, y, theClickCount);
+ 	mIgnoreMouseUp = !CanInteractWithBoardButtons();
+@@ -4580,6 +4585,7 @@ bool Board::CanInteractWithBoardButtons()
+ 
+ void Board::MouseUp(int x, int y, int theClickCount)
+ {
++	if (SandboxMouseUp()) return;
+ 	Widget::MouseUp(x, y, theClickCount);
+ 	if (mIgnoreMouseUp)
+ 	{
+@@ -5048,6 +5054,7 @@ void Board::PuzzleSaveStreak()
+ 
+ void Board::ZombiesWon(Zombie* theZombie)
+ {
++	if (gSandboxEnabled) { SandboxEscaped(); theZombie->DieNoLoot(); return; }
+ 	if (mApp->mGameScene == GameScenes::SCENE_ZOMBIES_WON)
+ 		return;
+ 
+@@ -5176,6 +5183,7 @@ bool Board::HasLevelAwardDropped()
+ 
+ void Board::UpdateSunSpawning()
+ {
++	if (gSandboxEnabled) return;
+ 	if (StageIsNight() ||
+ 		HasLevelAwardDropped() ||
+ 		mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_RAINING_SEEDS ||
+@@ -5234,6 +5242,7 @@ void Board::NextWaveComing()
+ 
+ void Board::UpdateZombieSpawning()
+ {
++	if (gSandboxEnabled) return;
+ 	if (mApp->mGameMode == GameMode::GAMEMODE_UPSELL || mApp->mGameMode == GameMode::GAMEMODE_INTRO)
+ 		return;
+ 
+@@ -5418,6 +5427,7 @@ void Board::UpdateIce()
+ 
+ void Board::UpdateProgressMeter()
+ {
++	if (gSandboxEnabled) return;
+ 	if (mApp->IsFinalBossLevel())
+ 	{
+ 		Zombie* aBoss = GetBossZombie();
+@@ -5692,6 +5702,7 @@ void Board::UpdateGame()
+ 
+ void Board::Update()
+ {
++	SandboxTick(this);
+ 	PvzpHesitationBracket aHesitation("Board::Update");
+ 
+ 	Widget::Update();
+@@ -7175,7 +7186,7 @@ void Board::DrawUIBottom(Graphics* g)
+ 
+ 	if (mApp->mGameScene != GameScenes::SCENE_ZOMBIES_WON)
+ 	{
+-		if (mSeedBank->BeginDraw(g))
++		if (!gSandboxEnabled && mSeedBank->BeginDraw(g))
+ 		{
+ 			mSeedBank->Draw(g);
+ 			mSeedBank->EndDraw(g);
+@@ -7372,6 +7383,7 @@ bool Board::IsScaryPotterDaveTalking()
+ 
+ void Board::DrawUITop(Graphics* g)
+ {
++	if (gSandboxEnabled) { SandboxDrawUI(g); return; }
+ 	if (StageHasFog())
+ 	{
+ 		DrawTopRightUI(g);
+@@ -7627,6 +7639,7 @@ void Board::DoTypingCheck(KeyCode theKey)
+ 
+ void Board::KeyDown(KeyCode theKey)
+ {
++	if (gSandboxEnabled) { SandboxKeyDown(theKey); return; }
+ 	DoTypingCheck(theKey);
+ 
+ 	if (mApp->mGameScene == GameScenes::SCENE_LEVEL_INTRO &&
+diff --git a/src/Lawn/Plant.cpp b/src/Lawn/Plant.cpp
+index c934659..3d7ee79 100644
+--- a/src/Lawn/Plant.cpp
++++ b/src/Lawn/Plant.cpp
+@@ -30,6 +30,7 @@
+ #include "Projectile.h"
+ #include "SeedPacket.h"
+ #include "../LawnApp.h"
++#include "../SandboxPlants.h"
+ #include "CursorObject.h"
+ #include "../GameConstants.h"
+ #include "System/PlayerInfo.h"
+@@ -107,6 +108,7 @@ Plant::Plant()
+ 
+ void Plant::PlantInitialize(int theGridX, int theGridY, SeedType theSeedType, SeedType theImitaterType)
+ {
++    SandboxPlants::Forget(this);
+ 	mPlantCol = theGridX;
+ 	mRow = theGridY;
+ 	if (mBoard)
+@@ -2848,6 +2850,7 @@ void Plant::UpdateReanim()
+ 		aOffsetY += mApp->mZenGarden->PlantPottedDrawHeightOffset(mSeedType, aScaleY);
+ 	}
+ 
++    SandboxPlants::AdjustScale(this,aOffsetX,aOffsetY,aScaleX,aScaleY);
+ 	aBodyReanim->SetPosition(aOffsetX, aOffsetY);
+ 	aBodyReanim->OverrideScale(aScaleX, aScaleY);
+ }
+@@ -2889,6 +2892,7 @@ bool Plant::NotOnGround()
+ 
+ Reanimation* Plant::AttachBlinkAnim(Reanimation* theReanimBody)
+ {
++    if (SandboxPlants::IsCustom(this)) return nullptr; // Separate generated blink frame, driven by sandbox tick.
+ 	const PlantDefinition& aPlantDef = GetPlantDefinition(mSeedType);
+ 	LawnApp* aApp = (LawnApp*)gSexyAppBase;
+ 	Reanimation* aAnimToAttach = theReanimBody;
+@@ -4675,7 +4679,10 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
+ 		mApp->AddPvzpParticle(aOriginX + 27, aOriginY + 13, aRenderPosition, ParticleEffect::PARTICLE_PUFFSHROOM_MUZZLE);
+ 	}
+ 
++    const int sandboxShot = SandboxPlants::NextShot(this);
++    if (sandboxShot == 1) aProjectileType = ProjectileType::PROJECTILE_SNOWPEA;
+ 	Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder - 1, theRow, aProjectileType);
++    if (sandboxShot == 2) aProjectile->ConvertToFireball(mPlantCol);
+ 	aProjectile->mDamageRangeFlags = GetDamageRangeFlags(thePlantWeapon);
+ 
+ 	if (mSeedType == SeedType::SEED_CABBAGEPULT || mSeedType == SeedType::SEED_KERNELPULT ||
+@@ -4765,6 +4772,7 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
+ 		aProjectile->mCobTargetX = mTargetX - 40;
+ 		aProjectile->mCobTargetRow = mBoard->PixelToGridYKeepOnBoard(mTargetX, mTargetY);
+ 	}
++    SandboxPlants::OnFired(this,aProjectile,theTargetZombie);
+ }
+ 
+ Zombie* Plant::FindTargetZombie(int theRow, PlantWeapon thePlantWeapon)
+diff --git a/src/Lawn/Projectile.cpp b/src/Lawn/Projectile.cpp
+index 4500f46..cda6d5a 100644
+--- a/src/Lawn/Projectile.cpp
++++ b/src/Lawn/Projectile.cpp
+@@ -25,6 +25,7 @@
+ #include "Cutscene.h"
+ #include "Projectile.h"
+ #include "../LawnApp.h"
++#include "../SandboxPlants.h"
+ #include "../Resources.h"
+ #include "../GameConstants.h"
+ #include "../PvzpLib/PvzpFoley.h"
+@@ -824,7 +825,8 @@ void Projectile::DoImpact(Zombie* theZombie)
+ {
+ 	PlayImpactSound(theZombie);
+ 
+-	if (IsSplashDamage(theZombie))
++    const bool sandboxImpact=SandboxPlants::Impact(this,theZombie);
++	if (!sandboxImpact && IsSplashDamage(theZombie))
+ 	{
+ 		if (mProjectileType == ProjectileType::PROJECTILE_FIREBALL && theZombie)
+ 		{
+@@ -833,7 +835,7 @@ void Projectile::DoImpact(Zombie* theZombie)
+ 
+ 		DoSplashDamage(theZombie);
+ 	}
+-	else if (theZombie)
++	else if (!sandboxImpact && theZombie)
+ 	{
+ 		unsigned int aDamageFlags = GetDamageFlags(theZombie);
+ 		theZombie->TakeDamage(GetProjectileDef().mDamage, aDamageFlags);
+@@ -939,6 +941,7 @@ void Projectile::DoImpact(Zombie* theZombie)
+ 
+ void Projectile::Update()
+ {
++    SandboxPlants::UpdateShot(this);
+ 	mProjectileAge++;
+ 	if (mApp->mGameScene != GameScenes::SCENE_PLAYING && !mBoard->mCutScene->ShouldRunUpsellBoard())
+ 		return;
+@@ -974,6 +977,7 @@ void Projectile::Update()
+ 
+ void Projectile::Draw(Graphics* g)
+ {
++    SandboxPlants::DrawShot(g,this);
+ 	const ProjectileDefinition& aProjectileDef = GetProjectileDef();
+ 
+ 	Image* aImage = nullptr;
+@@ -1151,6 +1155,7 @@ void Projectile::DrawShadow(Graphics* g)
+ 
+ void Projectile::Die()
+ {
++    SandboxPlants::ForgetShot(this);
+ 	mDead = true;
+ 
+ 	if (mProjectileType == ProjectileType::PROJECTILE_PUFF || mProjectileType == ProjectileType::PROJECTILE_SNOWPEA)
+diff --git a/src/Lawn/System/PlayerInfo.cpp b/src/Lawn/System/PlayerInfo.cpp
+index 4f5e541..2e3c40d 100644
+--- a/src/Lawn/System/PlayerInfo.cpp
++++ b/src/Lawn/System/PlayerInfo.cpp
+@@ -25,6 +25,7 @@
+ #include "DataSync.h"
+ #include <algorithm>
+ #include "PlayerInfo.h"
++#include "../../Sandbox.h"
+ #include "../LawnCommon.h"
+ #include "../Widget/ChallengeScreen.h"
+ #include "../../PvzpLib/PvzpDebug.h"
+@@ -237,6 +238,7 @@ void PlayerInfo::LoadDetails()
+ 
+ void PlayerInfo::SaveDetails()
+ {
++	if (SandboxOwnsProfile(this)) return;
+ 	DataWriter aWriter;
+ 	aWriter.OpenMemory();
+ 	DataSync aSync(aWriter);
+@@ -249,6 +251,7 @@ void PlayerInfo::SaveDetails()
+ 
+ void PlayerInfo::DeleteUserFiles()
+ {
++	if (SandboxOwnsProfile(this)) return;
+ 	std::string aFilename = GetAppDataPath(std::format("userdata/user{}.dat", mId));
+ 	gSexyAppBase->EraseFile(aFilename);
+ 
+diff --git a/src/Lawn/System/SaveGame.cpp b/src/Lawn/System/SaveGame.cpp
+index 804aeba..df705d6 100644
+--- a/src/Lawn/System/SaveGame.cpp
++++ b/src/Lawn/System/SaveGame.cpp
+@@ -25,6 +25,7 @@
+ #include "../Challenge.h"
+ #include "../SeedPacket.h"
+ #include "../../LawnApp.h"
++#include "../../Sandbox.h"
+ #include "../CursorObject.h"
+ #include "../../Resources.h"
+ #include "../../ConstEnums.h"
+@@ -2792,6 +2793,7 @@ bool LawnLoadGame(Board* theBoard, const std::string& theFilePath)
+ 
+ bool LawnSaveGame(Board* theBoard, const std::string& theFilePath)
+ {
++	if (gSandboxEnabled) return false;
+ 	std::vector<unsigned char> aPayload;
+ 	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_BOARD_BASE, theBoard)) return false;
+ 	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_ZOMBIES, theBoard)) return false;
+diff --git a/src/Lawn/Widget/GameSelector.cpp b/src/Lawn/Widget/GameSelector.cpp
+index e30bd35..c34de83 100644
+--- a/src/Lawn/Widget/GameSelector.cpp
++++ b/src/Lawn/Widget/GameSelector.cpp
+@@ -27,6 +27,9 @@
+ #include "../ZenGarden.h"
+ #include "GameSelector.h"
+ #include "../../LawnApp.h"
++#include "../../Sandbox.h"
++#include "../../SandboxUIRules.h"
++#include "../../SandboxButton.h"
+ #include "AlmanacDialog.h"
+ #include "../../Resources.h"
+ #include "../System/Music.h"
+@@ -60,6 +63,18 @@ GameSelectorOverlay::GameSelectorOverlay(GameSelector* theGameSelector)
+ 	mHasAlpha = true;
+ }
+ 
++// Prominent native menu button. Stretch only the existing stone slices, not the label.
++class SandboxMenuButton final : public LawnStoneButton {
++public:
++	SandboxMenuButton(int id, ButtonListener* listener) : LawnStoneButton(nullptr, id, listener) {
++		SetLabel("沙盒模式"); mHasAlpha = true;
++	}
++	void Draw(Graphics* g) override {
++		const bool down = mIsDown && mIsOver && !mDisabled;
++		SandboxDrawButton(g,{0,0,mWidth,mHeight},mLabel,down,mIsOver,true);
++	}
++};
++
+ GameSelector::GameSelector(LawnApp* theApp)
+ {
+ 	mLoadedResourceNames.push_back("DelayLoad_Zombatar");
+@@ -254,6 +269,13 @@ GameSelector::GameSelector(LawnApp* theApp)
+ 	mOverlayWidget = new GameSelectorOverlay(this);
+ 	mOverlayWidget->Resize(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
+ 
++	// Native menu option, using the same stone button and bitmap fonts as the game.
++	mSandboxButton = new SandboxMenuButton(GameSelector_Sandbox, this);
++	const auto sandboxEntry = SandboxUIRules::MenuEntry;
++	mSandboxButton->Resize(sandboxEntry.x, sandboxEntry.y, sandboxEntry.w, sandboxEntry.h);
++	mSandboxButton->mVisible = false;
++	mSandboxButton->mMouseVisible = false;
++
+ 	mStoreButton = MakeNewButton(
+ 		GameSelector::GameSelector_Store,
+ 		this,
+@@ -362,6 +384,7 @@ GameSelector::GameSelector(LawnApp* theApp)
+ 	AddWidget(mHelpButton);
+ 	AddWidget(mStoreButton);
+ 	AddWidget(mAlmanacButton);
++	AddWidget(mSandboxButton);
+ 	AddWidget(mOverlayWidget);
+ }
+ 
+@@ -735,6 +758,9 @@ void GameSelector::UpdateTooltip()
+ 
+ void GameSelector::Update()
+ {
++	mSandboxButton->SetVisible(mSelectorState == SELECTOR_IDLE && !mStartingGame);
++	mSandboxButton->mMouseVisible = mSandboxButton->mVisible;
++	mSandboxButton->SetDisabled(mStartingGame || mSlideCounter > 0);
+ 	Widget::Update();
+ 	MarkDirty();
+ 	UpdateTooltip();
+@@ -1158,6 +1184,7 @@ void GameSelector::ClickedAdventure()
+ 	mZenGardenButton->SetDisabled(true);
+ 	mZombatarButton->SetDisabled(true);
+ 	mAchievementsButton->SetDisabled(true);
++	mSandboxButton->SetDisabled(true);
+ 
+ 	Reanimation* aHandReanim = mApp->AddReanimation(-70.0f, 10.0f, 0, ReanimationType::REANIM_ZOMBIE_HAND);
+ 	aHandReanim->mLoopType = ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD;
+@@ -1196,6 +1223,9 @@ void GameSelector::ButtonDepress(int theId)
+ 
+ 	switch (theId)
+ 	{
++	case GameSelector::GameSelector_Sandbox:
++		if (!mStartingGame && mSelectorState == SELECTOR_IDLE) SandboxEnter();
++		break;
+ 	case GameSelector::GameSelector_Adventure:
+ 		ClickedAdventure();
+ 		break;
+diff --git a/src/Lawn/Widget/GameSelector.h b/src/Lawn/Widget/GameSelector.h
+index d017de9..260efd1 100644
+--- a/src/Lawn/Widget/GameSelector.h
++++ b/src/Lawn/Widget/GameSelector.h
+@@ -64,7 +64,8 @@ private:
+ 		GameSelector_ZenGarden,
+ 		GameSelector_Survival,
+ 		GameSelector_Zombatar,
+-		GameSelector_Achievements
++		GameSelector_Achievements,
++		GameSelector_Sandbox
+ 	};
+ 
+ public:
+@@ -83,6 +84,7 @@ public:
+ 	NewLawnButton*              mChangeUserButton;
+ 	NewLawnButton*              mZombatarButton;             //+0xC0
+ 	NewLawnButton*              mAchievementsButton;        //+0xC4
++	LawnStoneButton*            mSandboxButton;
+ 	Widget*                     mOverlayWidget;
+ 	bool                        mStartingGame;
+ 	int                         mStartingGameCounter;
+diff --git a/src/Lawn/Zombie.cpp b/src/Lawn/Zombie.cpp
+index c140a3d..29c81d8 100644
+--- a/src/Lawn/Zombie.cpp
++++ b/src/Lawn/Zombie.cpp
+@@ -32,6 +32,7 @@
+ #include "Challenge.h"
+ #include "Projectile.h"
+ #include "../LawnApp.h"
++#include "../SandboxZombies.h"
+ #include "../Resources.h"
+ #include "System/PlayerInfo.h"
+ #include "System/Zombatar.h"
+@@ -4137,6 +4138,7 @@ void Zombie::UpdateZombieWalking()
+ 			}
+ 		}
+ 
++        aSpeed *= SandboxZombies::Speed(this);
+ 		if (IsWalkingBackwards() || mZombiePhase == ZombiePhase::PHASE_DANCER_DANCING_IN)
+ 		{
+ 			mPosX += aSpeed;
+@@ -7276,6 +7278,7 @@ bool Zombie::TrySpawnLevelAward()
+ 
+ void Zombie::DropLoot()
+ {
++    SandboxZombies::CombatDeath(this);
+ 	if (!IsOnBoard())
+ 		return;
+ 
+@@ -7969,6 +7972,7 @@ void Zombie::TakeBodyDamage(int theDamage, unsigned int theDamageFlags)
+ 
+ void Zombie::TakeDamage(int theDamage, unsigned int theDamageFlags)
+ {
++    theDamage=SandboxZombies::Damage(this,theDamage);
+ 	if (mZombiePhase == ZombiePhase::PHASE_JACK_IN_THE_BOX_POPPING || IsDeadOrDying())
+ 		return;
+ 
+@@ -8025,6 +8029,7 @@ float Zombie::GetPosYBasedOnRow(int theRow)
+ 
+ Zombie::~Zombie()
+ {
++    SandboxZombies::Forget(this);
+ 	AttachmentDie(mAttachmentID);
+ 	StopZombieSound();
+ }
+diff --git a/src/LawnApp.cpp b/src/LawnApp.cpp
+index d360a2f..cea1ec9 100644
+--- a/src/LawnApp.cpp
++++ b/src/LawnApp.cpp
+@@ -24,6 +24,7 @@
+ #include <cstdio>
+ #include <format>
+ #include "LawnApp.h"
++#include "Sandbox.h"
+ #include "Resources.h"
+ #include "Lawn/LawnCommon.h"
+ #include "Lawn/Board.h"
+@@ -255,7 +256,7 @@ void LawnApp::KillBoard()
+ 	KillSeedChooserScreen();
+ 	if (mBoard)
+ 	{
+-		if (mPlayerInfo && (
++		if (!gSandboxEnabled && mPlayerInfo && (
+ 			mBoardResult == BoardResult::BOARDRESULT_WON ||
+ 			mBoardResult == BoardResult::BOARDRESULT_LOST ||
+ 			mBoardResult == BoardResult::BOARDRESULT_RESTART ||
+@@ -312,7 +313,7 @@ void LawnApp::LostFocus()
+ 
+ void LawnApp::WriteToRegistry()
+ {
+-	if (mPlayerInfo)
++	if (mPlayerInfo && !SandboxOwnsProfile(mPlayerInfo))
+ 	{
+ 		RegistryWriteString("CurUser", mPlayerInfo->mName);
+ 		mPlayerInfo->SaveDetails();
+@@ -1395,6 +1396,7 @@ bool LawnApp::UpdatePlayerProfileForFinishingLevel()
+ 
+ void LawnApp::CheckForGameEnd()
+ {
++	if (gSandboxEnabled) return;
+ 	if (mBoard == nullptr || !mBoard->mLevelComplete)
+ 		return;
+ 

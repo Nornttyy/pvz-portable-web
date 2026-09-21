@@ -1,0 +1,36 @@
+{
+  "mode": "built-in image_gen",
+  "type": "production parts atlas",
+  "common": "Use case: stylized-concept. Asset type: final production transparent skeletal sprite atlas for a Plants vs Zombies PC 2009-style game, NOT a concept page. Provided images are style and part-geometry REFERENCES, not edit targets. Use the old game's softly painted 2D cartoon rendering, thick irregular dark olive/brown outline, broad simple shapes readable after downsampling to 40-100 pixels, restrained highlights and slight asymmetry. No realistic texture, no 3D, no glossy modern mobile-game look. ",
+  "specs": [
+    {
+      "name": "echo-lily",
+      "refs": [
+        "PeaShooter_Head.png"
+      ],
+      "prompt": "An original ECHO LILY plant. Pale ivory and lavender bell-shaped flower head facing RIGHT, little black oval eyes, flared wavy bell rim and one restrained golden bell clapper. Not a round pea, clearly a bellflower. A 2 by 2 grid: top-left open-eye head without attached stem or muzzle; top-right identical head with eyes CLOSED; bottom-left the separate flared bell mouth/rim with golden clapper, facing right; bottom-right one separate small green leaf. Each object centered, full silhouette and 15% clear margin."
+    },
+    {
+      "name": "spring-nut",
+      "refs": [
+        "Wallnut_body.png"
+      ],
+      "prompt": "An original SPRING WALNUT defender. Short squat warm ochre walnut shell with a subtle spiral seam, two funny startled white eyes, thick brown outlines, bottom half is a visible chunky coiled bronze spring in place of feet. One 2 by 2 grid: top-left complete character body with OPEN eyes; top-right same body, exact silhouette and scale, eyes CLOSED; bottom-left same character with a few cracks and one loose shell flake; bottom-right same character with more cracks and a small missing shell corner, still alive and cute. No blood, no detached body parts outside each cell. Native walnut sway will animate this piece. 15% empty transparent margin inside each cell."
+    },
+    {
+      "name": "rhythm-flower",
+      "refs": [
+        "SunFlower_head.png"
+      ],
+      "prompt": "An original RHYTHM FLOWER support plant, sunflower-like but its center face is a tiny round turquoise metronome seed face with a warm gold rim, two small friendly black eyes and a simple smile. Retain the native sunflower separate petal animation: DO NOT draw a whole sunflower or attached petals, stem or leaves into the FACE. One 2 by 2 grid: top-left ONLY the oval turquoise seed FACE with small red metronome needle across forehead, viewed slightly from right; top-right the identical FACE with eyes CLOSED; bottom-left ONE separate narrow golden-yellow petal, rounded teardrop silhouette, no face; bottom-right ONE separate small green leaf. Dark uneven outlines and sparse soft painted shading. 15% transparent margin in each cell."
+    },
+    {
+      "name": "relay-mushroom",
+      "refs": [
+        "PuffShroom_body.png",
+        "PuffShroom_head.png"
+      ],
+      "prompt": "An original ELECTRIC RELAY MUSHROOM trap. Pale lilac short mushroom body with two small black eyes, a broad dark indigo cap with a simple cyan lightning stripe and two tiny rounded brass contact studs at the top. Cute old tower-defense cartoon; no machinery panels or realistic metal. MUST separate body and cap for native skeletal animation. One 2 by 2 grid: top-left ONLY the short pale-lilac body and face, eyes OPEN, NO cap; top-right same body face eyes CLOSED; bottom-left ONLY the broad indigo mushroom CAP, domed broad sideways silhouette like reference cap, with cyan stripe and brass studs; bottom-right ONLY a short lilac stem connector. Each part has 15% transparent empty margin."
+    }
+  ]
+}

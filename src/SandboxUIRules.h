@@ -13,6 +13,7 @@ inline constexpr Box Panel{168, 82, 465, 513};
 constexpr Box Hotbar(int i) { return {79+i*59, 8, 50, 70}; }
 constexpr Box Control(int i) { return {452+(i%3)*114, 8+(i/3)*37, 108, 33}; }
 constexpr Box PlantCard(int i) { return {185+(i%8)*54, 128+(i/8)*70, 50, 70}; }
+constexpr Box CustomPlantCard(int i) { return {185+(i%8)*54, 128+(i/8)*82, 50, 70}; }
 constexpr Box ZombieCard(int i) { return {190+(i%5)*84, 128+(i/5)*84, 76, 76}; }
 constexpr Box MenuAction(int i) { return {195+(i%2)*212, 145+(i/2)*45, 190, 33}; }
 inline constexpr Box Close{330, 554, 140, 33};

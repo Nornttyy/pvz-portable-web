@@ -10,10 +10,23 @@ export const ORIGINAL_PLANTS = [
   [102,7,'双发火焰','连续两发 · 火球攻击'],[103,18,'三线寒冰','三路攻击 · 寒冰减速'],
   [104,18,'三线火焰','三路攻击 · 火球攻击'],[105,40,'寒冰机枪','连续四发 · 寒冰减速'],
   [106,40,'火焰机枪','连续四发 · 火球攻击'],[107,7,'冰火双发','冰火交替 · 火焰会解除减速'],
+  [108,0,'回声花','两次声波 · 穿过整路敌人'],[109,3,'弹簧坚果','受到攻击后弹开敌人 · 需要恢复'],
+  [110,1,'节拍花','生产阳光 · 加快周围植物攻击'],[111,8,'雷网蘑菇','同列两株连成电网 · 需要配对'],
+  [112,0,'电能豌豆','电击跳向附近两只敌人'],[113,0,'小豌豆','体型小 · 攻速快 · 单发伤害低'],
+  [114,0,'重炮豌豆','慢速重击 · 推退敌人'],[115,0,'散射豌豆','三发散射 · 攻击相邻三路'],
+  [116,0,'追击豌豆','子弹转向 · 自动追击敌人'],[117,0,'腐化豌豆','命中后持续伤害 · 再次命中刷新'],
 ].map(([id,base,name,note])=>({id,base,name,note}));
 export const PLANTS = [...plantNames.map((name,id) => ({id,name,note:notes[id] ?? '免费 · 无冷却'})),...ORIGINAL_PLANTS];
 const validPlant = id => (id>=0&&id<48)||ORIGINAL_PLANTS.some(p=>p.id===id);
+export const ORIGINAL_ZOMBIES = [
+  [200,2,'纸盒僵尸','纸盒破后短暂加速'],[201,1,'助威僵尸','周期加快附近同伴的移动'],
+  [202,0,'泡泡糖僵尸','靠近后降低植物攻速'],[203,4,'冰桶僵尸','铁桶完整时免受寒冰减速'],
+  [204,0,'电能僵尸','首次受到电击后恢复生命并加速'],[205,0,'轻装僵尸','体型小 · 移速快 · 生命低'],
+  [206,2,'重甲路障','移动缓慢 · 护甲厚重'],[207,4,'修理僵尸','周期修复附近同伴的护甲'],
+  [208,0,'烟雾僵尸','周期进入烟雾 · 受到伤害减半'],[209,0,'双子僵尸','倒下后出现两只小鬼'],
+].map(([id,base,name,note])=>({id,base,name,note}));
 export const ZOMBIES = [[0,'普通僵尸'],[1,'旗帜僵尸'],[2,'路障僵尸'],[3,'撑杆僵尸'],[4,'铁桶僵尸'],[5,'读报僵尸'],[6,'铁门僵尸'],[7,'橄榄球僵尸'],[8,'舞王僵尸'],[10,'鸭子救生圈'],[11,'潜水僵尸'],[12,'冰车僵尸'],[14,'海豚骑士'],[15,'玩偶匣僵尸'],[16,'气球僵尸'],[17,'矿工僵尸'],[18,'跳跳僵尸'],[19,'雪人僵尸'],[21,'梯子僵尸'],[22,'投石车僵尸'],[23,'巨人僵尸'],[24,'小鬼僵尸'],[32,'红眼巨人']].map(([id,name])=>({id,name,note:[10,11,14].includes(id)?'仅限水路':'手动放置'}));
+ZOMBIES.push(...ORIGINAL_ZOMBIES);
 export function plantsFor(category) { return category === 'original' ? ORIGINAL_PLANTS : category === 'all' ? PLANTS : (groups[category] ?? groups.common).map(id=>PLANTS[id]); }
 export function boardCell(x,y,pool=false) {
   if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
@@ -48,7 +61,7 @@ export function validateLayout(value) {
     if(water&&![16,19,24,35,43].includes(p.type)&&cell.base!==16&&!(p.type===30&&cell.normal===43)) throw Error('水路植物缺少睡莲');
     if([19,24,43].includes(cell.normal)&&cell.base!==undefined) throw Error('水生植物与底座冲突');
     if(p.type===11) throw Error('阵型不包含墓碑，不能保存正在吞噬墓碑的植物');
-    if(p.type===35&&![8,9,10,12,13,14,15,24,31,42].includes(cell.normal)) throw Error('咖啡豆缺少蘑菇');
+    if(p.type===35&&![8,9,10,12,13,14,15,24,31,42,111].includes(cell.normal)) throw Error('咖啡豆缺少蘑菇');
     if(p.type===47) {
       const right=occupied.get(`${p.col+1}:${p.row}`)??{};
       if(p.col>=8||right.normal!==undefined||right.shell!==undefined||cell.shell!==undefined) throw Error('玉米加农炮需要连续两个空位');

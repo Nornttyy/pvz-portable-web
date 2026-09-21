@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "GitHub Pages integrated Chinese sandbox with automatically loaded full resources",
+  "mode": "public integrated main menu sandbox; 18 original plants and 10 original zombies",
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 276052,
-      "sha256": "e8fb62485df932ffc57ac7154d1a82a7731a2322de05eb783fd1ffa56eccd7ef"
+      "size": 276326,
+      "sha256": "7df85fb101362787b477d407496053511d332ce029d47f5f38530998fb084cf8"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7325918,
-      "sha256": "f1d1b36ee0469cd4bad937ce259e9544f0f1e954c5deeff467f13d806b8c3968"
+      "size": 7353202,
+      "sha256": "87147dfb8ac04b7164b4ff14af914eab0fd07fd2c55a82ccdce8787ffe9020f4"
     }
   ]
 }
