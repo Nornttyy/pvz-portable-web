@@ -83,6 +83,8 @@ const sources = new Map(await Promise.all(names.map(async name => [name, await r
 const buildHash = createHash('sha256');
 for (const [name, source] of sources) buildHash.update(name).update('\0').update(source);
 buildHash.update(await readFile(new URL('site/sandbox-engine/build.json', root)));
+// Art-only releases need fresh URLs too; otherwise an unchanged engine masks a new bundle.
+buildHash.update(await readFile(new URL('site/resource-manifest.json', root)));
 const version = buildHash.digest('hex').slice(0, 12);
 for (const [name, source] of sources) {
   let output = source;

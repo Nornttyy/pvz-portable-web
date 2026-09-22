@@ -10,9 +10,28 @@ constexpr Box CenterInk(Box button,Box ink,bool down=false) {
 }
 inline constexpr Box MenuEntry{140, 320, 240, 56};
 inline constexpr int CanvasWidth=1024, CanvasHeight=600, WorldOffset=224, SidebarWidth=264;
+// Screen shake is relative to the layout origin, never an absolute board position.
+constexpr int BoardX(bool sandbox,int shake=0) { return (sandbox ? WorldOffset:0)+shake; }
 inline constexpr Box Panel{392, 82, 465, 513};
 constexpr Box Hotbar(int i) { return {79+i*59, 8, 50, 70}; }
-constexpr Box Control(int i) { return {548+(i%3)*154, 8+(i/3)*37, 148, 33}; }
+inline constexpr int ControlCount=8;
+constexpr Box Control(int i) { return {548+(i%4)*115, 8+(i/4)*37, 110, 33}; }
+// Wall-clock cadence: game speed and pause do not change the placement rate.
+struct RepeatPlacement {
+    bool active=false;
+    int cell=-1;
+    long long next=0;
+    static constexpr int IntervalMs=300;
+    void Stop() { active=false;cell=-1; }
+    void Begin(int at,long long now) { active=at>=0;cell=at;next=now+IntervalMs; }
+    bool Poll(int at,long long now,bool held,bool available) {
+        if(!held||!available){Stop();return false;}
+        if(!active)return false;
+        if(at<0){cell=-1;next=now+IntervalMs;return false;}
+        if(at==cell&&now<next)return false;
+        cell=at;next=now+IntervalMs;return true;
+    }
+};
 inline constexpr Box Shovel{447,4,86,74};
 constexpr Box SidebarZombie(int i) { return {8+(i%5)*50,118+(i/5)*62,46,58}; }
 constexpr Box SidebarPlant(int i) { return {5+(i%5)*51,118+(i/5)*78,50,70}; }

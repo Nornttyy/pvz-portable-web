@@ -49,7 +49,7 @@ test('published sandbox engine matches the recorded build and really initializes
   await ready;
   assert.equal(typeof Module.callMain, 'function');
   assert.ok(Module.FS.filesystems.IDBFS);
-  for (let command = 0; command <= 18; command++) assert.equal(Module._pvz_sandbox_command(command, 0, 0, 0), -1);
+  for (let command = 0; command <= 20; command++) assert.equal(Module._pvz_sandbox_command(command, 0, 0, 0), -1);
   assert.equal(Module._pvz_sandbox_plant_data(0, 0), -1);
 });
 

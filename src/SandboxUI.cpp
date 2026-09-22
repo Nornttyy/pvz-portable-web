@@ -24,6 +24,7 @@
 #include <array>
 #include <format>
 #include <memory>
+#include <chrono>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -38,6 +39,9 @@ std::array<int,6> plants{0,1,2,3,5,7};
 bool wasPaused=true, painting=false, dirty=false;
 int lastCell=-1, lastPlantCount=0, messageTicks=0;
 std::string message;
+RepeatPlacement zombieRepeat;
+long long PlacementTime() { return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count(); }
+void StopPainting() { painting=false;lastCell=-1;zombieRepeat.Stop(); }
 int Command(int cmd, int type=0, int col=0, int row=0) { return pvz_sandbox_command(cmd,type,col,row); }
 bool Hover(Box box) { auto* wm=gLawnApp->mWidgetManager.get(); return box.Contains(wm->mLastMouseX,wm->mLastMouseY); }
 void Say(const char* text) { message=text;messageTicks=240; }
@@ -48,10 +52,10 @@ void Outline(Graphics* g, Box b) {
     g->SetColor(Color(235,220,78));g->DrawRect(b.x-2,b.y-2,b.w+3,b.h+3);
     g->SetColor(Color(124,181,45));g->DrawRect(b.x-1,b.y-1,b.w+1,b.h+1);
 }
-void ClosePanel() { panel=0;painting=false;Command(4,wasPaused?1:0); }
+void ClosePanel() { panel=0;StopPainting();Command(4,wasPaused?1:0); }
 void OpenPanel(int next) {
     if (!panel) wasPaused=bool(Command(0)&2);
-    panel=next;painting=false;Command(4,1);
+    panel=next;StopPainting();Command(4,1);
 }
 // Native overlay, in the same canvas. Lawn input passes through to Board,
 // whose own origin supplies the inverse transform for every native interaction.
@@ -115,13 +119,21 @@ std::string SelectedName() {
     if(auto* custom=SandboxZombies::Find(selectedZombie))return custom->name;
     return std::string(PvzpStringTranslate(std::string("[")+GetZombieDefinition(static_cast<ZombieType>(selectedZombie)).mZombieName+"]"));
 }
-void Place(int cell, bool erase=false) {
-    if(cell<0)return;
+bool Place(int cell, bool erase=false) {
+    if(cell<0)return false;
     const int result=Command(erase||tool==EraseTool?3:tool==PlantTool?1:2,tool==PlantTool?selectedPlant:selectedZombie,cell%9,cell/9);
     if(result>0)dirty=true;
     else if(result==-3)Say("数量已满，请先清理场地");
     else if(result==-5)Say("这只僵尸不能放在此处");
     else Say("不能放在这里，请检查位置和底座");
+    return result>0;
+}
+void RepeatZombieAt(int x,int y) {
+    const auto* wm=gLawnApp->mWidgetManager.get();
+    const int flags=Command(0);
+    const bool available=flags>=0&&(flags&32)&&tool==ZombieTool&&!panel&&gLawnApp->GetDialogCount()==0&&gLawnApp->mHasFocus&&!gLawnApp->mMinimized;
+    const int cell=x<SidebarWidth?-1:Cell(x-WorldOffset,y,bool(flags&4));
+    if(zombieRepeat.Poll(cell,PlacementTime(),bool(wm->mDownButtons&1),available)&&!Place(cell))StopPainting();
 }
 void Action(int index) {
     switch(index) {
@@ -151,6 +163,7 @@ void SandboxUIReset() {
     panel=0;plantPage=0;catalog=2;catalogPage=0;tool=PlantTool;painting=false;dirty=false;wasPaused=true;
     selectedPlant=0;selectedZombie=0;plantSlot=0;lastCell=-1;lastPlantCount=0;messageTicks=0;
     plants={0,1,2,3,5,7};
+    StopPainting();
     PvzpLoadResources("DelayLoad_Almanac");
     SandboxRepairFonts();
     for(int i=0;i<48;++i)Plant::PreloadPlantResources(static_cast<SeedType>(i));
@@ -159,9 +172,12 @@ void SandboxUIReset() {
     gLawnApp->mWidgetManager->AddWidget(overlay.get());
 }
 void SandboxUIDetach() {
+    StopPainting();
     if(overlay){gLawnApp->mWidgetManager->RemoveWidget(overlay.get());overlay.reset();}
 }
 void SandboxUITick(Board* board) {
+    const auto* wm=gLawnApp->mWidgetManager.get();
+    RepeatZombieAt(wm->mLastMouseX,wm->mLastMouseY);
     if(messageTicks>0)--messageTicks;
     const int count=Command(9);
     if(count!=lastPlantCount){dirty=true;lastPlantCount=count;}
@@ -200,6 +216,8 @@ void SandboxDrawUI(Graphics* g) {
     Button(g,Control(3),flags&2?"开始":"暂停");
     Button(g,Control(4),std::format("{}x",static_cast<int>(gLawnApp->mUpdateMultiplier)));
     Button(g,Control(5),"每路一只");
+    Button(g,Control(6),flags&32?"连放：开":"连放：关",flags&32);
+    Button(g,Control(7),flags&16?"同格：开":"同格：关",flags&16);
 
     std::string title=catalog==2?"所有僵尸":plantPage?"原创植物":"所有植物";
     std::string hoverName;
@@ -258,6 +276,7 @@ bool SandboxMouseDown(int x,int y,int clicks) {
     if(gLawnApp->GetDialogCount()>0)return true;
     const int flags=Command(0);if(flags<0)return true;
     if(clicks<0){
+        StopPainting();
         if(panel)ClosePanel();
         else if(tool==InteractTool&&x>=SidebarWidth&&y>=80)return false;
         else if(x>=SidebarWidth)Place(Cell(x-WorldOffset,y,bool(flags&4)),true);
@@ -269,22 +288,25 @@ bool SandboxMouseDown(int x,int y,int clicks) {
         for(int i=0;i<14;++i)if(MenuAction(i).Contains(x,y)){gLawnApp->PlaySample(SOUND_GRAVEBUTTON);Action(i);return true;}
         return true;
     }
-    for(int i=0;i<6;++i)if(Control(i).Contains(x,y)){
-        painting=false;gLawnApp->PlaySample(SOUND_GRAVEBUTTON);
+    for(int i=0;i<ControlCount;++i)if(Control(i).Contains(x,y)){
+        StopPainting();gLawnApp->PlaySample(SOUND_GRAVEBUTTON);
         if(i<2){catalog=i+1;}
         else if(i==2)OpenPanel(3);
         else if(i==3)Command(4,flags&2?0:1);
         else if(i==4){int speed=static_cast<int>(gLawnApp->mUpdateMultiplier);Command(5,speed==4?1:speed*2);}
-        else Command(11,selectedZombie);
+        else if(i==5)Command(11,selectedZombie);
+        else if(i==6){Command(20,flags&32?0:1);if(!(flags&32))Say("按住连续放置，拖动换位置，松手停止");}
+        else {Command(19,flags&16?0:1);dirty=true;if(!(flags&16))Say("同一格可种多株，铲子每次移除一株");}
         return true;
     }
-    if(Shovel.Contains(x,y)){painting=false;tool=tool==EraseTool?InteractTool:EraseTool;return true;}
+    if(Shovel.Contains(x,y)){StopPainting();tool=tool==EraseTool?InteractTool:EraseTool;return true;}
     for(int i=0;i<6;++i)if(Hotbar(i).Contains(x,y)){
+        StopPainting();
         tool=PlantTool;plantSlot=i;selectedPlant=plants[i];
         gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;
     }
     if(x<SidebarWidth){
-        painting=false;
+        StopPainting();
         if(catalog==2){
             for(int i=0;i<int(Zombies.size()+SandboxZombies::Definitions.size());++i)if(SidebarZombie(i).Contains(x,y)){
                 selectedZombie=i<int(Zombies.size())?Zombies[i]:200+i-int(Zombies.size());
@@ -303,11 +325,16 @@ bool SandboxMouseDown(int x,int y,int clicks) {
     }
     if(y<80)return true;
     if(tool==InteractTool)return false;
-    lastCell=Cell(x-WorldOffset,y,bool(flags&4));Place(lastCell);painting=tool==PlantTool||tool==EraseTool;
+    StopPainting();lastCell=Cell(x-WorldOffset,y,bool(flags&4));
+    if(Place(lastCell)){
+        painting=tool==PlantTool||tool==EraseTool;
+        if(tool==ZombieTool&&(flags&32))zombieRepeat.Begin(lastCell,PlacementTime());
+    }
     return true;
 }
 bool SandboxMouseDrag(int x,int y) {
     if(!gSandboxEnabled)return false;
+    RepeatZombieAt(x,y);
     if(panel||x<SidebarWidth||y<80)return true;
     if(tool==InteractTool)return false;
     const int cell=Cell(x-WorldOffset,y,bool(Command(0)&4));
@@ -316,10 +343,11 @@ bool SandboxMouseDrag(int x,int y) {
 }
 bool SandboxMouseUp() {
     if(!gSandboxEnabled)return false;
-    painting=false;lastCell=-1;
+    StopPainting();
     return panel||tool!=InteractTool;
 }
 void SandboxKeyDown(int key) {
+    StopPainting();
     if(key==KEYCODE_ESCAPE){if(panel)ClosePanel();else OpenPanel(3);}
     else if(key==KEYCODE_SPACE&&!panel)Command(4,Command(0)&2?0:1);
     else if(key>='1'&&key<='6'&&!panel){const int i=key-'1';tool=PlantTool;plantSlot=i;selectedPlant=plants[i];}

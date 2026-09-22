@@ -2190,22 +2190,22 @@ void Board::GetPlantsOnLawn(int theGridX, int theGridY, PlantsOnLawn* thePlantOn
 
 		if (Plant::IsFlying(aSeedType))
 		{
-			PVZP_ASSERT(!thePlantOnLawn->mFlyingPlant);
+			PVZP_ASSERT(gSandboxEnabled || !thePlantOnLawn->mFlyingPlant);
 			thePlantOnLawn->mFlyingPlant = aPlant;
 		}
 		else if (aSeedType == SeedType::SEED_FLOWERPOT || (aSeedType == SeedType::SEED_LILYPAD && mApp->mGameMode != GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN))
 		{
-			PVZP_ASSERT(!thePlantOnLawn->mUnderPlant);
+			PVZP_ASSERT(gSandboxEnabled || !thePlantOnLawn->mUnderPlant);
 			thePlantOnLawn->mUnderPlant = aPlant;
 		}
 		else if (aSeedType == SeedType::SEED_PUMPKINSHELL)
 		{
-			PVZP_ASSERT(!thePlantOnLawn->mPumpkinPlant);
+			PVZP_ASSERT(gSandboxEnabled || !thePlantOnLawn->mPumpkinPlant);
 			thePlantOnLawn->mPumpkinPlant = aPlant;
 		}
 		else
 		{
-			PVZP_ASSERT(!thePlantOnLawn->mNormalPlant);
+			PVZP_ASSERT(gSandboxEnabled || !thePlantOnLawn->mNormalPlant);
 			thePlantOnLawn->mNormalPlant = aPlant;
 		}
 	}
@@ -3014,7 +3014,7 @@ void Board::MouseMove(int x, int y)
 
 void Board::MouseDrag(int x, int y)
 {
-	if (SandboxMouseDrag(x + (gSandboxEnabled ? SandboxUIRules::WorldOffset : 0), y)) return;
+	if (SandboxMouseDrag(x + (gSandboxEnabled ? mX : 0), y + (gSandboxEnabled ? mY : 0))) return;
 	Widget::MouseDrag(x, y);
 	mChallenge->MouseMove(x, y);
 }
@@ -4369,7 +4369,7 @@ void Board::PickUpTool(GameObjectType theObjectType)
 
 void Board::MouseDown(int x, int y, int theClickCount)
 {
-	if (SandboxMouseDown(x + (gSandboxEnabled ? SandboxUIRules::WorldOffset : 0), y, theClickCount)) return;
+	if (SandboxMouseDown(x + (gSandboxEnabled ? mX : 0), y + (gSandboxEnabled ? mY : 0), theClickCount)) return;
 	UpdateMousePosition();
 	Widget::MouseDown(x, y, theClickCount);
 	mIgnoreMouseUp = !CanInteractWithBoardButtons();
@@ -5760,7 +5760,7 @@ void Board::Update()
 		mShakeCounter--;
 		if (mShakeCounter == 0)
 		{
-			mX = 0;
+			mX = SandboxUIRules::BoardX(gSandboxEnabled);
 			mY = 0;
 		}
 		else
@@ -5769,7 +5769,7 @@ void Board::Update()
 			{
 				mShakeAmountX = -mShakeAmountX;
 			}
-			mX = PvzpAnimateCurve(12, 0, mShakeCounter, 0, mShakeAmountX, PvzpCurves::CURVE_BOUNCE);
+			mX = SandboxUIRules::BoardX(gSandboxEnabled, PvzpAnimateCurve(12, 0, mShakeCounter, 0, mShakeAmountX, PvzpCurves::CURVE_BOUNCE));
 			mY = PvzpAnimateCurve(12, 0, mShakeCounter, 0, mShakeAmountY, PvzpCurves::CURVE_BOUNCE);
 		}
 	}

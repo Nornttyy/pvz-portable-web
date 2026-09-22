@@ -28,6 +28,7 @@
 
 bool gSandboxEnabled = false;
 static bool paused = true, stepOnce = false, awake = true;
+static bool stackPlants = false, continuousZombies = false;
 static int mapType = 0, escaped = 0;
 static int sessionRevision = 0;
 static std::unique_ptr<PlayerInfo> sandboxProfile;
@@ -63,6 +64,8 @@ bool SandboxEnter() {
     sandboxProfile = std::make_unique<PlayerInfo>();
     gSandboxEnabled = true;
     awake = true;
+    stackPlants = false;
+    continuousZombies = false;
     CanvasSize(SandboxUIRules::CanvasWidth);
     SandboxStart(0);
     return true;
@@ -175,15 +178,29 @@ static void ClearEnemies(Board* board) {
 }
 static int PlacePlant(Board* board, int type, int col, int row) {
     if (!SandboxRules::ValidPlant(type) || !SandboxRules::ValidCell(col, row, mapType == 1)) return -2;
-    if (PlantCount(board) >= SandboxRules::MaxPlants) return -3;
+    if (PlantCount(board) >= SandboxRules::MaxPlants || board->mPlants.mSize >= board->mPlants.mMaxSize - 8) return -3;
     const auto seed = static_cast<SeedType>(SandboxPlants::Base(type));
     if (seed == SEED_COBCANNON && col >= 8) return -4;
     if (seed == SEED_CATTAIL && !board->IsPoolSquare(col, row)) return -4;
-    if (board->CanPlantAt(col, row, seed) != PLANTING_OK) return -4;
+    if (stackPlants && seed != SEED_GRAVEBUSTER && seed != SEED_INSTANT_COFFEE) {
+        SandboxRules::StackSite site;
+        site.water = board->IsPoolSquare(col, row);
+        site.blocked = board->GetGraveStoneAt(col,row) || board->GetCraterAt(col,row) || board->GetScaryPotAt(col,row) || board->IsIceAt(col,row);
+        for (auto* existing : board->mPlants) {
+            if (existing->mDead || existing->mRow != row || existing->NotOnGround()) continue;
+            if (existing->mPlantCol == col) {
+                site.lily |= existing->mSeedType == SEED_LILYPAD;
+                site.pot |= existing->mSeedType == SEED_FLOWERPOT;
+                site.cattail |= existing->mSeedType == SEED_CATTAIL;
+            }
+            if (existing->mPlantCol == col+1) site.rightLily |= existing->mSeedType == SEED_LILYPAD;
+        }
+        if (!SandboxRules::StackTerrainAllows(seed,col,site)) return -4;
+    } else if (board->CanPlantAt(col, row, seed) != PLANTING_OK) return -4;
     Plant::PreloadPlantResources(seed);
     PlantsOnLawn existing{};
     board->GetPlantsOnLawn(col, row, &existing);
-    if (Plant::IsUpgrade(seed)) {
+    if (!stackPlants && Plant::IsUpgrade(seed)) {
         if (seed == SEED_CATTAIL && existing.mUnderPlant) existing.mUnderPlant->Die();
         else if (existing.mNormalPlant && existing.mNormalPlant->IsUpgradableTo(seed)) existing.mNormalPlant->Die();
         if (seed == SEED_COBCANNON) {
@@ -220,14 +237,20 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
     auto* board = ActiveBoard();
     if (!board) return -1;
     switch (command) {
-    case 0: return 1 | (paused ? 2 : 0) | (mapType == 1 ? 4 : 0) | (awake ? 8 : 0);
+    case 0: return 1 | (paused ? 2 : 0) | (mapType == 1 ? 4 : 0) | (awake ? 8 : 0) | (stackPlants ? 16 : 0) | (continuousZombies ? 32 : 0);
     case 1: return PlacePlant(board, type, col, row);
     case 2: return Spawn(board, type, col, row);
-    case 3:
+    case 3: {
         if (!SandboxRules::ValidCell(col, row, mapType == 1)) return -2;
-        for (auto* plant : board->mPlants) if (!plant->mDead && plant->mRow == row && (plant->mPlantCol == col || (plant->mSeedType == SEED_COBCANNON && plant->mPlantCol + 1 == col))) plant->Die();
+        Plant* top = nullptr;
+        for (auto* plant : board->mPlants) if (!plant->mDead && plant->mRow == row && (plant->mPlantCol == col || (plant->mSeedType == SEED_COBCANNON && plant->mPlantCol + 1 == col))) {
+            if (stackPlants) top = plant;
+            else plant->Die();
+        }
+        if (top) top->Die();
         for (auto* item : board->mGridItems) if (!item->mDead && item->mGridX == col && item->mGridY == row) item->GridItemDie();
         board->ProcessDeleteQueue(); board->MarkAllDirty(); return 1;
+    }
     case 4: paused = type != 0; board->mPaused = paused; return 1;
     case 5:
         if (!SandboxRules::ValidSpeed(type)) return -2;
@@ -254,6 +277,8 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
     case 16: SandboxUIFeedback(type); return 1;
     case 17: return SandboxUIHasUnsaved() ? 1 : 0;
     case 18: return sessionRevision;
+    case 19: stackPlants = type != 0; return 1;
+    case 20: continuousZombies = type != 0; return 1;
     default: return -2;
     }
 }

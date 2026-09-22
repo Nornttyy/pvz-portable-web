@@ -1,5 +1,5 @@
 // Storage/fullscreen bridge only. All sandbox UI and input live in the native game.
-import { validateLayout, LAYOUT_KEY } from './sandbox-data.mjs';
+import { validateLayout, requiresStacking, LAYOUT_KEY } from './sandbox-data.mjs';
 const api=(command,type=0,col=0,row=0)=>Module._pvz_sandbox_command?.(command,type,col,row)??-1;
 const input=document.getElementById('layout-file');
 let importRevision=-1, stopped=false;
@@ -11,13 +11,14 @@ function snapshot() {
     const type=Module._pvz_sandbox_plant_data(i,0);if(type<0)break;
     plants.push({type,col:Module._pvz_sandbox_plant_data(i,1),row:Module._pvz_sandbox_plant_data(i,2)});
   }
-  return validateLayout({schema:1,map:flags&4?1:0,plants});
+  return validateLayout({schema:1,map:flags&4?1:0,stacked:Boolean(flags&16)||requiresStacking(plants),plants});
 }
 function restore(value,revision) {
   const layout=validateLayout(value);
   if(api(18)!==revision||api(0)<0)return;
   const awake=Boolean(api(0)&8);
   if(api(8,layout.map)<0)throw Error('Cannot reset sandbox');
+  api(19,layout.stacked?1:0);
   api(12,0);
   let rejected=0;
   for(const p of layout.plants)if(api(1,p.type,p.col,p.row)<0)rejected++;

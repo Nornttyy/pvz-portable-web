@@ -36,13 +36,30 @@ export function boardCell(x,y,pool=false) {
 }
 export function cellRect(col,row,pool=false) { return {x:40+col*80,y:80+row*(pool?85:100),width:80,height:pool?85:100}; }
 export const LAYOUT_KEY = 'pvz.sandbox.formation.v1';
+export function requiresStacking(plants) {
+  const seen=new Set(),cells=new Map();
+  for(const p of plants){
+    const layer=[16,33].includes(p.type)?'base':p.type===30?'shell':p.type===35?'coffee':'normal';
+    for(let col=p.col;col<=p.col+(p.type===47?1:0);col++){
+      const key=`${col}:${p.row}:${layer}`;
+      if(seen.has(key))return true;
+      seen.add(key);
+      const cellKey=`${col}:${p.row}`,types=cells.get(cellKey)??new Set();
+      types.add(p.type);cells.set(cellKey,types);
+      if(([16,33].some(id=>types.has(id))&&[19,24,43].some(id=>types.has(id)))||(types.has(47)&&types.has(30)))return true;
+    }
+  }
+  return false;
+}
 export function validateLayout(value) {
   if (value?.schema !== 1 || ![0,1].includes(value.map) || !Array.isArray(value.plants) || value.plants.length > 180) throw Error('不是支持的沙盒阵型文件');
+  if(value.stacked!==undefined&&typeof value.stacked!=='boolean')throw Error('同格种植设置无效');
+  const stacked=value.stacked===true;
   const seen = new Set();
   const plants = value.plants.map(p=>{
     if (!p || ![p.type,p.col,p.row].every(Number.isInteger) || !validPlant(p.type) || p.col<0 || p.col>=9 || p.row<0 || p.row >= (value.map===1?6:5)) throw Error('阵型中有无效的植物或位置');
     const key = `${p.type}:${p.col}:${p.row}`;
-    if (seen.has(key)) throw Error('阵型中有重复植物');
+    if (!stacked&&seen.has(key)) throw Error('阵型中有重复植物');
     seen.add(key);
     return {type:p.type,col:p.col,row:p.row};
   });
@@ -51,22 +68,24 @@ export function validateLayout(value) {
   for(const p of plants) {
     const key=`${p.col}:${p.row}`,kind=[16,33].includes(p.type)?'base':p.type===30?'shell':p.type===35?'coffee':'normal';
     const cell=occupied.get(key)??{};
-    if(cell[kind]!==undefined) throw Error('同一个格子的植物位置冲突');
-    cell[kind]=p.type;occupied.set(key,cell);
+    if(!stacked&&cell[kind]!==undefined) throw Error('同一个格子的植物位置冲突');
+    cell[kind]=p.type;
+    (cell.types??=new Set()).add(p.type);occupied.set(key,cell);
   }
   for(const p of plants) {
     const cell=occupied.get(`${p.col}:${p.row}`), water=value.map===1&&[2,3].includes(p.row);
     if([16,19,24,43].includes(p.type)&&!water) throw Error('水生植物不在水路');
     if(water&&[4,21,33,46].includes(p.type)) throw Error('陆生植物不能放在水路');
-    if(water&&![16,19,24,35,43].includes(p.type)&&cell.base!==16&&!(p.type===30&&cell.normal===43)) throw Error('水路植物缺少睡莲');
-    if([19,24,43].includes(cell.normal)&&cell.base!==undefined) throw Error('水生植物与底座冲突');
+    if(water&&![16,19,24,35,43].includes(p.type)&&!cell.types.has(16)&&!(p.type===30&&cell.types.has(43))) throw Error('水路植物缺少睡莲');
+    if(!stacked&&[19,24,43].includes(cell.normal)&&cell.base!==undefined) throw Error('水生植物与底座冲突');
+    if([21,46].includes(p.type)&&cell.types.has(33))throw Error('地刺需要地面');
     if(p.type===11) throw Error('阵型不包含墓碑，不能保存正在吞噬墓碑的植物');
     if(p.type===35&&![8,9,10,12,13,14,15,24,31,42,111].includes(cell.normal)) throw Error('咖啡豆缺少蘑菇');
     if(p.type===47) {
       const right=occupied.get(`${p.col+1}:${p.row}`)??{};
-      if(p.col>=8||right.normal!==undefined||right.shell!==undefined||cell.shell!==undefined) throw Error('玉米加农炮需要连续两个空位');
-      if(water&&right.base!==16) throw Error('玉米加农炮的第二格缺少睡莲');
+      if(p.col>=8||(!stacked&&(right.normal!==undefined||right.shell!==undefined||cell.shell!==undefined))) throw Error('玉米加农炮需要连续两个空位');
+      if(water&&!right.types?.has(16)) throw Error('玉米加农炮的第二格缺少睡莲');
     }
   }
-  return {schema:1,map:value.map,plants:plants.sort((a,b)=>layer(a)-layer(b))};
+  return {schema:1,map:value.map,...(stacked?{stacked:true}:{}),plants:plants.sort((a,b)=>layer(a)-layer(b))};
 }
