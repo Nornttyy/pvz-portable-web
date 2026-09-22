@@ -7,12 +7,12 @@
     {
       "name": "pvz-portable.js",
       "size": 277234,
-      "sha256": "ec81d0f12467cae2e92fa04f493284e3990d9956b5a4664e2685303ca0d22966"
+      "sha256": "7e6fcd5af81fba0b99b9360d850d6319cff6c524790bcfc6d675e8cfb3e4d65a"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7368219,
-      "sha256": "6c15233fbf4fc7034bd059c408b34124ef11f089ae07e9cfb956889bda05d327"
+      "size": 7375571,
+      "sha256": "e1ab3b8fd06404be0c18be1cbc8ac2d261e04a29b65049270cdb45f7d4bb5eef"
     }
   ]
 }

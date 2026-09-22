@@ -11,8 +11,9 @@ enum SeedType {SEED_PEASHOOTER=0,SEED_NONE=-1};
 enum ZombieType {ZOMBIE_NORMAL=0,ZOMBIE_IMP=24,ZOMBIE_GARGANTUAR=23,ZOMBIE_REDEYE_GARGANTUAR=32,ZOMBIE_ZAMBONI=12};
 enum ZombieID : unsigned { ZOMBIEID_NULL=0 };
 enum ReanimationType {REANIM_ZOMBIE,REANIM_FLAG};
-enum ProjectileType {PROJECTILE_PEA,PROJECTILE_SNOWPEA,PROJECTILE_FIREBALL};
-enum ProjectileMotion {MOTION_STRAIGHT,MOTION_STAR,MOTION_HOMING,MOTION_THREEPEATER};
+enum ProjectileType {PROJECTILE_PEA,PROJECTILE_SNOWPEA,PROJECTILE_FIREBALL,PROJECTILE_ZOMBIE_PEA};
+enum ProjectileMotion {MOTION_STRAIGHT,MOTION_STAR,MOTION_HOMING,MOTION_THREEPEATER,MOTION_BACKWARDS};
+constexpr int REANIM_PLAY_ONCE_AND_HOLD=0;
 enum PlantWeapon {WEAPON_PRIMARY};
 enum PlantSubClass {SUBCLASS_NORMAL,SUBCLASS_SHOOTER};
 constexpr int RENDER_GROUP_HIDDEN=-1,DS_ALIGN_CENTER=0;
@@ -41,7 +42,8 @@ struct Reanimation{
  Definition def;Definition* mDefinition=&def;TrackInstance* mTrackInstances=nullptr;float mAnimTime=0;
  std::string track;Sexy::SexyTransform2D matrix;ReanimatorTransform pose;
  void ReanimationInitializeType(int,int,ReanimationType){};bool TrackExists(const char* name){return track==name;}
- void SetFramesForLayer(const char*){};void Draw(Sexy::Graphics*){};void SetImageOverride(const char*,Sexy::Image*){};Reanimation* FindSubReanim(ReanimationType){return nullptr;}
+ void PlayReanim(const char*,int,int,float){}
+ void SetFramesForLayer(const char*){};void Draw(Sexy::Graphics*){};void SetImageOverride(const char* name,Sexy::Image* image){for(int i=0;i<def.mTracks.count;++i)if(std::string(def.mTracks.tracks[i].mName)==name)mTrackInstances[i].mImageOverride=image;};Reanimation* FindSubReanim(ReanimationType){return nullptr;}
  int mFrameBasePose=0;Sexy::SexyTransform2D mOverlayMatrix;int FindTrackIndex(const char*){return 0;}void GetAttachmentOverlayMatrix(int,Sexy::SexyTransform2D&){};
  void GetTrackMatrix(int,Sexy::SexyTransform2D& out){out=matrix;}void GetCurrentTransform(int,ReanimatorTransform* out){*out=pose;}
 };
@@ -54,7 +56,8 @@ public:
  static constexpr int ZOMBIE_WAVE_DEBUG=-1;
  Board* mBoard=nullptr;ZombieType mZombieType=ZOMBIE_NORMAL;ZombieID id=ZOMBIEID_NULL;
  float mPosX=0,mPosY=0,mScaleZombie=1;int mX=0,mY=0,mRow=0,mBodyReanimID=0,mBodyHealth=1000,mBodyMaxHealth=1000,mHelmHealth=0,mHelmMaxHealth=0;
- bool mDead=false,mMindControlled=false,mHasHead=true;int chill=0;
+ bool mDead=false,mMindControlled=false,mHasHead=true,mHasArm=true,mIsEating=false;int chill=0,mIceTrapCounter=0,mButteredCounter=0,mRenderOrder=0;
+ void StartWalkAnim(int){}
  int mSpecialHeadReanimID=0;
  bool IsDeadOrDying(){return mDead||mBodyHealth<=0;};bool EffectedByDamage(unsigned){return !IsDeadOrDying();}
  void TakeDamage(int n,unsigned){int armor=std::min(n,mHelmHealth);mHelmHealth-=armor;mBodyHealth-=n-armor;}
@@ -66,14 +69,20 @@ public:
  Board* mBoard=nullptr;SeedType mSeedType=SEED_PEASHOOTER;
  int mX=0,mY=0,mRow=0,mPlantCol=0,mPlantHealth=300,mPlantMaxHealth=300,mLaunchRate=150,mLaunchCounter=100,mBlinkCountdown=0,mShootingCounter=0;
  int mBodyReanimID=0,mHeadReanimID=0,mHeadReanimID2=0,mHeadReanimID3=0;
+ int mRenderOrder=0,mEatenFlashCountdown=0;
  bool mDead=false,mIsAsleep=false;
  int GetDamageRangeFlags(PlantWeapon){return 0;};Zombie* FindTargetZombie(int row,PlantWeapon);
 };
+class Projectile;
+namespace SandboxPlants {void ForgetShot(Projectile*);}
+namespace SandboxZombies {void ForgetShot(Projectile*);}
 class Projectile{
 public:
  Board* mBoard=nullptr;bool mDead=false;ProjectileMotion mMotionType=MOTION_STRAIGHT;ZombieID mTargetZombieID=ZOMBIEID_NULL;
  float mPosX=0,mPosY=0,mPosZ=0,mVelX=3.3,mVelY=0,mShadowY=0;
  int mX=0,mY=0,mRow=0,mRenderOrder=0,mDamageRangeFlags=0;
+ int mProjectileAge=0;
+ void Die(){mDead=true;SandboxPlants::ForgetShot(this);SandboxZombies::ForgetShot(this);}
  ProjectileType mProjectileType=PROJECTILE_PEA;
  int GetDamageFlags(Zombie*){return 0;}
 };
@@ -94,8 +103,8 @@ public:
  Zombie* AddZombieInRow(ZombieType type,int row,int){
   auto p=std::make_unique<Zombie>();auto* z=p.get();z->mBoard=this;z->id=ZombieID(nextID++);z->mZombieType=type;z->mRow=row;z->mPosY=row*100;ownedZombies.push_back(std::move(p));mZombies.add(z);return z;
  }
- Projectile* AddProjectile(float x,float y,int order,int row,ProjectileType){
-  auto p=std::make_unique<Projectile>();auto* s=p.get();s->mBoard=this;s->mPosX=x;s->mPosY=y;s->mRenderOrder=order;s->mRow=row;ownedShots.push_back(std::move(p));mProjectiles.add(s);return s;
+ Projectile* AddProjectile(float x,float y,int order,int row,ProjectileType type){
+  auto p=std::make_unique<Projectile>();auto* s=p.get();s->mBoard=this;s->mProjectileType=type;s->mPosX=x;s->mPosY=y;s->mRenderOrder=order;s->mRow=row;ownedShots.push_back(std::move(p));mProjectiles.add(s);return s;
  }
  Plant* plant(int col,int row){auto p=std::make_unique<Plant>();auto* a=p.get();a->mBoard=this;a->mPlantCol=col;a->mRow=row;a->mX=col*80;a->mY=row*100;ownedPlants.push_back(std::move(p));mPlants.add(a);return a;}
 };

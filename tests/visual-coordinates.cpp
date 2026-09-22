@@ -24,6 +24,25 @@ int main(){
  gatling->mBlinkCountdown=4;SandboxPlants::Tick(&skinBoard);
  assert(instances[0].mImageOverride->path.ends_with("fire-gatling-blink.png"));
  SandboxPlants::Reset();app.reanims.clear();
+ // Every costume is bound to all four native sleeve bones; faces keep native dimensions.
+ Track zTracks[]={{"anim_head1"},{"anim_head2"},{"Zombie_body"},{"anim_innerarm1"},{"anim_innerarm2"},{"Zombie_outerarm_upper"},{"Zombie_outerarm_lower"},{"Zombie_outerarm_hand"},{"anim_hair"},{"Zombie_tie"},{"anim_cone"},{"anim_bucket"}};
+ TrackInstance zInstances[12];Reanimation zRig;zRig.def.mTracks={12,zTracks};zRig.mTrackInstances=zInstances;app.reanims[91]=&zRig;
+ for(const auto& d:SandboxZombies::Definitions){
+  for(auto& t:zInstances){t.mImageOverride=nullptr;t.mRenderGroup=0;}
+  auto* z=skinBoard.AddZombieInRow(ZOMBIE_NORMAL,2,0);z->mBodyReanimID=91;SandboxZombies::Assign(z,d.id);
+  for(int i=0;i<7;++i)assert(zInstances[i].mImageOverride);
+  assert(zInstances[7].mImageOverride==nullptr); // native hand remains native, no baked projectile
+  if(d.id==210||d.id==211){assert(zInstances[8].mImageOverride->path.ends_with("-hat.png"));assert(zInstances[8].mRenderGroup==0);}
+  z->mHasArm=false;SandboxZombies::RefreshDamageArt(z);assert(zInstances[5].mImageOverride->path.ends_with("-outer-upper-damaged.png"));
+  if(d.armor){
+   int i=d.base==2?10:11;
+   z->mHelmHealth=d.armor/2;SandboxZombies::RefreshDamageArt(z);assert(zInstances[i].mImageOverride->path.ends_with("-prop-damage1.png"));
+   z->mHelmHealth=1;SandboxZombies::RefreshDamageArt(z);assert(zInstances[i].mImageOverride->path.ends_with("-prop-damage2.png"));
+   z->mHelmHealth=d.armor;SandboxZombies::RefreshDamageArt(z);assert(zInstances[i].mImageOverride->path.ends_with("-prop.png"));
+   assert(SandboxZombies::DetachedArmor(z)->path.ends_with("-prop-damage2.png"));
+  }else assert(!SandboxZombies::DetachedArmor(z));
+ }
+ SandboxZombies::Reset();app.reanims.clear();
  Sexy::Graphics g(nullptr);g.mTransX=170;g.mTransY=250;
  SandboxArt::Sprite(&g,"fire",12,12,30,22);near(testBlits.back().matrix.m02,182);near(testBlits.back().matrix.m12,262);
  Reanimation a;a.track="idle_mouth";a.matrix={0,-0.72f,60,0.72f,0,40};float x,y;

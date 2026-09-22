@@ -26,6 +26,7 @@
 #include "Projectile.h"
 #include "../LawnApp.h"
 #include "../SandboxPlants.h"
+#include "../SandboxZombies.h"
 #include "../Resources.h"
 #include "../GameConstants.h"
 #include "../PvzpLib/PvzpFoley.h"
@@ -157,6 +158,7 @@ void Projectile::ProjectileInitialize(int theX, int theY, int theRenderOrder, in
 
 Plant* Projectile::FindCollisionTargetPlant()
 {
+    if (SandboxZombies::HasShot(this)) return SandboxZombies::CollisionTarget(this);
 	Rect aProjectileRect = GetProjectileRect();
 
 	for (Plant* aPlant : mBoard->mPlants)
@@ -312,6 +314,7 @@ void Projectile::CheckForCollision()
 		Plant* aPlant = FindCollisionTargetPlant();
 		if (aPlant)
 		{
+			if (SandboxZombies::Impact(this,aPlant)) { Die(); return; }
 			const ProjectileDefinition& aProjectileDef = GetProjectileDef();
 			aPlant->mPlantHealth -= aProjectileDef.mDamage;
 			aPlant->mEatenFlashCountdown = std::max(aPlant->mEatenFlashCountdown, 25);
@@ -978,6 +981,7 @@ void Projectile::Update()
 
 void Projectile::Draw(Graphics* g)
 {
+    if (SandboxZombies::DrawShot(g,this)) return;
     if (SandboxPlants::DrawShot(g,this)) return;
 	const ProjectileDefinition& aProjectileDef = GetProjectileDef();
 
@@ -1157,6 +1161,7 @@ void Projectile::DrawShadow(Graphics* g)
 
 void Projectile::Die()
 {
+    SandboxZombies::ForgetShot(this);
     SandboxPlants::ForgetShot(this);
 	mDead = true;
 

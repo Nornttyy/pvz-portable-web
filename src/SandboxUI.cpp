@@ -236,7 +236,7 @@ void SandboxDrawUI(Graphics* g) {
     }else{
         const int count=plantPage?int(SandboxPlants::Definitions.size()):48;
         for(int i=0;i<25&&i+catalogPage*25<count;++i){
-            const int id=plantPage?100+i:i+catalogPage*25;
+            const int id=plantPage?SandboxPlants::Definitions[i].id:i+catalogPage*25;
             const auto b=SidebarPlant(i);SandboxPlants::DrawCard(g,b.x,b.y,id);
             if(tool==PlantTool&&selectedPlant==id)Outline(g,b);
             if(Hover(b)){Outline(g,b);const auto* d=SandboxPlants::Find(id);hoverName=d?d->name:Plant::GetNameString(static_cast<SeedType>(id));}
@@ -317,7 +317,7 @@ bool SandboxMouseDown(int x,int y,int clicks) {
             if(!plantPage&&(PrevPage.Contains(x,y)||NextPage.Contains(x,y))){catalogPage=1-catalogPage;return true;}
             const int count=plantPage?int(SandboxPlants::Definitions.size()):48;
             for(int i=0;i<25&&i+catalogPage*25<count;++i)if(SidebarPlant(i).Contains(x,y)){
-                selectedPlant=plantPage?100+i:i+catalogPage*25;plants[plantSlot]=selectedPlant;
+                selectedPlant=plantPage?SandboxPlants::Definitions[i].id:i+catalogPage*25;plants[plantSlot]=selectedPlant;
                 tool=PlantTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;
             }
         }

@@ -34,7 +34,7 @@ const bytes=await zip.generateAsync({type:'nodebuffer',compression:'DEFLATE',com
 manifest.bundle={url:`resources/game-${hash(bytes).slice(0,12)}.zip`,size:bytes.length,sha256:hash(bytes)};
 manifest.totalFiles=manifest.files.length;manifest.totalBytes=manifest.files.reduce((n,f)=>n+f.size,0);
 manifest.originalPlants.files=manifest.files.filter(f=>f.path.startsWith('images/sandbox/')).map(f=>f.path);
-manifest.sandboxExpansion={addedPlants:10,addedZombies:10,totalCustomPlants:18,totalCustomZombies:10,parts:parts.length,vfxParts:40,source:'Built-in image_gen edits of native sprite parts; original Gatling hardware and green mouths reused unchanged; separate rig parts and 40 projectile/VFX sprites; prompts in art/expansion'};
+manifest.sandboxExpansion={addedPlants:9,addedZombies:12,totalCustomPlants:17,totalCustomZombies:12,parts:parts.length,vfxParts:48,source:'Built-in image_gen edits with native joint registration; matching head/blink/mouth sets, three-stage storm mushroom, two ranged zombie rigs and damaged arms; original Gatling hardware reused unchanged; separate rig parts and 48 projectile/VFX sprites; prompts in art/expansion'};
 manifest.delivery='bundled';delete manifest.localOnly;validateManifest(manifest);
 await writeFile(resolve(target),bytes);
 await writeFile(new URL('site/resource-manifest.json',root),JSON.stringify(manifest,null,2)+'\n');

@@ -1,87 +1,27 @@
 [
   {
-    "file" : "vfx-fire.png",
-    "height" : 44,
+    "file" : "vfx-acid-hit-0.png",
+    "height" : 80,
     "ink" : [
-      0,
-      0,
-      60,
-      44
+      9,
+      8,
+      63,
+      68
     ],
     "native" : "generated-vfx",
-    "width" : 60
+    "width" : 80
   },
   {
-    "file" : "vfx-ice.png",
-    "height" : 40,
+    "file" : "vfx-acid-hit-1.png",
+    "height" : 80,
     "ink" : [
       0,
       0,
-      46,
-      40
+      80,
+      80
     ],
     "native" : "generated-vfx",
-    "width" : 46
-  },
-  {
-    "file" : "vfx-electric.png",
-    "height" : 46,
-    "ink" : [
-      0,
-      0,
-      50,
-      46
-    ],
-    "native" : "generated-vfx",
-    "width" : 50
-  },
-  {
-    "file" : "vfx-tiny.png",
-    "height" : 20,
-    "ink" : [
-      0,
-      0,
-      20,
-      20
-    ],
-    "native" : "generated-vfx",
-    "width" : 20
-  },
-  {
-    "file" : "vfx-heavy.png",
-    "height" : 48,
-    "ink" : [
-      0,
-      0,
-      48,
-      48
-    ],
-    "native" : "generated-vfx",
-    "width" : 48
-  },
-  {
-    "file" : "vfx-scatter.png",
-    "height" : 26,
-    "ink" : [
-      0,
-      0,
-      26,
-      26
-    ],
-    "native" : "generated-vfx",
-    "width" : 26
-  },
-  {
-    "file" : "vfx-seeker.png",
-    "height" : 36,
-    "ink" : [
-      0,
-      0,
-      50,
-      36
-    ],
-    "native" : "generated-vfx",
-    "width" : 50
+    "width" : 80
   },
   {
     "file" : "vfx-acid.png",
@@ -96,52 +36,16 @@
     "width" : 46
   },
   {
-    "file" : "vfx-fire-hit-0.png",
-    "height" : 80,
-    "ink" : [
-      15,
-      11,
-      53,
-      56
-    ],
-    "native" : "generated-vfx",
-    "width" : 80
-  },
-  {
-    "file" : "vfx-fire-hit-1.png",
-    "height" : 80,
+    "file" : "vfx-charge.png",
+    "height" : 60,
     "ink" : [
       0,
       0,
-      80,
-      80
+      60,
+      60
     ],
     "native" : "generated-vfx",
-    "width" : 80
-  },
-  {
-    "file" : "vfx-ice-hit-0.png",
-    "height" : 80,
-    "ink" : [
-      15,
-      15,
-      55,
-      55
-    ],
-    "native" : "generated-vfx",
-    "width" : 80
-  },
-  {
-    "file" : "vfx-ice-hit-1.png",
-    "height" : 80,
-    "ink" : [
-      0,
-      0,
-      80,
-      80
-    ],
-    "native" : "generated-vfx",
-    "width" : 80
+    "width" : 60
   },
   {
     "file" : "vfx-electric-hit-0.png",
@@ -168,19 +72,31 @@
     "width" : 80
   },
   {
-    "file" : "vfx-tiny-hit-0.png",
+    "file" : "vfx-electric.png",
+    "height" : 46,
+    "ink" : [
+      0,
+      0,
+      50,
+      46
+    ],
+    "native" : "generated-vfx",
+    "width" : 50
+  },
+  {
+    "file" : "vfx-fire-hit-0.png",
     "height" : 80,
     "ink" : [
-      14,
-      13,
-      54,
-      57
+      15,
+      11,
+      53,
+      56
     ],
     "native" : "generated-vfx",
     "width" : 80
   },
   {
-    "file" : "vfx-tiny-hit-1.png",
+    "file" : "vfx-fire-hit-1.png",
     "height" : 80,
     "ink" : [
       0,
@@ -190,6 +106,30 @@
     ],
     "native" : "generated-vfx",
     "width" : 80
+  },
+  {
+    "file" : "vfx-fire.png",
+    "height" : 44,
+    "ink" : [
+      0,
+      0,
+      60,
+      44
+    ],
+    "native" : "generated-vfx",
+    "width" : 60
+  },
+  {
+    "file" : "vfx-gum.png",
+    "height" : 48,
+    "ink" : [
+      0,
+      0,
+      48,
+      48
+    ],
+    "native" : "generated-vfx",
+    "width" : 48
   },
   {
     "file" : "vfx-heavy-hit-0.png",
@@ -216,19 +156,31 @@
     "width" : 80
   },
   {
-    "file" : "vfx-scatter-hit-0.png",
+    "file" : "vfx-heavy.png",
+    "height" : 48,
+    "ink" : [
+      0,
+      0,
+      48,
+      48
+    ],
+    "native" : "generated-vfx",
+    "width" : 48
+  },
+  {
+    "file" : "vfx-ice-hit-0.png",
     "height" : 80,
     "ink" : [
-      12,
-      10,
-      59,
-      65
+      15,
+      15,
+      55,
+      55
     ],
     "native" : "generated-vfx",
     "width" : 80
   },
   {
-    "file" : "vfx-scatter-hit-1.png",
+    "file" : "vfx-ice-hit-1.png",
     "height" : 80,
     "ink" : [
       0,
@@ -240,52 +192,64 @@
     "width" : 80
   },
   {
-    "file" : "vfx-seeker-hit-0.png",
-    "height" : 80,
+    "file" : "vfx-ice.png",
+    "height" : 40,
     "ink" : [
-      8,
-      10,
-      63,
-      65
+      0,
+      0,
+      46,
+      40
     ],
     "native" : "generated-vfx",
-    "width" : 80
+    "width" : 46
   },
   {
-    "file" : "vfx-seeker-hit-1.png",
-    "height" : 80,
+    "file" : "vfx-ink-hit-0.png",
+    "height" : 64,
     "ink" : [
-      0,
-      0,
-      80,
-      80
+      1,
+      1,
+      70,
+      62
     ],
     "native" : "generated-vfx",
-    "width" : 80
+    "width" : 72
   },
   {
-    "file" : "vfx-acid-hit-0.png",
-    "height" : 80,
+    "file" : "vfx-ink-hit-1.png",
+    "height" : 64,
     "ink" : [
-      9,
-      8,
-      63,
-      68
+      1,
+      1,
+      70,
+      62
     ],
     "native" : "generated-vfx",
-    "width" : 80
+    "width" : 72
   },
   {
-    "file" : "vfx-acid-hit-1.png",
-    "height" : 80,
+    "file" : "vfx-ink-ready.png",
+    "height" : 40,
     "ink" : [
-      0,
-      0,
-      80,
-      80
+      1,
+      1,
+      38,
+      38
     ],
     "native" : "generated-vfx",
-    "width" : 80
+    "width" : 40
+  },
+  {
+    "file" : "vfx-ink-shot.png",
+    "height" : 40,
+    "ink" : [
+      1,
+      1,
+      52,
+      38
+    ],
+    "native" : "generated-vfx",
+    "width" : 54
   },
   {
     "file" : "vfx-link-0.png",
@@ -312,25 +276,13 @@
     "width" : 80
   },
   {
-    "file" : "vfx-sonic-0.png",
-    "height" : 84,
-    "ink" : [
-      12,
-      10,
-      28,
-      67
-    ],
-    "native" : "generated-vfx",
-    "width" : 40
-  },
-  {
-    "file" : "vfx-sonic-1.png",
-    "height" : 84,
+    "file" : "vfx-muzzle-ice.png",
+    "height" : 30,
     "ink" : [
       0,
       0,
       40,
-      84
+      30
     ],
     "native" : "generated-vfx",
     "width" : 40
@@ -348,40 +300,160 @@
     "width" : 40
   },
   {
-    "file" : "vfx-muzzle-ice.png",
-    "height" : 30,
+    "file" : "vfx-notes.png",
+    "height" : 44,
+    "ink" : [
+      0,
+      0,
+      36,
+      44
+    ],
+    "native" : "generated-vfx",
+    "width" : 36
+  },
+  {
+    "file" : "vfx-paper-hit-0.png",
+    "height" : 64,
+    "ink" : [
+      1,
+      1,
+      70,
+      62
+    ],
+    "native" : "generated-vfx",
+    "width" : 72
+  },
+  {
+    "file" : "vfx-paper-hit-1.png",
+    "height" : 64,
+    "ink" : [
+      1,
+      1,
+      70,
+      62
+    ],
+    "native" : "generated-vfx",
+    "width" : 72
+  },
+  {
+    "file" : "vfx-paper-ready.png",
+    "height" : 44,
+    "ink" : [
+      1,
+      1,
+      42,
+      42
+    ],
+    "native" : "generated-vfx",
+    "width" : 44
+  },
+  {
+    "file" : "vfx-paper-shot.png",
+    "height" : 44,
+    "ink" : [
+      1,
+      1,
+      42,
+      42
+    ],
+    "native" : "generated-vfx",
+    "width" : 44
+  },
+  {
+    "file" : "vfx-poison.png",
+    "height" : 48,
+    "ink" : [
+      0,
+      0,
+      36,
+      48
+    ],
+    "native" : "generated-vfx",
+    "width" : 36
+  },
+  {
+    "file" : "vfx-repair.png",
+    "height" : 40,
     "ink" : [
       0,
       0,
       40,
-      30
+      40
     ],
     "native" : "generated-vfx",
     "width" : 40
   },
   {
-    "file" : "vfx-spring-0.png",
-    "height" : 64,
+    "file" : "vfx-scatter-hit-0.png",
+    "height" : 80,
     "ink" : [
-      7,
-      2,
-      53,
-      60
+      12,
+      10,
+      59,
+      65
     ],
     "native" : "generated-vfx",
-    "width" : 64
+    "width" : 80
   },
   {
-    "file" : "vfx-spring-1.png",
-    "height" : 64,
+    "file" : "vfx-scatter-hit-1.png",
+    "height" : 80,
     "ink" : [
       0,
       0,
-      64,
-      64
+      80,
+      80
     ],
     "native" : "generated-vfx",
-    "width" : 64
+    "width" : 80
+  },
+  {
+    "file" : "vfx-scatter.png",
+    "height" : 26,
+    "ink" : [
+      0,
+      0,
+      26,
+      26
+    ],
+    "native" : "generated-vfx",
+    "width" : 26
+  },
+  {
+    "file" : "vfx-seeker-hit-0.png",
+    "height" : 80,
+    "ink" : [
+      8,
+      10,
+      63,
+      65
+    ],
+    "native" : "generated-vfx",
+    "width" : 80
+  },
+  {
+    "file" : "vfx-seeker-hit-1.png",
+    "height" : 80,
+    "ink" : [
+      0,
+      0,
+      80,
+      80
+    ],
+    "native" : "generated-vfx",
+    "width" : 80
+  },
+  {
+    "file" : "vfx-seeker.png",
+    "height" : 36,
+    "ink" : [
+      0,
+      0,
+      50,
+      36
+    ],
+    "native" : "generated-vfx",
+    "width" : 50
   },
   {
     "file" : "vfx-smoke-0.png",
@@ -420,63 +492,87 @@
     "width" : 96
   },
   {
-    "file" : "vfx-notes.png",
-    "height" : 44,
+    "file" : "vfx-sonic-0.png",
+    "height" : 84,
     "ink" : [
-      0,
-      0,
-      36,
-      44
-    ],
-    "native" : "generated-vfx",
-    "width" : 36
-  },
-  {
-    "file" : "vfx-poison.png",
-    "height" : 48,
-    "ink" : [
-      0,
-      0,
-      36,
-      48
-    ],
-    "native" : "generated-vfx",
-    "width" : 36
-  },
-  {
-    "file" : "vfx-repair.png",
-    "height" : 40,
-    "ink" : [
-      0,
-      0,
-      40,
-      40
+      12,
+      10,
+      28,
+      67
     ],
     "native" : "generated-vfx",
     "width" : 40
   },
   {
-    "file" : "vfx-gum.png",
-    "height" : 48,
+    "file" : "vfx-sonic-1.png",
+    "height" : 84,
     "ink" : [
       0,
       0,
-      48,
-      48
+      40,
+      84
     ],
     "native" : "generated-vfx",
-    "width" : 48
+    "width" : 40
   },
   {
-    "file" : "vfx-charge.png",
-    "height" : 60,
+    "file" : "vfx-spring-0.png",
+    "height" : 64,
     "ink" : [
-      0,
-      0,
-      60,
+      7,
+      2,
+      53,
       60
     ],
     "native" : "generated-vfx",
-    "width" : 60
+    "width" : 64
+  },
+  {
+    "file" : "vfx-spring-1.png",
+    "height" : 64,
+    "ink" : [
+      0,
+      0,
+      64,
+      64
+    ],
+    "native" : "generated-vfx",
+    "width" : 64
+  },
+  {
+    "file" : "vfx-tiny-hit-0.png",
+    "height" : 80,
+    "ink" : [
+      14,
+      13,
+      54,
+      57
+    ],
+    "native" : "generated-vfx",
+    "width" : 80
+  },
+  {
+    "file" : "vfx-tiny-hit-1.png",
+    "height" : 80,
+    "ink" : [
+      0,
+      0,
+      80,
+      80
+    ],
+    "native" : "generated-vfx",
+    "width" : 80
+  },
+  {
+    "file" : "vfx-tiny.png",
+    "height" : 20,
+    "ink" : [
+      0,
+      0,
+      20,
+      20
+    ],
+    "native" : "generated-vfx",
+    "width" : 20
   }
 ]

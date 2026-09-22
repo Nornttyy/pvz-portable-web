@@ -1,0 +1,180 @@
+{
+  "mode": "built-in image_gen edit",
+  "specs": [
+    {
+      "key": "storm-mushroom-0",
+      "cols": 2,
+      "parts": [
+        {
+          "part": "head",
+          "native": "PuffShroom_body.png",
+          "export": true
+        },
+        {
+          "part": "blink",
+          "native": "PuffShroom_body.png",
+          "export": true
+        },
+        {
+          "part": "cap",
+          "native": "PuffShroom_head.png",
+          "export": true
+        },
+        {
+          "part": "stem",
+          "native": "PuffShroom_stem.png",
+          "export": true
+        }
+      ],
+      "prompt": "Use case: precise-object-edit. Production skeletal sprite atlas for the original 2009 Plants vs Zombies cartoon game, using the input ONLY as exact separate bone shapes and style reference. Old low-resolution softly painted 2D cartoon, irregular dark olive/brown outlines, muted but colorful flat shading, no realistic textures, no 3D, no shiny mobile-game polish. Actual transparent background. No text, grid, labels, assembled characters or shadows. Keep all pieces separate, their reading order, perspective, orientations and connector pads. New recognisable silhouettes and props, NOT just recolored existing characters. Preserve gray-green zombie skin. All sprites must read clearly when downsampled to 30-80 pixels. 2 columns x 2 rows. Upper left: small mushroom face/body facing right, with simple black oval eyes. Upper right: IDENTICAL face/body with closed eyes. Lower left: detached mushroom cap ONLY, no face or stem. Lower right: detached short stem connector ONLY. The cap overlaps the top of the separate face when assembled. Design a growing lightning mushroom stage 1 of 3. Young seedling: pale cream face, small sleepy smile, muted teal cap shaped as one rounded insulated bulb, one SHORT blunt pale-yellow lightning sprout growing from its top, broad cap brim. One simple dark-blue crescent gill below brim. Keep face and cap shading consistent and keep native attachment edges. Frame every part fully with empty margins."
+    },
+    {
+      "key": "storm-mushroom-1",
+      "cols": 2,
+      "parts": [
+        {
+          "part": "head",
+          "native": "PuffShroom_body.png",
+          "export": true
+        },
+        {
+          "part": "blink",
+          "native": "PuffShroom_body.png",
+          "export": true
+        },
+        {
+          "part": "cap",
+          "native": "PuffShroom_head.png",
+          "export": true
+        },
+        {
+          "part": "stem",
+          "native": "PuffShroom_stem.png",
+          "export": true
+        }
+      ],
+      "prompt": "Use case: precise-object-edit. Production skeletal sprite atlas for the original 2009 Plants vs Zombies cartoon game, using the input ONLY as exact separate bone shapes and style reference. Old low-resolution softly painted 2D cartoon, irregular dark olive/brown outlines, muted but colorful flat shading, no realistic textures, no 3D, no shiny mobile-game polish. Actual transparent background. No text, grid, labels, assembled characters or shadows. Keep all pieces separate, their reading order, perspective, orientations and connector pads. New recognisable silhouettes and props, NOT just recolored existing characters. Preserve gray-green zombie skin. All sprites must read clearly when downsampled to 30-80 pixels. 2 columns x 2 rows. Upper left: small mushroom face/body facing right, with simple black oval eyes. Upper right: IDENTICAL face/body with closed eyes. Lower left: detached mushroom cap ONLY, no face or stem. Lower right: detached short stem connector ONLY. The cap overlaps the top of the separate face when assembled. Design a growing lightning mushroom stage 2 of 3. Middle growth: pale cream face, determined eyes, teal-blue cap with a twin-pronged short lightning sprout on top, slightly scalloped broad brim and two big pale-yellow oval patches. Not metal, not neon. Keep face and cap shading consistent and keep native attachment edges. Frame every part fully with empty margins."
+    },
+    {
+      "key": "storm-mushroom-2",
+      "cols": 2,
+      "parts": [
+        {
+          "part": "head",
+          "native": "PuffShroom_body.png",
+          "export": true
+        },
+        {
+          "part": "blink",
+          "native": "PuffShroom_body.png",
+          "export": true
+        },
+        {
+          "part": "cap",
+          "native": "PuffShroom_head.png",
+          "export": true
+        },
+        {
+          "part": "stem",
+          "native": "PuffShroom_stem.png",
+          "export": true
+        }
+      ],
+      "prompt": "Use case: precise-object-edit. Production skeletal sprite atlas for the original 2009 Plants vs Zombies cartoon game, using the input ONLY as exact separate bone shapes and style reference. Old low-resolution softly painted 2D cartoon, irregular dark olive/brown outlines, muted but colorful flat shading, no realistic textures, no 3D, no shiny mobile-game polish. Actual transparent background. No text, grid, labels, assembled characters or shadows. Keep all pieces separate, their reading order, perspective, orientations and connector pads. New recognisable silhouettes and props, NOT just recolored existing characters. Preserve gray-green zombie skin. All sprites must read clearly when downsampled to 30-80 pixels. 2 columns x 2 rows. Upper left: small mushroom face/body facing right, with simple black oval eyes. Upper right: IDENTICAL face/body with closed eyes. Lower left: detached mushroom cap ONLY, no face or stem. Lower right: detached short stem connector ONLY. The cap overlaps the top of the separate face when assembled. Design a growing lightning mushroom stage 3 of 3. Mature growth: pale cream face, determined but cute eyes, broad cobalt-blue mushroom cap with three SHORT blunt organic yellow lightning sprouts on top like a small crown, softly scalloped brim, three bold cream-yellow oval patches. No smoke, no embedded lightning effects. Keep face and cap shading consistent and keep native attachment edges. Frame every part fully with empty margins."
+    },
+    {
+      "key": "paper-thrower",
+      "cols": 4,
+      "parts": [
+        {
+          "part": "head",
+          "native": "Zombie_head.png",
+          "export": true
+        },
+        {
+          "part": "body",
+          "native": "Zombie_body.png",
+          "export": true
+        },
+        {
+          "part": "jaw",
+          "native": "Zombie_jaw.png",
+          "export": true
+        },
+        {
+          "part": "inner-upper",
+          "native": "Zombie_innerarm_upper.png",
+          "export": true
+        },
+        {
+          "part": "outer-upper",
+          "native": "Zombie_outerarm_upper.png",
+          "export": true
+        },
+        {
+          "part": "inner-lower",
+          "native": "Zombie_innerarm_lower.png",
+          "export": true
+        },
+        {
+          "part": "outer-lower",
+          "native": "Zombie_outerarm_lower.png",
+          "export": true
+        },
+        {
+          "part": "hand",
+          "native": "Zombie_outerarm_hand.png",
+          "export": true
+        }
+      ],
+      "prompt": "Use case: precise-object-edit. Production skeletal sprite atlas for the original 2009 Plants vs Zombies cartoon game, using the input ONLY as exact separate bone shapes and style reference. Old low-resolution softly painted 2D cartoon, irregular dark olive/brown outlines, muted but colorful flat shading, no realistic textures, no 3D, no shiny mobile-game polish. Actual transparent background. No text, grid, labels, assembled characters or shadows. Keep all pieces separate, their reading order, perspective, orientations and connector pads. New recognisable silhouettes and props, NOT just recolored existing characters. Preserve gray-green zombie skin. All sprites must read clearly when downsampled to 30-80 pixels. 4 columns by 2 rows, exactly EIGHT pieces. Row1: upper HEAD WITHOUT lower jaw; TORSO WITHOUT arms/head/legs; separate LOWER JAW; inner UPPER ARM. Row2: outer UPPER ARM; inner FOREARM; outer FOREARM; outer HAND. Original paper-throwing zombie: very angular bony face with crooked round wire glasses and a small triangular folded-paper hat attached to upper head, original left-facing profile; a cream postman's ragged waistcoat, deep blue rolled shirtsleeves, bulging paper satchel across the chest filled with clearly crumpled pages. Torso is clearly new shape due to satchel. Change upper-arm sleeve silhouette into rolled cuffs while keeping bare lower-arm connector ends. Hand grips ONE crumpled cream paper ball near fingers; keep wrist joint and hand orientation exactly as input. Mouth upper and lower teeth match separately. No tie. Hat and glasses belong to upper head; satchel belongs to torso. Gray-green skin stays original."
+    },
+    {
+      "key": "ink-painter",
+      "cols": 4,
+      "parts": [
+        {
+          "part": "head",
+          "native": "Zombie_head.png",
+          "export": true
+        },
+        {
+          "part": "body",
+          "native": "Zombie_body.png",
+          "export": true
+        },
+        {
+          "part": "jaw",
+          "native": "Zombie_jaw.png",
+          "export": true
+        },
+        {
+          "part": "inner-upper",
+          "native": "Zombie_innerarm_upper.png",
+          "export": true
+        },
+        {
+          "part": "outer-upper",
+          "native": "Zombie_outerarm_upper.png",
+          "export": true
+        },
+        {
+          "part": "inner-lower",
+          "native": "Zombie_innerarm_lower.png",
+          "export": true
+        },
+        {
+          "part": "outer-lower",
+          "native": "Zombie_outerarm_lower.png",
+          "export": true
+        },
+        {
+          "part": "hand",
+          "native": "Zombie_outerarm_hand.png",
+          "export": true
+        }
+      ],
+      "prompt": "Use case: precise-object-edit. Production skeletal sprite atlas for the original 2009 Plants vs Zombies cartoon game, using the input ONLY as exact separate bone shapes and style reference. Old low-resolution softly painted 2D cartoon, irregular dark olive/brown outlines, muted but colorful flat shading, no realistic textures, no 3D, no shiny mobile-game polish. Actual transparent background. No text, grid, labels, assembled characters or shadows. Keep all pieces separate, their reading order, perspective, orientations and connector pads. New recognisable silhouettes and props, NOT just recolored existing characters. Preserve gray-green zombie skin. All sprites must read clearly when downsampled to 30-80 pixels. 4 columns by 2 rows, exactly EIGHT pieces. Row1: upper HEAD WITHOUT lower jaw; TORSO WITHOUT arms/head/legs; separate LOWER JAW; inner UPPER ARM. Row2: outer UPPER ARM; inner FOREARM; outer FOREARM; outer HAND. Original ink-throwing painter zombie: left-facing gray-green head with a lopsided dark purple beret and long drooping mustache on upper head, slightly crossed eyes. Torso wears an oversized pale tan painter's apron with THREE simple purple paint splashes and a round bulging ink pot in an apron pocket. Puffy violet upper sleeves, original green skinny forearms. Hand grips a short thick paintbrush loaded with dark purple ink. Preserve hand wrist orientation; only brush extends just beyond fingers, modest silhouette. No tie. Make a unique apron-and-beret silhouette, not a recolor of a suited zombie. Avoid tiny details."
+    }
+  ]
+}

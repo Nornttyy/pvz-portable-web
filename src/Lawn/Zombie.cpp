@@ -6291,6 +6291,7 @@ void Zombie::DrawButter(Graphics* g, const ZombieDrawPosition& theDrawPos)
 
 void Zombie::Draw(Graphics* g)
 {
+	SandboxZombies::RefreshDamageArt(this);
 	if (mZombieHeight == ZombieHeight::HEIGHT_GETTING_BUNGEE_DROPPED)
 		return;
 
@@ -7712,6 +7713,7 @@ void Zombie::DropHelm(unsigned int theDamageFlags)
 	{
 		PvzpParticleSystem* aParticle = mApp->AddPvzpParticle(aPosX, aPosY, mRenderOrder + 1, aEffect);
 		OverrideParticleScale(aParticle);
+		if (aParticle) if (auto* customArmor = SandboxZombies::DetachedArmor(this)) aParticle->OverrideImage(nullptr, customArmor);
 	}
 
 	mHelmType = HelmType::HELMTYPE_NONE;

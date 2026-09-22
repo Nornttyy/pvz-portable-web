@@ -1,0 +1,185 @@
+{
+  "mode": "built-in image_gen edit",
+  "specs": [
+    {
+      "key": "echo-lily",
+      "name": "回声花",
+      "cols": 2,
+      "parts": [
+        {
+          "part": "head",
+          "native": "PeaShooter_Head.png",
+          "export": true
+        },
+        {
+          "part": "blink",
+          "native": "PeaShooter_Head.png",
+          "export": true
+        },
+        {
+          "part": "mouth",
+          "native": "PeaShooter_mouth.png",
+          "export": true
+        },
+        {
+          "part": "reference-leaf",
+          "native": "PeaShooter_backleaf.png",
+          "export": false
+        }
+      ],
+      "identity": "Pale ivory/lavender bellflower pea head with simple black eyes. Make its right mouth ring a softly scalloped lavender bell rim with a tiny muted-gold clapper INSIDE the dark opening, not extending below. Retain the round native head and exact short nose connector, no long trumpet. A faint petal crease distinguishes the head.",
+      "kind": "pea",
+      "prompt": "Use case: precise-object-edit. This is a PRODUCTION skeletal sprite atlas edit, not a concept picture. Input is the actual original native parts arranged on a transparent contact sheet; edit these pieces directly. Retain every original piece position, perspective, silhouette, seam, transparency and bone-connection edge. Keep the original old 2009 low-resolution softly painted 2D cartoon rendering, dark irregular olive/brown outlines, broad simple soft shading and restrained highlights. No 3D, no realistic textures, no polished vector icons, no glossy modern mobile redesign. Keep original gray-green zombie skin unchanged. Actual transparent background, no grid, labels, text, shadows or assembled characters. Leave a wide clear gap between every part. Preserve the exact grid and read order. All changes must remain easy to read at original 30-100-pixel sprite sizes. Asset: 回声花. 2 columns by 2 rows. Top left original head eyes OPEN; top right exactly matching head eyes CLOSED; bottom left ONLY detached narrow oval muzzle ring, keep dark hole and small left connector exactly like original (not a long cone); bottom right unchanged native green reference leaf. Keep head and muzzle SEPARATE. Heads face RIGHT. Variant changes: Pale ivory/lavender bellflower pea head with simple black eyes. Make its right mouth ring a softly scalloped lavender bell rim with a tiny muted-gold clapper INSIDE the dark opening, not extending below. Retain the round native head and exact short nose connector, no long trumpet. A faint petal crease distinguishes the head. Preserve everything else. In particular do NOT join any parts, do NOT add a full mouth or jaw to the zombie upper head, do NOT add a head to the torso.\nCRITICAL MOUTH JOINT: the rightmost cut edge of each detached HEAD is a hidden overlapping socket, not an outer contour. DO NOT DRAW a dark vertical outline or a completed lip on this open cut edge. Continue the exact native smooth flesh color to the cut boundary. Likewise the detached muzzle's far LEFT cut connector has NO black vertical closing seam. Its dark contour belongs ONLY on the outside oval rim and dark inner opening. Head and muzzle must use the SAME palette and seamless shading at their connecting edges. Keep head nose connector geometry exactly like image 1. No extra trumpet on head."
+    },
+    {
+      "key": "tiny-pea",
+      "name": "小豌豆",
+      "cols": 2,
+      "parts": [
+        {
+          "part": "head",
+          "native": "PeaShooter_Head.png",
+          "export": true
+        },
+        {
+          "part": "blink",
+          "native": "PeaShooter_Head.png",
+          "export": true
+        },
+        {
+          "part": "mouth",
+          "native": "PeaShooter_mouth.png",
+          "export": true
+        },
+        {
+          "part": "reference-leaf",
+          "native": "PeaShooter_backleaf.png",
+          "export": false
+        }
+      ],
+      "identity": "Tender yellow-green baby pea, one tiny leaf mark on the cheek, bright simple black oval eyes. Keep the SAME native head anatomy, not a chibi redesign: the game shrinks the complete skeleton, do not shrink individual pieces.",
+      "kind": "pea",
+      "prompt": "Use case: precise-object-edit. This is a PRODUCTION skeletal sprite atlas edit, not a concept picture. Input is the actual original native parts arranged on a transparent contact sheet; edit these pieces directly. Retain every original piece position, perspective, silhouette, seam, transparency and bone-connection edge. Keep the original old 2009 low-resolution softly painted 2D cartoon rendering, dark irregular olive/brown outlines, broad simple soft shading and restrained highlights. No 3D, no realistic textures, no polished vector icons, no glossy modern mobile redesign. Keep original gray-green zombie skin unchanged. Actual transparent background, no grid, labels, text, shadows or assembled characters. Leave a wide clear gap between every part. Preserve the exact grid and read order. All changes must remain easy to read at original 30-100-pixel sprite sizes. Asset: 小豌豆. 2 columns by 2 rows. Top left original head eyes OPEN; top right exactly matching head eyes CLOSED; bottom left ONLY detached narrow oval muzzle ring, keep dark hole and small left connector exactly like original (not a long cone); bottom right unchanged native green reference leaf. Keep head and muzzle SEPARATE. Heads face RIGHT. Variant changes: Tender yellow-green baby pea, one tiny leaf mark on the cheek, bright simple black oval eyes. Keep the SAME native head anatomy, not a chibi redesign: the game shrinks the complete skeleton, do not shrink individual pieces. Preserve everything else. In particular do NOT join any parts, do NOT add a full mouth or jaw to the zombie upper head, do NOT add a head to the torso.\nCRITICAL MOUTH JOINT: the rightmost cut edge of each detached HEAD is a hidden overlapping socket, not an outer contour. DO NOT DRAW a dark vertical outline or a completed lip on this open cut edge. Continue the exact native smooth flesh color to the cut boundary. Likewise the detached muzzle's far LEFT cut connector has NO black vertical closing seam. Its dark contour belongs ONLY on the outside oval rim and dark inner opening. Head and muzzle must use the SAME palette and seamless shading at their connecting edges. Keep head nose connector geometry exactly like image 1. No extra trumpet on head."
+    },
+    {
+      "key": "heavy-pea",
+      "name": "重炮豌豆",
+      "cols": 2,
+      "parts": [
+        {
+          "part": "head",
+          "native": "PeaShooter_Head.png",
+          "export": true
+        },
+        {
+          "part": "blink",
+          "native": "PeaShooter_Head.png",
+          "export": true
+        },
+        {
+          "part": "mouth",
+          "native": "PeaShooter_mouth.png",
+          "export": true
+        },
+        {
+          "part": "reference-leaf",
+          "native": "PeaShooter_backleaf.png",
+          "export": false
+        }
+      ],
+      "identity": "Dark olive-green heavy pea with a modest dark olive reinforcing band around the back half of its head and a determined original-style eyebrow. The muzzle is a normal native oval lip reinforced with a thicker olive rim INSIDE the original silhouette. No metal gun, no helmet, no long barrel.",
+      "kind": "pea",
+      "prompt": "Use case: precise-object-edit. This is a PRODUCTION skeletal sprite atlas edit, not a concept picture. Input is the actual original native parts arranged on a transparent contact sheet; edit these pieces directly. Retain every original piece position, perspective, silhouette, seam, transparency and bone-connection edge. Keep the original old 2009 low-resolution softly painted 2D cartoon rendering, dark irregular olive/brown outlines, broad simple soft shading and restrained highlights. No 3D, no realistic textures, no polished vector icons, no glossy modern mobile redesign. Keep original gray-green zombie skin unchanged. Actual transparent background, no grid, labels, text, shadows or assembled characters. Leave a wide clear gap between every part. Preserve the exact grid and read order. All changes must remain easy to read at original 30-100-pixel sprite sizes. Asset: 重炮豌豆. 2 columns by 2 rows. Top left original head eyes OPEN; top right exactly matching head eyes CLOSED; bottom left ONLY detached narrow oval muzzle ring, keep dark hole and small left connector exactly like original (not a long cone); bottom right unchanged native green reference leaf. Keep head and muzzle SEPARATE. Heads face RIGHT. Variant changes: Dark olive-green heavy pea with a modest dark olive reinforcing band around the back half of its head and a determined original-style eyebrow. The muzzle is a normal native oval lip reinforced with a thicker olive rim INSIDE the original silhouette. No metal gun, no helmet, no long barrel. Preserve everything else. In particular do NOT join any parts, do NOT add a full mouth or jaw to the zombie upper head, do NOT add a head to the torso.\nCRITICAL MOUTH JOINT: the rightmost cut edge of each detached HEAD is a hidden overlapping socket, not an outer contour. DO NOT DRAW a dark vertical outline or a completed lip on this open cut edge. Continue the exact native smooth flesh color to the cut boundary. Likewise the detached muzzle's far LEFT cut connector has NO black vertical closing seam. Its dark contour belongs ONLY on the outside oval rim and dark inner opening. Head and muzzle must use the SAME palette and seamless shading at their connecting edges. Keep head nose connector geometry exactly like image 1. No extra trumpet on head."
+    },
+    {
+      "key": "scatter-pea",
+      "name": "散射豌豆",
+      "cols": 2,
+      "parts": [
+        {
+          "part": "head",
+          "native": "PeaShooter_Head.png",
+          "export": true
+        },
+        {
+          "part": "blink",
+          "native": "PeaShooter_Head.png",
+          "export": true
+        },
+        {
+          "part": "mouth",
+          "native": "PeaShooter_mouth.png",
+          "export": true
+        },
+        {
+          "part": "reference-leaf",
+          "native": "PeaShooter_backleaf.png",
+          "export": false
+        }
+      ],
+      "identity": "Warm yellow-green pea with three small seed freckles on its forehead. Muzzle lip is warm yellow-green with three subtle darker grooves along the rim, but ONE single unaltered dark oval opening. No three attached barrels.",
+      "kind": "pea",
+      "prompt": "Use case: precise-object-edit. This is a PRODUCTION skeletal sprite atlas edit, not a concept picture. Input is the actual original native parts arranged on a transparent contact sheet; edit these pieces directly. Retain every original piece position, perspective, silhouette, seam, transparency and bone-connection edge. Keep the original old 2009 low-resolution softly painted 2D cartoon rendering, dark irregular olive/brown outlines, broad simple soft shading and restrained highlights. No 3D, no realistic textures, no polished vector icons, no glossy modern mobile redesign. Keep original gray-green zombie skin unchanged. Actual transparent background, no grid, labels, text, shadows or assembled characters. Leave a wide clear gap between every part. Preserve the exact grid and read order. All changes must remain easy to read at original 30-100-pixel sprite sizes. Asset: 散射豌豆. 2 columns by 2 rows. Top left original head eyes OPEN; top right exactly matching head eyes CLOSED; bottom left ONLY detached narrow oval muzzle ring, keep dark hole and small left connector exactly like original (not a long cone); bottom right unchanged native green reference leaf. Keep head and muzzle SEPARATE. Heads face RIGHT. Variant changes: Warm yellow-green pea with three small seed freckles on its forehead. Muzzle lip is warm yellow-green with three subtle darker grooves along the rim, but ONE single unaltered dark oval opening. No three attached barrels. Preserve everything else. In particular do NOT join any parts, do NOT add a full mouth or jaw to the zombie upper head, do NOT add a head to the torso.\nCRITICAL MOUTH JOINT: the rightmost cut edge of each detached HEAD is a hidden overlapping socket, not an outer contour. DO NOT DRAW a dark vertical outline or a completed lip on this open cut edge. Continue the exact native smooth flesh color to the cut boundary. Likewise the detached muzzle's far LEFT cut connector has NO black vertical closing seam. Its dark contour belongs ONLY on the outside oval rim and dark inner opening. Head and muzzle must use the SAME palette and seamless shading at their connecting edges. Keep head nose connector geometry exactly like image 1. No extra trumpet on head."
+    },
+    {
+      "key": "seeker-pea",
+      "name": "追击豌豆",
+      "cols": 2,
+      "parts": [
+        {
+          "part": "head",
+          "native": "PeaShooter_Head.png",
+          "export": true
+        },
+        {
+          "part": "blink",
+          "native": "PeaShooter_Head.png",
+          "export": true
+        },
+        {
+          "part": "mouth",
+          "native": "PeaShooter_mouth.png",
+          "export": true
+        },
+        {
+          "part": "reference-leaf",
+          "native": "PeaShooter_backleaf.png",
+          "export": false
+        }
+      ],
+      "identity": "Fresh spring-green tracking pea, a single small darker curved leaf/arrow marking on its cheek, alert black oval eyes. Lime-green native muzzle, the same narrow oval opening. No modern target reticle or goggles.",
+      "kind": "pea",
+      "prompt": "Use case: precise-object-edit. This is a PRODUCTION skeletal sprite atlas edit, not a concept picture. Input is the actual original native parts arranged on a transparent contact sheet; edit these pieces directly. Retain every original piece position, perspective, silhouette, seam, transparency and bone-connection edge. Keep the original old 2009 low-resolution softly painted 2D cartoon rendering, dark irregular olive/brown outlines, broad simple soft shading and restrained highlights. No 3D, no realistic textures, no polished vector icons, no glossy modern mobile redesign. Keep original gray-green zombie skin unchanged. Actual transparent background, no grid, labels, text, shadows or assembled characters. Leave a wide clear gap between every part. Preserve the exact grid and read order. All changes must remain easy to read at original 30-100-pixel sprite sizes. Asset: 追击豌豆. 2 columns by 2 rows. Top left original head eyes OPEN; top right exactly matching head eyes CLOSED; bottom left ONLY detached narrow oval muzzle ring, keep dark hole and small left connector exactly like original (not a long cone); bottom right unchanged native green reference leaf. Keep head and muzzle SEPARATE. Heads face RIGHT. Variant changes: Fresh spring-green tracking pea, a single small darker curved leaf/arrow marking on its cheek, alert black oval eyes. Lime-green native muzzle, the same narrow oval opening. No modern target reticle or goggles. Preserve everything else. In particular do NOT join any parts, do NOT add a full mouth or jaw to the zombie upper head, do NOT add a head to the torso.\nCRITICAL MOUTH JOINT: the rightmost cut edge of each detached HEAD is a hidden overlapping socket, not an outer contour. DO NOT DRAW a dark vertical outline or a completed lip on this open cut edge. Continue the exact native smooth flesh color to the cut boundary. Likewise the detached muzzle's far LEFT cut connector has NO black vertical closing seam. Its dark contour belongs ONLY on the outside oval rim and dark inner opening. Head and muzzle must use the SAME palette and seamless shading at their connecting edges. Keep head nose connector geometry exactly like image 1. No extra trumpet on head."
+    },
+    {
+      "key": "acid-pea",
+      "name": "腐化豌豆",
+      "cols": 2,
+      "parts": [
+        {
+          "part": "head",
+          "native": "PeaShooter_Head.png",
+          "export": true
+        },
+        {
+          "part": "blink",
+          "native": "PeaShooter_Head.png",
+          "export": true
+        },
+        {
+          "part": "mouth",
+          "native": "PeaShooter_mouth.png",
+          "export": true
+        },
+        {
+          "part": "reference-leaf",
+          "native": "PeaShooter_backleaf.png",
+          "export": false
+        }
+      ],
+      "identity": "Muted dark plum-purple pea with three small yellow-olive spots on the rear cheek; keep eyes black and friendly. Mouth rim olive-purple with a restrained yellow-green inner edge, ONE native dark oval hole. No drips outside the silhouette, no skulls, no horror.",
+      "kind": "pea",
+      "prompt": "Use case: precise-object-edit. This is a PRODUCTION skeletal sprite atlas edit, not a concept picture. Input is the actual original native parts arranged on a transparent contact sheet; edit these pieces directly. Retain every original piece position, perspective, silhouette, seam, transparency and bone-connection edge. Keep the original old 2009 low-resolution softly painted 2D cartoon rendering, dark irregular olive/brown outlines, broad simple soft shading and restrained highlights. No 3D, no realistic textures, no polished vector icons, no glossy modern mobile redesign. Keep original gray-green zombie skin unchanged. Actual transparent background, no grid, labels, text, shadows or assembled characters. Leave a wide clear gap between every part. Preserve the exact grid and read order. All changes must remain easy to read at original 30-100-pixel sprite sizes. Asset: 腐化豌豆. 2 columns by 2 rows. Top left original head eyes OPEN; top right exactly matching head eyes CLOSED; bottom left ONLY detached narrow oval muzzle ring, keep dark hole and small left connector exactly like original (not a long cone); bottom right unchanged native green reference leaf. Keep head and muzzle SEPARATE. Heads face RIGHT. Variant changes: Muted dark plum-purple pea with three small yellow-olive spots on the rear cheek; keep eyes black and friendly. Mouth rim olive-purple with a restrained yellow-green inner edge, ONE native dark oval hole. No drips outside the silhouette, no skulls, no horror. Preserve everything else. In particular do NOT join any parts, do NOT add a full mouth or jaw to the zombie upper head, do NOT add a head to the torso.\nCRITICAL MOUTH JOINT: the rightmost cut edge of each detached HEAD is a hidden overlapping socket, not an outer contour. DO NOT DRAW a dark vertical outline or a completed lip on this open cut edge. Continue the exact native smooth flesh color to the cut boundary. Likewise the detached muzzle's far LEFT cut connector has NO black vertical closing seam. Its dark contour belongs ONLY on the outside oval rim and dark inner opening. Head and muzzle must use the SAME palette and seamless shading at their connecting edges. Keep head nose connector geometry exactly like image 1. No extra trumpet on head."
+    }
+  ]
+}

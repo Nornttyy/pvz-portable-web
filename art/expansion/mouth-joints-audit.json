@@ -1,0 +1,342 @@
+[
+  {
+    "blink" : false,
+    "detachedFrames" : 0,
+    "family" : "fire",
+    "minimumOverlapRatio" : 0.840080971659919,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 42
+  },
+  {
+    "blink" : true,
+    "detachedFrames" : 0,
+    "family" : "fire",
+    "minimumOverlapRatio" : 0.8393077873918418,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 60
+  },
+  {
+    "blink" : false,
+    "detachedFrames" : 0,
+    "family" : "ice",
+    "minimumOverlapRatio" : 0.8643724696356275,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 42
+  },
+  {
+    "blink" : true,
+    "detachedFrames" : 0,
+    "family" : "ice",
+    "minimumOverlapRatio" : 0.8677379480840544,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 60
+  },
+  {
+    "blink" : false,
+    "detachedFrames" : 0,
+    "family" : "electric-pea",
+    "minimumOverlapRatio" : 0.8529048207663782,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 60
+  },
+  {
+    "blink" : true,
+    "detachedFrames" : 0,
+    "family" : "electric-pea",
+    "minimumOverlapRatio" : 0.8467243510506799,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 60
+  },
+  {
+    "blink" : false,
+    "detachedFrames" : 0,
+    "family" : "echo-lily",
+    "minimumOverlapRatio" : 0.9505562422744128,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 60
+  },
+  {
+    "blink" : true,
+    "detachedFrames" : 0,
+    "family" : "echo-lily",
+    "minimumOverlapRatio" : 0.9505562422744128,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 60
+  },
+  {
+    "blink" : false,
+    "detachedFrames" : 0,
+    "family" : "tiny-pea",
+    "minimumOverlapRatio" : 0.9987639060568603,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 60
+  },
+  {
+    "blink" : true,
+    "detachedFrames" : 0,
+    "family" : "tiny-pea",
+    "minimumOverlapRatio" : 0.9987639060568603,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 60
+  },
+  {
+    "blink" : false,
+    "detachedFrames" : 0,
+    "family" : "heavy-pea",
+    "minimumOverlapRatio" : 0.8785425101214575,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 42
+  },
+  {
+    "blink" : true,
+    "detachedFrames" : 0,
+    "family" : "heavy-pea",
+    "minimumOverlapRatio" : 0.9023090586145648,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 46
+  },
+  {
+    "blink" : false,
+    "detachedFrames" : 0,
+    "family" : "scatter-pea",
+    "minimumOverlapRatio" : 0.9733893557422969,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 61
+  },
+  {
+    "blink" : true,
+    "detachedFrames" : 0,
+    "family" : "scatter-pea",
+    "minimumOverlapRatio" : 0.9747899159663865,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 61
+  },
+  {
+    "blink" : false,
+    "detachedFrames" : 0,
+    "family" : "seeker-pea",
+    "minimumOverlapRatio" : 0.9839307787391842,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 60
+  },
+  {
+    "blink" : true,
+    "detachedFrames" : 0,
+    "family" : "seeker-pea",
+    "minimumOverlapRatio" : 0.9839307787391842,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 60
+  },
+  {
+    "blink" : false,
+    "detachedFrames" : 0,
+    "family" : "acid-pea",
+    "minimumOverlapRatio" : 0.9331983805668016,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 42
+  },
+  {
+    "blink" : true,
+    "detachedFrames" : 0,
+    "family" : "acid-pea",
+    "minimumOverlapRatio" : 0.9352226720647774,
+    "pair" : 1,
+    "rig" : "PeaShooterSingle",
+    "testedFrames" : 75,
+    "worstFrame" : 42
+  },
+  {
+    "blink" : false,
+    "detachedFrames" : 0,
+    "family" : "fire",
+    "minimumOverlapRatio" : 0.840080971659919,
+    "pair" : 1,
+    "rig" : "PeaShooter",
+    "testedFrames" : 75,
+    "worstFrame" : 42
+  },
+  {
+    "blink" : true,
+    "detachedFrames" : 0,
+    "family" : "fire",
+    "minimumOverlapRatio" : 0.8393077873918418,
+    "pair" : 1,
+    "rig" : "PeaShooter",
+    "testedFrames" : 75,
+    "worstFrame" : 60
+  },
+  {
+    "blink" : false,
+    "detachedFrames" : 0,
+    "family" : "ice",
+    "minimumOverlapRatio" : 0.8643724696356275,
+    "pair" : 1,
+    "rig" : "PeaShooter",
+    "testedFrames" : 75,
+    "worstFrame" : 42
+  },
+  {
+    "blink" : true,
+    "detachedFrames" : 0,
+    "family" : "ice",
+    "minimumOverlapRatio" : 0.8677379480840544,
+    "pair" : 1,
+    "rig" : "PeaShooter",
+    "testedFrames" : 75,
+    "worstFrame" : 60
+  },
+  {
+    "blink" : false,
+    "detachedFrames" : 0,
+    "family" : "fire",
+    "minimumOverlapRatio" : 1.06158357771261,
+    "pair" : 1,
+    "rig" : "ThreePeater",
+    "testedFrames" : 38,
+    "worstFrame" : 32
+  },
+  {
+    "blink" : true,
+    "detachedFrames" : 0,
+    "family" : "fire",
+    "minimumOverlapRatio" : 1.0527859237536656,
+    "pair" : 1,
+    "rig" : "ThreePeater",
+    "testedFrames" : 38,
+    "worstFrame" : 32
+  },
+  {
+    "blink" : false,
+    "detachedFrames" : 0,
+    "family" : "fire",
+    "minimumOverlapRatio" : 1.067251461988304,
+    "pair" : 2,
+    "rig" : "ThreePeater",
+    "testedFrames" : 38,
+    "worstFrame" : 114
+  },
+  {
+    "blink" : true,
+    "detachedFrames" : 0,
+    "family" : "fire",
+    "minimumOverlapRatio" : 1.0614035087719298,
+    "pair" : 2,
+    "rig" : "ThreePeater",
+    "testedFrames" : 38,
+    "worstFrame" : 114
+  },
+  {
+    "blink" : false,
+    "detachedFrames" : 0,
+    "family" : "fire",
+    "minimumOverlapRatio" : 1.0526315789473684,
+    "pair" : 3,
+    "rig" : "ThreePeater",
+    "testedFrames" : 38,
+    "worstFrame" : 73
+  },
+  {
+    "blink" : true,
+    "detachedFrames" : 0,
+    "family" : "fire",
+    "minimumOverlapRatio" : 1.0526315789473684,
+    "pair" : 3,
+    "rig" : "ThreePeater",
+    "testedFrames" : 38,
+    "worstFrame" : 73
+  },
+  {
+    "blink" : false,
+    "detachedFrames" : 0,
+    "family" : "ice",
+    "minimumOverlapRatio" : 0.7945205479452054,
+    "pair" : 1,
+    "rig" : "ThreePeater",
+    "testedFrames" : 38,
+    "worstFrame" : 35
+  },
+  {
+    "blink" : true,
+    "detachedFrames" : 0,
+    "family" : "ice",
+    "minimumOverlapRatio" : 0.7945205479452054,
+    "pair" : 1,
+    "rig" : "ThreePeater",
+    "testedFrames" : 38,
+    "worstFrame" : 35
+  },
+  {
+    "blink" : false,
+    "detachedFrames" : 0,
+    "family" : "ice",
+    "minimumOverlapRatio" : 0.8157894736842105,
+    "pair" : 2,
+    "rig" : "ThreePeater",
+    "testedFrames" : 38,
+    "worstFrame" : 117
+  },
+  {
+    "blink" : true,
+    "detachedFrames" : 0,
+    "family" : "ice",
+    "minimumOverlapRatio" : 0.8080808080808081,
+    "pair" : 2,
+    "rig" : "ThreePeater",
+    "testedFrames" : 38,
+    "worstFrame" : 118
+  },
+  {
+    "blink" : false,
+    "detachedFrames" : 0,
+    "family" : "ice",
+    "minimumOverlapRatio" : 0.8229166666666666,
+    "pair" : 3,
+    "rig" : "ThreePeater",
+    "testedFrames" : 38,
+    "worstFrame" : 77
+  },
+  {
+    "blink" : true,
+    "detachedFrames" : 0,
+    "family" : "ice",
+    "minimumOverlapRatio" : 0.8229166666666666,
+    "pair" : 3,
+    "rig" : "ThreePeater",
+    "testedFrames" : 38,
+    "worstFrame" : 77
+  }
+]

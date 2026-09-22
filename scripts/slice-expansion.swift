@@ -76,3 +76,18 @@ if FileManager.default.fileExists(atPath:repo.appendingPathComponent("art/expans
  registration.arguments=[repo.appendingPathComponent("scripts/register-native-redraw.swift").path,repo.path,native.deletingLastPathComponent().path]
  try registration.run();registration.waitUntilExit();precondition(registration.terminationStatus==0)
 }
+if FileManager.default.fileExists(atPath:repo.appendingPathComponent("art/expansion/seam-generated/acid-pea.png").path){
+ let registration=Process();registration.executableURL=URL(fileURLWithPath:"/usr/bin/swift")
+ registration.arguments=[repo.appendingPathComponent("scripts/register-mouth-seams.swift").path,repo.path,native.deletingLastPathComponent().path]
+ try registration.run();registration.waitUntilExit();precondition(registration.terminationStatus==0)
+}
+if FileManager.default.fileExists(atPath:repo.appendingPathComponent("art/expansion/role-generated/storm-mushroom-0-fixed.png").path){
+ let registration=Process();registration.executableURL=URL(fileURLWithPath:"/usr/bin/swift")
+ registration.arguments=[repo.appendingPathComponent("scripts/register-role-art.swift").path,repo.path,native.deletingLastPathComponent().path]
+ try registration.run();registration.waitUntilExit();precondition(registration.terminationStatus==0)
+}
+if FileManager.default.fileExists(atPath:repo.appendingPathComponent("art/expansion/zombie-native-generated/paper-thrower.png").path){
+ let registration=Process();registration.executableURL=URL(fileURLWithPath:"/usr/bin/swift")
+ registration.arguments=[repo.appendingPathComponent("scripts/register-zombie-redraw.swift").path,repo.path,native.deletingLastPathComponent().path]
+ try registration.run();registration.waitUntilExit();precondition(registration.terminationStatus==0)
+}

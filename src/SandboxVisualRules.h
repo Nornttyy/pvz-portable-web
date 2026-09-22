@@ -15,5 +15,5 @@ inline constexpr ShotArt Shots[]{
  {"acid","acid-hit-0","acid-hit-1",23,23,14,10,33}
 };
 constexpr int HeadForRow(int plantRow,int shotRow){return shotRow>plantRow?1:shotRow<plantRow?3:2;}
-constexpr int ArtIndex(int id,bool fire,bool ice){return fire?0:ice?1:id>=112&&id<=117?id-110:3;}
+constexpr int ArtIndex(int id,bool fire,bool ice){return fire?0:ice?1:id==111?2:id>=112&&id<=117?id-110:3;}
 }

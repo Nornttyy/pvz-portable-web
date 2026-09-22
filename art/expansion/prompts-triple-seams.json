@@ -1,0 +1,63 @@
+{
+  "mode": "built-in image_gen edit",
+  "specs": [
+    {
+      "key": "fire-triple",
+      "name": "三线火焰",
+      "cols": 2,
+      "parts": [
+        {
+          "part": "small-head",
+          "native": "ThreePeater_head.png",
+          "export": true
+        },
+        {
+          "part": "small-blink",
+          "native": "ThreePeater_head.png",
+          "export": true
+        },
+        {
+          "part": "small-mouth",
+          "native": "ThreePeater_mouth.png",
+          "export": true
+        },
+        {
+          "part": "reference",
+          "native": "ThreePeater_head.png",
+          "export": false
+        }
+      ],
+      "family": "fire",
+      "prompt": "Use case: precise-object-edit. Image 1 is the ACTUAL 2009 game's tiny Threepeater skeletal parts, not regular Peashooter anatomy. Edit this very image. Keep EXACT SHAPE of EACH original sprite, especially the clean vertical right cut edge of the pea head. Change ONLY green skin hue to warm orange fire; top-right eye closed simple eyelid, other heads eyes open. Same soft native blurry shading, single simple black oval eye. Top-left and top-right are the two heads; bottom-left is detached small narrow oval mouth; bottom-right is reference copy of native green head keep unchanged. 2x2 atlas, genuine transparent background. CRITICAL: Threepeater head has NO green stalk socket underneath, NO neck, NO collar, NO round base pad. Do NOT add any shape underneath the head. Keep original little pear shape with right opening's FULL height unchanged, same exact upper and lower corners. Do not outline the right cut edge. Detached mouth has no extended barrel and no added tab. Native 2D low resolution, NO 3D, no glossy rim. Do NOT redesign it into a regular Peashooter head. Preserve alpha, all native shapes and relative size/position."
+    },
+    {
+      "key": "ice-triple",
+      "name": "三线寒冰",
+      "cols": 2,
+      "parts": [
+        {
+          "part": "small-head",
+          "native": "ThreePeater_head.png",
+          "export": true
+        },
+        {
+          "part": "small-blink",
+          "native": "ThreePeater_head.png",
+          "export": true
+        },
+        {
+          "part": "small-mouth",
+          "native": "ThreePeater_mouth.png",
+          "export": true
+        },
+        {
+          "part": "reference",
+          "native": "ThreePeater_head.png",
+          "export": false
+        }
+      ],
+      "family": "ice",
+      "prompt": "Use case: precise-object-edit. Image 1 is the ACTUAL 2009 game's tiny Threepeater skeletal parts, not regular Peashooter anatomy. Edit this very image. Keep EXACT SHAPE of EACH original sprite, especially the clean vertical right cut edge of the pea head. Change ONLY green skin hue to light cyan ice; top-right eye closed simple eyelid, other heads eyes open. Same soft native blurry shading, single simple black oval eye. Top-left and top-right are the two heads; bottom-left is detached small narrow oval mouth; bottom-right is reference copy of native green head keep unchanged. 2x2 atlas, genuine transparent background. CRITICAL: Threepeater head has NO green stalk socket underneath, NO neck, NO collar, NO round base pad. Do NOT add any shape underneath the head. Keep original little pear shape with right opening's FULL height unchanged, same exact upper and lower corners. Do not outline the right cut edge. Detached mouth has no extended barrel and no added tab. Native 2D low resolution, NO 3D, no glossy rim. Do NOT redesign it into a regular Peashooter head. Preserve alpha, all native shapes and relative size/position."
+    }
+  ]
+}

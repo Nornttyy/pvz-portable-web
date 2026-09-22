@@ -48,36 +48,132 @@
     "width" : 53
   },
   {
+    "file" : "armored-cone-zombie-hand.png",
+    "height" : 27,
+    "ink" : [
+      0,
+      0,
+      24,
+      26
+    ],
+    "native" : "Zombie_outerarm_hand.png",
+    "width" : 25
+  },
+  {
     "file" : "armored-cone-zombie-head.png",
     "height" : 48,
     "ink" : [
       1,
-      1,
+      0,
       52,
-      47
+      48
     ],
     "native" : "Zombie_head.png",
     "width" : 53
+  },
+  {
+    "file" : "armored-cone-zombie-inner-lower.png",
+    "height" : 24,
+    "ink" : [
+      1,
+      0,
+      18,
+      23
+    ],
+    "native" : "Zombie_innerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "armored-cone-zombie-inner-upper.png",
+    "height" : 25,
+    "ink" : [
+      1,
+      2,
+      13,
+      21
+    ],
+    "native" : "Zombie_innerarm_upper.png",
+    "width" : 15
   },
   {
     "file" : "armored-cone-zombie-jaw.png",
     "height" : 15,
     "ink" : [
       1,
-      0,
+      1,
       31,
-      15
+      14
     ],
     "native" : "Zombie_jaw.png",
     "width" : 32
   },
   {
+    "file" : "armored-cone-zombie-outer-lower.png",
+    "height" : 28,
+    "ink" : [
+      1,
+      1,
+      18,
+      27
+    ],
+    "native" : "Zombie_outerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "armored-cone-zombie-outer-upper-damaged.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      31
+    ],
+    "native" : "Zombie_outerarm_upper2.png",
+    "width" : 17
+  },
+  {
+    "file" : "armored-cone-zombie-outer-upper.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      34
+    ],
+    "native" : "Zombie_outerarm_upper.png",
+    "width" : 17
+  },
+  {
+    "file" : "armored-cone-zombie-prop-damage1.png",
+    "height" : 57,
+    "ink" : [
+      0,
+      6,
+      58,
+      51
+    ],
+    "native" : "Zombie_cone2.png",
+    "width" : 59
+  },
+  {
+    "file" : "armored-cone-zombie-prop-damage2.png",
+    "height" : 57,
+    "ink" : [
+      0,
+      7,
+      59,
+      50
+    ],
+    "native" : "Zombie_cone3.png",
+    "width" : 59
+  },
+  {
     "file" : "armored-cone-zombie-prop.png",
     "height" : 57,
     "ink" : [
-      3,
       0,
-      48,
+      0,
+      53,
       57
     ],
     "native" : "Zombie_cone1.png",
@@ -108,6 +204,18 @@
     "width" : 53
   },
   {
+    "file" : "battery-zombie-hand.png",
+    "height" : 27,
+    "ink" : [
+      0,
+      0,
+      24,
+      26
+    ],
+    "native" : "Zombie_outerarm_hand.png",
+    "width" : 25
+  },
+  {
     "file" : "battery-zombie-head.png",
     "height" : 48,
     "ink" : [
@@ -120,16 +228,76 @@
     "width" : 53
   },
   {
+    "file" : "battery-zombie-inner-lower.png",
+    "height" : 24,
+    "ink" : [
+      1,
+      0,
+      18,
+      23
+    ],
+    "native" : "Zombie_innerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "battery-zombie-inner-upper.png",
+    "height" : 25,
+    "ink" : [
+      1,
+      2,
+      13,
+      21
+    ],
+    "native" : "Zombie_innerarm_upper.png",
+    "width" : 15
+  },
+  {
     "file" : "battery-zombie-jaw.png",
     "height" : 15,
     "ink" : [
       1,
-      0,
+      1,
       31,
-      15
+      14
     ],
     "native" : "Zombie_jaw.png",
     "width" : 32
+  },
+  {
+    "file" : "battery-zombie-outer-lower.png",
+    "height" : 28,
+    "ink" : [
+      1,
+      1,
+      18,
+      27
+    ],
+    "native" : "Zombie_outerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "battery-zombie-outer-upper-damaged.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      31
+    ],
+    "native" : "Zombie_outerarm_upper2.png",
+    "width" : 17
+  },
+  {
+    "file" : "battery-zombie-outer-upper.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      34
+    ],
+    "native" : "Zombie_outerarm_upper.png",
+    "width" : 17
   },
   {
     "file" : "battery-zombie-prop.png",
@@ -156,6 +324,18 @@
     "width" : 53
   },
   {
+    "file" : "bell-zombie-hand.png",
+    "height" : 27,
+    "ink" : [
+      0,
+      0,
+      24,
+      26
+    ],
+    "native" : "Zombie_outerarm_hand.png",
+    "width" : 25
+  },
+  {
     "file" : "bell-zombie-head.png",
     "height" : 48,
     "ink" : [
@@ -168,16 +348,76 @@
     "width" : 53
   },
   {
+    "file" : "bell-zombie-inner-lower.png",
+    "height" : 24,
+    "ink" : [
+      1,
+      0,
+      18,
+      23
+    ],
+    "native" : "Zombie_innerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "bell-zombie-inner-upper.png",
+    "height" : 25,
+    "ink" : [
+      1,
+      2,
+      13,
+      21
+    ],
+    "native" : "Zombie_innerarm_upper.png",
+    "width" : 15
+  },
+  {
     "file" : "bell-zombie-jaw.png",
     "height" : 15,
     "ink" : [
       1,
-      0,
+      1,
       31,
-      15
+      14
     ],
     "native" : "Zombie_jaw.png",
     "width" : 32
+  },
+  {
+    "file" : "bell-zombie-outer-lower.png",
+    "height" : 28,
+    "ink" : [
+      1,
+      1,
+      18,
+      27
+    ],
+    "native" : "Zombie_outerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "bell-zombie-outer-upper-damaged.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      31
+    ],
+    "native" : "Zombie_outerarm_upper2.png",
+    "width" : 17
+  },
+  {
+    "file" : "bell-zombie-outer-upper.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      34
+    ],
+    "native" : "Zombie_outerarm_upper.png",
+    "width" : 17
   },
   {
     "file" : "bell-zombie-prop.png",
@@ -221,7 +461,7 @@
     "ink" : [
       0,
       0,
-      34,
+      33,
       49
     ],
     "native" : "PeaShooter_mouth.png",
@@ -420,28 +660,100 @@
     "width" : 32
   },
   {
+    "file" : "gum-zombie-hand.png",
+    "height" : 27,
+    "ink" : [
+      0,
+      0,
+      24,
+      26
+    ],
+    "native" : "Zombie_outerarm_hand.png",
+    "width" : 25
+  },
+  {
     "file" : "gum-zombie-head.png",
     "height" : 48,
     "ink" : [
       1,
       0,
-      51,
+      52,
       48
     ],
     "native" : "Zombie_head.png",
     "width" : 53
   },
   {
+    "file" : "gum-zombie-inner-lower.png",
+    "height" : 24,
+    "ink" : [
+      1,
+      0,
+      18,
+      23
+    ],
+    "native" : "Zombie_innerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "gum-zombie-inner-upper.png",
+    "height" : 25,
+    "ink" : [
+      1,
+      2,
+      13,
+      21
+    ],
+    "native" : "Zombie_innerarm_upper.png",
+    "width" : 15
+  },
+  {
     "file" : "gum-zombie-jaw.png",
     "height" : 15,
     "ink" : [
       1,
-      0,
+      1,
       31,
-      15
+      14
     ],
     "native" : "Zombie_jaw.png",
     "width" : 32
+  },
+  {
+    "file" : "gum-zombie-outer-lower.png",
+    "height" : 28,
+    "ink" : [
+      1,
+      1,
+      18,
+      27
+    ],
+    "native" : "Zombie_outerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "gum-zombie-outer-upper-damaged.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      31
+    ],
+    "native" : "Zombie_outerarm_upper2.png",
+    "width" : 17
+  },
+  {
+    "file" : "gum-zombie-outer-upper.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      34
+    ],
+    "native" : "Zombie_outerarm_upper.png",
+    "width" : 17
   },
   {
     "file" : "gum-zombie-prop.png",
@@ -516,6 +828,18 @@
     "width" : 53
   },
   {
+    "file" : "ice-bucket-zombie-hand.png",
+    "height" : 27,
+    "ink" : [
+      0,
+      0,
+      24,
+      26
+    ],
+    "native" : "Zombie_outerarm_hand.png",
+    "width" : 25
+  },
+  {
     "file" : "ice-bucket-zombie-head.png",
     "height" : 48,
     "ink" : [
@@ -528,25 +852,109 @@
     "width" : 53
   },
   {
+    "file" : "ice-bucket-zombie-inner-lower.png",
+    "height" : 24,
+    "ink" : [
+      1,
+      0,
+      18,
+      23
+    ],
+    "native" : "Zombie_innerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "ice-bucket-zombie-inner-upper.png",
+    "height" : 25,
+    "ink" : [
+      1,
+      2,
+      13,
+      21
+    ],
+    "native" : "Zombie_innerarm_upper.png",
+    "width" : 15
+  },
+  {
     "file" : "ice-bucket-zombie-jaw.png",
     "height" : 15,
     "ink" : [
       1,
-      0,
+      1,
       31,
-      15
+      14
     ],
     "native" : "Zombie_jaw.png",
     "width" : 32
+  },
+  {
+    "file" : "ice-bucket-zombie-outer-lower.png",
+    "height" : 28,
+    "ink" : [
+      1,
+      1,
+      18,
+      27
+    ],
+    "native" : "Zombie_outerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "ice-bucket-zombie-outer-upper-damaged.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      31
+    ],
+    "native" : "Zombie_outerarm_upper2.png",
+    "width" : 17
+  },
+  {
+    "file" : "ice-bucket-zombie-outer-upper.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      34
+    ],
+    "native" : "Zombie_outerarm_upper.png",
+    "width" : 17
+  },
+  {
+    "file" : "ice-bucket-zombie-prop-damage1.png",
+    "height" : 67,
+    "ink" : [
+      0,
+      0,
+      62,
+      67
+    ],
+    "native" : "Zombie_bucket2.png",
+    "width" : 62
+  },
+  {
+    "file" : "ice-bucket-zombie-prop-damage2.png",
+    "height" : 67,
+    "ink" : [
+      3,
+      0,
+      59,
+      53
+    ],
+    "native" : "Zombie_bucket3.png",
+    "width" : 62
   },
   {
     "file" : "ice-bucket-zombie-prop.png",
     "height" : 67,
     "ink" : [
       0,
-      4,
+      0,
       62,
-      59
+      67
     ],
     "native" : "Zombie_bucket1.png",
     "width" : 62
@@ -672,6 +1080,126 @@
     "width" : 19
   },
   {
+    "file" : "ink-painter-body.png",
+    "height" : 63,
+    "ink" : [
+      1,
+      0,
+      51,
+      62
+    ],
+    "native" : "Zombie_body.png",
+    "width" : 53
+  },
+  {
+    "file" : "ink-painter-hand.png",
+    "height" : 27,
+    "ink" : [
+      0,
+      0,
+      24,
+      26
+    ],
+    "native" : "Zombie_outerarm_hand.png",
+    "width" : 25
+  },
+  {
+    "file" : "ink-painter-hat.png",
+    "height" : 31,
+    "ink" : [
+      15,
+      5,
+      38,
+      24
+    ],
+    "native" : "Zombie_hair.png",
+    "width" : 64
+  },
+  {
+    "file" : "ink-painter-head.png",
+    "height" : 48,
+    "ink" : [
+      1,
+      0,
+      52,
+      48
+    ],
+    "native" : "Zombie_head.png",
+    "width" : 53
+  },
+  {
+    "file" : "ink-painter-inner-lower.png",
+    "height" : 24,
+    "ink" : [
+      1,
+      0,
+      18,
+      23
+    ],
+    "native" : "Zombie_innerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "ink-painter-inner-upper.png",
+    "height" : 25,
+    "ink" : [
+      1,
+      2,
+      13,
+      21
+    ],
+    "native" : "Zombie_innerarm_upper.png",
+    "width" : 15
+  },
+  {
+    "file" : "ink-painter-jaw.png",
+    "height" : 15,
+    "ink" : [
+      1,
+      1,
+      31,
+      14
+    ],
+    "native" : "Zombie_jaw.png",
+    "width" : 32
+  },
+  {
+    "file" : "ink-painter-outer-lower.png",
+    "height" : 28,
+    "ink" : [
+      1,
+      1,
+      18,
+      27
+    ],
+    "native" : "Zombie_outerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "ink-painter-outer-upper-damaged.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      31
+    ],
+    "native" : "Zombie_outerarm_upper2.png",
+    "width" : 17
+  },
+  {
+    "file" : "ink-painter-outer-upper.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      34
+    ],
+    "native" : "Zombie_outerarm_upper.png",
+    "width" : 17
+  },
+  {
     "file" : "light-zombie-body.png",
     "height" : 63,
     "ink" : [
@@ -684,13 +1212,25 @@
     "width" : 53
   },
   {
+    "file" : "light-zombie-hand.png",
+    "height" : 27,
+    "ink" : [
+      0,
+      0,
+      24,
+      26
+    ],
+    "native" : "Zombie_outerarm_hand.png",
+    "width" : 25
+  },
+  {
     "file" : "light-zombie-hat.png",
     "height" : 31,
     "ink" : [
-      7,
-      0,
-      53,
-      30
+      15,
+      5,
+      38,
+      24
     ],
     "native" : "Zombie_hair.png",
     "width" : 64
@@ -701,23 +1241,83 @@
     "ink" : [
       1,
       0,
-      51,
+      52,
       48
     ],
     "native" : "Zombie_head.png",
     "width" : 53
   },
   {
+    "file" : "light-zombie-inner-lower.png",
+    "height" : 24,
+    "ink" : [
+      1,
+      0,
+      18,
+      23
+    ],
+    "native" : "Zombie_innerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "light-zombie-inner-upper.png",
+    "height" : 25,
+    "ink" : [
+      1,
+      2,
+      13,
+      21
+    ],
+    "native" : "Zombie_innerarm_upper.png",
+    "width" : 15
+  },
+  {
     "file" : "light-zombie-jaw.png",
     "height" : 15,
     "ink" : [
       1,
-      0,
+      1,
       31,
-      15
+      14
     ],
     "native" : "Zombie_jaw.png",
     "width" : 32
+  },
+  {
+    "file" : "light-zombie-outer-lower.png",
+    "height" : 28,
+    "ink" : [
+      1,
+      1,
+      18,
+      27
+    ],
+    "native" : "Zombie_outerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "light-zombie-outer-upper-damaged.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      31
+    ],
+    "native" : "Zombie_outerarm_upper2.png",
+    "width" : 17
+  },
+  {
+    "file" : "light-zombie-outer-upper.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      34
+    ],
+    "native" : "Zombie_outerarm_upper.png",
+    "width" : 17
   },
   {
     "file" : "light-zombie-prop.png",
@@ -732,6 +1332,126 @@
     "width" : 59
   },
   {
+    "file" : "paper-thrower-body.png",
+    "height" : 63,
+    "ink" : [
+      1,
+      0,
+      51,
+      62
+    ],
+    "native" : "Zombie_body.png",
+    "width" : 53
+  },
+  {
+    "file" : "paper-thrower-hand.png",
+    "height" : 27,
+    "ink" : [
+      0,
+      0,
+      24,
+      26
+    ],
+    "native" : "Zombie_outerarm_hand.png",
+    "width" : 25
+  },
+  {
+    "file" : "paper-thrower-hat.png",
+    "height" : 31,
+    "ink" : [
+      15,
+      5,
+      38,
+      24
+    ],
+    "native" : "Zombie_hair.png",
+    "width" : 64
+  },
+  {
+    "file" : "paper-thrower-head.png",
+    "height" : 48,
+    "ink" : [
+      1,
+      0,
+      52,
+      48
+    ],
+    "native" : "Zombie_head.png",
+    "width" : 53
+  },
+  {
+    "file" : "paper-thrower-inner-lower.png",
+    "height" : 24,
+    "ink" : [
+      1,
+      0,
+      18,
+      23
+    ],
+    "native" : "Zombie_innerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "paper-thrower-inner-upper.png",
+    "height" : 25,
+    "ink" : [
+      1,
+      2,
+      13,
+      21
+    ],
+    "native" : "Zombie_innerarm_upper.png",
+    "width" : 15
+  },
+  {
+    "file" : "paper-thrower-jaw.png",
+    "height" : 15,
+    "ink" : [
+      1,
+      1,
+      31,
+      14
+    ],
+    "native" : "Zombie_jaw.png",
+    "width" : 32
+  },
+  {
+    "file" : "paper-thrower-outer-lower.png",
+    "height" : 28,
+    "ink" : [
+      1,
+      1,
+      18,
+      27
+    ],
+    "native" : "Zombie_outerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "paper-thrower-outer-upper-damaged.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      31
+    ],
+    "native" : "Zombie_outerarm_upper2.png",
+    "width" : 17
+  },
+  {
+    "file" : "paper-thrower-outer-upper.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      34
+    ],
+    "native" : "Zombie_outerarm_upper.png",
+    "width" : 17
+  },
+  {
     "file" : "parcel-zombie-body.png",
     "height" : 63,
     "ink" : [
@@ -742,6 +1462,18 @@
     ],
     "native" : "Zombie_body.png",
     "width" : 53
+  },
+  {
+    "file" : "parcel-zombie-hand.png",
+    "height" : 27,
+    "ink" : [
+      0,
+      0,
+      24,
+      26
+    ],
+    "native" : "Zombie_outerarm_hand.png",
+    "width" : 25
   },
   {
     "file" : "parcel-zombie-head.png",
@@ -756,25 +1488,109 @@
     "width" : 53
   },
   {
+    "file" : "parcel-zombie-inner-lower.png",
+    "height" : 24,
+    "ink" : [
+      1,
+      0,
+      18,
+      23
+    ],
+    "native" : "Zombie_innerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "parcel-zombie-inner-upper.png",
+    "height" : 25,
+    "ink" : [
+      1,
+      2,
+      13,
+      21
+    ],
+    "native" : "Zombie_innerarm_upper.png",
+    "width" : 15
+  },
+  {
     "file" : "parcel-zombie-jaw.png",
     "height" : 15,
     "ink" : [
       1,
-      0,
+      1,
       31,
-      15
+      14
     ],
     "native" : "Zombie_jaw.png",
     "width" : 32
+  },
+  {
+    "file" : "parcel-zombie-outer-lower.png",
+    "height" : 28,
+    "ink" : [
+      1,
+      1,
+      18,
+      27
+    ],
+    "native" : "Zombie_outerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "parcel-zombie-outer-upper-damaged.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      31
+    ],
+    "native" : "Zombie_outerarm_upper2.png",
+    "width" : 17
+  },
+  {
+    "file" : "parcel-zombie-outer-upper.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      34
+    ],
+    "native" : "Zombie_outerarm_upper.png",
+    "width" : 17
+  },
+  {
+    "file" : "parcel-zombie-prop-damage1.png",
+    "height" : 57,
+    "ink" : [
+      0,
+      6,
+      58,
+      51
+    ],
+    "native" : "Zombie_cone2.png",
+    "width" : 59
+  },
+  {
+    "file" : "parcel-zombie-prop-damage2.png",
+    "height" : 57,
+    "ink" : [
+      0,
+      7,
+      59,
+      50
+    ],
+    "native" : "Zombie_cone3.png",
+    "width" : 59
   },
   {
     "file" : "parcel-zombie-prop.png",
     "height" : 57,
     "ink" : [
       0,
-      4,
-      54,
-      48
+      0,
+      53,
+      57
     ],
     "native" : "Zombie_cone1.png",
     "width" : 59
@@ -840,6 +1656,18 @@
     "width" : 53
   },
   {
+    "file" : "repair-zombie-hand.png",
+    "height" : 27,
+    "ink" : [
+      0,
+      0,
+      24,
+      26
+    ],
+    "native" : "Zombie_outerarm_hand.png",
+    "width" : 25
+  },
+  {
     "file" : "repair-zombie-head.png",
     "height" : 48,
     "ink" : [
@@ -852,25 +1680,109 @@
     "width" : 53
   },
   {
+    "file" : "repair-zombie-inner-lower.png",
+    "height" : 24,
+    "ink" : [
+      1,
+      0,
+      18,
+      23
+    ],
+    "native" : "Zombie_innerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "repair-zombie-inner-upper.png",
+    "height" : 25,
+    "ink" : [
+      1,
+      2,
+      13,
+      21
+    ],
+    "native" : "Zombie_innerarm_upper.png",
+    "width" : 15
+  },
+  {
     "file" : "repair-zombie-jaw.png",
     "height" : 15,
     "ink" : [
       1,
-      0,
+      1,
       31,
-      15
+      14
     ],
     "native" : "Zombie_jaw.png",
     "width" : 32
+  },
+  {
+    "file" : "repair-zombie-outer-lower.png",
+    "height" : 28,
+    "ink" : [
+      1,
+      1,
+      18,
+      27
+    ],
+    "native" : "Zombie_outerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "repair-zombie-outer-upper-damaged.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      31
+    ],
+    "native" : "Zombie_outerarm_upper2.png",
+    "width" : 17
+  },
+  {
+    "file" : "repair-zombie-outer-upper.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      34
+    ],
+    "native" : "Zombie_outerarm_upper.png",
+    "width" : 17
+  },
+  {
+    "file" : "repair-zombie-prop-damage1.png",
+    "height" : 67,
+    "ink" : [
+      0,
+      0,
+      62,
+      67
+    ],
+    "native" : "Zombie_bucket2.png",
+    "width" : 62
+  },
+  {
+    "file" : "repair-zombie-prop-damage2.png",
+    "height" : 67,
+    "ink" : [
+      3,
+      0,
+      59,
+      53
+    ],
+    "native" : "Zombie_bucket3.png",
+    "width" : 62
   },
   {
     "file" : "repair-zombie-prop.png",
     "height" : 67,
     "ink" : [
       0,
-      6,
+      0,
       62,
-      55
+      67
     ],
     "native" : "Zombie_bucket1.png",
     "width" : 62
@@ -984,13 +1896,25 @@
     "width" : 53
   },
   {
+    "file" : "smoke-zombie-hand.png",
+    "height" : 27,
+    "ink" : [
+      0,
+      0,
+      24,
+      26
+    ],
+    "native" : "Zombie_outerarm_hand.png",
+    "width" : 25
+  },
+  {
     "file" : "smoke-zombie-hat.png",
     "height" : 31,
     "ink" : [
-      6,
-      0,
-      55,
-      30
+      15,
+      5,
+      38,
+      24
     ],
     "native" : "Zombie_hair.png",
     "width" : 64
@@ -1008,16 +1932,76 @@
     "width" : 53
   },
   {
+    "file" : "smoke-zombie-inner-lower.png",
+    "height" : 24,
+    "ink" : [
+      1,
+      0,
+      18,
+      23
+    ],
+    "native" : "Zombie_innerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "smoke-zombie-inner-upper.png",
+    "height" : 25,
+    "ink" : [
+      1,
+      2,
+      13,
+      21
+    ],
+    "native" : "Zombie_innerarm_upper.png",
+    "width" : 15
+  },
+  {
     "file" : "smoke-zombie-jaw.png",
     "height" : 15,
     "ink" : [
       1,
-      0,
+      1,
       31,
-      15
+      14
     ],
     "native" : "Zombie_jaw.png",
     "width" : 32
+  },
+  {
+    "file" : "smoke-zombie-outer-lower.png",
+    "height" : 28,
+    "ink" : [
+      1,
+      1,
+      18,
+      27
+    ],
+    "native" : "Zombie_outerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "smoke-zombie-outer-upper-damaged.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      31
+    ],
+    "native" : "Zombie_outerarm_upper2.png",
+    "width" : 17
+  },
+  {
+    "file" : "smoke-zombie-outer-upper.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      34
+    ],
+    "native" : "Zombie_outerarm_upper.png",
+    "width" : 17
   },
   {
     "file" : "smoke-zombie-prop.png",
@@ -1080,6 +2064,150 @@
     "width" : 100
   },
   {
+    "file" : "storm-mushroom-0-blink.png",
+    "height" : 38,
+    "ink" : [
+      2,
+      3,
+      46,
+      35
+    ],
+    "native" : "PuffShroom_body.png",
+    "width" : 49
+  },
+  {
+    "file" : "storm-mushroom-0-cap.png",
+    "height" : 81,
+    "ink" : [
+      1,
+      0,
+      80,
+      67
+    ],
+    "native" : "PuffShroom_head.png",
+    "width" : 81
+  },
+  {
+    "file" : "storm-mushroom-0-head.png",
+    "height" : 38,
+    "ink" : [
+      2,
+      3,
+      46,
+      35
+    ],
+    "native" : "PuffShroom_body.png",
+    "width" : 49
+  },
+  {
+    "file" : "storm-mushroom-0-stem.png",
+    "height" : 14,
+    "ink" : [
+      4,
+      0,
+      2,
+      13
+    ],
+    "native" : "PuffShroom_stem.png",
+    "width" : 7
+  },
+  {
+    "file" : "storm-mushroom-1-blink.png",
+    "height" : 38,
+    "ink" : [
+      2,
+      3,
+      46,
+      35
+    ],
+    "native" : "PuffShroom_body.png",
+    "width" : 49
+  },
+  {
+    "file" : "storm-mushroom-1-cap.png",
+    "height" : 81,
+    "ink" : [
+      1,
+      0,
+      80,
+      67
+    ],
+    "native" : "PuffShroom_head.png",
+    "width" : 81
+  },
+  {
+    "file" : "storm-mushroom-1-head.png",
+    "height" : 38,
+    "ink" : [
+      2,
+      3,
+      46,
+      35
+    ],
+    "native" : "PuffShroom_body.png",
+    "width" : 49
+  },
+  {
+    "file" : "storm-mushroom-1-stem.png",
+    "height" : 14,
+    "ink" : [
+      4,
+      1,
+      2,
+      13
+    ],
+    "native" : "PuffShroom_stem.png",
+    "width" : 7
+  },
+  {
+    "file" : "storm-mushroom-2-blink.png",
+    "height" : 38,
+    "ink" : [
+      2,
+      3,
+      46,
+      35
+    ],
+    "native" : "PuffShroom_body.png",
+    "width" : 49
+  },
+  {
+    "file" : "storm-mushroom-2-cap.png",
+    "height" : 81,
+    "ink" : [
+      1,
+      0,
+      80,
+      67
+    ],
+    "native" : "PuffShroom_head.png",
+    "width" : 81
+  },
+  {
+    "file" : "storm-mushroom-2-head.png",
+    "height" : 38,
+    "ink" : [
+      2,
+      3,
+      46,
+      35
+    ],
+    "native" : "PuffShroom_body.png",
+    "width" : 49
+  },
+  {
+    "file" : "storm-mushroom-2-stem.png",
+    "height" : 14,
+    "ink" : [
+      4,
+      1,
+      2,
+      12
+    ],
+    "native" : "PuffShroom_stem.png",
+    "width" : 7
+  },
+  {
     "file" : "tiny-pea-blink.png",
     "height" : 65,
     "ink" : [
@@ -1128,13 +2256,25 @@
     "width" : 53
   },
   {
+    "file" : "twin-zombie-hand.png",
+    "height" : 27,
+    "ink" : [
+      0,
+      0,
+      24,
+      26
+    ],
+    "native" : "Zombie_outerarm_hand.png",
+    "width" : 25
+  },
+  {
     "file" : "twin-zombie-hat.png",
     "height" : 31,
     "ink" : [
-      9,
-      0,
-      49,
-      30
+      15,
+      5,
+      38,
+      24
     ],
     "native" : "Zombie_hair.png",
     "width" : 64
@@ -1152,16 +2292,76 @@
     "width" : 53
   },
   {
+    "file" : "twin-zombie-inner-lower.png",
+    "height" : 24,
+    "ink" : [
+      1,
+      0,
+      18,
+      23
+    ],
+    "native" : "Zombie_innerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "twin-zombie-inner-upper.png",
+    "height" : 25,
+    "ink" : [
+      1,
+      2,
+      13,
+      21
+    ],
+    "native" : "Zombie_innerarm_upper.png",
+    "width" : 15
+  },
+  {
     "file" : "twin-zombie-jaw.png",
     "height" : 15,
     "ink" : [
       1,
-      0,
+      1,
       31,
-      15
+      14
     ],
     "native" : "Zombie_jaw.png",
     "width" : 32
+  },
+  {
+    "file" : "twin-zombie-outer-lower.png",
+    "height" : 28,
+    "ink" : [
+      1,
+      1,
+      18,
+      27
+    ],
+    "native" : "Zombie_outerarm_lower.png",
+    "width" : 19
+  },
+  {
+    "file" : "twin-zombie-outer-upper-damaged.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      31
+    ],
+    "native" : "Zombie_outerarm_upper2.png",
+    "width" : 17
+  },
+  {
+    "file" : "twin-zombie-outer-upper.png",
+    "height" : 35,
+    "ink" : [
+      1,
+      1,
+      16,
+      34
+    ],
+    "native" : "Zombie_outerarm_upper.png",
+    "width" : 17
   },
   {
     "file" : "twin-zombie-prop.png",

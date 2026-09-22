@@ -21,8 +21,12 @@ for file in try FileManager.default.contentsOfDirectory(at:source.appendingPathC
 func image(_ url:URL)->CGImage?{if let x=images[url.path]{return x};guard let s=CGImageSourceCreateWithURL(url as CFURL,nil),let i=CGImageSourceCreateImageAtIndex(s,0,nil)else{return nil};images[url.path]=i;return i}
 func rig(_ name:String)->[Track]{if let t=rigs[name]{return t};let s=try! String(contentsOf:source.appendingPathComponent("reanim/"+name+".reanim"),encoding:.utf8);let p=XMLParser(data:Data(("<root>"+s+"</root>").utf8)),r=Reader();p.delegate=r;precondition(p.parse());rigs[name]=r.tracks;return r.tracks}
 let poseMode=CommandLine.arguments.contains("--poses")
+let roleMode=CommandLine.arguments.contains("--roles")
+let zombieMode=CommandLine.arguments.contains("--zombies")
+var damaged=false
+var armorStage=0
 var closed=false
-let space=CGColorSpace(name:CGColorSpace.sRGB)!,w=1400,h=poseMode ? 1260:1120
+let space=CGColorSpace(name:CGColorSpace.sRGB)!,w=1400,h=zombieMode ? 940:roleMode ? 900:poseMode ? 1260:1120
 let ctx=CGContext(data:nil,width:w,height:h,bitsPerComponent:8,bytesPerRow:w*4,space:space,bitmapInfo:CGImageAlphaInfo.premultipliedLast.rawValue)!
 ctx.setFillColor(CGColor(red:0.54,green:0.66,blue:0.3,alpha:1));ctx.fill(CGRect(x:0,y:0,width:w,height:h));ctx.interpolationQuality = .high
 func override(_ family:String,_ part:String)->CGImage?{
@@ -48,11 +52,19 @@ func draw(_ name:String,_ family:String,_ layer:String,_ x:Double,_ y:Double,_ s
    if forbidden.contains(n)||(n.contains("screendoor") && !(base==1&&n=="Zombie_innerarm_screendoor"))||n.contains("duckytube")||n.contains("whitewater")||(n=="Zombie_flaghand"&&base != 1)||(n=="anim_innerarm"&&base==1){continue}
    if n=="anim_cone" && base != 2{continue};if n=="anim_bucket" && base != 4{continue}
    if !family.isEmpty{
+    if FileManager.default.fileExists(atPath:repo.appendingPathComponent("art/expansion/zombie-native-generated/"+family+".png").path){
+     if n=="Zombie_tie"&&family != "battery-zombie"{continue}
+     if damaged&&(n=="Zombie_outerarm_lower"||n=="Zombie_outerarm_hand"){continue}
+     if n=="anim_innerarm1"{selected=override(family,"inner-upper")!}
+     if n=="anim_innerarm2"{selected=override(family,"inner-lower")!}
+     if n=="Zombie_outerarm_upper"{selected=override(family,damaged ? "outer-upper-damaged":"outer-upper")!}
+     if n=="Zombie_outerarm_lower"{selected=override(family,"outer-lower")!}
+    }
     if n=="anim_head1"{selected=override(family,"head")!}
     if n=="anim_head2"{selected=override(family,"jaw")!}
     if n=="Zombie_body"{selected=override(family,"body")!}
-    if n=="anim_cone"||n=="anim_bucket"{selected=override(family,"prop")!}
-    if n=="anim_hair" && ["light-zombie","smoke-zombie","twin-zombie"].contains(family){selected=override(family,"hat")!}
+    if n=="anim_cone"||n=="anim_bucket"{selected=override(family,armorStage==0 ? "prop":"prop-damage\(armorStage)")!}
+    if n=="anim_hair" && ["light-zombie","smoke-zombie","twin-zombie","paper-thrower","ink-painter"].contains(family){selected=override(family,"hat")!}
     if n=="Zombie_tie" && family=="battery-zombie"{selected=override(family,"battery")!}
    }
   }else if name=="Zombie_flagpole"{if n=="Zombie_flag"{selected=override(family,"prop")!}}
@@ -73,16 +85,16 @@ func draw(_ name:String,_ family:String,_ layer:String,_ x:Double,_ y:Double,_ s
  }
  ctx.restoreGState()
 }
-let plants:[(String,String,Double)]=[("PeaShooter","",1),("PeaShooter","fire",1),("PeaShooter","ice",1),("ThreePeater","fire",1),("ThreePeater","ice",1),("GatlingPea","fire",1),("GatlingPea","ice",1),("PeaShooter","echo-lily",1),("Wallnut","spring-nut",1),("SunFlower","rhythm-flower",1),("PuffShroom","relay-mushroom",1),("PeaShooter","electric-pea",1),("PeaShooter","tiny-pea",0.72),("PeaShooter","heavy-pea",1.04),("PeaShooter","scatter-pea",1),("PeaShooter","seeker-pea",1),("PeaShooter","acid-pea",1)]
-for (i,item) in (poseMode ? []:plants).enumerated(){let (name,family,size)=item;let x=Double(i%7*200+35)+(1-size)*40,y=Double(i/7*185+50)+(1-size)*65
+let plants:[(String,String,Double)]=[("PeaShooter","",1),("PeaShooter","fire",1),("PeaShooter","ice",1),("ThreePeater","fire",1),("ThreePeater","ice",1),("GatlingPea","fire",1),("GatlingPea","ice",1),("PeaShooter","echo-lily",1),("SunFlower","rhythm-flower",1),("PuffShroom","storm-mushroom-2",1.36),("PeaShooter","electric-pea",1),("PeaShooter","tiny-pea",0.72),("PeaShooter","heavy-pea",1.04),("PeaShooter","scatter-pea",1),("PeaShooter","seeker-pea",1),("PeaShooter","acid-pea",1)]
+for (i,item) in (poseMode||roleMode||zombieMode ? []:plants).enumerated(){let (name,family,size)=item;let x=Double(i%7*200+35)+(1-size)*40,y=Double(i/7*185+50)+(1-size)*65
  draw(name,family,"anim_idle",x,y,size*1.25)
  if name=="ThreePeater"{for layer in ["anim_head_idle1","anim_head_idle3","anim_head_idle2"]{draw(name,family,layer,x,y,size*1.25)}}
  else if name=="PeaShooter"||name=="GatlingPea"{draw(name,family,"anim_head_idle",x,y,size*1.25)}
 }
 let zombies=[("",0),("parcel-zombie",2),("bell-zombie",1),("gum-zombie",0),("ice-bucket-zombie",4),("battery-zombie",0),("light-zombie",0),("armored-cone-zombie",2),("repair-zombie",4),("smoke-zombie",0),("twin-zombie",0)]
-for (i,p) in (poseMode ? []:zombies).enumerated(){draw("Zombie",p.0,"anim_walk",Double(i%7*200+5),Double(550+i/7*260),p.0=="light-zombie" ? 1.0:1.2,p.1,4)}
+for (i,p) in (poseMode||roleMode||zombieMode ? []:zombies).enumerated(){draw("Zombie",p.0,"anim_walk",Double(i%7*200+5),Double(550+i/7*260),p.0=="light-zombie" ? 1.0:1.2,p.1,4)}
 if poseMode{
- let roster:[(String,String,Double)]=[("PeaShooterSingle","fire",1),("PeaShooter","ice",1),("PeaShooter","fire",1),("ThreePeater","ice",1),("ThreePeater","fire",1),("GatlingPea","ice",1),("GatlingPea","fire",1),("PeaShooter","ice-fire",1),("PeaShooterSingle","echo-lily",1),("Wallnut","spring-nut",1),("SunFlower","rhythm-flower",1),("PuffShroom","relay-mushroom",1),("PeaShooterSingle","electric-pea",1),("PeaShooterSingle","tiny-pea",0.72),("PeaShooterSingle","heavy-pea",1.04),("PeaShooterSingle","scatter-pea",1),("PeaShooterSingle","seeker-pea",1),("PeaShooterSingle","acid-pea",1)]
+ let roster:[(String,String,Double)]=[("PeaShooterSingle","fire",1),("PeaShooter","ice",1),("PeaShooter","fire",1),("ThreePeater","ice",1),("ThreePeater","fire",1),("GatlingPea","ice",1),("GatlingPea","fire",1),("PeaShooter","ice-fire",1),("PeaShooterSingle","echo-lily",1),("SunFlower","rhythm-flower",1),("PuffShroom","storm-mushroom-2",1.36),("PeaShooterSingle","electric-pea",1),("PeaShooterSingle","tiny-pea",0.72),("PeaShooterSingle","heavy-pea",1.04),("PeaShooterSingle","scatter-pea",1),("PeaShooterSingle","seeker-pea",1),("PeaShooterSingle","acid-pea",1)]
  for (i,item) in roster.enumerated(){let (name,family,size)=item
   for state in 0..<3{
    closed=state==2;let frame=state==0 ? 0:6
@@ -97,4 +109,22 @@ if poseMode{
   }
  }
 }
-let target=repo.appendingPathComponent(poseMode ? "art/expansion/plant-poses-proof.png":"art/expansion/rig-proof.png"),dest=CGImageDestinationCreateWithURL(target as CFURL,UTType.png.identifier as CFString,1,nil)!;CGImageDestinationAddImage(dest,ctx.makeImage()!,nil);precondition(CGImageDestinationFinalize(dest));print(target.path)
+if roleMode{
+ for state in 0..<3{
+  closed=state==2;damaged=state==2
+  for stage in 0..<3{let size=1.0+Double(stage)*0.18;draw("PuffShroom","storm-mushroom-\(stage)","anim_idle",Double(stage*250+35)+(1-size)*40,Double(state*290+65)+(1-size)*65,size*1.5,0,state*6)}
+  closed=false
+  for (i,family) in ["paper-thrower","ink-painter"].enumerated(){draw("Zombie",family,state==1 ? "anim_eat":"anim_walk",Double(790+i*275),Double(state*290+30),1.5,0,state*6)}
+ }
+}
+if zombieMode{
+ let roster=Array(zombies.dropFirst())+[("paper-thrower",0),("ink-painter",0)]
+ for (i,p) in roster.enumerated(){
+  for state in 0..<3{
+   damaged=state==2;closed=false;armorStage=state
+   let size=p.0=="light-zombie" ? 0.72:1.0
+   draw("Zombie",p.0,state==1 ? "anim_eat":"anim_walk",Double(i%4*350+state*108+4),Double(i/4*300+55)+(1-size)*145,size,p.1,state*7)
+  }
+ }
+}
+let target=repo.appendingPathComponent(zombieMode ? "art/expansion/zombie-poses-proof.png":roleMode ? "art/expansion/role-poses-proof.png":poseMode ? "art/expansion/plant-poses-proof.png":"art/expansion/rig-proof.png"),dest=CGImageDestinationCreateWithURL(target as CFURL,UTType.png.identifier as CFString,1,nil)!;CGImageDestinationAddImage(dest,ctx.makeImage()!,nil);precondition(CGImageDestinationFinalize(dest));print(target.path)

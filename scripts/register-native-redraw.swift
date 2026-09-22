@@ -1,5 +1,5 @@
 // Mechanical extraction/registration of image_gen edits onto the original bone canvases.
-// No recoloring or procedural art: hardware and green mouths are copied byte-for-byte.
+// No recoloring or procedural art: hardware is copied byte-for-byte.
 import Foundation
 import CoreGraphics
 import ImageIO
@@ -27,7 +27,8 @@ func record(_ name:String,_ ref:String,_ image:CGImage){
 let refs=["PeaShooter_Head.png","PeaShooter_mouth.png","ThreePeater_head.png","ThreePeater_mouth.png","GatlingPea_head.png"]
 let parts=["head","mouth","small-head","small-mouth","gatling-head"]
 let families=["fire","ice","electric-pea"]
-for (closed,filename) in [(false,"native-redraw.png"),(true,"native-blink.png")]{
+let seamEdit=FileManager.default.fileExists(atPath:repo.appendingPathComponent("art/expansion/generated/native-seams-blink.png").path)
+for (closed,filename) in [(false,seamEdit ? "native-seams.png":"native-redraw.png"),(true,seamEdit ? "native-seams-blink.png":"native-blink.png")]{
  let atlas=load(repo.appendingPathComponent("art/expansion/generated/"+filename))
  for (row,family) in families.enumerated(){for col in 0..<5 where (row<2||col<2)&&(!closed||[0,2,4].contains(col)){
   let ref=load(source.appendingPathComponent("reanim/"+refs[col])),ink=bounds(ref)
@@ -45,7 +46,7 @@ for family in ["fire","ice"]{for (part,ref) in [("gatling-mouth","GatlingPea_mou
  let name=family+"-"+part+".png",url=source.appendingPathComponent("reanim/"+ref)
  try Data(contentsOf:url).write(to:out.appendingPathComponent(name));record(name,ref,load(url))
 }}
-for family in ["tiny-pea","heavy-pea","scatter-pea","seeker-pea","acid-pea"]{
+for family in (seamEdit ? []:["tiny-pea","heavy-pea","scatter-pea","seeker-pea","acid-pea"]){
  let name=family+"-mouth.png",ref="PeaShooter_mouth.png",url=source.appendingPathComponent("reanim/"+ref)
  try Data(contentsOf:url).write(to:out.appendingPathComponent(name));record(name,ref,load(url))
 }
