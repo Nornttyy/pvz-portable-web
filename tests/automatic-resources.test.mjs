@@ -68,5 +68,10 @@ test('deployed ZIP contains every original manifest entry, including animations 
     assert.equal(actual.length,entry.size,entry.path);assert.equal(await sha256(actual),entry.sha256,entry.path);
   }
   for(const prefix of ['reanim/','sounds/','data/','images/','particles/'])assert.ok(plan.files.some(f=>f.path.startsWith(prefix)),prefix);
-  assert.equal(plan.totalFiles,3158);
+  const baseline=JSON.parse(await readFile(new URL('../tests/baseline-assets.json',import.meta.url)));
+  const tech=plan.files.filter(f=>f.path.startsWith('images/sandbox/'));
+  assert.equal(plan.technologyGarden.addedPlants,10);
+  assert.equal(plan.technologyGarden.addedZombies,10);
+  assert.equal(tech.length,252,'only the declared Technology Garden runtime pieces may extend the base pack');
+  assert.equal(plan.totalFiles,baseline.fileCount+tech.length);
 });

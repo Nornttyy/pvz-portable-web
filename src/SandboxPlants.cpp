@@ -1,8 +1,7 @@
-// Original sandbox roster; skins and combat state are per instance and never saved into adventure.
+// Garden-tech sandbox roster. Every state belongs to a placed instance; adventure plants and native animation definitions stay untouched.
 #include "SandboxPlants.h"
 #include "SandboxZombies.h"
 #include "SandboxArt.h"
-#include "SandboxCombatRules.h"
 #include "SandboxVisualRules.h"
 #include "Sandbox.h"
 #include "LawnApp.h"
@@ -17,296 +16,274 @@
 #include "PvzpLib/PvzpCommon.h"
 #include "graphics/Graphics.h"
 #include "graphics/MemoryImage.h"
+#include <algorithm>
+#include <cmath>
 #include <map>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
-#include <cmath>
-#include <algorithm>
+
 namespace SandboxPlants {
 namespace {
-struct State { int id,shots=0,age=0,cooldown=0,health=0,echo=-1,stage=0,charge=0;bool closed=false; };
-struct Shot { int id,damage,hops=3;float limit=10000; };
-struct Beam { float x1,y1,x2,y2;int ticks;bool electric;int row; };
-struct Effect {float x,y;int row,art,ticks=18;bool muzzle=false;};
+constexpr int kMaxNetworkMembers=6;
+constexpr int kMaxCharge=3;
+constexpr int kResonanceTicks=240;
+
+struct State {
+    int id=0,shots=0,age=0,cooldown=0,health=0,hits=0;
+    int network=-1,charge=0,resonance=0,pulseSerial=0,severed=0;
+    bool closed=false;
+};
+struct Shot { int id=0,damage=0,hops=1; Plant* source=nullptr; bool powered=false; };
+struct Beam { float x1=0,y1=0,x2=0,y2=0; int ticks=0,row=0,kind=0; };
+struct Effect { float x=0,y=0; int row=0,kind=0,ticks=18; bool muzzle=false; };
+struct Network { Plant* hub=nullptr; std::vector<Plant*> members; bool jammed=false; };
+
 std::map<const Plant*,State> states;
 std::map<const Projectile*,Shot> shots;
-std::map<ZombieID,int> poison;
 std::map<int,std::unique_ptr<Sexy::MemoryImage>> cards;
+std::vector<Network> networks;
 std::vector<Beam> beams;
 std::vector<Effect> effects;
-void EffectAt(float x,float y,int row,int art,bool muzzle=false){
- if(effects.size()>=256)effects.erase(effects.begin());
- effects.push_back({x,y,row,art,muzzle?10:18,muzzle});
+std::map<ZombieID,bool> harvestedCores;
+
+bool Alive(const Plant* p){return p&&!p->mDead&&p->mPlantHealth>0;}
+bool Enemy(Zombie* z){return z&&!z->mMindControlled&&!z->IsDeadOrDying()&&z->mHasHead;}
+bool Orthogonal(const Plant* a,const Plant* b){return a&&b&&std::abs(a->mPlantCol-b->mPlantCol)+std::abs(a->mRow-b->mRow)==1;}
+bool HasState(const Plant* p){return states.contains(p);}
+bool IsHub(const Plant* p){auto i=states.find(p);return i!=states.end()&&i->second.id==103;}
+void EffectAt(float x,float y,int row,int kind,bool muzzle=false){
+    if(effects.size()>=256)effects.erase(effects.begin());
+    effects.push_back({x,y,row,kind,muzzle?10:18,muzzle});
 }
-int Art(const Projectile* p,int id){return SandboxVisualRules::ArtIndex(id,p->mProjectileType==PROJECTILE_FIREBALL,p->mProjectileType==PROJECTILE_SNOWPEA);}
-bool Muzzle(const Plant* p,int row,float& x,float& y){
- const auto* d=Find(Type(p));if(!d)return false;
- auto reanim=p->mHeadReanimID;const char* track="idle_mouth";float w=35,h=49;
- if(d->base==18){
-  const int head=SandboxVisualRules::HeadForRow(p->mRow,row);
-  reanim=head==1?p->mHeadReanimID:head==2?p->mHeadReanimID2:p->mHeadReanimID3;
-  track=head==1?"ThreePeater_mouth1":head==2?"ThreePeater_mouth2":"ThreePeater_mouth3";w=19;h=43;
- }else if(d->base==40){track="GatlingPea_barrel3";w=43;h=27;} // Front barrel, not the rear green housing.
- float localX,localY;
- if(!SandboxArt::TrackPoint(gLawnApp->ReanimationTryToGet(reanim),track,w,h,w-3,h*0.5f,localX,localY))return false;
- x=p->mX+localX;y=p->mY+localY;return true;
+const char* ProjectileArt(int id){
+    switch(id){case 101:return "pulse";case 104:return "arc";case 105:return "magnet";case 106:return "resin";case 107:return "scout";default:return "pulse";}
+}
+const char* ImpactArt(int id,int frame){
+    switch(id){
+    case 101:return frame?"pulse-hit-1":"pulse-hit-0";case 104:return frame?"arc-hit-1":"arc-hit-0";
+    case 105:return frame?"magnet-hit-1":"magnet-hit-0";case 106:return frame?"resin-hit-1":"resin-hit-0";
+    case 107:return frame?"scout-hit-1":"scout-hit-0";default:return frame?"pulse-hit-1":"pulse-hit-0";
+    }
 }
 void PlantPoint(const Plant* p,const char* track,float w,float h,float& x,float& y){
- float px,py;if(SandboxArt::TrackPoint(gLawnApp->ReanimationTryToGet(p->mBodyReanimID),track,w,h,w*0.5f,h*0.5f,px,py)){x=p->mX+px;y=p->mY+py;}
+    float px=0,py=0;
+    if(SandboxArt::TrackPoint(gLawnApp->ReanimationTryToGet(p->mBodyReanimID),track,w,h,w*.5f,h*.5f,px,py)){x=p->mX+px;y=p->mY+py;}
 }
-bool Enemy(Zombie* z){return !z->mMindControlled&&!z->IsDeadOrDying()&&z->mHasHead;}
-void Skin(Reanimation* anim,int id,bool closed,int health=4000,int stage=0){
- if(!anim)return;
- const auto* def=Find(id);if(!def)return;
- const bool triple=def->base==18;
- const char* family=def->art?def->art:(def->element==Element::Fire?"fire":"ice");
- if(id==111)family=stage==2?"storm-mushroom-2":stage==1?"storm-mushroom-1":"storm-mushroom-0";
- for(int i=0;i<anim->mDefinition->mTracks.count;++i){
-  const std::string_view name=anim->mDefinition->mTracks.tracks[i].mName;
-  auto& t=anim->mTrackInstances[i];
-  if(id==110){
-   if(name=="anim_idle")t.mImageOverride=SandboxArt::Image(family,closed?"blink":"head");
-   if(name.find("blink")!=name.npos)t.mRenderGroup=RENDER_GROUP_HIDDEN;
-  }else if(id==111){
-   if(name=="anim_face")t.mImageOverride=SandboxArt::Image(family,closed?"blink":"head");
-   if(name=="PuffShroom_head")t.mImageOverride=SandboxArt::Image(family,"cap");
-   if(name=="PuffShroom_stem")t.mImageOverride=SandboxArt::Image(family,"stem");
-   if(name=="PuffShroom_eyes"||name.find("blink")!=name.npos)t.mRenderGroup=RENDER_GROUP_HIDDEN;
-  }else{
-   if(name=="anim_face"||name=="anim_face1"||name=="anim_face2"||name=="anim_face3")
-    t.mImageOverride=SandboxArt::Image(family,def->base==40?(closed?"gatling-blink":"gatling-head"):triple?(closed?"small-blink":"small-head"):(closed?"blink":"head"));
-   else if(name=="idle_mouth"||name=="ThreePeater_mouth1"||name=="ThreePeater_mouth2"||name=="ThreePeater_mouth3")
-    t.mImageOverride=SandboxArt::Image(def->element==Element::Alternating?"fire":family,triple?"small-mouth":"mouth");
-   // Keep all original Gatling hardware and its native painter order. The rear
-   // housing, four rotating barrels and front occluder are NOT interchangeable.
-   else if(def->base==40&&(name=="GatlingPea_mouth"||name.starts_with("GatlingPea_barrel")||name=="GatlingPea_mouth_overlay"))
-    t.mImageOverride=nullptr;
-   else if(name.find("blink")!=name.npos)t.mRenderGroup=RENDER_GROUP_HIDDEN;
-  }
- }
+bool Muzzle(const Plant* p,int row,float& x,float& y){
+    const auto* d=Find(Type(p));if(!d)return false;
+    // The native Peashooter/Threepeater mouth pivots have a visible gap from
+    // their heads during both idle and firing frames.  Technology Garden's
+    // living nozzles are therefore part of the custom head silhouette; read
+    // the live face bone's front edge so a projectile never starts in a
+    // detached legacy mouth layer.
+    auto reanim=p->mHeadReanimID;const char* track="anim_face";float w=70,h=65;
+    if(d->base==18){
+        const int head=SandboxVisualRules::HeadForRow(p->mRow,row);
+        reanim=head==1?p->mHeadReanimID:head==2?p->mHeadReanimID2:p->mHeadReanimID3;
+        track=head==1?"anim_face1":head==2?"anim_face2":"anim_face3";w=30;h=30;
+    }
+    float localX=0,localY=0;
+    if(!SandboxArt::TrackPoint(gLawnApp->ReanimationTryToGet(reanim),track,w,h,w-3,h*.5f,localX,localY))return false;
+    x=p->mX+localX;y=p->mY+localY;return true;
 }
-void SkinPlant(Plant* plant,State& s){
- for(auto id:{plant->mBodyReanimID,plant->mHeadReanimID,plant->mHeadReanimID2,plant->mHeadReanimID3})
-  Skin(gLawnApp->ReanimationTryToGet(id),s.id,s.closed,plant->mPlantHealth,s.stage);
+void Skin(Reanimation* anim,int id,bool closed,int health){
+    if(!anim)return;const auto* d=Find(id);if(!d)return;
+    for(int i=0;i<anim->mDefinition->mTracks.count;++i){
+        const std::string_view name=anim->mDefinition->mTracks.tracks[i].mName;auto& track=anim->mTrackInstances[i];
+        if(d->base==1){
+            if(name=="anim_idle")track.mImageOverride=SandboxArt::Image(d->art,closed?"blink":"head");
+            else if(name.find("blink")!=name.npos)track.mRenderGroup=RENDER_GROUP_HIDDEN;
+        }else if(d->base==3){
+            if(name=="anim_face")track.mImageOverride=SandboxArt::Image(d->art,health<1200?"cracked2":health<2600?"cracked1":"head");
+            else if(name.find("blink")!=name.npos)track.mRenderGroup=RENDER_GROUP_HIDDEN;
+        }else if(d->base==8){
+            if(name=="anim_face")track.mImageOverride=SandboxArt::Image(d->art,closed?"blink":"head");
+            if(name=="PuffShroom_head")track.mImageOverride=SandboxArt::Image(d->art,"cap");
+            if(name=="PuffShroom_stem")track.mImageOverride=SandboxArt::Image(d->art,"stem");
+            if(name=="PuffShroom_eyes"||name.find("blink")!=name.npos)track.mRenderGroup=RENDER_GROUP_HIDDEN;
+        }else{
+            const bool triple=d->base==18;
+            if(name=="anim_face"||name=="anim_face1"||name=="anim_face2"||name=="anim_face3")track.mImageOverride=SandboxArt::Image(d->art,triple?(closed?"small-blink":"small-head"):(closed?"blink":"head"));
+            // Never show a legacy mouth bone under a full custom head: their
+            // native pivots separate during firing and produced the floating
+            // nozzle/transparent-hole regression.  Unique muzzle, beam and
+            // hit sprites remain drawn by the combat effect layer.
+            else if(name=="idle_mouth"||name=="ThreePeater_mouth1"||name=="ThreePeater_mouth2"||name=="ThreePeater_mouth3")track.mRenderGroup=RENDER_GROUP_HIDDEN;
+            else if(name.find("blink")!=name.npos)track.mRenderGroup=RENDER_GROUP_HIDDEN;
+        }
+    }
 }
-Sexy::MemoryImage* Card(int id){
- auto& cached=cards[id];if(cached)return cached.get();
- const auto* d=Find(id);const auto seed=static_cast<SeedType>(d->base);
- cached=gLawnApp->mReanimatorCache->MakeBlankMemoryImage(180,180);
- Sexy::Graphics g(cached.get());g.SetLinearBlend(true);
- auto frame=[&](const char* layer){
-  Reanimation a;a.ReanimationInitializeType(40,40,GetPlantDefinition(seed).mReanimationType);
-  if(!a.TrackExists(layer))return;a.SetFramesForLayer(layer);if(d->base==1)a.mAnimTime=0.15f;
-  Skin(&a,id,false,4000,id==111?2:0);a.Draw(&g);
- };
- frame("anim_idle");
- if(d->base==18){frame("anim_head_idle1");frame("anim_head_idle3");frame("anim_head_idle2");}
- else if(d->base==0||d->base==7||d->base==40)frame("anim_head_idle");
- return cached.get();
+void SkinPlant(Plant* p,State& s){for(auto id:{p->mBodyReanimID,p->mHeadReanimID,p->mHeadReanimID2,p->mHeadReanimID3})Skin(gLawnApp->ReanimationTryToGet(id),s.id,s.closed,p->mPlantHealth);}
+void DirectDamage(Plant* source,Zombie* target,int damage){
+    if(!source||!Enemy(target)||damage<=0)return;
+    target->TakeDamage(damage,source->GetDamageRangeFlags(WEAPON_PRIMARY));
+    auto i=states.find(source);if(i!=states.end()&&++i->second.hits%4==0)AddRootEnergy(source->mBoard,source,RootEnergySource::Damage);
+    if(target->IsDeadOrDying()&&SandboxZombies::IsMechanical(target))OnMechanicalCoreDestroyed(source->mBoard,target);
 }
-void Pulse(Board* b,Plant* p){
- float x=p->mX+50,y=p->mY+35;Muzzle(p,p->mRow,x,y);
- beams.push_back({x,y,780,y,36,false,p->mRow});
- for(auto* z:b->mZombies)if(Enemy(z)&&z->mRow==p->mRow&&z->mPosX+65>x&&z->EffectedByDamage(p->GetDamageRangeFlags(WEAPON_PRIMARY)))z->TakeDamage(18,0);
+void AddShot(Projectile* p,Plant* source,int id,int damage,bool powered){shots[p]={id,damage,id==104?(powered?5:3):1,source,powered};}
+std::vector<Plant*> Nearby(Board* board,const Plant* p){
+    std::vector<Plant*> result;if(!board||!p)return result;
+    for(auto* other:board->mPlants)if(Alive(other)&&HasState(other)&&Orthogonal(p,other))result.push_back(other);return result;
 }
 }
-void Reset(){states.clear();shots.clear();poison.clear();beams.clear();effects.clear();}
-void Forget(Plant* p){states.erase(p);SandboxZombies::ForgetPlant(p);}
+
+void Reset(){states.clear();shots.clear();cards.clear();networks.clear();beams.clear();effects.clear();harvestedCores.clear();}
+void Forget(Plant* p){states.erase(p);}
 void ForgetShot(Projectile* p){shots.erase(p);}
 bool IsCustom(const Plant* p){return gSandboxEnabled&&states.contains(p);}
-int Type(const Plant* p){auto it=states.find(p);return it==states.end()?int(p->mSeedType):it->second.id;}
-int GrowthStage(const Plant* p){auto it=states.find(p);return it==states.end()?0:it->second.stage;}
+bool IsTech(const Plant* p){return IsCustom(p);}
+int Type(const Plant* p){auto i=states.find(p);return i==states.end()?int(p->mSeedType):i->second.id;}
+bool IsResonating(const Plant* p){
+    auto i=states.find(p);if(i==states.end()||i->second.network<0||i->second.network>=int(networks.size()))return false;
+    auto h=states.find(networks[i->second.network].hub);return h!=states.end()&&h->second.resonance>0;
+}
 void Assign(Plant* p,int id){
- auto* d=Find(id);if(!d)return;
- auto& s=states[p];s={id};s.health=p->mPlantHealth;
- if(id==111)s.cooldown=80;
- if(d->rate){p->mLaunchRate=d->rate;p->mLaunchCounter=std::min(p->mLaunchCounter,d->rate);}
- if(id==111||id==108)p->mLaunchCounter=9999;
- SkinPlant(p,s);
+    const auto* d=Find(id);if(!d)return;auto& s=states[p];s={};s.id=id;s.health=p->mPlantHealth;
+    if(d->rate){p->mLaunchRate=d->rate;p->mLaunchCounter=std::min(p->mLaunchCounter,d->rate);}
+    if(d->role==Role::Relay||d->role==Role::Prism||d->role==Role::Repair)p->mLaunchCounter=9999;SkinPlant(p,s);
 }
-void AdjustScale(const Plant* p,float& x,float& y,float& sx,float& sy){
- if(!gSandboxEnabled)return;auto* d=Find(Type(p));if(!d)return;
- const float scale=d->id==111?1.0f+GrowthStage(p)*0.18f:d->scale;
- x+=SandboxVisualRules::GroundX*sx*(1-scale);y+=SandboxVisualRules::GroundY*sy*(1-scale);sx*=scale;sy*=scale;
+void RebuildRootNetworks(Board* board){
+    networks.clear();for(auto& [plant,state]:states)state.network=-1;if(!board)return;
+    std::vector<Plant*> hubs;for(auto* p:board->mPlants)if(Alive(p)&&IsHub(p))hubs.push_back(p);
+    std::sort(hubs.begin(),hubs.end(),[](const Plant* a,const Plant* b){return a->mRow==b->mRow?a->mPlantCol<b->mPlantCol:a->mRow<b->mRow;});
+    for(auto* hub:hubs){
+        auto h=states.find(hub);if(h==states.end()||h->second.severed>0||h->second.network>=0)continue;
+        Network net;net.hub=hub;net.members.push_back(hub);h->second.network=int(networks.size());
+        for(size_t cursor=0;cursor<net.members.size()&&net.members.size()<kMaxNetworkMembers;++cursor){
+            Plant* from=net.members[cursor];for(auto* next:Nearby(board,from)){
+                auto n=states.find(next);if(n==states.end()||n->second.severed>0||n->second.network>=0||IsHub(next))continue;
+                n->second.network=int(networks.size());net.members.push_back(next);if(net.members.size()>=kMaxNetworkMembers)break;
+            }
+        }
+        net.jammed=SandboxZombies::IsJamming(hub);networks.push_back(std::move(net));
+    }
 }
-void AdjustShadow(const Plant* p,float& x,float& y,float& scale){
- if(!gSandboxEnabled)return;auto* d=Find(Type(p));if(!d)return;
- // Native center-scaled shadow keeps its center while its width follows the body.
- scale*=d->id==111?1.0f+GrowthStage(p)*0.18f:d->scale;
+RootNetworkView RootNetwork(const Plant* p){
+    RootNetworkView view;auto i=states.find(p);if(i==states.end())return view;const auto& s=i->second;view.network=s.network;view.severed=s.severed>0;
+    if(s.network<0||s.network>=int(networks.size()))return view;const auto& net=networks[s.network];auto h=states.find(net.hub);if(h==states.end())return view;
+    view.members=int(net.members.size());view.linked=view.members>1;view.charge=h->second.charge;view.activeTicks=h->second.resonance;view.pulseSerial=h->second.pulseSerial;view.jammed=net.jammed;return view;
 }
-float ShotScale(const Projectile* p){auto i=shots.find(p);return i==shots.end()?1.0f:i->second.id==113?0.55f:i->second.id==115?0.7f:i->second.id==114?1.1f:1.0f;}
+bool RootLinked(const Plant* a,const Plant* b){const auto av=RootNetwork(a),bv=RootNetwork(b);return av.linked&&bv.linked&&av.network>=0&&av.network==bv.network;}
+bool AddRootEnergy(Board* board,Plant* source,RootEnergySource sourceType,int amount){
+    (void)sourceType;if(!board||board->mPaused||!Alive(source)||amount<=0)return false;RebuildRootNetworks(board);const auto view=RootNetwork(source);
+    if(!view.linked||view.jammed||view.network<0)return false;auto h=states.find(networks[view.network].hub);if(h==states.end())return false;h->second.charge=std::min(kMaxCharge,h->second.charge+amount);return true;
+}
+RootTriggerResult TriggerRootResonance(Board* board,Plant* hub){
+    if(!board||board->mPaused)return RootTriggerResult::Paused;if(!IsHub(hub))return RootTriggerResult::NotHub;RebuildRootNetworks(board);const auto view=RootNetwork(hub);
+    if(!view.linked||view.charge<kMaxCharge)return RootTriggerResult::NotFull;auto h=states.find(hub);if(h==states.end())return RootTriggerResult::NotHub;
+    h->second.charge=0;h->second.resonance=kResonanceTicks;++h->second.pulseSerial;EffectAt(hub->mX+42,hub->mY+38,hub->mRow,5);return RootTriggerResult::Fired;
+}
+bool SeverRootCable(Board* board,Plant* member,int ticks){
+    auto i=states.find(member);if(!board||i==states.end()||i->second.id==103||ticks<=0)return false;i->second.severed=std::max(i->second.severed,ticks);RebuildRootNetworks(board);return true;
+}
+bool RepairRootCable(Board* board,Plant* repairer,Plant* member){
+    auto r=states.find(repairer),m=states.find(member);if(!board||r==states.end()||m==states.end()||r->second.id!=109||m->second.severed<=0||!Orthogonal(repairer,member))return false;
+    m->second.severed=0;RebuildRootNetworks(board);return true;
+}
+void OnMechanicalCoreDestroyed(Board* board,Zombie* zombie){
+    if(!board||!zombie||!SandboxZombies::IsMechanical(zombie))return;const auto id=board->ZombieGetID(zombie);if(harvestedCores.contains(id))return;harvestedCores[id]=true;
+    Plant* best=nullptr;float distance=100000;for(auto* p:board->mPlants)if(Alive(p)&&IsTech(p)){const float d=std::abs(p->mX-zombie->mPosX)+std::abs(p->mY-zombie->mPosY);if(d<distance){distance=d;best=p;}}
+    if(best&&distance<230)AddRootEnergy(board,best,RootEnergySource::ScrapCore);
+}
+int ActivateNetwork(Board* board,int col,int row){
+    if(!board)return 0;Plant* hub=nullptr;for(auto* p:board->mPlants)if(Alive(p)&&p->mPlantCol==col&&p->mRow==row&&IsHub(p)){hub=p;break;}if(!hub)return 0;
+    const auto result=TriggerRootResonance(board,hub);
+    if(result==RootTriggerResult::Fired)return 1;
+    if(result==RootTriggerResult::Paused)return -3;
+    if(result==RootTriggerResult::NotFull&&RootNetwork(hub).jammed)return -2;
+    return -1;
+}
+int NetworkCharge(const Plant* relay){return RootNetwork(relay).charge;}
+void AdjustScale(const Plant*,float&,float&,float&,float&){}
+void AdjustShadow(const Plant*,float&,float&,float&){}
+float ShotScale(const Projectile* p){auto i=shots.find(p);return i==shots.end()?1.0f:i->second.id==106?1.15f:1.0f;}
 bool HasShot(const Projectile* p){return shots.contains(p);}
-int ShotRadius(const Projectile* p){auto it=shots.find(p);return it==shots.end()?12:std::max(5,int(SandboxVisualRules::Shots[Art(p,it->second.id)].h*0.45f));}
-int NextShot(Plant* p){
- if(!gSandboxEnabled)return 0;auto it=states.find(p);if(it==states.end())return 0;
- const auto e=ShotElement(it->second.id,it->second.shots++);return e==Element::Ice?1:e==Element::Fire?2:0;
-}
+int ShotRadius(const Projectile* p){auto i=shots.find(p);return i==shots.end()?12:SandboxVisualRules::TechShotRadius(i->second.id);}
+int NextShot(Plant*){return 0;}
 void OnFired(Plant* p,Projectile* shot,Zombie* target){
- if(!gSandboxEnabled)return;auto* d=Find(Type(p));if(!d)return;
- shots[shot]={d->id,d->damage};
- float mx,my;
- if(Muzzle(p,shot->mRow,mx,my)){
-  shot->mPosX=mx-SandboxVisualRules::PeaCenter;
-  shot->mPosY=my-SandboxVisualRules::PeaCenter-shot->mPosZ;
- }else if(d->scale!=1){
-  shot->mPosX=p->mX+SandboxVisualRules::GroundX+(shot->mPosX-p->mX-SandboxVisualRules::GroundX)*d->scale;
-  shot->mPosY=p->mY+SandboxVisualRules::GroundY+(shot->mPosY-p->mY-SandboxVisualRules::GroundY)*d->scale;
- }
- shot->mX=int(shot->mPosX);shot->mY=int(shot->mPosY+shot->mPosZ);
- EffectAt(shot->mPosX+12,shot->mPosY+shot->mPosZ+12,p->mRow,Art(shot,d->id),true);
- if(d->id==116&&target){shot->mMotionType=MOTION_HOMING;shot->mTargetZombieID=p->mBoard->ZombieGetID(target);shot->mVelX=3.0f;}
- if(d->id==114){shot->mMotionType=MOTION_STAR;shot->mVelX=2.2f;shot->mVelY=0;}
- if(d->id==115){
-  for(int dy:{-1,1}){
-   const int row=p->mRow+dy;if(row<0||row>=(p->mBoard->StageHasPool()?6:5))continue;
-   auto* extra=p->mBoard->AddProjectile(shot->mPosX,shot->mPosY,shot->mRenderOrder,row,PROJECTILE_PEA);
-   extra->mDamageRangeFlags=shot->mDamageRangeFlags;extra->mMotionType=MOTION_THREEPEATER;extra->mVelY=dy*3.0f;extra->mShadowY-=dy*80.0f;
-   shots[extra]={115,d->damage};
-  }
- }
+    if(!gSandboxEnabled||!p||!shot)return;const auto* d=Find(Type(p));if(!d||d->role==Role::Prism||d->role==Role::Relay||d->role==Role::Repair)return;
+    const bool powered=IsResonating(p);const int damage=d->damage+(powered?6:0);AddShot(shot,p,d->id,damage,powered);float mx=shot->mPosX+12,my=shot->mPosY+12;
+    if(Muzzle(p,shot->mRow,mx,my)){shot->mPosX=mx-SandboxVisualRules::PeaCenter;shot->mPosY=my-SandboxVisualRules::PeaCenter-shot->mPosZ;}
+    shot->mX=int(shot->mPosX);shot->mY=int(shot->mPosY+shot->mPosZ);EffectAt(shot->mPosX+12,shot->mPosY+shot->mPosZ+12,p->mRow,d->id,true);
+    if(d->role==Role::Scout&&target){shot->mMotionType=MOTION_HOMING;shot->mTargetZombieID=p->mBoard->ZombieGetID(target);shot->mVelX=3.1f;}
+    if(d->role==Role::Shooter&&powered)for(int extra=0;extra<2&&p->mBoard->mProjectiles.mSize<p->mBoard->mProjectiles.mMaxSize-8;++extra){
+        auto* clone=p->mBoard->AddProjectile(shot->mPosX-extra*7,shot->mPosY+(extra?4:-4),shot->mRenderOrder,shot->mRow,PROJECTILE_PEA);
+        if(clone){clone->mDamageRangeFlags=shot->mDamageRangeFlags;clone->mVelX=3.3f+extra*.25f;AddShot(clone,p,d->id,damage,true);}
+    }
 }
 void UpdateShot(Projectile* p){
- auto it=shots.find(p);if(it==shots.end()||p->mDead)return;
- if(it->second.id==111&&p->mPosX>it->second.limit){p->Die();return;}
- if(it->second.id!=116)return;
- auto* current=p->mBoard->ZombieTryToGet(p->mTargetZombieID);
- if(current&&Enemy(current))return;
- Zombie* best=nullptr;float distance=100000;
- for(auto* z:p->mBoard->mZombies)if(Enemy(z)&&z->EffectedByDamage(p->mDamageRangeFlags)){
-  const float d=std::abs(z->mPosX-p->mPosX)+std::abs(z->mPosY-p->mPosY);
-  if(d<distance){distance=d;best=z;}
- }
- if(best)p->mTargetZombieID=p->mBoard->ZombieGetID(best);
- else {p->mMotionType=MOTION_STRAIGHT;p->mVelX=3.3f;p->mVelY=0;}
+    auto i=shots.find(p);if(i==shots.end()||p->mDead)return;if(SandboxZombies::Intercept(p)){p->Die();return;}if(i->second.id!=107)return;
+    auto* current=p->mBoard->ZombieTryToGet(p->mTargetZombieID);if(current&&Enemy(current))return;Zombie* best=nullptr;float distance=100000;
+    for(auto* z:p->mBoard->mZombies)if(Enemy(z)&&z->EffectedByDamage(p->mDamageRangeFlags)){const float d=std::abs(z->mPosX-p->mPosX)+std::abs(z->mPosY-p->mPosY);if(d<distance){distance=d;best=z;}}
+    if(best)p->mTargetZombieID=p->mBoard->ZombieGetID(best);else{p->mMotionType=MOTION_STRAIGHT;p->mVelX=3.3f;p->mVelY=0;}
 }
 bool Impact(Projectile* p,Zombie* target){
- auto it=shots.find(p);if(it==shots.end())return false;
- const auto shot=it->second;
- EffectAt(p->mPosX+12,p->mPosY+p->mPosZ+12,target?target->mRow:p->mRow,Art(p,shot.id));
- // The original eight keep their native fire splash / ice slow combat, only their artwork changes.
- if(shot.id<112&&shot.id!=111)return false;
- if(!target)return true;
- if(shot.id==112||shot.id==111){
-  std::vector<ZombieID> hit;Zombie* from=target;int damage=shot.damage;
-  for(int hop=0;hop<shot.hops&&from;++hop){
-   hit.push_back(p->mBoard->ZombieGetID(from));
-   const float x=from->mPosX+55,y=from->mPosY+55;
-   if(!SandboxZombies::ElectricHit(from))from->TakeDamage(damage,p->GetDamageFlags(from));
-   Zombie* next=nullptr;float distance=150;
-   for(auto* z:p->mBoard->mZombies)if(Enemy(z)&&z->EffectedByDamage(p->mDamageRangeFlags)&&std::find(hit.begin(),hit.end(),p->mBoard->ZombieGetID(z))==hit.end()){
-    float d=std::hypot(z->mPosX+55-x,z->mPosY+55-y);if(d<distance){distance=d;next=z;}
-   }
-   if(next&&hop+1<shot.hops)beams.push_back({x,y,next->mPosX+55,next->mPosY+55,16,true,from->mRow});
-   from=next;damage=std::max(5,damage-6);
-  }
- }else{
-  target->TakeDamage(shot.damage,p->GetDamageFlags(target));
-  if(shot.id==114&&Enemy(target)&&target->mZombieType!=ZOMBIE_GARGANTUAR&&target->mZombieType!=ZOMBIE_REDEYE_GARGANTUAR&&target->mZombieType!=ZOMBIE_ZAMBONI){
-   target->mPosX=std::min(850.0f,target->mPosX+35);target->UpdateReanim();
-  }
-  if(shot.id==117&&Enemy(target))poison[p->mBoard->ZombieGetID(target)]=SandboxCombatRules::PoisonDuration;
- }
- return true;
+    auto i=shots.find(p);if(i==shots.end())return false;const auto shot=i->second;EffectAt(p->mPosX+12,p->mPosY+p->mPosZ+12,target?target->mRow:p->mRow,shot.id);if(!target)return true;
+    if(shot.id==104){
+        std::vector<ZombieID> hit;Zombie* from=target;int damage=shot.damage;
+        for(int hop=0;hop<shot.hops&&from;++hop){
+            hit.push_back(p->mBoard->ZombieGetID(from));if(!SandboxZombies::ArcHit(from,damage))DirectDamage(shot.source,from,damage);
+            Zombie* next=nullptr;float distance=150;const float x=from->mPosX+55,y=from->mPosY+55;
+            for(auto* z:p->mBoard->mZombies)if(Enemy(z)&&z->EffectedByDamage(p->mDamageRangeFlags)&&std::find(hit.begin(),hit.end(),p->mBoard->ZombieGetID(z))==hit.end()){
+                const float d=std::hypot(z->mPosX+55-x,z->mPosY+55-y);if(d<distance){distance=d;next=z;}}
+            if(next&&hop+1<shot.hops)beams.push_back({x,y,next->mPosX+55,next->mPosY+55,16,from->mRow,0});from=next;damage=std::max(6,damage-4);
+        }
+    }else if(shot.id==105){
+        if(target->mHelmHealth>0)target->mHelmHealth=std::max(0,target->mHelmHealth-(shot.powered?65:38));DirectDamage(shot.source,target,shot.damage);
+    }else{DirectDamage(shot.source,target,shot.damage);if(shot.id==106)SandboxZombies::ApplyResin(target,shot.powered?300:180);}
+    return true;
 }
-void Tick(Board* b){
- if(b->mPaused)return;
- for(auto it=beams.begin();it!=beams.end();)if(--it->ticks<=0)it=beams.erase(it);else ++it;
- for(auto it=effects.begin();it!=effects.end();)if(--it->ticks<=0)it=effects.erase(it);else ++it;
- for(auto it=poison.begin();it!=poison.end();){
-  auto* z=b->ZombieTryToGet(it->first);
-  if(!z||!Enemy(z)||it->second<=0){it=poison.erase(it);continue;}
-  if(SandboxCombatRules::PoisonPulse(it->second))z->TakeDamage(SandboxCombatRules::PoisonDamage,0);
-  --it->second;++it;
- }
- for(auto* p:b->mPlants){
-  if(p->mDead){Forget(p);continue;}auto it=states.find(p);if(it==states.end())continue;auto& s=it->second;
-  const bool closed=p->mBlinkCountdown>0&&p->mBlinkCountdown<=8&&p->mShootingCounter==0;
-  if(closed!=s.closed||s.health!=p->mPlantHealth){s.closed=closed;SkinPlant(p,s);}
-  s.health=p->mPlantHealth;
-  if(p->mIsAsleep)continue;++s.age;
-  const bool inkDelay=SandboxZombies::AttackSlowed(p)&&b->mMainCounter%3==0;
-  if(s.cooldown>0&&!inkDelay)--s.cooldown;
-  if(s.id==108){
-   p->mLaunchCounter=9999;
-   if(s.echo>=0){if(SandboxCombatRules::EchoPulse(s.echo))Pulse(b,p);--s.echo;}
-   if(s.echo<0&&s.age%240==0&&p->FindTargetZombie(p->mRow,WEAPON_PRIMARY))s.echo=SandboxCombatRules::EchoDelay;
-  }
-  if(s.id==111){
-   p->mLaunchCounter=9999;
-   const int stage=SandboxCombatRules::GrowthStage(s.age);
-   if(stage!=s.stage){s.stage=stage;SkinPlant(p,s);EffectAt(p->mX+40,p->mY+30,p->mRow,2);}
-   Zombie* target=nullptr;float distance=SandboxCombatRules::GrowthRange(stage);
-   for(auto* z:b->mZombies)if(Enemy(z)&&z->mRow==p->mRow&&z->EffectedByDamage(p->GetDamageRangeFlags(WEAPON_PRIMARY))){
-    const float d=z->mPosX+55-(p->mX+40);if(d>=0&&d<distance){distance=d;target=z;}
-   }
-   if(!target){s.charge=0;continue;}
-   if(s.cooldown==0&&s.charge==0)s.charge=25;
-   if(s.charge>0&&!inkDelay&&--s.charge==0){
-    if(b->mProjectiles.mSize>=b->mProjectiles.mMaxSize-8){s.cooldown=30;continue;}
-    float x=p->mX+40,y=p->mY+20;PlantPoint(p,"PuffShroom_head",81,53,x,y);
-    auto* shot=b->AddProjectile(x-12,y-12,p->mRenderOrder,p->mRow,PROJECTILE_PEA);
-    if(shot){
-     shot->mDamageRangeFlags=p->GetDamageRangeFlags(WEAPON_PRIMARY);
-     shots[shot]={111,SandboxCombatRules::GrowthDamage(stage),stage==2?3:1,float(p->mX+40+SandboxCombatRules::GrowthRange(stage))};
-     EffectAt(x,y,p->mRow,2,true);
+void Tick(Board* board){
+    if(!board||board->mPaused)return;for(auto it=beams.begin();it!=beams.end();)if(--it->ticks<=0)it=beams.erase(it);else ++it;for(auto it=effects.begin();it!=effects.end();)if(--it->ticks<=0)it=effects.erase(it);else ++it;
+    for(auto it=states.begin();it!=states.end();){
+        Plant* p=const_cast<Plant*>(it->first);if(!Alive(p)){it=states.erase(it);continue;}auto& s=it->second;++s.age;
+        const bool closed=p->mBlinkCountdown>0&&p->mBlinkCountdown<=8&&p->mShootingCounter==0;if(closed!=s.closed||s.health!=p->mPlantHealth){s.closed=closed;SkinPlant(p,s);}s.health=p->mPlantHealth;if(s.severed>0)--s.severed;++it;
     }
-    s.cooldown=SandboxCombatRules::GrowthRate(stage);
-   }
-  }
- }
- // Auras are evaluated once per recipient, so surrounding it with flowers cannot stack infinitely.
- for(auto* p:b->mPlants)if(!p->mDead&&!p->mIsAsleep&&p->mLaunchCounter>1&&GetPlantDefinition(p->mSeedType).mSubClass==SUBCLASS_SHOOTER){
-  bool buff=false;
-  for(const auto& [source,s]:states)if(s.id==110&&!source->mDead&&!source->mIsAsleep&&std::abs(source->mRow-p->mRow)<=1&&std::abs(source->mPlantCol-p->mPlantCol)<=1&&source!=p){buff=true;break;}
-  if(buff&&b->mMainCounter%2==0&&SandboxCombatRules::CanHaste(p->mLaunchCounter))--p->mLaunchCounter;
- }
+    RebuildRootNetworks(board);
+    for(auto& net:networks){
+        auto h=states.find(net.hub);if(h==states.end())continue;auto& hub=h->second;if(hub.resonance>0)--hub.resonance;
+        int generators=0;for(auto* p:net.members)if(Type(p)==100)++generators;
+        if(!net.jammed&&net.members.size()>1&&generators>0&&hub.age%210==0)hub.charge=std::min(kMaxCharge,hub.charge+generators);
+        if(hub.resonance>0)for(auto* p:net.members){auto s=states.find(p);if(s==states.end())continue;
+            if((s->second.id==101||s->second.id==104||s->second.id==105||s->second.id==106||s->second.id==107)&&p->mLaunchCounter>1&&board->mMainCounter%2==0)--p->mLaunchCounter;
+            if(s->second.id==102&&board->mMainCounter%24==0)p->mPlantHealth=std::min(p->mPlantMaxHealth,p->mPlantHealth+18);
+        }
+    }
+    for(auto& [raw,s]:states){
+        auto* p=const_cast<Plant*>(raw);if(!Alive(p)||p->mIsAsleep)continue;
+        if(s.id==102){
+            if(s.cooldown>0)--s.cooldown;if(s.cooldown==0)for(auto* z:board->mZombies)if(Enemy(z)&&z->mRow==p->mRow&&z->mPosX>p->mX-6&&z->mPosX<p->mX+105){DirectDamage(p,z,IsResonating(p)?38:18);s.cooldown=90;EffectAt(p->mX+45,p->mY+48,p->mRow,4);break;}
+        }else if(s.id==108){
+            p->mLaunchCounter=9999;if(s.cooldown>0)--s.cooldown;Zombie* target=nullptr;for(auto* z:board->mZombies)if(Enemy(z)&&z->mRow==p->mRow&&z->mPosX>p->mX){target=z;break;}
+            if(target&&s.cooldown==0){float x=p->mX+48,y=p->mY+32;Muzzle(p,p->mRow,x,y);beams.push_back({x,y,780,y,26,p->mRow,1});const int damage=IsResonating(p)?68:36;for(auto* z:board->mZombies)if(Enemy(z)&&z->mRow==p->mRow&&z->mPosX>=x)DirectDamage(p,z,damage);s.cooldown=IsResonating(p)?180:310;EffectAt(x,y,p->mRow,8,true);}
+        }else if(s.id==109){
+            p->mLaunchCounter=9999;if(s.age%150==0)for(auto* other:Nearby(board,p)){other->mPlantHealth=std::min(other->mPlantMaxHealth,other->mPlantHealth+35);RepairRootCable(board,p,other);}
+        }else if(s.id==103)p->mLaunchCounter=9999;
+    }
 }
-void DrawEffects(Sexy::Graphics* graphics,Board* b,int row){
- Sexy::Graphics clipped(*graphics);clipped.ClipRect(0,82,800,518);auto* g=&clipped;
- for(const auto& beam:beams)if(beam.row==row){
-  if(beam.electric)SandboxArt::Link(g,beam.x1,beam.y1,beam.x2,beam.y2,b->mMainCounter/4,std::min(230,beam.ticks*25));
-  else {const float t=1-beam.ticks/36.0f,x=beam.x1+(beam.x2-beam.x1)*t;
-   SandboxArt::Sprite(g,(b->mMainCounter/5)%2?"sonic-1":"sonic-0",x,beam.y1,20,42,0,std::min(220,beam.ticks*25));
-  }
- }
- for(const auto& e:effects)if(e.row==row){
-  const int age=(e.muzzle?10:18)-e.ticks;const float grow=e.muzzle?1:0.7f+age/36.0f;
-  if(e.art==8)SandboxArt::Sprite(g,age<8?"spring-0":"spring-1",e.x,e.y,44*grow,27*grow,0,std::min(230,e.ticks*30));
-  else {const auto& a=SandboxVisualRules::Shots[e.art];
-   const char* file=e.muzzle?(e.art==1||e.art==2?"muzzle-ice":"muzzle-warm"):age<8?a.hit0:a.hit1;
-   const float size=e.muzzle?(e.art==3?11:18):a.impact*grow;
-   SandboxArt::Sprite(g,file,e.x,e.y,size,size,0,std::min(240,e.ticks*35));
-  }
- }
- for(const auto& [p,s]:states)if(!p->mDead&&!p->mIsAsleep&&p->mRow==row&&s.id==111&&s.charge>0){
-  float x=p->mX+40,y=p->mY+20;PlantPoint(p,"PuffShroom_head",81,53,x,y);
-  const float size=12+(25-s.charge)*0.7f;
-  SandboxArt::Sprite(g,"charge",x,y,size,size,0,190);
- }
- for(const auto& [p,s]:states)if(s.id==110&&!p->mDead&&!p->mIsAsleep&&p->mRow==row&&s.age%100<45){
-  float x=p->mX+40,y=p->mY+20;PlantPoint(p,"anim_idle",57,43,x,y);
-  SandboxArt::Sprite(g,"notes",x+24,y-15-(s.age%100)*0.3f,15,19,0,160);
- }
- for(auto [id,time]:poison)if(auto* z=b->ZombieTryToGet(id);z&&Enemy(z)&&z->mRow==row)
-  SandboxArt::Sprite(g,"poison",z->mPosX+42,z->mPosY+40-(b->mMainCounter%40)*0.25f,15,20,0,170);
+void DrawEffects(Sexy::Graphics* graphics,Board* board,int row){
+    Sexy::Graphics clipped(*graphics);clipped.ClipRect(0,82,800,518);auto* g=&clipped;
+    for(const auto& net:networks){
+        auto h=states.find(net.hub);if(h==states.end()||net.hub->mRow!=row)continue;const auto& s=h->second;
+        for(size_t i=1;i<net.members.size();++i){auto* p=net.members[i];auto* nearest=net.hub;int best=999;for(size_t j=0;j<i;++j){auto* q=net.members[j];const int d=std::abs(p->mPlantCol-q->mPlantCol)+std::abs(p->mRow-q->mRow);if(d<best){best=d;nearest=q;}}if(p->mRow==row||nearest->mRow==row)SandboxArt::Link(g,nearest->mX+42,nearest->mY+60,p->mX+42,p->mY+60,board->mMainCounter/8,net.jammed?80:s.resonance>0?220:120);}
+        const int lit=std::clamp(s.charge,0,kMaxCharge);for(int i=0;i<kMaxCharge;++i)SandboxArt::Sprite(g,i<lit?"root-charge-on":"root-charge-off",net.hub->mX+29+i*13,net.hub->mY+20,10,10,0,s.resonance>0?255:190);
+        if(s.resonance>0)SandboxArt::Sprite(g,"root-resonance",net.hub->mX+42,net.hub->mY+42,54,54,0,std::min(230,s.resonance*2));
+    }
+    for(const auto& beam:beams)if(beam.row==row){if(beam.kind==0)SandboxArt::Link(g,beam.x1,beam.y1,beam.x2,beam.y2,board->mMainCounter/4,std::min(230,beam.ticks*25));else SandboxArt::Sprite(g,"prism-beam",(beam.x1+beam.x2)*.5f,beam.y1,std::abs(beam.x2-beam.x1),18,0,std::min(230,beam.ticks*20));}
+    for(const auto& e:effects)if(e.row==row){const int age=(e.muzzle?10:18)-e.ticks;const float grow=e.muzzle?1:0.7f+age/36.0f;
+        if(e.kind==5)SandboxArt::Sprite(g,"root-resonance",e.x,e.y,58*grow,58*grow,0,std::min(240,e.ticks*30));else if(e.kind==8)SandboxArt::Sprite(g,"prism-muzzle",e.x,e.y,24,22,0,std::min(240,e.ticks*30));else if(e.kind==4)SandboxArt::Sprite(g,"thorn-hit",e.x,e.y,36*grow,32*grow,0,std::min(230,e.ticks*25));else if(e.muzzle)SandboxArt::Sprite(g,"tech-muzzle",e.x,e.y,20,16,0,std::min(230,e.ticks*30));else SandboxArt::Sprite(g,ImpactArt(e.kind,age>=8?0:1),e.x,e.y,36*grow,36*grow,0,std::min(230,e.ticks*25));}
 }
 bool DrawShot(Sexy::Graphics* g,const Projectile* p){
- const auto it=shots.find(p);if(it==shots.end())return false;
- const auto& a=SandboxVisualRules::Shots[Art(p,it->second.id)];
- const float angle=p->mMotionType==MOTION_HOMING?std::atan2(p->mVelY,p->mVelX):0;
- const float ox=a.w*0.5f-a.coreX,oy=a.h*0.5f-a.coreY,c=std::cos(angle),s=std::sin(angle);
- // Core center stays at the native pea's collision center even when the drawn tail is asymmetric.
- SandboxArt::Sprite(g,a.sprite,p->mPosX-p->mX+12+c*ox-s*oy,p->mPosY+p->mPosZ-p->mY+12+s*ox+c*oy,a.w,a.h,angle);
- return true;
+    auto i=shots.find(p);if(i==shots.end())return false;const auto& shot=i->second;const float angle=p->mMotionType==MOTION_HOMING?std::atan2(p->mVelY,p->mVelX):0;const float size=shot.id==106?28:shot.id==107?23:shot.id==104?25:22;
+    SandboxArt::Sprite(g,ProjectileArt(shot.id),p->mPosX-p->mX+12,p->mPosY+p->mPosZ-p->mY+12,size,size,angle,shot.powered?255:225);return true;
+}
+Sexy::MemoryImage* Card(int id){
+    auto& cached=cards[id];if(cached)return cached.get();const auto* d=Find(id);if(!d)return nullptr;cached=gLawnApp->mReanimatorCache->MakeBlankMemoryImage(180,180);Sexy::Graphics g(cached.get());g.SetLinearBlend(true);
+    Reanimation a;a.ReanimationInitializeType(40,40,GetPlantDefinition(static_cast<SeedType>(d->base)).mReanimationType);for(const char* layer:{"anim_idle","anim_face","anim_head_idle","anim_head_idle1","anim_head_idle2","anim_head_idle3"})if(a.TrackExists(layer)){a.SetFramesForLayer(layer);Skin(&a,id,false,4000);a.Draw(&g);}return cached.get();
 }
 void DrawCard(Sexy::Graphics* g,int x,int y,int id){
- const auto* d=Find(id);
- if(!d){DrawSeedPacket(g,x,y,static_cast<SeedType>(id),SEED_NONE,0,255,false,false);return;}
- PvzpDrawImageCelScaledF(g,Sexy::IMAGE_SEEDS,x,y,2,0,1,1);
- Sexy::Graphics clip(*g);clip.SetClipRect(x+3,y+9,44,48);
- SandboxArt::DrawFit(&clip,Card(id),x+4,y+10,42,44,d->id==113?0.82f:1.0f);
- PvzpDrawString(g,"0",x+25,y+65,Sexy::FONT_BRIANNETOD12,Sexy::Color(55,64,23),DS_ALIGN_CENTER);
+    const auto* d=Find(id);if(!d){DrawSeedPacket(g,x,y,static_cast<SeedType>(id),SEED_NONE,0,255,false,false);return;}PvzpDrawImageCelScaledF(g,Sexy::IMAGE_SEEDS,x,y,2,0,1,1);Sexy::Graphics clip(*g);clip.SetClipRect(x+3,y+9,44,48);SandboxArt::DrawFit(&clip,Card(id),x+4,y+10,42,44,1.0f);PvzpDrawString(g,"0",x+25,y+65,Sexy::FONT_BRIANNETOD12,Sexy::Color(55,64,23),DS_ALIGN_CENTER);
 }
 }

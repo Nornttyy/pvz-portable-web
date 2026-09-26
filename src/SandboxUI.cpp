@@ -114,7 +114,7 @@ void Portrait(Graphics* g, Box b, int type) {
 }
 std::string SelectedName() {
     if(tool==EraseTool)return "铲除";
-    if(tool==InteractTool)return "操作场地";
+    if(tool==InteractTool)return "根网共振";
     if(tool==PlantTool){const auto* custom=SandboxPlants::Find(selectedPlant);return custom?custom->name:Plant::GetNameString(static_cast<SeedType>(selectedPlant));}
     if(auto* custom=SandboxZombies::Find(selectedZombie))return custom->name;
     return std::string(PvzpStringTranslate(std::string("[")+GetZombieDefinition(static_cast<ZombieType>(selectedZombie)).mZombieName+"]"));
@@ -161,8 +161,10 @@ void Action(int index) {
 void SandboxUIReset() {
     SandboxUIDetach();
     panel=0;plantPage=0;catalog=2;catalogPage=0;tool=PlantTool;painting=false;dirty=false;wasPaused=true;
-    selectedPlant=0;selectedZombie=0;plantSlot=0;lastCell=-1;lastPlantCount=0;messageTicks=0;
-    plants={0,1,2,3,5,7};
+    selectedPlant=100;selectedZombie=0;plantSlot=0;lastCell=-1;lastPlantCount=0;messageTicks=0;
+    // Put a complete starter root circuit in reach without hiding it in a
+    // separate menu: generator → shooter → relay, plus counterplay tools.
+    plants={100,101,103,104,106,109};
     StopPainting();
     PvzpLoadResources("DelayLoad_Almanac");
     SandboxRepairFonts();
@@ -215,7 +217,7 @@ void SandboxDrawUI(Graphics* g) {
     Button(g,Control(2),"菜单",panel==3);
     Button(g,Control(3),flags&2?"开始":"暂停");
     Button(g,Control(4),std::format("{}x",static_cast<int>(gLawnApp->mUpdateMultiplier)));
-    Button(g,Control(5),"每路一只");
+    Button(g,Control(5),"根网共振",tool==InteractTool);
     Button(g,Control(6),flags&32?"连放：开":"连放：关",flags&32);
     Button(g,Control(7),flags&16?"同格：开":"同格：关",flags&16);
 
@@ -263,7 +265,7 @@ void SandboxDrawUI(Graphics* g) {
     // Only the settings menu is modal. Browsing plants/zombies never pauses or hides the lawn.
     g->SetColor(Color(0,0,0,125));g->FillRect(SidebarWidth,80,CanvasWidth-SidebarWidth,520);
     g->DrawImage(IMAGE_SEEDCHOOSER_BACKGROUND,Panel.x,Panel.y);
-    const std::array<std::string,14> labels{"白天草地","白天泳池","清除僵尸","清空场地","保存阵型","读取阵型","导出阵型","导入阵型",flags&8?"蘑菇免唤醒":"蘑菇正常睡眠","单步","每路一只","操作场地","全屏","返回主菜单"};
+    const std::array<std::string,14> labels{"白天草地","白天泳池","清除僵尸","清空场地","保存阵型","读取阵型","导出阵型","导入阵型",flags&8?"蘑菇免唤醒":"蘑菇正常睡眠","单步","每路一只","根网共振","全屏","返回主菜单"};
     for(int i=0;i<14;++i)Button(g,MenuAction(i),labels[i],i==(flags&4?1:0));
     PvzpDrawString(g,std::format("植物 {}   僵尸 {}   越界 {}",Command(9),Command(10),Command(14)),624,504,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
     if(messageTicks>0)PvzpDrawString(g,message,624,531,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
@@ -278,7 +280,7 @@ bool SandboxMouseDown(int x,int y,int clicks) {
     if(clicks<0){
         StopPainting();
         if(panel)ClosePanel();
-        else if(tool==InteractTool&&x>=SidebarWidth&&y>=80)return false;
+        else if(tool==InteractTool&&x>=SidebarWidth&&y>=80)return true;
         else if(x>=SidebarWidth)Place(Cell(x-WorldOffset,y,bool(flags&4)),true);
         return true;
     }
@@ -294,7 +296,7 @@ bool SandboxMouseDown(int x,int y,int clicks) {
         else if(i==2)OpenPanel(3);
         else if(i==3)Command(4,flags&2?0:1);
         else if(i==4){int speed=static_cast<int>(gLawnApp->mUpdateMultiplier);Command(5,speed==4?1:speed*2);}
-        else if(i==5)Command(11,selectedZombie);
+        else if(i==5){tool=InteractTool;Say("点按充满的菌缆菇");}
         else if(i==6){Command(20,flags&32?0:1);if(!(flags&32))Say("按住连续放置，拖动换位置，松手停止");}
         else {Command(19,flags&16?0:1);dirty=true;if(!(flags&16))Say("同一格可种多株，铲子每次移除一株");}
         return true;
@@ -324,7 +326,17 @@ bool SandboxMouseDown(int x,int y,int clicks) {
         return true;
     }
     if(y<80)return true;
-    if(tool==InteractTool)return false;
+    if(tool==InteractTool){
+        const int cell=Cell(x-WorldOffset,y,bool(flags&4));
+        if(cell<0)return true;
+        const int result=Command(21,0,cell%9,cell/9);
+        if(result==1)Say("根网已共振");
+        else if(result==-2)Say("干扰天线压制了根网");
+        else if(result==-3)Say("开始后才能启动共振");
+        else if(result==-1)Say("根网需要三格能量");
+        else Say("这里没有菌缆菇");
+        return true;
+    }
     StopPainting();lastCell=Cell(x-WorldOffset,y,bool(flags&4));
     if(Place(lastCell)){
         painting=tool==PlantTool||tool==EraseTool;
@@ -336,7 +348,7 @@ bool SandboxMouseDrag(int x,int y) {
     if(!gSandboxEnabled)return false;
     RepeatZombieAt(x,y);
     if(panel||x<SidebarWidth||y<80)return true;
-    if(tool==InteractTool)return false;
+    if(tool==InteractTool)return true;
     const int cell=Cell(x-WorldOffset,y,bool(Command(0)&4));
     if(painting&&cell>=0&&cell!=lastCell){lastCell=cell;Place(cell);}
     return true;
@@ -344,7 +356,7 @@ bool SandboxMouseDrag(int x,int y) {
 bool SandboxMouseUp() {
     if(!gSandboxEnabled)return false;
     StopPainting();
-    return panel||tool!=InteractTool;
+    return true;
 }
 void SandboxKeyDown(int key) {
     StopPainting();

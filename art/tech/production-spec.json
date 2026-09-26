@@ -1,0 +1,228 @@
+{
+  "schema": "tech-garden-production-v1",
+  "theme": "科技花园：活体植物与破旧回收机械",
+  "style": {
+    "rendering": "low-resolution hand-painted cartoon, irregular soft ink outline, 3-5 flat colour ramps, no photorealism, no 3D render, no copied or recoloured legacy sprites",
+    "palette": ["leaf green", "amber resin", "pulse cyan", "violet arc", "rust red", "soft soot"],
+    "scale": "match native lawn baseline and card silhouette; validate at 1x, 1.5x and 2x",
+    "files": "transparent RGBA PNG; one rig piece per file; use art/tech/<slug>/<part>-<state>.png"
+  },
+  "rig_contract": {
+    "plant_common": ["body", "head", "face-blink", "stem", "leaf-back", "leaf-front", "mouth-or-tool", "shadow"],
+    "zombie_common": ["body", "head", "jaw", "inner-upper-arm", "inner-lower-arm", "outer-upper-arm", "outer-lower-arm", "hand", "equipment", "shadow"],
+    "mouth_rule": "Every shooter owns a dedicated living nozzle, maw, aperture or tool-end. When a borrowed native mouth pivot visibly separates in firing frames, the tool-end remains integrated with the complete custom head while independently drawn muzzle, projectile and impact layers carry the attack; it is never a recoloured legacy sprite.",
+    "damage_rule": "Every unit supplies normal, damage1 and damage2 body states. Armour supplies armor, armor-damage1, armor-damage2 and detached-armor. Damage follows its construction with cracks, wilt, smoke or loose screws rather than a tint overlay.",
+    "layer_order": "back appendages > body > head/face > mouth-or-tool > arms/equipment > foreground sparks/projectile"
+  },
+  "mechanic": {
+    "name": "根网共振",
+    "visual": ["root-link-idle", "root-charge-1", "root-charge-2", "root-charge-3", "root-resonance", "root-sever", "root-repair", "jam-wave"],
+    "readability": "Cablecap owns the hub ring; adjacent tech plants show a subtle living cable only while linked. Three filled cells pulse amber/cyan before manual activation. Jammer desaturates the cable, hook leaves a dangling broken end, repair moss stitches it with a leaf-green spark."
+  },
+  "plants": [
+    {
+      "id": 100,
+      "slug": "sunwheel",
+      "name": "日轮花",
+      "personality": "好奇的太阳花带着花瓣式小型集热盘，像会转头找光的园艺仪器，而非机械炮塔。",
+      "parts": ["petal-back", "body", "face-blink", "petal-front", "stem", "leaf-back", "leaf-front", "collector-disk", "charge-ring"],
+      "damage": ["body-normal", "body-damage1", "body-damage2", "collector-crack1", "collector-crack2"],
+      "projectiles": [],
+      "vfx": ["sunwheel-glint", "sunwheel-sun", "root-charge-source"]
+    },
+    {
+      "id": 101,
+      "slug": "pulse-pod",
+      "name": "脉芽荚",
+      "personality": "紧张又有节拍感的嫩芽荚，叶脉会一格一格亮起；圆润喉管从种荚前端自然长出。",
+      "parts": ["leaf-back", "stem", "head", "face-blink", "mouth-closed", "mouth-open", "leaf-front", "pulse-vein"],
+      "damage": ["body-normal", "body-damage1", "body-damage2"],
+      "projectiles": ["pulse-seed", "pulse-seed-resonant"],
+      "vfx": ["pulse-muzzle", "pulse-hit", "pulse-triple"]
+    },
+    {
+      "id": 102,
+      "slug": "thornshell",
+      "name": "棘壳蕨",
+      "personality": "缩在卷叶壳里的沉稳小蕨，壳边天然长出纤维尖刺，受击时会缩紧再反刺。",
+      "parts": ["root-back", "shell-back", "body", "face-blink", "shell-front", "thorn-cluster", "leaf-front"],
+      "damage": ["body-normal", "body-damage1", "body-damage2", "shell-crack1", "shell-crack2"],
+      "projectiles": ["thorn-shard"],
+      "vfx": ["thorn-hit", "thorn-heal", "thorn-resonance"]
+    },
+    {
+      "id": 103,
+      "slug": "cable-cap",
+      "name": "菌缆菇",
+      "personality": "圆帽菌菇像一位安静的接线员，菌褶下垂出柔软菌丝线，不是硬塞在头上的电线。",
+      "parts": ["mycelium-back", "stem", "cap-back", "face-blink", "cap-front", "cable-left", "cable-right", "hub-ring"],
+      "damage": ["body-normal", "body-damage1", "body-damage2", "cable-fray1", "cable-fray2"],
+      "projectiles": [],
+      "vfx": ["hub-idle", "hub-full", "hub-trigger", "root-link-idle", "root-sever"]
+    },
+    {
+      "id": 104,
+      "slug": "arc-orchid",
+      "name": "弧苞兰",
+      "personality": "骄傲的兰花把三片花瓣张成绝缘罩，中央花蕊像会呼吸的弧光孔，攻击时三路分叉。",
+      "parts": ["leaf-back", "stem", "petal-back", "head", "face-blink", "aperture-closed", "aperture-open", "petal-front"],
+      "damage": ["body-normal", "body-damage1", "body-damage2", "petal-scorch1", "petal-scorch2"],
+      "projectiles": ["arc-bolt", "arc-chain"],
+      "vfx": ["arc-muzzle", "arc-hit", "arc-chain-hit"]
+    },
+    {
+      "id": 105,
+      "slug": "magnet-maw",
+      "name": "磁喉捕手",
+      "personality": "贪吃的捕蝇草有一副磁性咽喉，张嘴吸走护甲；磁环在上下颚之间转动，不能画成普通豌豆炮。",
+      "parts": ["leaf-back", "stem", "head", "face-blink", "upper-maw", "lower-maw", "magnet-ring", "leaf-front"],
+      "damage": ["body-normal", "body-damage1", "body-damage2", "magnet-scratch1", "magnet-scratch2"],
+      "projectiles": ["magnet-pull"],
+      "vfx": ["magnet-inhale", "armor-strip", "device-stagger"]
+    },
+    {
+      "id": 106,
+      "slug": "amber-gourd",
+      "name": "胶琥瓜",
+      "personality": "慢吞吞的南瓜把黏稠琥珀储在半透明瓜囊里，前唇像果皮裂口，喷胶时有明显挤压形变。",
+      "parts": ["vine-back", "body", "amber-sac", "face-blink", "nozzle-lip-closed", "nozzle-lip-open", "leaf-front"],
+      "damage": ["body-normal", "body-damage1", "body-damage2", "sac-crack1", "sac-crack2"],
+      "projectiles": ["resin-glob", "resin-splash"],
+      "vfx": ["resin-muzzle", "resin-hit", "resin-slow"]
+    },
+    {
+      "id": 107,
+      "slug": "scout-bloom",
+      "name": "巡芽花",
+      "personality": "活泼的小花像在张望，花心可左右转向；不是双头植物，追踪芽弹由独立的花心孔发出。",
+      "parts": ["leaf-back", "stem", "head", "face-blink", "eye-ring", "aim-aperture-closed", "aim-aperture-open", "leaf-front"],
+      "damage": ["body-normal", "body-damage1", "body-damage2"],
+      "projectiles": ["scout-bud", "scout-bud-turn"],
+      "vfx": ["scout-lock", "scout-muzzle", "scout-hit"]
+    },
+    {
+      "id": 108,
+      "slug": "prism-reed",
+      "name": "棱光芦苇",
+      "personality": "高挑寡言的芦苇把叶片折成三棱透镜，头顶只有可开合的晶孔，蓄光后射出细而清楚的整行光束。",
+      "parts": ["reed-back", "stem", "prism-head", "face-blink", "aperture-closed", "aperture-open", "reed-front", "lens-glint"],
+      "damage": ["body-normal", "body-damage1", "body-damage2", "lens-crack1", "lens-crack2"],
+      "projectiles": ["prism-beam-core", "prism-beam-tail"],
+      "vfx": ["prism-charge", "prism-muzzle", "prism-beam", "prism-hit"]
+    },
+    {
+      "id": 109,
+      "slug": "repair-moss",
+      "name": "修植苔",
+      "personality": "小团苔藓像带叶片围巾的园丁，伸出两根柔软孢子触手缝补根缆，表情专注而不拟人换皮。",
+      "parts": ["moss-back", "body", "face-blink", "tool-tendril-left", "tool-tendril-right", "moss-front", "leaf-patch"],
+      "damage": ["body-normal", "body-damage1", "body-damage2"],
+      "projectiles": ["repair-spore"],
+      "vfx": ["repair-cast", "repair-stitch", "repair-cleanse"]
+    }
+  ],
+  "zombies": [
+    {
+      "id": 200,
+      "slug": "leak-pack",
+      "name": "漏电背包僵尸",
+      "personality": "走路漏电的快递员，背包电芯摇晃、软线拖地，倒下时留下可回收废能芯。",
+      "parts": ["body", "head", "jaw", "arm-rig", "battery-pack-back", "battery-pack-front", "loose-cable", "core"],
+      "damage": ["body-normal", "body-damage1", "body-damage2", "pack-crack1", "pack-crack2"],
+      "projectiles": [],
+      "vfx": ["battery-spark", "core-drop", "core-pickup"]
+    },
+    {
+      "id": 201,
+      "slug": "weld-shield",
+      "name": "焊板盾僵尸",
+      "personality": "笨重的焊工把锯齿焊板当盾，板上有新旧焊点和手抓凹口，绝不是锥桶换皮。",
+      "parts": ["body", "head", "jaw", "arm-rig", "shield-back", "shield-front", "weld-visor"],
+      "damage": ["body-normal", "body-damage1", "body-damage2", "armor", "armor-damage1", "armor-damage2", "detached-armor"],
+      "projectiles": [],
+      "vfx": ["shield-block", "shield-spark", "shield-break"]
+    },
+    {
+      "id": 202,
+      "slug": "turbine-boot",
+      "name": "涡轮靴僵尸",
+      "personality": "急性子的邮差把两只风扇靴绑在小腿上，蓄力时身体前倾，过热时吐烟，双腿必须独立。",
+      "parts": ["body", "head", "jaw", "arm-rig", "leg-left", "leg-right", "boot-left", "boot-right", "turbine-left", "turbine-right"],
+      "damage": ["body-normal", "body-damage1", "body-damage2", "turbine-bent1", "turbine-bent2"],
+      "projectiles": [],
+      "vfx": ["turbine-charge", "turbine-dash", "turbine-overheat"]
+    },
+    {
+      "id": 203,
+      "slug": "cable-hook",
+      "name": "拖缆钩手",
+      "personality": "回收站钩手拖着可卷起的软缆，前臂是一只抓根网而非抓植物本体的弯钩。",
+      "parts": ["body", "head", "jaw", "inner-arm-rig", "winch-pack", "cable-coil", "cable-segment", "hook"],
+      "damage": ["body-normal", "body-damage1", "body-damage2", "winch-crack1", "winch-crack2"],
+      "projectiles": ["hook-line", "hook-tip"],
+      "vfx": ["hook-windup", "hook-cast", "hook-sever", "hook-recoil"]
+    },
+    {
+      "id": 204,
+      "slug": "wrench-tech",
+      "name": "扳手维修僵尸",
+      "personality": "瘦高维修员背着破铁桶工具箱，扳手敲击同伴护甲；桶、扳手和手腕均可动。",
+      "parts": ["body", "head", "jaw", "arm-rig", "toolbox-back", "bucket-armor", "wrench", "repair-arm"],
+      "damage": ["body-normal", "body-damage1", "body-damage2", "armor", "armor-damage1", "armor-damage2", "detached-armor"],
+      "projectiles": [],
+      "vfx": ["repair-windup", "repair-hit", "repair-spark", "bucket-break"]
+    },
+    {
+      "id": 205,
+      "slug": "bolt-thrower",
+      "name": "螺栓投手",
+      "personality": "冷静的投手用肩扛弹簧弩发射粗短螺栓，瞄准时会偏头；弩口与头分层、后坐分明。",
+      "parts": ["body", "head", "jaw", "arm-rig", "crossbow-back", "crossbow-front", "bowstring", "bolt-rack"],
+      "damage": ["body-normal", "body-damage1", "body-damage2", "crossbow-bend1", "crossbow-bend2"],
+      "projectiles": ["bolt", "bolt-broken"],
+      "vfx": ["bolt-aim", "bolt-muzzle", "bolt-trail", "bolt-hit"]
+    },
+    {
+      "id": 206,
+      "slug": "hover-drone",
+      "name": "嗡鸣浮空僵尸",
+      "personality": "被花园无人机吊着的慌张僵尸，浮盘环绕腰部，脚悬空摇摆，产生柔和向下气流。",
+      "parts": ["body", "head", "jaw", "arm-rig", "suspension-straps", "hover-ring-back", "hover-ring-front", "leg-left", "leg-right"],
+      "damage": ["body-normal", "body-damage1", "body-damage2", "ring-crack1", "ring-crack2"],
+      "projectiles": [],
+      "vfx": ["drone-hum", "drone-drift", "drone-fall"]
+    },
+    {
+      "id": 207,
+      "slug": "jammer-aerial",
+      "name": "干扰天线僵尸",
+      "personality": "头顶折叠天线像歪掉的昆虫触须，张开时发出不规则波圈压制根网，不是普通路障帽。",
+      "parts": ["body", "head", "jaw", "arm-rig", "antenna-base", "antenna-left", "antenna-right", "signal-dial"],
+      "damage": ["body-normal", "body-damage1", "body-damage2", "antenna-bent1", "antenna-bent2"],
+      "projectiles": ["jam-pulse"],
+      "vfx": ["jam-deploy", "jam-wave", "jam-static", "jam-collapse"]
+    },
+    {
+      "id": 208,
+      "slug": "magnet-salvager",
+      "name": "磁暴回收僵尸",
+      "personality": "壮实的回收员推着半月电磁铁，吸住芽弹时双臂吃力后仰，线圈绕热后会冒烟。",
+      "parts": ["body", "head", "jaw", "arm-rig", "magnet-back", "magnet-front", "coil-left", "coil-right", "scrap-satchel"],
+      "damage": ["body-normal", "body-damage1", "body-damage2", "magnet-crack1", "magnet-crack2"],
+      "projectiles": [],
+      "vfx": ["magnet-field", "magnet-catch", "magnet-charge", "magnet-pulse"]
+    },
+    {
+      "id": 209,
+      "slug": "holo-decoy",
+      "name": "全息诱饵僵尸",
+      "personality": "胆小的僵尸腰挂破投影器，先投出略带错位线条的假身；真身的表情和投影要能一眼分辨。",
+      "parts": ["body", "head", "jaw", "arm-rig", "projector-back", "projector-front", "lens-shutter", "holo-ghost"],
+      "damage": ["body-normal", "body-damage1", "body-damage2", "projector-crack1", "projector-crack2"],
+      "projectiles": ["holo-decoy-silhouette"],
+      "vfx": ["holo-spawn", "holo-glitch", "holo-shatter"]
+    }
+  ],
+  "shared_vfx": ["tech-spark-small", "tech-spark-large", "smoke-puff", "damage-flash", "ground-shadow", "scrap-chip"],
+  "qa": ["No single full-body placeholder is accepted.", "All unit cards, bodies, damage stages, ammunition and VFX must be unique finished art.", "Test attack, hit, death, root-link, jam and repair on the actual lawn before packaging."]
+}

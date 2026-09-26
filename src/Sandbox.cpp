@@ -279,6 +279,9 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
     case 18: return sessionRevision;
     case 19: stackPlants = type != 0; return 1;
     case 20: continuousZombies = type != 0; return 1;
+    case 21:
+        if (!SandboxRules::ValidCell(col, row, mapType == 1)) return -2;
+        return SandboxPlants::ActivateNetwork(board, col, row);
     default: return -2;
     }
 }

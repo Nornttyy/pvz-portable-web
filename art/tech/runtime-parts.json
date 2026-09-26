@@ -1,0 +1,1500 @@
+[
+  {
+    "file": "sunwheel-head.png",
+    "width": 57,
+    "height": 43,
+    "source": "parts/sunwheel-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "sunwheel-blink.png",
+    "width": 57,
+    "height": 43,
+    "source": "parts/sunwheel-blink.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "pulse-pod-head.png",
+    "width": 70,
+    "height": 65,
+    "source": "parts/pulse-pod-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "pulse-pod-blink.png",
+    "width": 70,
+    "height": 65,
+    "source": "parts/pulse-pod-blink.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "pulse-pod-mouth.png",
+    "width": 35,
+    "height": 49,
+    "source": "parts/pulse-pod-mouth.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "thornshell-head.png",
+    "width": 100,
+    "height": 100,
+    "source": "parts/thornshell-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "thornshell-cracked1.png",
+    "width": 100,
+    "height": 100,
+    "source": "parts/thornshell-cracked1.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "thornshell-cracked2.png",
+    "width": 100,
+    "height": 100,
+    "source": "parts/thornshell-cracked2.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-cap-head.png",
+    "width": 49,
+    "height": 38,
+    "source": "parts/cable-cap-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-cap-blink.png",
+    "width": 49,
+    "height": 38,
+    "source": "parts/cable-cap-blink.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-cap-cap.png",
+    "width": 81,
+    "height": 53,
+    "source": "parts/cable-cap-cap.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-cap-stem.png",
+    "width": 7,
+    "height": 14,
+    "source": "parts/cable-cap-stem.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "arc-orchid-small-head.png",
+    "width": 30,
+    "height": 30,
+    "source": "parts/arc-orchid-small-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "arc-orchid-small-blink.png",
+    "width": 30,
+    "height": 30,
+    "source": "parts/arc-orchid-small-blink.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "arc-orchid-small-mouth.png",
+    "width": 19,
+    "height": 43,
+    "source": "parts/arc-orchid-small-mouth.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-maw-head.png",
+    "width": 70,
+    "height": 65,
+    "source": "parts/magnet-maw-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-maw-blink.png",
+    "width": 70,
+    "height": 65,
+    "source": "parts/magnet-maw-blink.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-maw-mouth.png",
+    "width": 35,
+    "height": 49,
+    "source": "parts/magnet-maw-mouth.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "amber-gourd-head.png",
+    "width": 70,
+    "height": 65,
+    "source": "parts/amber-gourd-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "amber-gourd-blink.png",
+    "width": 70,
+    "height": 65,
+    "source": "parts/amber-gourd-blink.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "amber-gourd-mouth.png",
+    "width": 35,
+    "height": 49,
+    "source": "parts/amber-gourd-mouth.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "scout-bloom-head.png",
+    "width": 70,
+    "height": 65,
+    "source": "parts/scout-bloom-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "scout-bloom-blink.png",
+    "width": 70,
+    "height": 65,
+    "source": "parts/scout-bloom-blink.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "scout-bloom-mouth.png",
+    "width": 35,
+    "height": 49,
+    "source": "parts/scout-bloom-mouth.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "prism-reed-head.png",
+    "width": 70,
+    "height": 65,
+    "source": "parts/prism-reed-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "prism-reed-blink.png",
+    "width": 70,
+    "height": 65,
+    "source": "parts/prism-reed-blink.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "prism-reed-mouth.png",
+    "width": 35,
+    "height": 49,
+    "source": "parts/prism-reed-mouth.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "repair-moss-head.png",
+    "width": 57,
+    "height": 43,
+    "source": "parts/repair-moss-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "repair-moss-blink.png",
+    "width": 57,
+    "height": 43,
+    "source": "parts/repair-moss-blink.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-head.png",
+    "width": 53,
+    "height": 48,
+    "source": "parts/leak-pack-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-body.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/leak-pack-body.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-body-damage1.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/leak-pack-body-damage1.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-body-damage2.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/leak-pack-body-damage2.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-jaw.png",
+    "width": 32,
+    "height": 15,
+    "source": "parts/leak-pack-jaw.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-inner-upper.png",
+    "width": 15,
+    "height": 25,
+    "source": "parts/leak-pack-inner-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-inner-lower.png",
+    "width": 19,
+    "height": 24,
+    "source": "parts/leak-pack-inner-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-outer-upper.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/leak-pack-outer-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-outer-upper-damaged.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/leak-pack-outer-upper-damaged.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-outer-lower.png",
+    "width": 19,
+    "height": 28,
+    "source": "parts/leak-pack-outer-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-hand.png",
+    "width": 25,
+    "height": 27,
+    "source": "parts/leak-pack-hand.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-inner-leg-upper.png",
+    "width": 15,
+    "height": 26,
+    "source": "parts/leak-pack-inner-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-inner-leg-lower.png",
+    "width": 32,
+    "height": 36,
+    "source": "parts/leak-pack-inner-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-inner-leg-foot.png",
+    "width": 27,
+    "height": 17,
+    "source": "parts/leak-pack-inner-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-outer-leg-upper.png",
+    "width": 21,
+    "height": 39,
+    "source": "parts/leak-pack-outer-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-outer-leg-lower.png",
+    "width": 24,
+    "height": 30,
+    "source": "parts/leak-pack-outer-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-outer-leg-foot.png",
+    "width": 42,
+    "height": 21,
+    "source": "parts/leak-pack-outer-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "leak-pack-pack.png",
+    "width": 17,
+    "height": 30,
+    "source": "parts/leak-pack-pack.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-head.png",
+    "width": 53,
+    "height": 48,
+    "source": "parts/weld-shield-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-body.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/weld-shield-body.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-body-damage1.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/weld-shield-body-damage1.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-body-damage2.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/weld-shield-body-damage2.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-jaw.png",
+    "width": 32,
+    "height": 15,
+    "source": "parts/weld-shield-jaw.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-inner-upper.png",
+    "width": 15,
+    "height": 25,
+    "source": "parts/weld-shield-inner-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-inner-lower.png",
+    "width": 19,
+    "height": 24,
+    "source": "parts/weld-shield-inner-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-outer-upper.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/weld-shield-outer-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-outer-upper-damaged.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/weld-shield-outer-upper-damaged.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-outer-lower.png",
+    "width": 19,
+    "height": 28,
+    "source": "parts/weld-shield-outer-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-hand.png",
+    "width": 25,
+    "height": 27,
+    "source": "parts/weld-shield-hand.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-inner-leg-upper.png",
+    "width": 15,
+    "height": 26,
+    "source": "parts/weld-shield-inner-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-inner-leg-lower.png",
+    "width": 32,
+    "height": 36,
+    "source": "parts/weld-shield-inner-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-inner-leg-foot.png",
+    "width": 27,
+    "height": 17,
+    "source": "parts/weld-shield-inner-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-outer-leg-upper.png",
+    "width": 21,
+    "height": 39,
+    "source": "parts/weld-shield-outer-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-outer-leg-lower.png",
+    "width": 24,
+    "height": 30,
+    "source": "parts/weld-shield-outer-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-outer-leg-foot.png",
+    "width": 42,
+    "height": 21,
+    "source": "parts/weld-shield-outer-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-pack.png",
+    "width": 17,
+    "height": 30,
+    "source": "parts/weld-shield-pack.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-prop.png",
+    "width": 59,
+    "height": 57,
+    "source": "parts/weld-shield-prop.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-prop-damage1.png",
+    "width": 59,
+    "height": 57,
+    "source": "parts/weld-shield-prop-damage1.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "weld-shield-prop-damage2.png",
+    "width": 59,
+    "height": 57,
+    "source": "parts/weld-shield-prop-damage2.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "turbine-boot-head.png",
+    "width": 53,
+    "height": 48,
+    "source": "parts/turbine-boot-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "turbine-boot-body.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/turbine-boot-body.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "turbine-boot-body-damage1.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/turbine-boot-body-damage1.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "turbine-boot-body-damage2.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/turbine-boot-body-damage2.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "turbine-boot-jaw.png",
+    "width": 32,
+    "height": 15,
+    "source": "parts/turbine-boot-jaw.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "turbine-boot-inner-upper.png",
+    "width": 15,
+    "height": 25,
+    "source": "parts/turbine-boot-inner-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "turbine-boot-inner-lower.png",
+    "width": 19,
+    "height": 24,
+    "source": "parts/turbine-boot-inner-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "turbine-boot-outer-upper.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/turbine-boot-outer-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "turbine-boot-outer-upper-damaged.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/turbine-boot-outer-upper-damaged.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "turbine-boot-outer-lower.png",
+    "width": 19,
+    "height": 28,
+    "source": "parts/turbine-boot-outer-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "turbine-boot-hand.png",
+    "width": 25,
+    "height": 27,
+    "source": "parts/turbine-boot-hand.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "turbine-boot-inner-leg-upper.png",
+    "width": 15,
+    "height": 26,
+    "source": "parts/turbine-boot-inner-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "turbine-boot-inner-leg-lower.png",
+    "width": 32,
+    "height": 36,
+    "source": "parts/turbine-boot-inner-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "turbine-boot-inner-leg-foot.png",
+    "width": 27,
+    "height": 17,
+    "source": "parts/turbine-boot-inner-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "turbine-boot-outer-leg-upper.png",
+    "width": 21,
+    "height": 39,
+    "source": "parts/turbine-boot-outer-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "turbine-boot-outer-leg-lower.png",
+    "width": 24,
+    "height": 30,
+    "source": "parts/turbine-boot-outer-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "turbine-boot-outer-leg-foot.png",
+    "width": 42,
+    "height": 21,
+    "source": "parts/turbine-boot-outer-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-head.png",
+    "width": 53,
+    "height": 48,
+    "source": "parts/cable-hook-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-body.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/cable-hook-body.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-body-damage1.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/cable-hook-body-damage1.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-body-damage2.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/cable-hook-body-damage2.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-jaw.png",
+    "width": 32,
+    "height": 15,
+    "source": "parts/cable-hook-jaw.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-inner-upper.png",
+    "width": 15,
+    "height": 25,
+    "source": "parts/cable-hook-inner-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-inner-lower.png",
+    "width": 19,
+    "height": 24,
+    "source": "parts/cable-hook-inner-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-outer-upper.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/cable-hook-outer-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-outer-upper-damaged.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/cable-hook-outer-upper-damaged.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-outer-lower.png",
+    "width": 19,
+    "height": 28,
+    "source": "parts/cable-hook-outer-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-hand.png",
+    "width": 25,
+    "height": 27,
+    "source": "parts/cable-hook-hand.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-inner-leg-upper.png",
+    "width": 15,
+    "height": 26,
+    "source": "parts/cable-hook-inner-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-inner-leg-lower.png",
+    "width": 32,
+    "height": 36,
+    "source": "parts/cable-hook-inner-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-inner-leg-foot.png",
+    "width": 27,
+    "height": 17,
+    "source": "parts/cable-hook-inner-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-outer-leg-upper.png",
+    "width": 21,
+    "height": 39,
+    "source": "parts/cable-hook-outer-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-outer-leg-lower.png",
+    "width": 24,
+    "height": 30,
+    "source": "parts/cable-hook-outer-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-outer-leg-foot.png",
+    "width": 42,
+    "height": 21,
+    "source": "parts/cable-hook-outer-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "cable-hook-pack.png",
+    "width": 17,
+    "height": 30,
+    "source": "parts/cable-hook-pack.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-head.png",
+    "width": 53,
+    "height": 48,
+    "source": "parts/wrench-tech-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-body.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/wrench-tech-body.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-body-damage1.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/wrench-tech-body-damage1.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-body-damage2.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/wrench-tech-body-damage2.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-jaw.png",
+    "width": 32,
+    "height": 15,
+    "source": "parts/wrench-tech-jaw.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-inner-upper.png",
+    "width": 15,
+    "height": 25,
+    "source": "parts/wrench-tech-inner-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-inner-lower.png",
+    "width": 19,
+    "height": 24,
+    "source": "parts/wrench-tech-inner-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-outer-upper.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/wrench-tech-outer-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-outer-upper-damaged.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/wrench-tech-outer-upper-damaged.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-outer-lower.png",
+    "width": 19,
+    "height": 28,
+    "source": "parts/wrench-tech-outer-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-hand.png",
+    "width": 25,
+    "height": 27,
+    "source": "parts/wrench-tech-hand.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-inner-leg-upper.png",
+    "width": 15,
+    "height": 26,
+    "source": "parts/wrench-tech-inner-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-inner-leg-lower.png",
+    "width": 32,
+    "height": 36,
+    "source": "parts/wrench-tech-inner-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-inner-leg-foot.png",
+    "width": 27,
+    "height": 17,
+    "source": "parts/wrench-tech-inner-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-outer-leg-upper.png",
+    "width": 21,
+    "height": 39,
+    "source": "parts/wrench-tech-outer-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-outer-leg-lower.png",
+    "width": 24,
+    "height": 30,
+    "source": "parts/wrench-tech-outer-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-outer-leg-foot.png",
+    "width": 42,
+    "height": 21,
+    "source": "parts/wrench-tech-outer-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-pack.png",
+    "width": 17,
+    "height": 30,
+    "source": "parts/wrench-tech-pack.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-prop.png",
+    "width": 59,
+    "height": 57,
+    "source": "parts/wrench-tech-prop.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-prop-damage1.png",
+    "width": 59,
+    "height": 57,
+    "source": "parts/wrench-tech-prop-damage1.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "wrench-tech-prop-damage2.png",
+    "width": 59,
+    "height": 57,
+    "source": "parts/wrench-tech-prop-damage2.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-head.png",
+    "width": 53,
+    "height": 48,
+    "source": "parts/bolt-thrower-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-body.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/bolt-thrower-body.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-body-damage1.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/bolt-thrower-body-damage1.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-body-damage2.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/bolt-thrower-body-damage2.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-jaw.png",
+    "width": 32,
+    "height": 15,
+    "source": "parts/bolt-thrower-jaw.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-inner-upper.png",
+    "width": 15,
+    "height": 25,
+    "source": "parts/bolt-thrower-inner-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-inner-lower.png",
+    "width": 19,
+    "height": 24,
+    "source": "parts/bolt-thrower-inner-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-outer-upper.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/bolt-thrower-outer-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-outer-upper-damaged.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/bolt-thrower-outer-upper-damaged.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-outer-lower.png",
+    "width": 19,
+    "height": 28,
+    "source": "parts/bolt-thrower-outer-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-hand.png",
+    "width": 25,
+    "height": 27,
+    "source": "parts/bolt-thrower-hand.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-inner-leg-upper.png",
+    "width": 15,
+    "height": 26,
+    "source": "parts/bolt-thrower-inner-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-inner-leg-lower.png",
+    "width": 32,
+    "height": 36,
+    "source": "parts/bolt-thrower-inner-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-inner-leg-foot.png",
+    "width": 27,
+    "height": 17,
+    "source": "parts/bolt-thrower-inner-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-outer-leg-upper.png",
+    "width": 21,
+    "height": 39,
+    "source": "parts/bolt-thrower-outer-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-outer-leg-lower.png",
+    "width": 24,
+    "height": 30,
+    "source": "parts/bolt-thrower-outer-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-outer-leg-foot.png",
+    "width": 42,
+    "height": 21,
+    "source": "parts/bolt-thrower-outer-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "bolt-thrower-pack.png",
+    "width": 17,
+    "height": 30,
+    "source": "parts/bolt-thrower-pack.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-head.png",
+    "width": 53,
+    "height": 48,
+    "source": "parts/hover-drone-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-body.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/hover-drone-body.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-body-damage1.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/hover-drone-body-damage1.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-body-damage2.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/hover-drone-body-damage2.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-jaw.png",
+    "width": 32,
+    "height": 15,
+    "source": "parts/hover-drone-jaw.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-inner-upper.png",
+    "width": 15,
+    "height": 25,
+    "source": "parts/hover-drone-inner-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-inner-lower.png",
+    "width": 19,
+    "height": 24,
+    "source": "parts/hover-drone-inner-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-outer-upper.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/hover-drone-outer-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-outer-upper-damaged.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/hover-drone-outer-upper-damaged.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-outer-lower.png",
+    "width": 19,
+    "height": 28,
+    "source": "parts/hover-drone-outer-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-hand.png",
+    "width": 25,
+    "height": 27,
+    "source": "parts/hover-drone-hand.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-inner-leg-upper.png",
+    "width": 15,
+    "height": 26,
+    "source": "parts/hover-drone-inner-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-inner-leg-lower.png",
+    "width": 32,
+    "height": 36,
+    "source": "parts/hover-drone-inner-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-inner-leg-foot.png",
+    "width": 27,
+    "height": 17,
+    "source": "parts/hover-drone-inner-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-outer-leg-upper.png",
+    "width": 21,
+    "height": 39,
+    "source": "parts/hover-drone-outer-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-outer-leg-lower.png",
+    "width": 24,
+    "height": 30,
+    "source": "parts/hover-drone-outer-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-outer-leg-foot.png",
+    "width": 42,
+    "height": 21,
+    "source": "parts/hover-drone-outer-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "hover-drone-pack.png",
+    "width": 17,
+    "height": 30,
+    "source": "parts/hover-drone-pack.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-head.png",
+    "width": 53,
+    "height": 48,
+    "source": "parts/jammer-aerial-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-body.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/jammer-aerial-body.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-body-damage1.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/jammer-aerial-body-damage1.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-body-damage2.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/jammer-aerial-body-damage2.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-jaw.png",
+    "width": 32,
+    "height": 15,
+    "source": "parts/jammer-aerial-jaw.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-inner-upper.png",
+    "width": 15,
+    "height": 25,
+    "source": "parts/jammer-aerial-inner-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-inner-lower.png",
+    "width": 19,
+    "height": 24,
+    "source": "parts/jammer-aerial-inner-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-outer-upper.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/jammer-aerial-outer-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-outer-upper-damaged.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/jammer-aerial-outer-upper-damaged.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-outer-lower.png",
+    "width": 19,
+    "height": 28,
+    "source": "parts/jammer-aerial-outer-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-hand.png",
+    "width": 25,
+    "height": 27,
+    "source": "parts/jammer-aerial-hand.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-inner-leg-upper.png",
+    "width": 15,
+    "height": 26,
+    "source": "parts/jammer-aerial-inner-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-inner-leg-lower.png",
+    "width": 32,
+    "height": 36,
+    "source": "parts/jammer-aerial-inner-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-inner-leg-foot.png",
+    "width": 27,
+    "height": 17,
+    "source": "parts/jammer-aerial-inner-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-outer-leg-upper.png",
+    "width": 21,
+    "height": 39,
+    "source": "parts/jammer-aerial-outer-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-outer-leg-lower.png",
+    "width": 24,
+    "height": 30,
+    "source": "parts/jammer-aerial-outer-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-outer-leg-foot.png",
+    "width": 42,
+    "height": 21,
+    "source": "parts/jammer-aerial-outer-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "jammer-aerial-pack.png",
+    "width": 17,
+    "height": 30,
+    "source": "parts/jammer-aerial-pack.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-head.png",
+    "width": 53,
+    "height": 48,
+    "source": "parts/magnet-salvager-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-body.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/magnet-salvager-body.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-body-damage1.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/magnet-salvager-body-damage1.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-body-damage2.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/magnet-salvager-body-damage2.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-jaw.png",
+    "width": 32,
+    "height": 15,
+    "source": "parts/magnet-salvager-jaw.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-inner-upper.png",
+    "width": 15,
+    "height": 25,
+    "source": "parts/magnet-salvager-inner-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-inner-lower.png",
+    "width": 19,
+    "height": 24,
+    "source": "parts/magnet-salvager-inner-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-outer-upper.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/magnet-salvager-outer-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-outer-upper-damaged.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/magnet-salvager-outer-upper-damaged.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-outer-lower.png",
+    "width": 19,
+    "height": 28,
+    "source": "parts/magnet-salvager-outer-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-hand.png",
+    "width": 25,
+    "height": 27,
+    "source": "parts/magnet-salvager-hand.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-inner-leg-upper.png",
+    "width": 15,
+    "height": 26,
+    "source": "parts/magnet-salvager-inner-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-inner-leg-lower.png",
+    "width": 32,
+    "height": 36,
+    "source": "parts/magnet-salvager-inner-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-inner-leg-foot.png",
+    "width": 27,
+    "height": 17,
+    "source": "parts/magnet-salvager-inner-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-outer-leg-upper.png",
+    "width": 21,
+    "height": 39,
+    "source": "parts/magnet-salvager-outer-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-outer-leg-lower.png",
+    "width": 24,
+    "height": 30,
+    "source": "parts/magnet-salvager-outer-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-outer-leg-foot.png",
+    "width": 42,
+    "height": 21,
+    "source": "parts/magnet-salvager-outer-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "magnet-salvager-pack.png",
+    "width": 17,
+    "height": 30,
+    "source": "parts/magnet-salvager-pack.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-head.png",
+    "width": 53,
+    "height": 48,
+    "source": "parts/holo-decoy-head.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-body.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/holo-decoy-body.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-body-damage1.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/holo-decoy-body-damage1.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-body-damage2.png",
+    "width": 53,
+    "height": 63,
+    "source": "parts/holo-decoy-body-damage2.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-jaw.png",
+    "width": 32,
+    "height": 15,
+    "source": "parts/holo-decoy-jaw.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-inner-upper.png",
+    "width": 15,
+    "height": 25,
+    "source": "parts/holo-decoy-inner-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-inner-lower.png",
+    "width": 19,
+    "height": 24,
+    "source": "parts/holo-decoy-inner-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-outer-upper.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/holo-decoy-outer-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-outer-upper-damaged.png",
+    "width": 17,
+    "height": 35,
+    "source": "parts/holo-decoy-outer-upper-damaged.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-outer-lower.png",
+    "width": 19,
+    "height": 28,
+    "source": "parts/holo-decoy-outer-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-hand.png",
+    "width": 25,
+    "height": 27,
+    "source": "parts/holo-decoy-hand.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-inner-leg-upper.png",
+    "width": 15,
+    "height": 26,
+    "source": "parts/holo-decoy-inner-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-inner-leg-lower.png",
+    "width": 32,
+    "height": 36,
+    "source": "parts/holo-decoy-inner-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-inner-leg-foot.png",
+    "width": 27,
+    "height": 17,
+    "source": "parts/holo-decoy-inner-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-outer-leg-upper.png",
+    "width": 21,
+    "height": 39,
+    "source": "parts/holo-decoy-outer-leg-upper.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-outer-leg-lower.png",
+    "width": 24,
+    "height": 30,
+    "source": "parts/holo-decoy-outer-leg-lower.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-outer-leg-foot.png",
+    "width": 42,
+    "height": 21,
+    "source": "parts/holo-decoy-outer-leg-foot.png",
+    "role": "native-rig-override"
+  },
+  {
+    "file": "holo-decoy-pack.png",
+    "width": 17,
+    "height": 30,
+    "source": "parts/holo-decoy-pack.png",
+    "role": "native-rig-override"
+  }
+]

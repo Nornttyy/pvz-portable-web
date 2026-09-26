@@ -9,7 +9,7 @@ import vm from 'node:vm';
 import { cacheResource } from '../web/resource-cache.mjs';
 import { verifyResourceBytes } from '../web/resource-import.mjs';
 import { validateManifest, sha256 } from '../web/resource-utils.mjs';
-import { ORIGINAL_PLANTS, validateLayout } from '../web/sandbox-data.mjs';
+import { TECH_PLANTS, validateLayout } from '../web/sandbox-data.mjs';
 const read = name => readFile(new URL('../' + name, import.meta.url));
 
 test('default page uses integrated sandbox and project-relative paths, not loopback resources', async () => {
@@ -30,7 +30,7 @@ test('default page uses integrated sandbox and project-relative paths, not loopb
   }
   assert.doesNotMatch((await read('site/resource-import.mjs')).toString(), /\bfetch\s*\(|XMLHttpRequest|sendBeacon/);
   const manifest = validateManifest(JSON.parse(await read('site/resource-manifest.json')));
-  assert.equal(manifest.totalFiles, 3158);
+  assert.equal(manifest.totalFiles, manifest.files.length);
 });
 
 test('published sandbox engine matches the recorded build and really initializes its exported API', async () => {
@@ -49,15 +49,17 @@ test('published sandbox engine matches the recorded build and really initializes
   await ready;
   assert.equal(typeof Module.callMain, 'function');
   assert.ok(Module.FS.filesystems.IDBFS);
-  for (let command = 0; command <= 20; command++) assert.equal(Module._pvz_sandbox_command(command, 0, 0, 0), -1);
+  for (let command = 0; command <= 21; command++) assert.equal(Module._pvz_sandbox_command(command, 0, 0, 0), -1);
   assert.equal(Module._pvz_sandbox_plant_data(0, 0), -1);
 });
 
-test('sandbox source and all seventeen active custom plant IDs are included', async () => {
-  assert.deepEqual(ORIGINAL_PLANTS.map(p => p.id), Array.from({length:18},(_,i)=>100+i).filter(id=>id!==109));
+test('sandbox source and all ten active technology plant IDs are included', async () => {
+  assert.deepEqual(TECH_PLANTS.map(p => p.id), Array.from({length:10},(_,i)=>100+i));
   const layout = {schema: 1, map: 0, plants: [{type: 100, col: 2, row: 2}]};
   assert.deepEqual(validateLayout(layout), layout);
   for (const file of ['Sandbox.cpp', 'SandboxUI.cpp', 'SandboxPlants.cpp', 'SandboxButton.cpp']) assert.ok((await read('src/' + file)).length > 1000);
+  assert.match((await read('src/Sandbox.cpp')).toString(), /case 21:/);
+  assert.match((await read('src/SandboxUI.cpp')).toString(), /根网共振/);
   assert.match((await read('src/Lawn/Widget/GameSelector.cpp')).toString(), /SandboxEnter\(\)/);
   assert.match((await read('src/Lawn/System/SaveGame.cpp')).toString(), /if \(gSandboxEnabled\) return false/);
 });

@@ -1,0 +1,1122 @@
+[
+  {
+    "file": "parts/sunwheel-petal-back.png",
+    "width": 371,
+    "height": 353,
+    "source": "generated/sunwheel-rig-atlas-v1.png",
+    "role": "back petal wheel"
+  },
+  {
+    "file": "parts/sunwheel-body.png",
+    "width": 312,
+    "height": 259,
+    "source": "generated/sunwheel-rig-atlas-v1.png",
+    "role": "leafy body"
+  },
+  {
+    "file": "parts/sunwheel-head.png",
+    "width": 301,
+    "height": 270,
+    "source": "generated/sunwheel-rig-atlas-v1.png",
+    "role": "normal face"
+  },
+  {
+    "file": "parts/sunwheel-blink.png",
+    "width": 306,
+    "height": 270,
+    "source": "generated/sunwheel-rig-atlas-v1.png",
+    "role": "closed-eye face"
+  },
+  {
+    "file": "parts/sunwheel-petal-front.png",
+    "width": 392,
+    "height": 367,
+    "source": "generated/sunwheel-rig-atlas-v1.png",
+    "role": "front petal ring"
+  },
+  {
+    "file": "parts/sunwheel-stem.png",
+    "width": 236,
+    "height": 320,
+    "source": "generated/sunwheel-rig-atlas-v1.png",
+    "role": "stem"
+  },
+  {
+    "file": "parts/sunwheel-leaf-back.png",
+    "width": 256,
+    "height": 312,
+    "source": "generated/sunwheel-rig-atlas-v1.png",
+    "role": "back leaf"
+  },
+  {
+    "file": "parts/sunwheel-leaf-front.png",
+    "width": 253,
+    "height": 307,
+    "source": "generated/sunwheel-rig-atlas-v1.png",
+    "role": "front leaf"
+  },
+  {
+    "file": "parts/sunwheel-collector-disk.png",
+    "width": 303,
+    "height": 277,
+    "source": "generated/sunwheel-rig-atlas-v1.png",
+    "role": "collector disk"
+  },
+  {
+    "file": "parts/sunwheel-body-damage1.png",
+    "width": 304,
+    "height": 271,
+    "source": "generated/sunwheel-rig-atlas-v1.png",
+    "role": "collector damage stage 1"
+  },
+  {
+    "file": "parts/sunwheel-body-damage2.png",
+    "width": 306,
+    "height": 270,
+    "source": "generated/sunwheel-rig-atlas-v1.png",
+    "role": "collector damage stage 2"
+  },
+  {
+    "file": "parts/sunwheel-charge-ring.png",
+    "width": 331,
+    "height": 300,
+    "source": "generated/sunwheel-rig-atlas-v1.png",
+    "role": "root-network charge ring"
+  },
+  {
+    "file": "parts/pulse-pod-head.png",
+    "width": 321,
+    "height": 301,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "normal pod head with its integrated living nozzle"
+  },
+  {
+    "file": "parts/pulse-pod-blink.png",
+    "width": 271,
+    "height": 243,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "closed-eye pod head with its integrated living nozzle"
+  },
+  {
+    "file": "parts/pulse-pod-mouth.png",
+    "width": 137,
+    "height": 170,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "detached closed muzzle ring"
+  },
+  {
+    "file": "parts/pulse-pod-mouth-open.png",
+    "width": 173,
+    "height": 187,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "detached charged muzzle"
+  },
+  {
+    "file": "parts/pulse-pod-stem.png",
+    "width": 192,
+    "height": 285,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "flexible stem"
+  },
+  {
+    "file": "parts/pulse-pod-body.png",
+    "width": 260,
+    "height": 275,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "pod torso"
+  },
+  {
+    "file": "parts/pulse-pod-leaf-back.png",
+    "width": 243,
+    "height": 176,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "back leaf"
+  },
+  {
+    "file": "parts/pulse-pod-leaf-front.png",
+    "width": 275,
+    "height": 180,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "front leaf"
+  },
+  {
+    "file": "parts/pulse-pod-root-base.png",
+    "width": 279,
+    "height": 194,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "root base"
+  },
+  {
+    "file": "parts/pulse-pod-pulse-projectile-0.png",
+    "width": 228,
+    "height": 150,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "pulse seed flight frame 0"
+  },
+  {
+    "file": "parts/pulse-pod-pulse-projectile-1.png",
+    "width": 248,
+    "height": 149,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "pulse seed flight frame 1"
+  },
+  {
+    "file": "parts/pulse-pod-pulse-projectile-2.png",
+    "width": 300,
+    "height": 155,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "pulse seed flight frame 2"
+  },
+  {
+    "file": "parts/pulse-pod-pulse-muzzle.png",
+    "width": 299,
+    "height": 249,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "pulse muzzle flash"
+  },
+  {
+    "file": "parts/pulse-pod-pulse-hit.png",
+    "width": 240,
+    "height": 254,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "pulse impact"
+  },
+  {
+    "file": "parts/pulse-pod-charge-halo.png",
+    "width": 238,
+    "height": 231,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "resonance charge halo"
+  },
+  {
+    "file": "parts/pulse-pod-capacitor-crack.png",
+    "width": 282,
+    "height": 265,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "damaged capacitor head"
+  },
+  {
+    "file": "parts/pulse-pod-leaf-torn.png",
+    "width": 226,
+    "height": 213,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "torn leaf damage overlay"
+  },
+  {
+    "file": "parts/pulse-pod-leaf-left.png",
+    "width": 228,
+    "height": 197,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "detached leaf left"
+  },
+  {
+    "file": "parts/pulse-pod-leaf-right.png",
+    "width": 221,
+    "height": 197,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "detached leaf right"
+  },
+  {
+    "file": "parts/pulse-pod-root-damaged.png",
+    "width": 260,
+    "height": 164,
+    "source": "generated/pulse-pod-rig-atlas-v1.png",
+    "role": "damaged root base"
+  },
+  {
+    "file": "parts/thornshell-head.png",
+    "width": 303,
+    "height": 311,
+    "source": "generated/thornshell-rig-atlas-v1.png",
+    "role": "normal shell face"
+  },
+  {
+    "file": "parts/thornshell-blink.png",
+    "width": 301,
+    "height": 305,
+    "source": "generated/thornshell-rig-atlas-v1.png",
+    "role": "closed-eye shell face"
+  },
+  {
+    "file": "parts/thornshell-mouth.png",
+    "width": 163,
+    "height": 138,
+    "source": "generated/thornshell-rig-atlas-v1.png",
+    "role": "detached face and mouth"
+  },
+  {
+    "file": "parts/thornshell-shell-front.png",
+    "width": 276,
+    "height": 255,
+    "source": "generated/thornshell-rig-atlas-v1.png",
+    "role": "front shell plate"
+  },
+  {
+    "file": "parts/thornshell-shell-back.png",
+    "width": 297,
+    "height": 216,
+    "source": "generated/thornshell-rig-atlas-v1.png",
+    "role": "back shell plate"
+  },
+  {
+    "file": "parts/thornshell-frond-left.png",
+    "width": 267,
+    "height": 240,
+    "source": "generated/thornshell-rig-atlas-v1.png",
+    "role": "left striking frond"
+  },
+  {
+    "file": "parts/thornshell-frond-right.png",
+    "width": 200,
+    "height": 247,
+    "source": "generated/thornshell-rig-atlas-v1.png",
+    "role": "right striking frond"
+  },
+  {
+    "file": "parts/thornshell-root-base.png",
+    "width": 227,
+    "height": 157,
+    "source": "generated/thornshell-rig-atlas-v1.png",
+    "role": "root base"
+  },
+  {
+    "file": "parts/thornshell-thorn-strike-0.png",
+    "width": 321,
+    "height": 236,
+    "source": "generated/thornshell-rig-atlas-v1.png",
+    "role": "thorn strike frame 0"
+  },
+  {
+    "file": "parts/thornshell-thorn-strike-1.png",
+    "width": 308,
+    "height": 231,
+    "source": "generated/thornshell-rig-atlas-v1.png",
+    "role": "thorn strike frame 1"
+  },
+  {
+    "file": "parts/thornshell-thorn-projectile-0.png",
+    "width": 191,
+    "height": 102,
+    "source": "generated/thornshell-rig-atlas-v1.png",
+    "role": "thorn projectile frame 0"
+  },
+  {
+    "file": "parts/thornshell-thorn-projectile-1.png",
+    "width": 157,
+    "height": 75,
+    "source": "generated/thornshell-rig-atlas-v1.png",
+    "role": "thorn projectile frame 1"
+  },
+  {
+    "file": "parts/thornshell-thorn-projectile-2.png",
+    "width": 114,
+    "height": 57,
+    "source": "generated/thornshell-rig-atlas-v1.png",
+    "role": "thorn projectile frame 2"
+  },
+  {
+    "file": "parts/thornshell-thorn-hit.png",
+    "width": 253,
+    "height": 291,
+    "source": "generated/thornshell-rig-atlas-v1.png",
+    "role": "thorn impact burst"
+  },
+  {
+    "file": "parts/thornshell-thorn-resonance.png",
+    "width": 261,
+    "height": 313,
+    "source": "generated/thornshell-rig-atlas-v1.png",
+    "role": "defense resonance halo"
+  },
+  {
+    "file": "parts/thornshell-cracked1.png",
+    "width": 288,
+    "height": 238,
+    "source": "generated/thornshell-rig-atlas-v1.png",
+    "role": "cracked shell damage state"
+  },
+  {
+    "file": "parts/thornshell-cracked2.png",
+    "width": 240,
+    "height": 249,
+    "source": "generated/thornshell-rig-atlas-v1.png",
+    "role": "torn frond damage state"
+  },
+  {
+    "file": "parts/cable-cap-head.png",
+    "width": 294,
+    "height": 277,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "normal mushroom cap face"
+  },
+  {
+    "file": "parts/cable-cap-blink.png",
+    "width": 296,
+    "height": 275,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "closed-eye mushroom cap face"
+  },
+  {
+    "file": "parts/cable-cap-mouth.png",
+    "width": 204,
+    "height": 137,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "detached face/mouth plate"
+  },
+  {
+    "file": "parts/cable-cap-cap.png",
+    "width": 288,
+    "height": 216,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "cap top"
+  },
+  {
+    "file": "parts/cable-cap-cap-underside.png",
+    "width": 286,
+    "height": 145,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "cap underside"
+  },
+  {
+    "file": "parts/cable-cap-node-left.png",
+    "width": 160,
+    "height": 201,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "left cable node"
+  },
+  {
+    "file": "parts/cable-cap-node-center.png",
+    "width": 139,
+    "height": 178,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "center cable node"
+  },
+  {
+    "file": "parts/cable-cap-node-right.png",
+    "width": 169,
+    "height": 195,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "right cable node"
+  },
+  {
+    "file": "parts/cable-cap-stem.png",
+    "width": 267,
+    "height": 307,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "coiled mycelium stem"
+  },
+  {
+    "file": "parts/cable-cap-root-base.png",
+    "width": 300,
+    "height": 221,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "root base"
+  },
+  {
+    "file": "parts/cable-cap-cable-left.png",
+    "width": 220,
+    "height": 189,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "left root cable"
+  },
+  {
+    "file": "parts/cable-cap-cable-right.png",
+    "width": 215,
+    "height": 219,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "right root cable"
+  },
+  {
+    "file": "parts/cable-cap-cable-loop-left.png",
+    "width": 221,
+    "height": 224,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "curled root cable left"
+  },
+  {
+    "file": "parts/cable-cap-cable-loop-right.png",
+    "width": 247,
+    "height": 194,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "curled root cable right"
+  },
+  {
+    "file": "parts/cable-cap-hub-idle.png",
+    "width": 223,
+    "height": 130,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "idle hub glow"
+  },
+  {
+    "file": "parts/cable-cap-hub-full.png",
+    "width": 177,
+    "height": 241,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "full hub glow"
+  },
+  {
+    "file": "parts/cable-cap-root-link.png",
+    "width": 429,
+    "height": 204,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "root link pulse"
+  },
+  {
+    "file": "parts/cable-cap-root-sever.png",
+    "width": 238,
+    "height": 195,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "severed cable spark"
+  },
+  {
+    "file": "parts/cable-cap-root-repair.png",
+    "width": 198,
+    "height": 230,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "reconnected cable spark"
+  },
+  {
+    "file": "parts/cable-cap-cable-fray.png",
+    "width": 237,
+    "height": 236,
+    "source": "generated/cable-cap-rig-atlas-v1.png",
+    "role": "cracked cable node"
+  },
+  {
+    "file": "parts/arc-orchid-head.png",
+    "width": 376,
+    "height": 417,
+    "source": "generated/arc-orchid-rig-atlas-v1.png",
+    "role": "normal orchid body/head"
+  },
+  {
+    "file": "parts/arc-orchid-small-head.png",
+    "width": 404,
+    "height": 408,
+    "source": "generated/arc-orchid-rig-atlas-v2.png",
+    "role": "right-facing arc orchid firing head"
+  },
+  {
+    "file": "parts/arc-orchid-small-blink.png",
+    "width": 394,
+    "height": 389,
+    "source": "generated/arc-orchid-rig-atlas-v2.png",
+    "role": "right-facing arc orchid firing head"
+  },
+  {
+    "file": "parts/arc-orchid-small-mouth.png",
+    "width": 115,
+    "height": 214,
+    "source": "generated/arc-orchid-rig-atlas-v2.png",
+    "role": "right-facing independent arc aperture"
+  },
+  {
+    "file": "parts/arc-orchid-stem.png",
+    "width": 394,
+    "height": 366,
+    "source": "generated/arc-orchid-rig-atlas-v1.png",
+    "role": "long orchid stem"
+  },
+  {
+    "file": "parts/arc-orchid-petal-left.png",
+    "width": 236,
+    "height": 261,
+    "source": "generated/arc-orchid-rig-atlas-v1.png",
+    "role": "left detached petal"
+  },
+  {
+    "file": "parts/arc-orchid-petal-center.png",
+    "width": 265,
+    "height": 286,
+    "source": "generated/arc-orchid-rig-atlas-v1.png",
+    "role": "center detached petal"
+  },
+  {
+    "file": "parts/arc-orchid-petal-right.png",
+    "width": 242,
+    "height": 258,
+    "source": "generated/arc-orchid-rig-atlas-v1.png",
+    "role": "right detached petal"
+  },
+  {
+    "file": "parts/arc-orchid-aperture-closed.png",
+    "width": 237,
+    "height": 237,
+    "source": "generated/arc-orchid-rig-atlas-v1.png",
+    "role": "closed arc aperture"
+  },
+  {
+    "file": "parts/arc-orchid-aperture-open.png",
+    "width": 243,
+    "height": 238,
+    "source": "generated/arc-orchid-rig-atlas-v1.png",
+    "role": "open arc aperture"
+  },
+  {
+    "file": "parts/arc-orchid-body-damage1.png",
+    "width": 355,
+    "height": 354,
+    "source": "generated/arc-orchid-rig-atlas-v1.png",
+    "role": "scorched orchid damage state 1"
+  },
+  {
+    "file": "parts/arc-orchid-body-damage2.png",
+    "width": 348,
+    "height": 349,
+    "source": "generated/arc-orchid-rig-atlas-v1.png",
+    "role": "scorched orchid damage state 2"
+  },
+  {
+    "file": "parts/arc-orchid-arc-bolt.png",
+    "width": 327,
+    "height": 153,
+    "source": "generated/arc-orchid-rig-atlas-v1.png",
+    "role": "arc projectile"
+  },
+  {
+    "file": "parts/arc-orchid-arc-hit.png",
+    "width": 264,
+    "height": 277,
+    "source": "generated/arc-orchid-rig-atlas-v1.png",
+    "role": "arc impact burst"
+  },
+  {
+    "file": "parts/magnet-maw-head.png",
+    "width": 378,
+    "height": 359,
+    "source": "generated/magnet-maw-rig-atlas-v2.png",
+    "role": "right-facing magnetic head"
+  },
+  {
+    "file": "parts/magnet-maw-blink.png",
+    "width": 376,
+    "height": 320,
+    "source": "generated/magnet-maw-rig-atlas-v2.png",
+    "role": "right-facing detached magnetic rig part"
+  },
+  {
+    "file": "parts/magnet-maw-mouth.png",
+    "width": 257,
+    "height": 291,
+    "source": "generated/magnet-maw-rig-atlas-v2.png",
+    "role": "right-facing detached magnetic rig part"
+  },
+  {
+    "file": "parts/magnet-maw-upper-maw-open.png",
+    "width": 254,
+    "height": 297,
+    "source": "generated/magnet-maw-rig-atlas-v1.png",
+    "role": "open upper magnetic jaw"
+  },
+  {
+    "file": "parts/magnet-maw-upper-maw-closed.png",
+    "width": 259,
+    "height": 203,
+    "source": "generated/magnet-maw-rig-atlas-v1.png",
+    "role": "closed upper magnetic jaw"
+  },
+  {
+    "file": "parts/magnet-maw-lower-maw.png",
+    "width": 281,
+    "height": 116,
+    "source": "generated/magnet-maw-rig-atlas-v1.png",
+    "role": "separate lower jaw"
+  },
+  {
+    "file": "parts/magnet-maw-stem.png",
+    "width": 395,
+    "height": 315,
+    "source": "generated/magnet-maw-rig-atlas-v1.png",
+    "role": "trap stem and leaf base"
+  },
+  {
+    "file": "parts/magnet-maw-body-damage1.png",
+    "width": 314,
+    "height": 321,
+    "source": "generated/magnet-maw-rig-atlas-v1.png",
+    "role": "cracked trap damage state"
+  },
+  {
+    "file": "parts/magnet-maw-body-damage2.png",
+    "width": 322,
+    "height": 315,
+    "source": "generated/magnet-maw-rig-atlas-v1.png",
+    "role": "heavily cracked trap damage state"
+  },
+  {
+    "file": "parts/magnet-maw-magnet-pull.png",
+    "width": 301,
+    "height": 204,
+    "source": "generated/magnet-maw-rig-atlas-v1.png",
+    "role": "magnetic pull effect"
+  },
+  {
+    "file": "parts/magnet-maw-magnet-inhale.png",
+    "width": 365,
+    "height": 331,
+    "source": "generated/magnet-maw-rig-atlas-v1.png",
+    "role": "magnetic inhale effect"
+  },
+  {
+    "file": "parts/magnet-maw-armor-strip.png",
+    "width": 317,
+    "height": 321,
+    "source": "generated/magnet-maw-rig-atlas-v1.png",
+    "role": "armor strip effect"
+  },
+  {
+    "file": "parts/amber-gourd-head.png",
+    "width": 391,
+    "height": 381,
+    "source": "generated/amber-gourd-rig-atlas-v2.png",
+    "role": "right-facing amber head"
+  },
+  {
+    "file": "parts/amber-gourd-blink.png",
+    "width": 381,
+    "height": 350,
+    "source": "generated/amber-gourd-rig-atlas-v2.png",
+    "role": "right-facing detached resin nozzle rig part"
+  },
+  {
+    "file": "parts/amber-gourd-mouth.png",
+    "width": 225,
+    "height": 153,
+    "source": "generated/amber-gourd-rig-atlas-v2.png",
+    "role": "right-facing detached resin nozzle rig part"
+  },
+  {
+    "file": "parts/amber-gourd-mouth-open.png",
+    "width": 247,
+    "height": 171,
+    "source": "generated/amber-gourd-rig-atlas-v1.png",
+    "role": "detached open nozzle lip"
+  },
+  {
+    "file": "parts/amber-gourd-top-leaves.png",
+    "width": 333,
+    "height": 253,
+    "source": "generated/amber-gourd-rig-atlas-v1.png",
+    "role": "gourd top leaves"
+  },
+  {
+    "file": "parts/amber-gourd-leaf-back.png",
+    "width": 359,
+    "height": 159,
+    "source": "generated/amber-gourd-rig-atlas-v1.png",
+    "role": "back leaf"
+  },
+  {
+    "file": "parts/amber-gourd-stem.png",
+    "width": 366,
+    "height": 314,
+    "source": "generated/amber-gourd-rig-atlas-v1.png",
+    "role": "vine stem and leaf base"
+  },
+  {
+    "file": "parts/amber-gourd-body-damage1.png",
+    "width": 319,
+    "height": 310,
+    "source": "generated/amber-gourd-rig-atlas-v1.png",
+    "role": "scratched gourd damage state"
+  },
+  {
+    "file": "parts/amber-gourd-body-damage2.png",
+    "width": 312,
+    "height": 299,
+    "source": "generated/amber-gourd-rig-atlas-v1.png",
+    "role": "cracked gourd damage state"
+  },
+  {
+    "file": "parts/amber-gourd-resin-glob.png",
+    "width": 326,
+    "height": 146,
+    "source": "generated/amber-gourd-rig-atlas-v1.png",
+    "role": "resin projectile"
+  },
+  {
+    "file": "parts/amber-gourd-resin-splash.png",
+    "width": 196,
+    "height": 223,
+    "source": "generated/amber-gourd-rig-atlas-v1.png",
+    "role": "resin splash impact"
+  },
+  {
+    "file": "parts/amber-gourd-resin-slow.png",
+    "width": 366,
+    "height": 177,
+    "source": "generated/amber-gourd-rig-atlas-v1.png",
+    "role": "resin slow puddle"
+  },
+  {
+    "file": "parts/scout-bloom-head.png",
+    "width": 255,
+    "height": 275,
+    "source": "generated/scout-bloom-rig-atlas-v1.png",
+    "role": "normal scout head with integrated aim aperture"
+  },
+  {
+    "file": "parts/scout-bloom-blink.png",
+    "width": 256,
+    "height": 275,
+    "source": "generated/scout-bloom-rig-atlas-v1.png",
+    "role": "closed-eye scout head with integrated aim aperture"
+  },
+  {
+    "file": "parts/scout-bloom-aim-left.png",
+    "width": 241,
+    "height": 239,
+    "source": "generated/scout-bloom-rig-atlas-v1.png",
+    "role": "left aim pose"
+  },
+  {
+    "file": "parts/scout-bloom-aim-up.png",
+    "width": 239,
+    "height": 279,
+    "source": "generated/scout-bloom-rig-atlas-v1.png",
+    "role": "up aim pose"
+  },
+  {
+    "file": "parts/scout-bloom-mouth.png",
+    "width": 142,
+    "height": 142,
+    "source": "generated/scout-bloom-rig-atlas-v1.png",
+    "role": "detached aiming aperture"
+  },
+  {
+    "file": "parts/scout-bloom-stem.png",
+    "width": 148,
+    "height": 279,
+    "source": "generated/scout-bloom-rig-atlas-v1.png",
+    "role": "twist stem"
+  },
+  {
+    "file": "parts/scout-bloom-body.png",
+    "width": 183,
+    "height": 293,
+    "source": "generated/scout-bloom-rig-atlas-v1.png",
+    "role": "body stem"
+  },
+  {
+    "file": "parts/scout-bloom-leaf-left.png",
+    "width": 203,
+    "height": 177,
+    "source": "generated/scout-bloom-rig-atlas-v1.png",
+    "role": "left leaf"
+  },
+  {
+    "file": "parts/scout-bloom-leaf-right.png",
+    "width": 207,
+    "height": 163,
+    "source": "generated/scout-bloom-rig-atlas-v1.png",
+    "role": "right leaf"
+  },
+  {
+    "file": "parts/scout-bloom-root-base.png",
+    "width": 244,
+    "height": 224,
+    "source": "generated/scout-bloom-rig-atlas-v1.png",
+    "role": "root base"
+  },
+  {
+    "file": "parts/scout-bloom-scout-projectile-0.png",
+    "width": 218,
+    "height": 100,
+    "source": "generated/scout-bloom-rig-atlas-v1.png",
+    "role": "guided seed frame 0"
+  },
+  {
+    "file": "parts/scout-bloom-scout-projectile-1.png",
+    "width": 246,
+    "height": 126,
+    "source": "generated/scout-bloom-rig-atlas-v1.png",
+    "role": "guided seed frame 1"
+  },
+  {
+    "file": "parts/scout-bloom-scout-lock.png",
+    "width": 322,
+    "height": 157,
+    "source": "generated/scout-bloom-rig-atlas-v1.png",
+    "role": "target lock arc"
+  },
+  {
+    "file": "parts/scout-bloom-scout-hit.png",
+    "width": 162,
+    "height": 154,
+    "source": "generated/scout-bloom-rig-atlas-v1.png",
+    "role": "guided seed impact"
+  },
+  {
+    "file": "parts/scout-bloom-scout-muzzle.png",
+    "width": 241,
+    "height": 225,
+    "source": "generated/scout-bloom-rig-atlas-v1.png",
+    "role": "scout muzzle flash"
+  },
+  {
+    "file": "parts/scout-bloom-body-damage1.png",
+    "width": 204,
+    "height": 205,
+    "source": "generated/scout-bloom-rig-atlas-v1.png",
+    "role": "sensor burst damage"
+  },
+  {
+    "file": "parts/scout-bloom-body-damage2.png",
+    "width": 234,
+    "height": 203,
+    "source": "generated/scout-bloom-rig-atlas-v1.png",
+    "role": "torn leaf damage state"
+  },
+  {
+    "file": "parts/prism-reed-head.png",
+    "width": 195,
+    "height": 329,
+    "source": "generated/prism-reed-rig-atlas-v1.png",
+    "role": "normal prism head with integrated crystal aperture"
+  },
+  {
+    "file": "parts/prism-reed-blink.png",
+    "width": 201,
+    "height": 303,
+    "source": "generated/prism-reed-rig-atlas-v1.png",
+    "role": "closed shutter head with integrated crystal aperture"
+  },
+  {
+    "file": "parts/prism-reed-prism.png",
+    "width": 130,
+    "height": 279,
+    "source": "generated/prism-reed-rig-atlas-v1.png",
+    "role": "detached prism crystal"
+  },
+  {
+    "file": "parts/prism-reed-mouth.png",
+    "width": 168,
+    "height": 168,
+    "source": "generated/prism-reed-rig-atlas-v1.png",
+    "role": "detached aperture ring"
+  },
+  {
+    "file": "parts/prism-reed-aim-right.png",
+    "width": 243,
+    "height": 232,
+    "source": "generated/prism-reed-rig-atlas-v1.png",
+    "role": "right aim head"
+  },
+  {
+    "file": "parts/prism-reed-stem-upper.png",
+    "width": 120,
+    "height": 334,
+    "source": "generated/prism-reed-rig-atlas-v1.png",
+    "role": "upper reed stem"
+  },
+  {
+    "file": "parts/prism-reed-stem-lower.png",
+    "width": 126,
+    "height": 222,
+    "source": "generated/prism-reed-rig-atlas-v1.png",
+    "role": "lower reed stem"
+  },
+  {
+    "file": "parts/prism-reed-leaf-left.png",
+    "width": 148,
+    "height": 245,
+    "source": "generated/prism-reed-rig-atlas-v1.png",
+    "role": "left reed leaf"
+  },
+  {
+    "file": "parts/prism-reed-leaf-right.png",
+    "width": 168,
+    "height": 270,
+    "source": "generated/prism-reed-rig-atlas-v1.png",
+    "role": "right reed leaf"
+  },
+  {
+    "file": "parts/prism-reed-root-base.png",
+    "width": 261,
+    "height": 237,
+    "source": "generated/prism-reed-rig-atlas-v1.png",
+    "role": "root base"
+  },
+  {
+    "file": "parts/prism-reed-prism-beam-tail.png",
+    "width": 176,
+    "height": 63,
+    "source": "generated/prism-reed-rig-atlas-v1.png",
+    "role": "beam tail segment"
+  },
+  {
+    "file": "parts/prism-reed-prism-beam-mid.png",
+    "width": 207,
+    "height": 67,
+    "source": "generated/prism-reed-rig-atlas-v1.png",
+    "role": "beam middle segment"
+  },
+  {
+    "file": "parts/prism-reed-prism-beam-core.png",
+    "width": 261,
+    "height": 68,
+    "source": "generated/prism-reed-rig-atlas-v1.png",
+    "role": "beam core segment"
+  },
+  {
+    "file": "parts/prism-reed-prism-charge.png",
+    "width": 253,
+    "height": 274,
+    "source": "generated/prism-reed-rig-atlas-v1.png",
+    "role": "prism charge flare"
+  },
+  {
+    "file": "parts/prism-reed-prism-hit.png",
+    "width": 196,
+    "height": 244,
+    "source": "generated/prism-reed-rig-atlas-v1.png",
+    "role": "prism impact flare"
+  },
+  {
+    "file": "parts/prism-reed-body-damage1.png",
+    "width": 216,
+    "height": 357,
+    "source": "generated/prism-reed-rig-atlas-v1.png",
+    "role": "cracked prism damage state"
+  },
+  {
+    "file": "parts/prism-reed-body-damage2.png",
+    "width": 181,
+    "height": 348,
+    "source": "generated/prism-reed-rig-atlas-v1.png",
+    "role": "burned reed damage state"
+  },
+  {
+    "file": "parts/repair-moss-head.png",
+    "width": 323,
+    "height": 312,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "normal moss face with integrated smile"
+  },
+  {
+    "file": "parts/repair-moss-blink.png",
+    "width": 279,
+    "height": 237,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "closed-eye moss face"
+  },
+  {
+    "file": "parts/repair-moss-mouth.png",
+    "width": 99,
+    "height": 60,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "detached smiling mouth"
+  },
+  {
+    "file": "parts/repair-moss-moss-front.png",
+    "width": 248,
+    "height": 184,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "front moss tuft"
+  },
+  {
+    "file": "parts/repair-moss-moss-back.png",
+    "width": 294,
+    "height": 219,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "back moss cushion"
+  },
+  {
+    "file": "parts/repair-moss-tendril-left.png",
+    "width": 237,
+    "height": 223,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "left repair tendril"
+  },
+  {
+    "file": "parts/repair-moss-tendril-right.png",
+    "width": 232,
+    "height": 198,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "right repair tendril"
+  },
+  {
+    "file": "parts/repair-moss-tendril-long.png",
+    "width": 266,
+    "height": 230,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "long reaching tendril"
+  },
+  {
+    "file": "parts/repair-moss-leaf-left.png",
+    "width": 206,
+    "height": 153,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "left leaf pad"
+  },
+  {
+    "file": "parts/repair-moss-leaf-right.png",
+    "width": 197,
+    "height": 138,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "right leaf pad"
+  },
+  {
+    "file": "parts/repair-moss-root-base.png",
+    "width": 272,
+    "height": 206,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "root pad"
+  },
+  {
+    "file": "parts/repair-moss-repair-spore.png",
+    "width": 114,
+    "height": 181,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "healing sap bead"
+  },
+  {
+    "file": "parts/repair-moss-repair-thread-0.png",
+    "width": 248,
+    "height": 157,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "repair thread segment 0"
+  },
+  {
+    "file": "parts/repair-moss-repair-thread-1.png",
+    "width": 244,
+    "height": 175,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "repair thread segment 1"
+  },
+  {
+    "file": "parts/repair-moss-repair-thread-2.png",
+    "width": 243,
+    "height": 147,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "repair thread segment 2"
+  },
+  {
+    "file": "parts/repair-moss-repair-cast.png",
+    "width": 181,
+    "height": 201,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "repair cast sparkle"
+  },
+  {
+    "file": "parts/repair-moss-repair-stitch.png",
+    "width": 243,
+    "height": 188,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "reconnect knot effect"
+  },
+  {
+    "file": "parts/repair-moss-body-damage1.png",
+    "width": 214,
+    "height": 136,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "scorched moss damage state"
+  },
+  {
+    "file": "parts/repair-moss-tendril-fray.png",
+    "width": 217,
+    "height": 215,
+    "source": "generated/repair-moss-rig-atlas-v1.png",
+    "role": "frayed tendril damage state"
+  }
+]

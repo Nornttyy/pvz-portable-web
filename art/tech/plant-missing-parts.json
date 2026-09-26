@@ -1,0 +1,93 @@
+[
+  {
+    "file": "parts/cable-cap-body-damage1.png",
+    "width": 360,
+    "height": 352,
+    "source": "missing-atlases/cable-cap-damage-atlas-v1.png",
+    "role": "cable cap root-and-mycelium damage state 1; no head, cap, or stem"
+  },
+  {
+    "file": "parts/cable-cap-body-damage2.png",
+    "width": 360,
+    "height": 351,
+    "source": "missing-atlases/cable-cap-damage-atlas-v1.png",
+    "role": "cable cap root-and-mycelium damage state 2; no head, cap, or stem"
+  },
+  {
+    "file": "parts/repair-moss-body-damage2.png",
+    "width": 360,
+    "height": 240,
+    "source": "missing-atlases/repair-moss-damage2-atlas-v1.png",
+    "role": "repair moss heavy body damage state 2; no face or tendril"
+  },
+  {
+    "file": "parts/sunwheel-sun.png",
+    "width": 260,
+    "height": 207,
+    "source": "missing-atlases/sunwheel-source-atlas-v1.png",
+    "role": "detached sunwheel sunlight token"
+  },
+  {
+    "file": "parts/root-charge-source.png",
+    "width": 320,
+    "height": 220,
+    "source": "missing-atlases/sunwheel-source-atlas-v1.png",
+    "role": "detached root-network charge source"
+  },
+  {
+    "file": "parts/pulse-triple.png",
+    "width": 360,
+    "height": 241,
+    "source": "missing-atlases/pulse-triple-atlas-v1.png",
+    "role": "pulse pod three-shot pulse projectile fan"
+  },
+  {
+    "file": "parts/thorn-heal.png",
+    "width": 360,
+    "height": 355,
+    "source": "missing-atlases/thorn-heal-atlas-v1.png",
+    "role": "thornshell thorn-and-leaf restoration effect"
+  },
+  {
+    "file": "parts/arc-chain.png",
+    "width": 420,
+    "height": 325,
+    "source": "missing-atlases/arc-chain-atlas-v1.png",
+    "role": "arc orchid branching chain-lightning segment"
+  },
+  {
+    "file": "parts/arc-chain-hit.png",
+    "width": 266,
+    "height": 300,
+    "source": "missing-atlases/arc-chain-atlas-v1.png",
+    "role": "arc orchid chain-lightning impact bloom"
+  },
+  {
+    "file": "parts/amber-gourd-resin-muzzle.png",
+    "width": 360,
+    "height": 254,
+    "source": "missing-atlases/amber-gourd-resin-muzzle-atlas-v1.png",
+    "role": "amber gourd resin firing muzzle flash"
+  },
+  {
+    "file": "parts/scout-bloom-scout-projectile-2.png",
+    "width": 300,
+    "height": 226,
+    "source": "missing-atlases/scout-bloom-projectile-2-atlas-v1.png",
+    "role": "scout bloom guided seed projectile flight frame 2"
+  },
+  {
+    "file": "parts/prism-reed-lens-glint.png",
+    "width": 300,
+    "height": 263,
+    "source": "missing-atlases/prism-reed-lens-glint-atlas-v1.png",
+    "role": "prism reed detached lens glint; distinct from vfx-prism-muzzle"
+  },
+  {
+    "file": "parts/repair-moss-repair-cleanse.png",
+    "width": 330,
+    "height": 231,
+    "source": "missing-atlases/repair-moss-cleanse-atlas-v1.png",
+    "role": "repair moss cleansing repair pulse"
+  }
+]

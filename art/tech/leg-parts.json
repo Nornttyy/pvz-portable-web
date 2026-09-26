@@ -1,0 +1,366 @@
+{
+  "schema": 1,
+  "description": "Independent RGBA technology-zombie leg rig parts cut only from the five dedicated generated 3x2 leg atlases.",
+  "parts": [
+    {
+      "file": "parts/leak-pack-inner-leg-upper.png",
+      "width": 327,
+      "height": 400,
+      "source": "generated/leak-pack-leg-rig-atlas-v1.png#grid(0,0)",
+      "role": "inner upper leg / thigh only",
+      "slug": "leak-pack",
+      "runtime_canvas": {
+        "width": 15,
+        "height": 26
+      }
+    },
+    {
+      "file": "parts/leak-pack-inner-leg-lower.png",
+      "width": 190,
+      "height": 394,
+      "source": "generated/leak-pack-leg-rig-atlas-v1.png#grid(1,0)",
+      "role": "inner lower leg / shin only",
+      "slug": "leak-pack",
+      "runtime_canvas": {
+        "width": 32,
+        "height": 36
+      }
+    },
+    {
+      "file": "parts/leak-pack-inner-leg-foot.png",
+      "width": 330,
+      "height": 218,
+      "source": "generated/leak-pack-leg-rig-atlas-v1.png#grid(2,0)",
+      "role": "inner foot / boot only",
+      "slug": "leak-pack",
+      "runtime_canvas": {
+        "width": 27,
+        "height": 17
+      }
+    },
+    {
+      "file": "parts/leak-pack-outer-leg-upper.png",
+      "width": 299,
+      "height": 406,
+      "source": "generated/leak-pack-leg-rig-atlas-v1.png#grid(0,1)",
+      "role": "outer upper leg / thigh only",
+      "slug": "leak-pack",
+      "runtime_canvas": {
+        "width": 21,
+        "height": 39
+      }
+    },
+    {
+      "file": "parts/leak-pack-outer-leg-lower.png",
+      "width": 206,
+      "height": 415,
+      "source": "generated/leak-pack-leg-rig-atlas-v1.png#grid(1,1)",
+      "role": "outer lower leg / shin only",
+      "slug": "leak-pack",
+      "runtime_canvas": {
+        "width": 24,
+        "height": 30
+      }
+    },
+    {
+      "file": "parts/leak-pack-outer-leg-foot.png",
+      "width": 344,
+      "height": 233,
+      "source": "generated/leak-pack-leg-rig-atlas-v1.png#grid(2,1)",
+      "role": "outer foot / boot only",
+      "slug": "leak-pack",
+      "runtime_canvas": {
+        "width": 42,
+        "height": 21
+      }
+    },
+    {
+      "file": "parts/weld-shield-inner-leg-upper.png",
+      "width": 267,
+      "height": 429,
+      "source": "generated/weld-shield-leg-rig-atlas-v1.png#grid(0,0)",
+      "role": "inner upper leg / thigh only",
+      "slug": "weld-shield",
+      "runtime_canvas": {
+        "width": 15,
+        "height": 26
+      }
+    },
+    {
+      "file": "parts/weld-shield-inner-leg-lower.png",
+      "width": 208,
+      "height": 371,
+      "source": "generated/weld-shield-leg-rig-atlas-v1.png#grid(1,0)",
+      "role": "inner lower leg / shin only",
+      "slug": "weld-shield",
+      "runtime_canvas": {
+        "width": 32,
+        "height": 36
+      }
+    },
+    {
+      "file": "parts/weld-shield-inner-leg-foot.png",
+      "width": 285,
+      "height": 260,
+      "source": "generated/weld-shield-leg-rig-atlas-v1.png#grid(2,0)",
+      "role": "inner foot / boot only",
+      "slug": "weld-shield",
+      "runtime_canvas": {
+        "width": 27,
+        "height": 17
+      }
+    },
+    {
+      "file": "parts/weld-shield-outer-leg-upper.png",
+      "width": 266,
+      "height": 426,
+      "source": "generated/weld-shield-leg-rig-atlas-v1.png#grid(0,1)",
+      "role": "outer upper leg / thigh only",
+      "slug": "weld-shield",
+      "runtime_canvas": {
+        "width": 21,
+        "height": 39
+      }
+    },
+    {
+      "file": "parts/weld-shield-outer-leg-lower.png",
+      "width": 229,
+      "height": 386,
+      "source": "generated/weld-shield-leg-rig-atlas-v1.png#grid(1,1)",
+      "role": "outer lower leg / shin only",
+      "slug": "weld-shield",
+      "runtime_canvas": {
+        "width": 24,
+        "height": 30
+      }
+    },
+    {
+      "file": "parts/weld-shield-outer-leg-foot.png",
+      "width": 301,
+      "height": 282,
+      "source": "generated/weld-shield-leg-rig-atlas-v1.png#grid(2,1)",
+      "role": "outer foot / boot only",
+      "slug": "weld-shield",
+      "runtime_canvas": {
+        "width": 42,
+        "height": 21
+      }
+    },
+    {
+      "file": "parts/turbine-boot-inner-leg-upper.png",
+      "width": 268,
+      "height": 443,
+      "source": "generated/turbine-boot-leg-rig-atlas-v1.png#grid(0,0)",
+      "role": "inner upper leg / thigh only",
+      "slug": "turbine-boot",
+      "runtime_canvas": {
+        "width": 15,
+        "height": 26
+      }
+    },
+    {
+      "file": "parts/turbine-boot-inner-leg-lower.png",
+      "width": 233,
+      "height": 444,
+      "source": "generated/turbine-boot-leg-rig-atlas-v1.png#grid(1,0)",
+      "role": "inner lower leg / shin only",
+      "slug": "turbine-boot",
+      "runtime_canvas": {
+        "width": 32,
+        "height": 36
+      }
+    },
+    {
+      "file": "parts/turbine-boot-inner-leg-foot.png",
+      "width": 342,
+      "height": 409,
+      "source": "generated/turbine-boot-leg-rig-atlas-v1.png#grid(2,0)",
+      "role": "inner foot / boot only",
+      "slug": "turbine-boot",
+      "runtime_canvas": {
+        "width": 27,
+        "height": 17
+      }
+    },
+    {
+      "file": "parts/turbine-boot-outer-leg-upper.png",
+      "width": 291,
+      "height": 458,
+      "source": "generated/turbine-boot-leg-rig-atlas-v1.png#grid(0,1)",
+      "role": "outer upper leg / thigh only",
+      "slug": "turbine-boot",
+      "runtime_canvas": {
+        "width": 21,
+        "height": 39
+      }
+    },
+    {
+      "file": "parts/turbine-boot-outer-leg-lower.png",
+      "width": 256,
+      "height": 454,
+      "source": "generated/turbine-boot-leg-rig-atlas-v1.png#grid(1,1)",
+      "role": "outer lower leg / shin only",
+      "slug": "turbine-boot",
+      "runtime_canvas": {
+        "width": 24,
+        "height": 30
+      }
+    },
+    {
+      "file": "parts/turbine-boot-outer-leg-foot.png",
+      "width": 340,
+      "height": 408,
+      "source": "generated/turbine-boot-leg-rig-atlas-v1.png#grid(2,1)",
+      "role": "outer foot / boot only",
+      "slug": "turbine-boot",
+      "runtime_canvas": {
+        "width": 42,
+        "height": 21
+      }
+    },
+    {
+      "file": "parts/cable-hook-inner-leg-upper.png",
+      "width": 327,
+      "height": 430,
+      "source": "generated/cable-hook-leg-rig-atlas-v1.png#grid(0,0)",
+      "role": "inner upper leg / thigh only",
+      "slug": "cable-hook",
+      "runtime_canvas": {
+        "width": 15,
+        "height": 26
+      }
+    },
+    {
+      "file": "parts/cable-hook-inner-leg-lower.png",
+      "width": 187,
+      "height": 412,
+      "source": "generated/cable-hook-leg-rig-atlas-v1.png#grid(1,0)",
+      "role": "inner lower leg / shin only",
+      "slug": "cable-hook",
+      "runtime_canvas": {
+        "width": 32,
+        "height": 36
+      }
+    },
+    {
+      "file": "parts/cable-hook-inner-leg-foot.png",
+      "width": 372,
+      "height": 409,
+      "source": "generated/cable-hook-leg-rig-atlas-v1.png#grid(2,0)",
+      "role": "inner foot / boot only",
+      "slug": "cable-hook",
+      "runtime_canvas": {
+        "width": 27,
+        "height": 17
+      }
+    },
+    {
+      "file": "parts/cable-hook-outer-leg-upper.png",
+      "width": 322,
+      "height": 468,
+      "source": "generated/cable-hook-leg-rig-atlas-v1.png#grid(0,1)",
+      "role": "outer upper leg / thigh only",
+      "slug": "cable-hook",
+      "runtime_canvas": {
+        "width": 21,
+        "height": 39
+      }
+    },
+    {
+      "file": "parts/cable-hook-outer-leg-lower.png",
+      "width": 245,
+      "height": 428,
+      "source": "generated/cable-hook-leg-rig-atlas-v1.png#grid(1,1)",
+      "role": "outer lower leg / shin only",
+      "slug": "cable-hook",
+      "runtime_canvas": {
+        "width": 24,
+        "height": 30
+      }
+    },
+    {
+      "file": "parts/cable-hook-outer-leg-foot.png",
+      "width": 404,
+      "height": 389,
+      "source": "generated/cable-hook-leg-rig-atlas-v1.png#grid(2,1)",
+      "role": "outer foot / boot only",
+      "slug": "cable-hook",
+      "runtime_canvas": {
+        "width": 42,
+        "height": 21
+      }
+    },
+    {
+      "file": "parts/wrench-tech-inner-leg-upper.png",
+      "width": 361,
+      "height": 388,
+      "source": "generated/wrench-tech-leg-rig-atlas-v1.png#grid(0,0)",
+      "role": "inner upper leg / thigh only",
+      "slug": "wrench-tech",
+      "runtime_canvas": {
+        "width": 15,
+        "height": 26
+      }
+    },
+    {
+      "file": "parts/wrench-tech-inner-leg-lower.png",
+      "width": 218,
+      "height": 408,
+      "source": "generated/wrench-tech-leg-rig-atlas-v1.png#grid(1,0)",
+      "role": "inner lower leg / shin only",
+      "slug": "wrench-tech",
+      "runtime_canvas": {
+        "width": 32,
+        "height": 36
+      }
+    },
+    {
+      "file": "parts/wrench-tech-inner-leg-foot.png",
+      "width": 360,
+      "height": 278,
+      "source": "generated/wrench-tech-leg-rig-atlas-v1.png#grid(2,0)",
+      "role": "inner foot / boot only",
+      "slug": "wrench-tech",
+      "runtime_canvas": {
+        "width": 27,
+        "height": 17
+      }
+    },
+    {
+      "file": "parts/wrench-tech-outer-leg-upper.png",
+      "width": 365,
+      "height": 400,
+      "source": "generated/wrench-tech-leg-rig-atlas-v1.png#grid(0,1)",
+      "role": "outer upper leg / thigh only",
+      "slug": "wrench-tech",
+      "runtime_canvas": {
+        "width": 21,
+        "height": 39
+      }
+    },
+    {
+      "file": "parts/wrench-tech-outer-leg-lower.png",
+      "width": 209,
+      "height": 411,
+      "source": "generated/wrench-tech-leg-rig-atlas-v1.png#grid(1,1)",
+      "role": "outer lower leg / shin only",
+      "slug": "wrench-tech",
+      "runtime_canvas": {
+        "width": 24,
+        "height": 30
+      }
+    },
+    {
+      "file": "parts/wrench-tech-outer-leg-foot.png",
+      "width": 372,
+      "height": 282,
+      "source": "generated/wrench-tech-leg-rig-atlas-v1.png#grid(2,1)",
+      "role": "outer foot / boot only",
+      "slug": "wrench-tech",
+      "runtime_canvas": {
+        "width": 42,
+        "height": 21
+      }
+    }
+  ]
+}

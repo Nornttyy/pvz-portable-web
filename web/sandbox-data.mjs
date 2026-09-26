@@ -5,30 +5,27 @@ const groups = {
   support:[1,9,11,22,25,31,33,35,38], water:[16,19,24,43], upgrade:[40,41,42,43,44,45,46,47],
 };
 const notes = {11:'需要墓碑',16:'水上底座',19:'仅限水路',24:'仅限水路',30:'可套在植物外',35:'需要睡眠蘑菇',43:'放在泳池',47:'占两格 · 操作后发射'};
-export const ORIGINAL_PLANTS = [
-  [100,0,'火焰豌豆','火球攻击 · 小范围伤害'],[101,7,'双发寒冰','连续两发 · 寒冰减速'],
-  [102,7,'双发火焰','连续两发 · 火球攻击'],[103,18,'三线寒冰','三路攻击 · 寒冰减速'],
-  [104,18,'三线火焰','三路攻击 · 火球攻击'],[105,40,'寒冰机枪','连续四发 · 寒冰减速'],
-  [106,40,'火焰机枪','连续四发 · 火球攻击'],[107,7,'冰火双发','冰火交替 · 火焰会解除减速'],
-  [108,0,'回声花','两次声波 · 穿过整路敌人'],
-  [110,1,'节拍花','生产阳光 · 加快周围植物攻击'],[111,8,'雷电蘑菇','独立远程 · 成长后更强 · 成熟跳电'],
-  [112,0,'电能豌豆','电击跳向附近两只敌人'],[113,0,'小豌豆','体型小 · 攻速快 · 单发伤害低'],
-  [114,0,'重炮豌豆','慢速重击 · 推退敌人'],[115,0,'散射豌豆','三发散射 · 攻击相邻三路'],
-  [116,0,'追击豌豆','子弹转向 · 自动追击敌人'],[117,0,'腐化豌豆','命中后持续伤害 · 再次命中刷新'],
+export const TECH_PLANTS = [
+  [100,1,'日轮花','产阳光 · 为根网充能'],[101,0,'脉芽荚','脉冲种子 · 共振三连'],
+  [102,3,'棘壳蕨','近身反刺 · 共振自愈'],[103,8,'菌缆菇','连接根网 · 点按启动共振'],
+  [104,18,'弧苞兰','三路电弧 · 连锁机械敌人'],[105,0,'磁喉捕手','吸走护甲 · 打断装置'],
+  [106,0,'胶琥瓜','树脂胶团 · 减速目标'],[107,0,'巡芽花','追击芽弹 · 优先前排'],
+  [108,0,'棱光芦苇','蓄能光束 · 贯穿整行'],[109,1,'修植苔','修复邻格 · 清除干扰'],
 ].map(([id,base,name,note])=>({id,base,name,note}));
-export const PLANTS = [...plantNames.map((name,id) => ({id,name,note:notes[id] ?? '免费 · 无冷却'})),...ORIGINAL_PLANTS];
-const validPlant = id => (id>=0&&id<48)||ORIGINAL_PLANTS.some(p=>p.id===id);
-export const ORIGINAL_ZOMBIES = [
-  [200,2,'纸盒僵尸','纸盒破后短暂加速'],[201,1,'助威僵尸','周期加快附近同伴的移动'],
-  [202,0,'泡泡糖僵尸','靠近后降低植物攻速'],[203,4,'冰桶僵尸','铁桶完整时免受寒冰减速'],
-  [204,0,'电能僵尸','首次受到电击后恢复生命并加速'],[205,0,'轻装僵尸','体型小 · 移速快 · 生命低'],
-  [206,2,'重甲路障','移动缓慢 · 护甲厚重'],[207,4,'修理僵尸','周期修复附近同伴的护甲'],
-  [208,0,'烟雾僵尸','周期进入烟雾 · 受到伤害减半'],[209,0,'双子僵尸','倒下后出现两只小鬼'],
-  [210,0,'纸团投手','停步准备 · 纸弹被前排挡住'],[211,0,'画家僵尸','远程颜料 · 暂时降低植物攻速'],
+// Compatibility aliases keep saved-layout readers stable; the game and UI use
+// the Technology names from here on, not the retired mixed expansion roster.
+export const PLANTS = [...plantNames.map((name,id) => ({id,name,note:notes[id] ?? '免费 · 无冷却'})),...TECH_PLANTS];
+const validPlant = id => (id>=0&&id<48)||TECH_PLANTS.some(p=>p.id===id);
+export const TECH_ZOMBIES = [
+  [200,0,'漏电背包僵尸','倒下留下废能芯 · 为附近同伴充电'],[201,2,'焊板盾僵尸','焊板护盾 · 破损后失去格挡'],
+  [202,0,'涡轮靴僵尸','蓄力冲刺 · 过热后减速'],[203,0,'拖缆钩手','拉断附近根网 · 钩索可被打断'],
+  [204,4,'扳手维修僵尸','修复机械护甲 · 破桶后失效'],[205,0,'螺栓投手','停步瞄准 · 远程螺栓'],
+  [206,0,'嗡鸣浮空僵尸','悬浮移动 · 优先躲开地面陷阱'],[207,0,'干扰天线僵尸','压制附近根网充能'],
+  [208,0,'磁暴回收僵尸','吸附芽弹 · 积蓄电磁脉冲'],[209,0,'全息诱饵僵尸','周期投影假身 · 首次受击免伤'],
 ].map(([id,base,name,note])=>({id,base,name,note}));
 export const ZOMBIES = [[0,'普通僵尸'],[1,'旗帜僵尸'],[2,'路障僵尸'],[3,'撑杆僵尸'],[4,'铁桶僵尸'],[5,'读报僵尸'],[6,'铁门僵尸'],[7,'橄榄球僵尸'],[8,'舞王僵尸'],[10,'鸭子救生圈'],[11,'潜水僵尸'],[12,'冰车僵尸'],[14,'海豚骑士'],[15,'玩偶匣僵尸'],[16,'气球僵尸'],[17,'矿工僵尸'],[18,'跳跳僵尸'],[19,'雪人僵尸'],[21,'梯子僵尸'],[22,'投石车僵尸'],[23,'巨人僵尸'],[24,'小鬼僵尸'],[32,'红眼巨人']].map(([id,name])=>({id,name,note:[10,11,14].includes(id)?'仅限水路':'手动放置'}));
-ZOMBIES.push(...ORIGINAL_ZOMBIES);
-export function plantsFor(category) { return category === 'original' ? ORIGINAL_PLANTS : category === 'all' ? PLANTS : (groups[category] ?? groups.common).map(id=>PLANTS[id]); }
+ZOMBIES.push(...TECH_ZOMBIES);
+export function plantsFor(category) { return category === 'technology' || category === 'original' ? TECH_PLANTS : category === 'all' ? PLANTS : (groups[category] ?? groups.common).map(id=>PLANTS[id]); }
 export function boardCell(x,y,pool=false) {
   if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
   const height = pool ? 85 : 100;
@@ -58,8 +55,6 @@ export function validateLayout(value) {
   const stacked=value.stacked===true;
   const seen = new Set();
   const plants = value.plants.map(p=>{
-    // Retired spring nuts become regular wall-nuts in older saved formations.
-    if(p?.type===109)p={...p,type:3};
     if (!p || ![p.type,p.col,p.row].every(Number.isInteger) || !validPlant(p.type) || p.col<0 || p.col>=9 || p.row<0 || p.row >= (value.map===1?6:5)) throw Error('阵型中有无效的植物或位置');
     const key = `${p.type}:${p.col}:${p.row}`;
     if (!stacked&&seen.has(key)) throw Error('阵型中有重复植物');
@@ -83,7 +78,7 @@ export function validateLayout(value) {
     if(!stacked&&[19,24,43].includes(cell.normal)&&cell.base!==undefined) throw Error('水生植物与底座冲突');
     if([21,46].includes(p.type)&&cell.types.has(33))throw Error('地刺需要地面');
     if(p.type===11) throw Error('阵型不包含墓碑，不能保存正在吞噬墓碑的植物');
-    if(p.type===35&&![8,9,10,12,13,14,15,24,31,42,111].includes(cell.normal)) throw Error('咖啡豆缺少蘑菇');
+    if(p.type===35&&![8,9,10,12,13,14,15,24,31,42].includes(cell.normal)) throw Error('咖啡豆缺少蘑菇');
     if(p.type===47) {
       const right=occupied.get(`${p.col+1}:${p.row}`)??{};
       if(p.col>=8||(!stacked&&(right.normal!==undefined||right.shell!==undefined||cell.shell!==undefined))) throw Error('玉米加农炮需要连续两个空位');

@@ -3,27 +3,35 @@
 class Board; class Zombie; class Reanimation; class Plant; class Projectile;
 namespace Sexy { class Graphics; class Image; }
 namespace SandboxZombies {
-struct Definition {int id,base;const char* name;const char* note;const char* art;int health,armor;};
-inline constexpr std::array<Definition,12> Definitions{{
- {200,2,"纸盒僵尸","纸盒破后短暂加速","parcel-zombie",270,300},
- {201,1,"助威僵尸","周期加快附近同伴的移动","bell-zombie",320,0},
- {202,0,"泡泡糖僵尸","靠近后降低植物攻速","gum-zombie",360,0},
- {203,4,"冰桶僵尸","铁桶完整时免受寒冰减速","ice-bucket-zombie",270,850},
- {204,0,"电能僵尸","首次受到电击后恢复生命并加速","battery-zombie",340,0},
- {205,0,"轻装僵尸","体型小 · 移速快 · 生命低","light-zombie",160,0},
- {206,2,"重甲路障","移动缓慢 · 护甲厚重","armored-cone-zombie",350,950},
- {207,4,"修理僵尸","周期修复附近同伴的护甲","repair-zombie",300,600},
- {208,0,"烟雾僵尸","周期进入烟雾 · 受到伤害减半","smoke-zombie",360,0},
- {209,0,"双子僵尸","倒下后出现两只小鬼","twin-zombie",380,0},
- {210,0,"纸团投手","停步准备 · 纸弹被前排挡住","paper-thrower",330,0},
- {211,0,"画家僵尸","远程颜料 · 暂时降低植物攻速","ink-painter",380,0},
+enum class Role { Battery, Shield, Turbine, Hook, Repair, Bolt, Drone, Jammer, Magnet, Holo };
+struct Definition {int id,base;Role role;const char* name;const char* note;const char* art;int health,armor;};
+inline constexpr std::array<Definition,10> Definitions{{
+ {200,0,Role::Battery,"漏电背包僵尸","倒下留下废能芯 · 为附近同伴充电","leak-pack",320,0},
+ {201,2,Role::Shield,"焊板盾僵尸","焊板护盾 · 破损后失去格挡","weld-shield",360,750},
+ {202,0,Role::Turbine,"涡轮靴僵尸","蓄力冲刺 · 过热后减速","turbine-boot",280,0},
+ {203,0,Role::Hook,"拖缆钩手","拉断附近根网 · 钩索可被打断","cable-hook",330,0},
+ {204,4,Role::Repair,"扳手维修僵尸","修复机械护甲 · 破桶后失效","wrench-tech",320,650},
+ {205,0,Role::Bolt,"螺栓投手","停步瞄准 · 远程螺栓","bolt-thrower",300,0},
+ {206,0,Role::Drone,"嗡鸣浮空僵尸","悬浮移动 · 优先躲开地面陷阱","hover-drone",260,0},
+ {207,0,Role::Jammer,"干扰天线僵尸","压制附近根网充能","jammer-aerial",360,0},
+ {208,0,Role::Magnet,"磁暴回收僵尸","吸附芽弹 · 积蓄电磁脉冲","magnet-salvager",400,0},
+ {209,0,Role::Holo,"全息诱饵僵尸","周期投影假身 · 首次受击免伤","holo-decoy",330,0},
 }};
-constexpr const Definition* Find(int id){return id>=200&&id<212?&Definitions[id-200]:nullptr;}
+constexpr const Definition* Find(int id){return id>=200&&id<210?&Definitions[id-200]:nullptr;}
 constexpr int Base(int id){auto* d=Find(id);return d?d->base:id;}
 void Reset();void Forget(Zombie* zombie);void Assign(Zombie* zombie,int id);
 void Tick(Board* board);void DrawPortrait(Sexy::Graphics* g,int x,int y,int w,int h,int id);
 float Speed(const Zombie* zombie);int Damage(const Zombie* zombie,int damage);
-bool ElectricHit(Zombie* zombie);void CombatDeath(Zombie* zombie);
+bool ArcHit(Zombie* zombie,int damage=0);
+bool IsMechanical(const Zombie* zombie);
+bool IsResinSlowed(const Zombie* zombie);
+void ApplyResin(Zombie* zombie,int ticks);
+bool IsJamming(const Plant* relay);
+bool HookRootCable(Board* board,Zombie* hooker,Plant* target);
+bool Intercept(Projectile* shot);
+// Zombie::DropLoot is the one native death hook shared by all causes of
+// damage.  It hands mechanical-core credit to the plant-side root network.
+void CombatDeath(Zombie* zombie);
 void DrawEffects(Sexy::Graphics* g,Board* board,int row);
 bool HasShot(const Projectile* shot);
 bool DrawShot(Sexy::Graphics* g,const Projectile* shot);
@@ -31,7 +39,6 @@ bool Impact(Projectile* shot,Plant* plant);
 Plant* CollisionTarget(Projectile* shot);
 void ForgetShot(Projectile* shot);
 void ForgetPlant(Plant* plant);
-bool AttackSlowed(const Plant* plant);
 void RefreshDamageArt(Zombie* zombie);
 Sexy::Image* DetachedArmor(const Zombie* zombie);
 }

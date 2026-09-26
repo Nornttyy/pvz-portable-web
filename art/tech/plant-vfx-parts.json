@@ -1,0 +1,178 @@
+[
+  {
+    "file": "vfx-pulse.png",
+    "width": 209,
+    "height": 130,
+    "source": "art/tech/generated/plant-combat-vfx-atlas-v1.png",
+    "gridCell": [
+      1,
+      1
+    ],
+    "role": "projectile-or-impact"
+  },
+  {
+    "file": "vfx-arc.png",
+    "width": 224,
+    "height": 169,
+    "source": "art/tech/generated/plant-combat-vfx-atlas-v1.png",
+    "gridCell": [
+      1,
+      2
+    ],
+    "role": "projectile-or-impact"
+  },
+  {
+    "file": "vfx-magnet.png",
+    "width": 203,
+    "height": 176,
+    "source": "art/tech/generated/plant-combat-vfx-atlas-v1.png",
+    "gridCell": [
+      1,
+      3
+    ],
+    "role": "projectile-or-impact"
+  },
+  {
+    "file": "vfx-resin.png",
+    "width": 222,
+    "height": 119,
+    "source": "art/tech/generated/plant-combat-vfx-atlas-v1.png",
+    "gridCell": [
+      1,
+      4
+    ],
+    "role": "projectile-or-impact"
+  },
+  {
+    "file": "vfx-scout.png",
+    "width": 198,
+    "height": 114,
+    "source": "art/tech/generated/plant-combat-vfx-atlas-v1.png",
+    "gridCell": [
+      2,
+      1
+    ],
+    "role": "projectile-or-impact"
+  },
+  {
+    "file": "vfx-pulse-hit-0.png",
+    "width": 157,
+    "height": 176,
+    "source": "art/tech/generated/plant-combat-vfx-atlas-v1.png",
+    "gridCell": [
+      2,
+      2
+    ],
+    "role": "projectile-or-impact"
+  },
+  {
+    "file": "vfx-pulse-hit-1.png",
+    "width": 263,
+    "height": 233,
+    "source": "art/tech/generated/plant-combat-vfx-atlas-v1.png",
+    "gridCell": [
+      2,
+      3
+    ],
+    "role": "projectile-or-impact"
+  },
+  {
+    "file": "vfx-arc-hit-0.png",
+    "width": 243,
+    "height": 218,
+    "source": "art/tech/generated/plant-combat-vfx-atlas-v1.png",
+    "gridCell": [
+      2,
+      4
+    ],
+    "role": "projectile-or-impact"
+  },
+  {
+    "file": "vfx-arc-hit-1.png",
+    "width": 294,
+    "height": 243,
+    "source": "art/tech/generated/plant-combat-vfx-atlas-v1.png",
+    "gridCell": [
+      3,
+      1
+    ],
+    "role": "projectile-or-impact"
+  },
+  {
+    "file": "vfx-magnet-hit-0.png",
+    "width": 212,
+    "height": 197,
+    "source": "art/tech/generated/plant-combat-vfx-atlas-v1.png",
+    "gridCell": [
+      3,
+      2
+    ],
+    "role": "projectile-or-impact"
+  },
+  {
+    "file": "vfx-magnet-hit-1.png",
+    "width": 246,
+    "height": 243,
+    "source": "art/tech/generated/plant-combat-vfx-atlas-v1.png",
+    "gridCell": [
+      3,
+      3
+    ],
+    "role": "projectile-or-impact"
+  },
+  {
+    "file": "vfx-resin-hit-0.png",
+    "width": 196,
+    "height": 169,
+    "source": "art/tech/generated/plant-combat-vfx-atlas-v1.png",
+    "gridCell": [
+      3,
+      4
+    ],
+    "role": "projectile-or-impact"
+  },
+  {
+    "file": "vfx-resin-hit-1.png",
+    "width": 290,
+    "height": 199,
+    "source": "art/tech/generated/plant-combat-vfx-atlas-v1.png",
+    "gridCell": [
+      4,
+      1
+    ],
+    "role": "projectile-or-impact"
+  },
+  {
+    "file": "vfx-scout-hit-0.png",
+    "width": 153,
+    "height": 144,
+    "source": "art/tech/generated/plant-combat-vfx-atlas-v1.png",
+    "gridCell": [
+      4,
+      2
+    ],
+    "role": "projectile-or-impact"
+  },
+  {
+    "file": "vfx-scout-hit-1.png",
+    "width": 214,
+    "height": 201,
+    "source": "art/tech/generated/plant-combat-vfx-atlas-v1.png",
+    "gridCell": [
+      4,
+      3
+    ],
+    "role": "projectile-or-impact"
+  },
+  {
+    "file": "vfx-tech-muzzle.png",
+    "width": 262,
+    "height": 170,
+    "source": "art/tech/generated/plant-combat-vfx-atlas-v1.png",
+    "gridCell": [
+      4,
+      4
+    ],
+    "role": "projectile-or-impact"
+  }
+]

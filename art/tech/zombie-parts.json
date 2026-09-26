@@ -1,0 +1,1893 @@
+{
+  "schema": 1,
+  "description": "True RGBA parts cut from the ten mechanical-zombie rig atlases; no old expansion or placeholder art.",
+  "parts": [
+    {
+      "file": "parts/leak-pack-head.png",
+      "width": 266,
+      "height": 268,
+      "source": "generated/leak-pack-rig-atlas-v1.png#45,32,315,301",
+      "role": "head",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/leak-pack-jaw.png",
+      "width": 179,
+      "height": 141,
+      "source": "generated/leak-pack-rig-atlas-v1.png#396,125,577,268",
+      "role": "jaw",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/leak-pack-body.png",
+      "width": 273,
+      "height": 271,
+      "source": "generated/leak-pack-rig-atlas-v1.png#629,36,902,307",
+      "role": "torso normal",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/leak-pack-body-damage1.png",
+      "width": 267,
+      "height": 284,
+      "source": "generated/leak-pack-rig-atlas-v1.png#951,36,1218,320",
+      "role": "torso damage stage 1",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/leak-pack-body-damage2.png",
+      "width": 275,
+      "height": 290,
+      "source": "generated/leak-pack-rig-atlas-v1.png#36,332,315,623",
+      "role": "torso damage stage 2",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/leak-pack-inner-upper.png",
+      "width": 127,
+      "height": 276,
+      "source": "generated/leak-pack-rig-atlas-v1.png#422,339,552,615",
+      "role": "inner upper arm",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/leak-pack-inner-lower.png",
+      "width": 102,
+      "height": 264,
+      "source": "generated/leak-pack-rig-atlas-v1.png#724,343,827,609",
+      "role": "inner lower arm",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/leak-pack-outer-upper.png",
+      "width": 179,
+      "height": 256,
+      "source": "generated/leak-pack-rig-atlas-v1.png#998,350,1178,607",
+      "role": "outer upper arm",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/leak-pack-outer-lower.png",
+      "width": 139,
+      "height": 247,
+      "source": "generated/leak-pack-rig-atlas-v1.png#111,664,251,913",
+      "role": "outer lower arm",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/leak-pack-inner-hand.png",
+      "width": 189,
+      "height": 176,
+      "source": "generated/leak-pack-rig-atlas-v1.png#377,700,568,878",
+      "role": "independent inner hand",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/leak-pack-hand.png",
+      "width": 189,
+      "height": 176,
+      "source": "generated/leak-pack-rig-atlas-v1.png#377,700,568,878",
+      "role": "runtime hand; independent inner hand",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/leak-pack-pack.png",
+      "width": 287,
+      "height": 307,
+      "source": "generated/leak-pack-rig-atlas-v1.png#629,619,916,927",
+      "role": "battery pack compatibility part",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/leak-pack-battery-pack-back.png",
+      "width": 287,
+      "height": 307,
+      "source": "generated/leak-pack-rig-atlas-v1.png#629,619,916,927",
+      "role": "battery pack back",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/leak-pack-battery-pack-front.png",
+      "width": 236,
+      "height": 265,
+      "source": "generated/leak-pack-rig-atlas-v1.png#967,646,1203,911",
+      "role": "battery pack front",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/leak-pack-loose-cable.png",
+      "width": 287,
+      "height": 219,
+      "source": "generated/leak-pack-rig-atlas-v1.png#35,983,322,1202",
+      "role": "loose power cable",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/leak-pack-power-core.png",
+      "width": 131,
+      "height": 239,
+      "source": "generated/leak-pack-rig-atlas-v1.png#416,975,547,1215",
+      "role": "glowing removable power core",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/leak-pack-battery-spark-vfx.png",
+      "width": 178,
+      "height": 259,
+      "source": "generated/leak-pack-rig-atlas-v1.png#670,953,848,1212",
+      "role": "battery spark visual effect",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/leak-pack-battery-steam-vfx.png",
+      "width": 229,
+      "height": 248,
+      "source": "generated/leak-pack-rig-atlas-v1.png#997,959,1226,1210",
+      "role": "battery vent steam visual effect",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/weld-shield-head.png",
+      "width": 260,
+      "height": 273,
+      "source": "generated/weld-shield-rig-atlas-v1.png#35,22,296,297",
+      "role": "head",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-jaw.png",
+      "width": 184,
+      "height": 149,
+      "source": "generated/weld-shield-rig-atlas-v1.png#371,146,558,297",
+      "role": "jaw",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-body.png",
+      "width": 247,
+      "height": 271,
+      "source": "generated/weld-shield-rig-atlas-v1.png#643,40,891,315",
+      "role": "torso normal",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-body-damage1.png",
+      "width": 254,
+      "height": 271,
+      "source": "generated/weld-shield-rig-atlas-v1.png#961,40,1215,315",
+      "role": "torso damage stage 1",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-body-damage2.png",
+      "width": 260,
+      "height": 300,
+      "source": "generated/weld-shield-rig-atlas-v1.png#35,334,296,638",
+      "role": "torso damage stage 2",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-inner-upper.png",
+      "width": 162,
+      "height": 257,
+      "source": "generated/weld-shield-rig-atlas-v1.png#397,342,560,600",
+      "role": "inner upper arm",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-inner-lower.png",
+      "width": 152,
+      "height": 194,
+      "source": "generated/weld-shield-rig-atlas-v1.png#705,381,861,578",
+      "role": "inner lower arm",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-outer-upper.png",
+      "width": 174,
+      "height": 242,
+      "source": "generated/weld-shield-rig-atlas-v1.png#993,352,1170,595",
+      "role": "outer upper arm",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-outer-lower.png",
+      "width": 197,
+      "height": 241,
+      "source": "generated/weld-shield-rig-atlas-v1.png#60,659,258,903",
+      "role": "outer lower arm",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-inner-hand.png",
+      "width": 179,
+      "height": 153,
+      "source": "generated/weld-shield-rig-atlas-v1.png#358,705,538,860",
+      "role": "independent inner hand",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-hand.png",
+      "width": 179,
+      "height": 153,
+      "source": "generated/weld-shield-rig-atlas-v1.png#358,705,538,860",
+      "role": "runtime hand; independent inner hand",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-pack.png",
+      "width": 248,
+      "height": 283,
+      "source": "generated/weld-shield-rig-atlas-v1.png#644,632,895,915",
+      "role": "shield-back compatibility equipment",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-shield-back.png",
+      "width": 248,
+      "height": 283,
+      "source": "generated/weld-shield-rig-atlas-v1.png#644,632,895,915",
+      "role": "shield back",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-shield-front.png",
+      "width": 266,
+      "height": 298,
+      "source": "generated/weld-shield-rig-atlas-v1.png#957,620,1225,919",
+      "role": "shield front",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-prop.png",
+      "width": 266,
+      "height": 305,
+      "source": "generated/weld-shield-rig-atlas-v1.png#32,920,299,1225",
+      "role": "shield prop normal",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-prop-damage1.png",
+      "width": 256,
+      "height": 302,
+      "source": "generated/weld-shield-rig-atlas-v1.png#346,922,602,1225",
+      "role": "shield prop damage stage 1",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-prop-damage2.png",
+      "width": 273,
+      "height": 246,
+      "source": "generated/weld-shield-rig-atlas-v1.png#650,950,925,1198",
+      "role": "shield prop damage stage 2",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-shield-normal.png",
+      "width": 266,
+      "height": 305,
+      "source": "generated/weld-shield-rig-atlas-v1.png#32,920,299,1225",
+      "role": "detachable shield normal",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-shield-damage1.png",
+      "width": 256,
+      "height": 302,
+      "source": "generated/weld-shield-rig-atlas-v1.png#346,922,602,1225",
+      "role": "detachable shield damage stage 1",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-shield-damage2.png",
+      "width": 273,
+      "height": 246,
+      "source": "generated/weld-shield-rig-atlas-v1.png#650,950,925,1198",
+      "role": "detachable shield damage stage 2",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/weld-shield-shield-impact-vfx.png",
+      "width": 207,
+      "height": 260,
+      "source": "generated/weld-shield-rig-atlas-v1.png#998,955,1205,1215",
+      "role": "shield weld-impact visual effect",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/turbine-boot-head.png",
+      "width": 258,
+      "height": 293,
+      "source": "generated/turbine-boot-rig-atlas-v1.png#38,15,298,308",
+      "role": "head",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/turbine-boot-jaw.png",
+      "width": 183,
+      "height": 153,
+      "source": "generated/turbine-boot-rig-atlas-v1.png#376,135,562,290",
+      "role": "jaw",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/turbine-boot-body.png",
+      "width": 260,
+      "height": 284,
+      "source": "generated/turbine-boot-rig-atlas-v1.png#650,23,911,308",
+      "role": "torso normal",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/turbine-boot-body-damage1.png",
+      "width": 244,
+      "height": 288,
+      "source": "generated/turbine-boot-rig-atlas-v1.png#959,19,1205,310",
+      "role": "torso damage stage 1",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/turbine-boot-body-damage2.png",
+      "width": 251,
+      "height": 300,
+      "source": "generated/turbine-boot-rig-atlas-v1.png#48,331,301,631",
+      "role": "torso damage stage 2",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/turbine-boot-inner-upper.png",
+      "width": 154,
+      "height": 249,
+      "source": "generated/turbine-boot-rig-atlas-v1.png#382,363,538,612",
+      "role": "inner upper arm",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/turbine-boot-inner-lower.png",
+      "width": 176,
+      "height": 259,
+      "source": "generated/turbine-boot-rig-atlas-v1.png#684,355,861,614",
+      "role": "inner lower arm",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/turbine-boot-outer-upper.png",
+      "width": 124,
+      "height": 245,
+      "source": "generated/turbine-boot-rig-atlas-v1.png#1036,365,1161,612",
+      "role": "outer upper arm",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/turbine-boot-outer-lower.png",
+      "width": 211,
+      "height": 280,
+      "source": "generated/turbine-boot-rig-atlas-v1.png#68,651,282,931",
+      "role": "outer lower arm",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/turbine-boot-inner-hand.png",
+      "width": 171,
+      "height": 225,
+      "source": "generated/turbine-boot-rig-atlas-v1.png#385,679,556,904",
+      "role": "independent inner hand",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/turbine-boot-hand.png",
+      "width": 171,
+      "height": 225,
+      "source": "generated/turbine-boot-rig-atlas-v1.png#385,679,556,904",
+      "role": "runtime hand; independent hand",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/turbine-boot-leg-left.png",
+      "width": 128,
+      "height": 274,
+      "source": "generated/turbine-boot-rig-atlas-v1.png#707,659,836,935",
+      "role": "left independent leg",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/turbine-boot-leg-right.png",
+      "width": 152,
+      "height": 282,
+      "source": "generated/turbine-boot-rig-atlas-v1.png#1000,646,1154,930",
+      "role": "right independent leg",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/turbine-boot-turbine-left.png",
+      "width": 221,
+      "height": 300,
+      "source": "generated/turbine-boot-rig-atlas-v1.png#52,946,274,1247",
+      "role": "left boot turbine",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/turbine-boot-turbine-right.png",
+      "width": 212,
+      "height": 298,
+      "source": "generated/turbine-boot-rig-atlas-v1.png#351,953,563,1252",
+      "role": "right boot turbine",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/turbine-boot-overheat-smoke-vfx.png",
+      "width": 264,
+      "height": 288,
+      "source": "generated/turbine-boot-rig-atlas-v1.png#628,969,892,1257",
+      "role": "turbine overheat smoke",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/turbine-boot-dash-flame-vfx.png",
+      "width": 293,
+      "height": 192,
+      "source": "generated/turbine-boot-rig-atlas-v1.png#924,1006,1217,1198",
+      "role": "turbine dash flame",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/cable-hook-head.png",
+      "width": 249,
+      "height": 251,
+      "source": "generated/cable-hook-rig-atlas-v1.png#44,70,297,324",
+      "role": "head",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/cable-hook-jaw.png",
+      "width": 180,
+      "height": 133,
+      "source": "generated/cable-hook-rig-atlas-v1.png#331,201,512,334",
+      "role": "jaw",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/cable-hook-body.png",
+      "width": 292,
+      "height": 258,
+      "source": "generated/cable-hook-rig-atlas-v1.png#564,83,856,344",
+      "role": "torso normal",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/cable-hook-body-damage1.png",
+      "width": 284,
+      "height": 262,
+      "source": "generated/cable-hook-rig-atlas-v1.png#904,82,1192,344",
+      "role": "torso damage stage 1",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/cable-hook-body-damage2.png",
+      "width": 285,
+      "height": 262,
+      "source": "generated/cable-hook-rig-atlas-v1.png#1225,78,1512,344",
+      "role": "torso damage stage 2",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/cable-hook-inner-upper.png",
+      "width": 154,
+      "height": 241,
+      "source": "generated/cable-hook-rig-atlas-v1.png#117,371,271,614",
+      "role": "inner upper arm",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/cable-hook-inner-lower.png",
+      "width": 122,
+      "height": 218,
+      "source": "generated/cable-hook-rig-atlas-v1.png#346,377,471,597",
+      "role": "inner lower arm",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/cable-hook-inner-hand.png",
+      "width": 162,
+      "height": 151,
+      "source": "generated/cable-hook-rig-atlas-v1.png#540,436,704,588",
+      "role": "independent inner hand",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/cable-hook-outer-upper.png",
+      "width": 159,
+      "height": 218,
+      "source": "generated/cable-hook-rig-atlas-v1.png#817,385,977,603",
+      "role": "outer upper arm",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/cable-hook-outer-lower.png",
+      "width": 185,
+      "height": 205,
+      "source": "generated/cable-hook-rig-atlas-v1.png#1018,404,1206,611",
+      "role": "outer lower arm",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/cable-hook-outer-hand.png",
+      "width": 162,
+      "height": 153,
+      "source": "generated/cable-hook-rig-atlas-v1.png#1287,452,1449,607",
+      "role": "independent outer hand",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/cable-hook-hand.png",
+      "width": 162,
+      "height": 153,
+      "source": "generated/cable-hook-rig-atlas-v1.png#1287,452,1449,607",
+      "role": "runtime hand; independent outer hand",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/cable-hook-pack.png",
+      "width": 333,
+      "height": 323,
+      "source": "generated/cable-hook-rig-atlas-v1.png#40,640,376,965",
+      "role": "winch pack compatibility equipment",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/cable-hook-winch-pack.png",
+      "width": 333,
+      "height": 323,
+      "source": "generated/cable-hook-rig-atlas-v1.png#40,640,376,965",
+      "role": "winch backpack",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/cable-hook-cable-coil.png",
+      "width": 205,
+      "height": 257,
+      "source": "generated/cable-hook-rig-atlas-v1.png#443,686,648,943",
+      "role": "coiled cable",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/cable-hook-hook.png",
+      "width": 280,
+      "height": 126,
+      "source": "generated/cable-hook-rig-atlas-v1.png#667,738,949,864",
+      "role": "detachable hook",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/cable-hook-hook-cast-vfx.png",
+      "width": 218,
+      "height": 220,
+      "source": "generated/cable-hook-rig-atlas-v1.png#974,698,1192,918",
+      "role": "charged hook cast visual effect",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/cable-hook-hook-sever-vfx.png",
+      "width": 269,
+      "height": 245,
+      "source": "generated/cable-hook-rig-atlas-v1.png#1223,694,1492,939",
+      "role": "hook sever visual effect",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/wrench-tech-head.png",
+      "width": 255,
+      "height": 279,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#15,44,270,326",
+      "role": "head",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-jaw.png",
+      "width": 189,
+      "height": 115,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#287,243,479,360",
+      "role": "jaw",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-body.png",
+      "width": 233,
+      "height": 302,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#514,59,749,362",
+      "role": "torso normal",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-body-damage1.png",
+      "width": 235,
+      "height": 298,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#779,61,1014,362",
+      "role": "torso damage stage 1",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-body-damage2.png",
+      "width": 231,
+      "height": 298,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#1045,61,1278,361",
+      "role": "torso damage stage 2",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-inner-upper.png",
+      "width": 179,
+      "height": 273,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#48,387,227,660",
+      "role": "inner upper arm",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-inner-lower.png",
+      "width": 136,
+      "height": 238,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#258,439,396,677",
+      "role": "inner lower arm",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-inner-hand.png",
+      "width": 175,
+      "height": 175,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#438,493,613,670",
+      "role": "independent inner hand",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-outer-upper.png",
+      "width": 169,
+      "height": 274,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#661,394,832,672",
+      "role": "outer upper arm",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-outer-lower.png",
+      "width": 152,
+      "height": 218,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#876,442,1029,662",
+      "role": "outer lower arm",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-outer-hand.png",
+      "width": 206,
+      "height": 175,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#1049,493,1256,671",
+      "role": "independent outer hand",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-hand.png",
+      "width": 206,
+      "height": 175,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#1049,493,1256,671",
+      "role": "runtime hand; independent outer hand",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-pack.png",
+      "width": 269,
+      "height": 297,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#32,681,301,978",
+      "role": "repair tank compatibility equipment",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-repair-tank.png",
+      "width": 269,
+      "height": 297,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#32,681,301,978",
+      "role": "repair tank backpack",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-wrench.png",
+      "width": 469,
+      "height": 264,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#316,721,787,987",
+      "role": "independent oversized wrench",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-prop.png",
+      "width": 202,
+      "height": 201,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#808,755,1011,958",
+      "role": "bucket armour normal",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-prop-damage1.png",
+      "width": 187,
+      "height": 211,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#1068,758,1256,970",
+      "role": "bucket armour damage stage 1",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-bucket-armour.png",
+      "width": 202,
+      "height": 201,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#808,755,1011,958",
+      "role": "bucket armour normal",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-bucket-armour-damaged.png",
+      "width": 187,
+      "height": 211,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#1068,758,1256,970",
+      "role": "bucket armour damaged",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/wrench-tech-repair-pulse-vfx.png",
+      "width": 445,
+      "height": 253,
+      "source": "generated/wrench-tech-rig-atlas-v1.png#43,965,488,1218",
+      "role": "repair pulse visual effect",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/bolt-thrower-head.png",
+      "width": 263,
+      "height": 301,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#29,78,295,380",
+      "role": "head",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-jaw.png",
+      "width": 163,
+      "height": 137,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#297,263,462,401",
+      "role": "jaw",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-body.png",
+      "width": 255,
+      "height": 325,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#495,92,752,420",
+      "role": "torso normal",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-body-damage1.png",
+      "width": 261,
+      "height": 330,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#797,91,1060,425",
+      "role": "torso damage stage 1",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-body-damage2.png",
+      "width": 258,
+      "height": 332,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#1092,91,1352,427",
+      "role": "torso damage stage 2",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-inner-upper.png",
+      "width": 188,
+      "height": 266,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#44,461,234,728",
+      "role": "inner upper arm",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-inner-lower.png",
+      "width": 178,
+      "height": 240,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#279,501,459,741",
+      "role": "inner lower arm",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-inner-hand.png",
+      "width": 169,
+      "height": 194,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#480,544,650,740",
+      "role": "independent inner hand",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-outer-upper.png",
+      "width": 192,
+      "height": 277,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#711,462,903,741",
+      "role": "outer upper arm",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-outer-lower.png",
+      "width": 164,
+      "height": 232,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#953,507,1117,740",
+      "role": "outer lower arm",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-outer-hand.png",
+      "width": 168,
+      "height": 198,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#1158,542,1327,742",
+      "role": "independent outer hand",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-hand.png",
+      "width": 168,
+      "height": 198,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#1158,542,1327,742",
+      "role": "runtime hand; independent outer hand",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-pack.png",
+      "width": 283,
+      "height": 326,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#32,768,317,1096",
+      "role": "bolt rack compatibility equipment",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-bolt-rack.png",
+      "width": 283,
+      "height": 326,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#32,768,317,1096",
+      "role": "bolt rack backpack",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-torsion-launcher.png",
+      "width": 364,
+      "height": 255,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#334,819,699,1076",
+      "role": "independent torsion bolt launcher",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-bolt-projectile.png",
+      "width": 209,
+      "height": 126,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#737,893,947,1019",
+      "role": "flying bolt projectile",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-bolt-hit-vfx.png",
+      "width": 189,
+      "height": 256,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#956,819,1145,1075",
+      "role": "bolt strike visual effect",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-armour-break.png",
+      "width": 136,
+      "height": 215,
+      "source": "generated/bolt-thrower-rig-atlas-v1.png#1212,846,1350,1062",
+      "role": "broken armour debris",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/hover-drone-head.png",
+      "width": 292,
+      "height": 253,
+      "source": "generated/hover-drone-rig-atlas-v1.png#6,50,299,304",
+      "role": "head",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-jaw.png",
+      "width": 179,
+      "height": 125,
+      "source": "generated/hover-drone-rig-atlas-v1.png#320,183,500,308",
+      "role": "jaw",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-body.png",
+      "width": 212,
+      "height": 242,
+      "source": "generated/hover-drone-rig-atlas-v1.png#523,64,736,306",
+      "role": "torso normal",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-body-damage1.png",
+      "width": 223,
+      "height": 239,
+      "source": "generated/hover-drone-rig-atlas-v1.png#749,64,972,304",
+      "role": "torso damage stage 1",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-body-damage2.png",
+      "width": 214,
+      "height": 240,
+      "source": "generated/hover-drone-rig-atlas-v1.png#993,65,1209,305",
+      "role": "torso damage stage 2",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-inner-upper.png",
+      "width": 156,
+      "height": 219,
+      "source": "generated/hover-drone-rig-atlas-v1.png#67,369,223,590",
+      "role": "inner upper arm",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-inner-lower.png",
+      "width": 94,
+      "height": 206,
+      "source": "generated/hover-drone-rig-atlas-v1.png#352,386,447,592",
+      "role": "inner lower arm",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-outer-upper.png",
+      "width": 138,
+      "height": 219,
+      "source": "generated/hover-drone-rig-atlas-v1.png#547,375,688,594",
+      "role": "outer upper arm",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-outer-lower.png",
+      "width": 127,
+      "height": 233,
+      "source": "generated/hover-drone-rig-atlas-v1.png#787,375,917,608",
+      "role": "outer lower arm",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-outer-hand.png",
+      "width": 152,
+      "height": 177,
+      "source": "generated/hover-drone-rig-atlas-v1.png#1021,398,1175,577",
+      "role": "independent outer hand",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-hand.png",
+      "width": 152,
+      "height": 177,
+      "source": "generated/hover-drone-rig-atlas-v1.png#1021,398,1175,577",
+      "role": "runtime hand; independent outer hand",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-leg-left.png",
+      "width": 154,
+      "height": 292,
+      "source": "generated/hover-drone-rig-atlas-v1.png#58,647,214,939",
+      "role": "left independent leg",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-leg-right.png",
+      "width": 142,
+      "height": 283,
+      "source": "generated/hover-drone-rig-atlas-v1.png#329,647,472,930",
+      "role": "right independent leg",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-pack.png",
+      "width": 335,
+      "height": 269,
+      "source": "generated/hover-drone-rig-atlas-v1.png#505,669,840,940",
+      "role": "hover ring back compatibility equipment",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-hover-ring-back.png",
+      "width": 335,
+      "height": 269,
+      "source": "generated/hover-drone-rig-atlas-v1.png#505,669,840,940",
+      "role": "hover ring rear",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-hover-ring-front.png",
+      "width": 359,
+      "height": 323,
+      "source": "generated/hover-drone-rig-atlas-v1.png#866,655,1225,978",
+      "role": "hover ring front",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-lift-vortex-vfx.png",
+      "width": 243,
+      "height": 233,
+      "source": "generated/hover-drone-rig-atlas-v1.png#120,990,363,1223",
+      "role": "hover lift vortex",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-landing-dust-vfx.png",
+      "width": 246,
+      "height": 214,
+      "source": "generated/hover-drone-rig-atlas-v1.png#485,1011,731,1225",
+      "role": "hover landing dust",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/jammer-aerial-head.png",
+      "width": 272,
+      "height": 288,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#23,9,296,299",
+      "role": "head",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-jaw.png",
+      "width": 195,
+      "height": 140,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#346,135,543,277",
+      "role": "jaw",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-body.png",
+      "width": 316,
+      "height": 315,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#592,5,911,320",
+      "role": "torso normal",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-body-damage1.png",
+      "width": 280,
+      "height": 311,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#938,10,1218,321",
+      "role": "torso damage stage 1",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-body-damage2.png",
+      "width": 286,
+      "height": 291,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#25,376,312,669",
+      "role": "torso damage stage 2",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-inner-upper.png",
+      "width": 164,
+      "height": 256,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#1008,386,1175,642",
+      "role": "inner upper arm",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-inner-lower.png",
+      "width": 201,
+      "height": 266,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#47,690,249,957",
+      "role": "inner lower arm",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-outer-upper.png",
+      "width": 180,
+      "height": 224,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#383,721,563,947",
+      "role": "outer upper arm",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-outer-lower.png",
+      "width": 227,
+      "height": 245,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#657,708,885,954",
+      "role": "outer lower arm with attached hand",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-leg-left.png",
+      "width": 203,
+      "height": 285,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#978,678,1181,963",
+      "role": "left independent leg",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-leg-right.png",
+      "width": 212,
+      "height": 289,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#78,970,290,1259",
+      "role": "right independent leg",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-pack.png",
+      "width": 294,
+      "height": 367,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#641,318,935,685",
+      "role": "aerial pack back compatibility equipment",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-aerial-dish-front.png",
+      "width": 317,
+      "height": 374,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#319,296,636,671",
+      "role": "aerial dish front",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-aerial-dish-back.png",
+      "width": 294,
+      "height": 367,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#641,318,935,685",
+      "role": "aerial dish back",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-signal-wave-vfx.png",
+      "width": 335,
+      "height": 271,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#317,976,652,1247",
+      "role": "jam signal wave visual effect",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-signal-pulse-vfx.png",
+      "width": 233,
+      "height": 186,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#701,1028,934,1214",
+      "role": "signal pulse visual effect",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-cable-arc-vfx.png",
+      "width": 216,
+      "height": 271,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#981,974,1197,1245",
+      "role": "cable arc visual effect",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/magnet-salvager-head.png",
+      "width": 281,
+      "height": 301,
+      "source": "generated/magnet-salvager-rig-atlas-v1.png#15,59,298,363",
+      "role": "head",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-jaw.png",
+      "width": 183,
+      "height": 131,
+      "source": "generated/magnet-salvager-rig-atlas-v1.png#309,235,495,368",
+      "role": "jaw",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-body.png",
+      "width": 280,
+      "height": 359,
+      "source": "generated/magnet-salvager-rig-atlas-v1.png#531,84,813,444",
+      "role": "torso normal",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-body-damage1.png",
+      "width": 253,
+      "height": 350,
+      "source": "generated/magnet-salvager-rig-atlas-v1.png#821,86,1075,438",
+      "role": "torso damage stage 1",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-body-damage2.png",
+      "width": 268,
+      "height": 357,
+      "source": "generated/magnet-salvager-rig-atlas-v1.png#1087,81,1355,438",
+      "role": "torso damage stage 2",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-magnet-assembly.png",
+      "width": 303,
+      "height": 360,
+      "source": "generated/magnet-salvager-rig-atlas-v1.png#22,416,327,777",
+      "role": "independent salvage magnet",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-pack.png",
+      "width": 303,
+      "height": 360,
+      "source": "generated/magnet-salvager-rig-atlas-v1.png#22,416,327,777",
+      "role": "magnet assembly compatibility equipment",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-magnet-brace.png",
+      "width": 198,
+      "height": 348,
+      "source": "generated/magnet-salvager-rig-atlas-v1.png#339,427,538,777",
+      "role": "magnet brace",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-inner-upper.png",
+      "width": 191,
+      "height": 259,
+      "source": "generated/magnet-salvager-rig-atlas-v1.png#554,469,745,728",
+      "role": "inner upper arm",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-inner-lower.png",
+      "width": 190,
+      "height": 300,
+      "source": "generated/magnet-salvager-rig-atlas-v1.png#766,452,957,752",
+      "role": "inner lower arm with attached hand",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-outer-upper.png",
+      "width": 177,
+      "height": 272,
+      "source": "generated/magnet-salvager-rig-atlas-v1.png#991,461,1170,735",
+      "role": "outer upper arm",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-outer-lower.png",
+      "width": 153,
+      "height": 270,
+      "source": "generated/magnet-salvager-rig-atlas-v1.png#1208,473,1362,745",
+      "role": "outer lower arm with attached hand",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-leg-left.png",
+      "width": 222,
+      "height": 296,
+      "source": "generated/magnet-salvager-rig-atlas-v1.png#26,799,252,1095",
+      "role": "left independent leg",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-leg-right.png",
+      "width": 236,
+      "height": 316,
+      "source": "generated/magnet-salvager-rig-atlas-v1.png#311,786,547,1104",
+      "role": "right independent leg",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-magnetic-field-vfx.png",
+      "width": 301,
+      "height": 309,
+      "source": "generated/magnet-salvager-rig-atlas-v1.png#534,793,835,1102",
+      "role": "magnetic field visual effect",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-magnet-debris-vfx.png",
+      "width": 234,
+      "height": 278,
+      "source": "generated/magnet-salvager-rig-atlas-v1.png#855,806,1089,1084",
+      "role": "magnet debris visual effect",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-magnet-impact-vfx.png",
+      "width": 266,
+      "height": 287,
+      "source": "generated/magnet-salvager-rig-atlas-v1.png#1094,798,1360,1085",
+      "role": "magnet impact visual effect",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/holo-decoy-head.png",
+      "width": 253,
+      "height": 255,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#27,47,280,302",
+      "role": "head",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-jaw.png",
+      "width": 157,
+      "height": 112,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#286,204,445,317",
+      "role": "jaw",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-body.png",
+      "width": 234,
+      "height": 269,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#480,52,714,323",
+      "role": "torso normal",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-body-damage1.png",
+      "width": 227,
+      "height": 273,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#739,50,966,323",
+      "role": "torso damage stage 1",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-body-damage2.png",
+      "width": 241,
+      "height": 280,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#969,39,1210,319",
+      "role": "torso damage stage 2",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-pack.png",
+      "width": 230,
+      "height": 347,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#59,290,289,637",
+      "role": "projector back compatibility equipment",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-projector-back.png",
+      "width": 230,
+      "height": 347,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#59,290,289,637",
+      "role": "projector back",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-projector-front.png",
+      "width": 231,
+      "height": 285,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#405,332,636,617",
+      "role": "projector front",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-inner-upper.png",
+      "width": 133,
+      "height": 220,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#735,373,868,593",
+      "role": "inner upper arm",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-inner-lower.png",
+      "width": 213,
+      "height": 227,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#938,386,1151,613",
+      "role": "inner lower arm with attached hand",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-outer-upper.png",
+      "width": 144,
+      "height": 235,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#110,656,254,892",
+      "role": "outer upper arm",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-outer-lower.png",
+      "width": 183,
+      "height": 269,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#370,671,553,941",
+      "role": "outer lower arm with attached hand",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-leg-left.png",
+      "width": 198,
+      "height": 304,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#649,634,847,940",
+      "role": "left independent leg",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-leg-right.png",
+      "width": 170,
+      "height": 315,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#1013,634,1184,949",
+      "role": "right independent leg",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-holo-ghost.png",
+      "width": 363,
+      "height": 345,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#28,912,391,1257",
+      "role": "hologram ghost",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-holo-glitch-vfx.png",
+      "width": 335,
+      "height": 284,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#434,965,769,1249",
+      "role": "hologram glitch visual effect",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-holo-ready-vfx.png",
+      "width": 390,
+      "height": 264,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#801,983,1191,1247",
+      "role": "hologram deployment visual effect",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/vfx-jam-wave.png",
+      "width": 335,
+      "height": 271,
+      "source": "generated/jammer-aerial-rig-atlas-v1.png#317,976,652,1247",
+      "role": "canonical jammer wave visual effect",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/vfx-holo-ready.png",
+      "width": 390,
+      "height": 264,
+      "source": "generated/holo-decoy-rig-atlas-v1.png#801,983,1191,1247",
+      "role": "canonical hologram ready visual effect",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/leak-pack-outer-upper-damaged.png",
+      "width": 179,
+      "height": 256,
+      "source": "generated/zombie-outer-upper-damaged-rig-atlas-v1.png#56,6,371,380",
+      "role": "independent damaged outer upper arm; torn/broken state",
+      "slug": "leak-pack"
+    },
+    {
+      "file": "parts/weld-shield-outer-upper-damaged.png",
+      "width": 174,
+      "height": 242,
+      "source": "generated/zombie-outer-upper-damaged-rig-atlas-v1.png#462,14,742,379",
+      "role": "independent damaged outer upper arm; torn/broken state",
+      "slug": "weld-shield"
+    },
+    {
+      "file": "parts/turbine-boot-outer-upper-damaged.png",
+      "width": 124,
+      "height": 245,
+      "source": "generated/zombie-outer-upper-damaged-rig-atlas-v1.png#841,6,1099,376",
+      "role": "independent damaged outer upper arm; torn/broken state",
+      "slug": "turbine-boot"
+    },
+    {
+      "file": "parts/cable-hook-outer-upper-damaged.png",
+      "width": 159,
+      "height": 218,
+      "source": "generated/zombie-outer-upper-damaged-rig-atlas-v1.png#1225,6,1533,389",
+      "role": "independent damaged outer upper arm; torn/broken state",
+      "slug": "cable-hook"
+    },
+    {
+      "file": "parts/wrench-tech-outer-upper-damaged.png",
+      "width": 169,
+      "height": 274,
+      "source": "generated/zombie-outer-upper-damaged-rig-atlas-v1.png#1698,10,1940,391",
+      "role": "independent damaged outer upper arm; torn/broken state",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/bolt-thrower-outer-upper-damaged.png",
+      "width": 192,
+      "height": 277,
+      "source": "generated/zombie-outer-upper-damaged-rig-atlas-v1.png#48,395,333,780",
+      "role": "independent damaged outer upper arm; torn/broken state",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/hover-drone-outer-upper-damaged.png",
+      "width": 138,
+      "height": 219,
+      "source": "generated/zombie-outer-upper-damaged-rig-atlas-v1.png#457,395,722,770",
+      "role": "independent damaged outer upper arm; torn/broken state",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/jammer-aerial-outer-upper-damaged.png",
+      "width": 180,
+      "height": 224,
+      "source": "generated/zombie-outer-upper-damaged-rig-atlas-v1.png#828,401,1110,782",
+      "role": "independent damaged outer upper arm; torn/broken state",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/magnet-salvager-outer-upper-damaged.png",
+      "width": 177,
+      "height": 272,
+      "source": "generated/zombie-outer-upper-damaged-rig-atlas-v1.png#1278,401,1538,774",
+      "role": "independent damaged outer upper arm; torn/broken state",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/holo-decoy-outer-upper-damaged.png",
+      "width": 144,
+      "height": 235,
+      "source": "generated/zombie-outer-upper-damaged-rig-atlas-v1.png#1665,395,1941,781",
+      "role": "independent damaged outer upper arm; torn/broken state",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/jammer-aerial-hand.png",
+      "width": 174,
+      "height": 165,
+      "source": "generated/jammer-aerial-hand-rig-v2.png#full-alpha-component",
+      "role": "standalone palm and fingers only; no forearm",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/magnet-salvager-hand.png",
+      "width": 163,
+      "height": 168,
+      "source": "generated/magnet-salvager-hand-rig-v2.png#full-alpha-component",
+      "role": "standalone palm and fingers only; no forearm",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/holo-decoy-hand.png",
+      "width": 154,
+      "height": 164,
+      "source": "generated/holo-decoy-hand-rig-v2.png#full-alpha-component",
+      "role": "standalone palm and fingers only; no forearm",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/wrench-tech-prop-damage2.png",
+      "width": 222,
+      "height": 210,
+      "source": "generated/mechanical-hands-bucket-rig-atlas-v1.png#682,677,1197,1159",
+      "role": "bucket armour prop damage stage 2; severe hole, torn edge, split chain",
+      "slug": "wrench-tech"
+    },
+    {
+      "file": "parts/bolt-thrower-inner-leg-upper.png",
+      "width": 89,
+      "height": 120,
+      "source": "generated/bolt-thrower-legs-rig-atlas-v1.png#132,10,486,484",
+      "role": "independent inner leg upper leg rig part",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-inner-leg-lower.png",
+      "width": 71,
+      "height": 130,
+      "source": "generated/bolt-thrower-legs-rig-atlas-v1.png#650,8,910,489",
+      "role": "independent inner leg lower leg rig part",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-inner-leg-foot.png",
+      "width": 92,
+      "height": 88,
+      "source": "generated/bolt-thrower-legs-rig-atlas-v1.png#1020,103,1405,474",
+      "role": "independent inner leg foot leg rig part",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-outer-leg-upper.png",
+      "width": 92,
+      "height": 120,
+      "source": "generated/bolt-thrower-legs-rig-atlas-v1.png#99,518,448,974",
+      "role": "independent outer leg upper leg rig part",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-outer-leg-lower.png",
+      "width": 80,
+      "height": 130,
+      "source": "generated/bolt-thrower-legs-rig-atlas-v1.png#632,512,933,1001",
+      "role": "independent outer leg lower leg rig part",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/bolt-thrower-outer-leg-foot.png",
+      "width": 89,
+      "height": 88,
+      "source": "generated/bolt-thrower-legs-rig-atlas-v1.png#1074,591,1453,966",
+      "role": "independent outer leg foot leg rig part",
+      "slug": "bolt-thrower"
+    },
+    {
+      "file": "parts/hover-drone-inner-leg-upper.png",
+      "width": 74,
+      "height": 115,
+      "source": "generated/hover-drone-legs-rig-atlas-v1.png#182,27,456,453",
+      "role": "independent inner leg upper leg rig part",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-inner-leg-lower.png",
+      "width": 52,
+      "height": 125,
+      "source": "generated/hover-drone-legs-rig-atlas-v1.png#696,26,882,472",
+      "role": "independent inner leg lower leg rig part",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-inner-leg-foot.png",
+      "width": 85,
+      "height": 82,
+      "source": "generated/hover-drone-legs-rig-atlas-v1.png#1139,232,1417,498",
+      "role": "independent inner leg foot leg rig part",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-outer-leg-upper.png",
+      "width": 60,
+      "height": 115,
+      "source": "generated/hover-drone-legs-rig-atlas-v1.png#233,517,457,943",
+      "role": "independent outer leg upper leg rig part",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-outer-leg-lower.png",
+      "width": 62,
+      "height": 125,
+      "source": "generated/hover-drone-legs-rig-atlas-v1.png#663,529,871,945",
+      "role": "independent outer leg lower leg rig part",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/hover-drone-outer-leg-foot.png",
+      "width": 94,
+      "height": 82,
+      "source": "generated/hover-drone-legs-rig-atlas-v1.png#1118,707,1428,979",
+      "role": "independent outer leg foot leg rig part",
+      "slug": "hover-drone"
+    },
+    {
+      "file": "parts/jammer-aerial-inner-leg-upper.png",
+      "width": 81,
+      "height": 118,
+      "source": "generated/jammer-aerial-legs-rig-atlas-v1.png#128,29,452,498",
+      "role": "independent inner leg upper leg rig part",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-inner-leg-lower.png",
+      "width": 67,
+      "height": 126,
+      "source": "generated/jammer-aerial-legs-rig-atlas-v1.png#643,15,904,505",
+      "role": "independent inner leg lower leg rig part",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-inner-leg-foot.png",
+      "width": 93,
+      "height": 88,
+      "source": "generated/jammer-aerial-legs-rig-atlas-v1.png#1044,112,1452,498",
+      "role": "independent inner leg foot leg rig part",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-outer-leg-upper.png",
+      "width": 92,
+      "height": 118,
+      "source": "generated/jammer-aerial-legs-rig-atlas-v1.png#101,515,467,981",
+      "role": "independent outer leg upper leg rig part",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-outer-leg-lower.png",
+      "width": 60,
+      "height": 126,
+      "source": "generated/jammer-aerial-legs-rig-atlas-v1.png#669,507,896,986",
+      "role": "independent outer leg lower leg rig part",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/jammer-aerial-outer-leg-foot.png",
+      "width": 97,
+      "height": 88,
+      "source": "generated/jammer-aerial-legs-rig-atlas-v1.png#1048,596,1485,993",
+      "role": "independent outer leg foot leg rig part",
+      "slug": "jammer-aerial"
+    },
+    {
+      "file": "parts/magnet-salvager-inner-leg-upper.png",
+      "width": 84,
+      "height": 122,
+      "source": "generated/magnet-salvager-legs-rig-atlas-v1.png#136,46,447,494",
+      "role": "independent inner leg upper leg rig part",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-inner-leg-lower.png",
+      "width": 77,
+      "height": 130,
+      "source": "generated/magnet-salvager-legs-rig-atlas-v1.png#629,42,890,485",
+      "role": "independent inner leg lower leg rig part",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-inner-leg-foot.png",
+      "width": 99,
+      "height": 92,
+      "source": "generated/magnet-salvager-legs-rig-atlas-v1.png#1039,157,1402,493",
+      "role": "independent inner leg foot leg rig part",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-outer-leg-upper.png",
+      "width": 86,
+      "height": 122,
+      "source": "generated/magnet-salvager-legs-rig-atlas-v1.png#133,536,441,970",
+      "role": "independent outer leg upper leg rig part",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-outer-leg-lower.png",
+      "width": 75,
+      "height": 130,
+      "source": "generated/magnet-salvager-legs-rig-atlas-v1.png#632,536,884,973",
+      "role": "independent outer leg lower leg rig part",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/magnet-salvager-outer-leg-foot.png",
+      "width": 103,
+      "height": 92,
+      "source": "generated/magnet-salvager-legs-rig-atlas-v1.png#1030,629,1411,968",
+      "role": "independent outer leg foot leg rig part",
+      "slug": "magnet-salvager"
+    },
+    {
+      "file": "parts/holo-decoy-inner-leg-upper.png",
+      "width": 85,
+      "height": 125,
+      "source": "generated/holo-decoy-legs-rig-atlas-v1.png#182,45,471,470",
+      "role": "independent inner leg upper leg rig part",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-inner-leg-lower.png",
+      "width": 70,
+      "height": 132,
+      "source": "generated/holo-decoy-legs-rig-atlas-v1.png#668,35,909,485",
+      "role": "independent inner leg lower leg rig part",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-inner-leg-foot.png",
+      "width": 115,
+      "height": 86,
+      "source": "generated/holo-decoy-legs-rig-atlas-v1.png#1076,255,1379,480",
+      "role": "independent inner leg foot leg rig part",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-outer-leg-upper.png",
+      "width": 69,
+      "height": 125,
+      "source": "generated/holo-decoy-legs-rig-atlas-v1.png#213,515,477,990",
+      "role": "independent outer leg upper leg rig part",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-outer-leg-lower.png",
+      "width": 65,
+      "height": 132,
+      "source": "generated/holo-decoy-legs-rig-atlas-v1.png#666,519,892,979",
+      "role": "independent outer leg lower leg rig part",
+      "slug": "holo-decoy"
+    },
+    {
+      "file": "parts/holo-decoy-outer-leg-foot.png",
+      "width": 124,
+      "height": 86,
+      "source": "generated/holo-decoy-legs-rig-atlas-v1.png#1046,739,1399,984",
+      "role": "independent outer leg foot leg rig part",
+      "slug": "holo-decoy"
+    }
+  ],
+  "existingCanonicalVfx": [
+    "vfx-battery-core.png",
+    "vfx-turbine-burst.png",
+    "vfx-hook-snap.png",
+    "vfx-hook-line.png",
+    "vfx-repair-pulse.png",
+    "vfx-bolt-ready.png",
+    "vfx-bolt-shot.png",
+    "vfx-bolt-hit-0.png",
+    "vfx-drone-hum.png",
+    "vfx-magnet-field.png",
+    "vfx-holo-glitch.png"
+  ],
+  "limitations": [],
+  "missing": [
+    {
+      "slug": "leak-pack",
+      "runtime": "hat",
+      "reason": "No independently painted hat/helmet component; any headwear is joined to the head silhouette."
+    },
+    {
+      "slug": "weld-shield",
+      "runtime": "hat",
+      "reason": "No independently painted hat/helmet component; any headwear is joined to the head silhouette."
+    },
+    {
+      "slug": "turbine-boot",
+      "runtime": "hat",
+      "reason": "No independently painted hat/helmet component; any headwear is joined to the head silhouette."
+    },
+    {
+      "slug": "cable-hook",
+      "runtime": "hat",
+      "reason": "No independently painted hat/helmet component; any headwear is joined to the head silhouette."
+    },
+    {
+      "slug": "wrench-tech",
+      "runtime": "hat",
+      "reason": "No independently painted hat/helmet component; any headwear is joined to the head silhouette."
+    },
+    {
+      "slug": "bolt-thrower",
+      "runtime": "hat",
+      "reason": "No independently painted hat/helmet component; any headwear is joined to the head silhouette."
+    },
+    {
+      "slug": "hover-drone",
+      "runtime": "hat",
+      "reason": "No independently painted hat/helmet component; any headwear is joined to the head silhouette."
+    },
+    {
+      "slug": "jammer-aerial",
+      "runtime": "hat",
+      "reason": "No independently painted hat/helmet component; any headwear is joined to the head silhouette."
+    },
+    {
+      "slug": "magnet-salvager",
+      "runtime": "hat",
+      "reason": "No independently painted hat/helmet component; any headwear is joined to the head silhouette."
+    },
+    {
+      "slug": "holo-decoy",
+      "runtime": "hat",
+      "reason": "No independently painted hat/helmet component; any headwear is joined to the head silhouette."
+    },
+    {
+      "slug": "turbine-boot",
+      "runtime": "pack",
+      "reason": "No separate backpack component was painted; the only separated equipment is the pair of boot turbines."
+    }
+  ]
+}

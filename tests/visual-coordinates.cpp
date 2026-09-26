@@ -1,5 +1,5 @@
-// Runs actual production skin/projectile/effect draw code against a captured raster API.
-// It checks coordinate contracts, not a live browser/GPU screenshot.
+// Executes production draw hooks against the raster capture stub.  It verifies
+// bone ownership and coordinate contracts, not subjective art quality.
 #include "Engine.h"
 #include "SandboxArt.h"
 #include "SandboxPlants.h"
@@ -8,71 +8,74 @@
 #include <cassert>
 #include <cmath>
 #include <iostream>
+
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
+
 int main(){
- // Actual production Skin() is exercised through Assign, including stale override removal.
- Board skinBoard;
- Track tracks[]={{"anim_face"},{"GatlingPea_mouth"},{"GatlingPea_barrel1"},{"GatlingPea_barrel2"},{"GatlingPea_barrel3"},{"GatlingPea_barrel4"},{"GatlingPea_mouth_overlay"},{"GatlingPea_helmet"},{"unrelated_mouth_decoration"}};
- TrackInstance instances[9];Reanimation skin;skin.def.mTracks={9,tracks};skin.mTrackInstances=instances;
- Sexy::Image stale;for(auto& t:instances){t.mImageOverride=&stale;t.mRenderGroup=7;}
- app.reanims[90]=&skin;auto* gatling=skinBoard.plant(0,0);gatling->mHeadReanimID=90;
- SandboxPlants::Assign(gatling,106);
- assert(instances[0].mImageOverride->path.ends_with("fire-gatling-head.png"));
- for(int i=1;i<=6;++i){assert(instances[i].mImageOverride==nullptr);assert(instances[i].mRenderGroup==7);}
- assert(instances[7].mImageOverride==&stale&&instances[8].mImageOverride==&stale);
- gatling->mBlinkCountdown=4;SandboxPlants::Tick(&skinBoard);
- assert(instances[0].mImageOverride->path.ends_with("fire-gatling-blink.png"));
- SandboxPlants::Reset();app.reanims.clear();
- // Every costume is bound to all four native sleeve bones; faces keep native dimensions.
- Track zTracks[]={{"anim_head1"},{"anim_head2"},{"Zombie_body"},{"anim_innerarm1"},{"anim_innerarm2"},{"Zombie_outerarm_upper"},{"Zombie_outerarm_lower"},{"Zombie_outerarm_hand"},{"anim_hair"},{"Zombie_tie"},{"anim_cone"},{"anim_bucket"}};
- TrackInstance zInstances[12];Reanimation zRig;zRig.def.mTracks={12,zTracks};zRig.mTrackInstances=zInstances;app.reanims[91]=&zRig;
- for(const auto& d:SandboxZombies::Definitions){
-  for(auto& t:zInstances){t.mImageOverride=nullptr;t.mRenderGroup=0;}
-  auto* z=skinBoard.AddZombieInRow(ZOMBIE_NORMAL,2,0);z->mBodyReanimID=91;SandboxZombies::Assign(z,d.id);
-  for(int i=0;i<7;++i)assert(zInstances[i].mImageOverride);
-  assert(zInstances[7].mImageOverride==nullptr); // native hand remains native, no baked projectile
-  if(d.id==210||d.id==211){assert(zInstances[8].mImageOverride->path.ends_with("-hat.png"));assert(zInstances[8].mRenderGroup==0);}
-  z->mHasArm=false;SandboxZombies::RefreshDamageArt(z);assert(zInstances[5].mImageOverride->path.ends_with("-outer-upper-damaged.png"));
-  if(d.armor){
-   int i=d.base==2?10:11;
-   z->mHelmHealth=d.armor/2;SandboxZombies::RefreshDamageArt(z);assert(zInstances[i].mImageOverride->path.ends_with("-prop-damage1.png"));
-   z->mHelmHealth=1;SandboxZombies::RefreshDamageArt(z);assert(zInstances[i].mImageOverride->path.ends_with("-prop-damage2.png"));
-   z->mHelmHealth=d.armor;SandboxZombies::RefreshDamageArt(z);assert(zInstances[i].mImageOverride->path.ends_with("-prop.png"));
-   assert(SandboxZombies::DetachedArmor(z)->path.ends_with("-prop-damage2.png"));
-  }else assert(!SandboxZombies::DetachedArmor(z));
- }
- SandboxZombies::Reset();app.reanims.clear();
- Sexy::Graphics g(nullptr);g.mTransX=170;g.mTransY=250;
- SandboxArt::Sprite(&g,"fire",12,12,30,22);near(testBlits.back().matrix.m02,182);near(testBlits.back().matrix.m12,262);
- Reanimation a;a.track="idle_mouth";a.matrix={0,-0.72f,60,0.72f,0,40};float x,y;
- assert(SandboxArt::TrackPoint(&a,"idle_mouth",35,49,32,24.5f,x,y));near(x,60);near(y,50.44f);
- assert(!SandboxArt::TrackPoint(&a,"missing",35,49,32,24.5f,x,y));a.pose.mFrame=-1;
- assert(!SandboxArt::TrackPoint(&a,"idle_mouth",35,49,32,24.5f,x,y));a.pose.mFrame=0;
- Board board;auto* pea=board.plant(2,2);SandboxPlants::Assign(pea,113);pea->mHeadReanimID=1;app.reanims[1]=&a;
- auto* shot=board.AddProjectile(0,0,0,2,PROJECTILE_PEA);SandboxPlants::OnFired(pea,shot,nullptr);
- near(shot->mPosX+12,pea->mX+60);near(shot->mPosY+12,pea->mY+50.44f);near(SandboxPlants::ShotScale(shot),0.55f);assert(SandboxPlants::ShotRadius(shot)==5);
- g.mTransX=shot->mX;g.mTransY=shot->mY;testBlits.clear();assert(SandboxPlants::DrawShot(&g,shot));
- assert(testBlits.size()==1&&testBlits[0].path.ends_with("vfx-tiny.png"));near(testBlits[0].matrix.m02,shot->mPosX+12);near(testBlits[0].matrix.m12,shot->mPosY+12);
- auto* three=board.plant(3,2);three->mSeedType=static_cast<SeedType>(18);SandboxPlants::Assign(three,103);
- Reanimation heads[3];for(int i=0;i<3;++i){heads[i].track="ThreePeater_mouth"+std::to_string(i+1);heads[i].matrix.m02=40;heads[i].matrix.m12=70-i*23;app.reanims[i+2]=&heads[i];}
- three->mHeadReanimID=2;three->mHeadReanimID2=3;three->mHeadReanimID3=4;
- float ys[3];for(int row=1;row<=3;++row){auto* s=board.AddProjectile(0,0,0,row,PROJECTILE_PEA);s->mProjectileType=PROJECTILE_SNOWPEA;SandboxPlants::OnFired(three,s,nullptr);ys[row-1]=s->mPosY;assert(SandboxPlants::HasShot(s));}
- assert(ys[0]<ys[1]&&ys[1]<ys[2]);near(ys[1]-ys[0],23);near(ys[2]-ys[1],23);
- // Gatling projectiles leave the front barrel, never from behind its front plate.
- Reanimation barrel;barrel.track="GatlingPea_barrel3";barrel.matrix.m00=0.55f;barrel.matrix.m11=0.55f;barrel.matrix.m02=70.125f;barrel.matrix.m12=27.525f;app.reanims[5]=&barrel;
- auto* gun=board.plant(2,1);SandboxPlants::Assign(gun,105);gun->mHeadReanimID=5;
- auto* gunShot=board.AddProjectile(0,0,0,1,PROJECTILE_PEA);SandboxPlants::OnFired(gun,gunShot,nullptr);
- near(gunShot->mPosX+12,gun->mX+80.30f);near(gunShot->mPosY+12,gun->mY+27.525f);
- // All eight original variants get custom art without overriding native splash/slow damage.
- for(int id=100;id<=107;++id){auto* p=board.plant(1,1);SandboxPlants::Assign(p,id);auto* s=board.AddProjectile(40,40,0,1,PROJECTILE_PEA);SandboxPlants::OnFired(p,s,nullptr);assert(SandboxPlants::HasShot(s));assert(!SandboxPlants::Impact(s,nullptr));}
- SandboxPlants::Reset();app.reanims.clear();testBlits.clear();auto* acid=board.plant(1,2);SandboxPlants::Assign(acid,117);auto* s=board.AddProjectile(200,230,0,2,PROJECTILE_PEA);SandboxPlants::OnFired(acid,s,nullptr);
- auto* enemy=board.AddZombieInRow(ZOMBIE_NORMAL,2,0);SandboxPlants::Impact(s,enemy);SandboxPlants::DrawEffects(&g,&board,1);assert(testBlits.empty());
- SandboxPlants::DrawEffects(&g,&board,2);assert(!testBlits.empty());bool found=false;for(auto& b:testBlits)if(b.path.ends_with("vfx-acid-hit-0.png"))found=true;assert(found);
- const auto before=testBlits;board.mPaused=true;for(int i=0;i<100;++i)SandboxPlants::Tick(&board);testBlits.clear();SandboxPlants::DrawEffects(&g,&board,2);assert(before.size()==testBlits.size());for(size_t i=0;i<before.size();++i){assert(before[i].path==testBlits[i].path);near(before[i].matrix.m02,testBlits[i].matrix.m02);assert(before[i].alpha==testBlits[i].alpha);}board.mPaused=false;
- // Reverse homing must rotate the sprite AND its off-center tail around the pea core.
- auto* seeker=board.plant(1,2);SandboxPlants::Assign(seeker,116);auto* reverse=board.AddProjectile(200,230,0,2,PROJECTILE_PEA);SandboxPlants::OnFired(seeker,reverse,enemy);reverse->mVelX=-3;reverse->mVelY=0;reverse->mX=200;reverse->mY=230;g.mTransX=200;g.mTransY=230;testBlits.clear();SandboxPlants::DrawShot(&g,reverse);assert(testBlits.back().matrix.m00<0);near(testBlits.back().matrix.m02,216.5f);
- SandboxPlants::Reset();testBlits.clear();SandboxPlants::DrawEffects(&g,&board,2);assert(testBlits.empty());
- for(int id=112;id<=117;++id){const auto& art=SandboxVisualRules::Shots[SandboxVisualRules::ArtIndex(id,false,false)];assert(art.w<=30&&art.h<=24&&art.coreX>=0&&art.coreX<=art.w);}
- std::cout<<"Visual coordinate contracts passed: matrix pivot, scale, 3 independent mouths, projectile core, all 8 original variants, row effects and reset\n";
+    // A regular plant owns one complete custom head.  The borrowed native
+    // mouth pivot visibly separates in shooting frames, so it must remain
+    // hidden rather than leaving a floating legacy nozzle under the head.
+    Board board;
+    Track plantTracks[]={{"anim_face"},{"idle_mouth"},{"anim_blink"}};
+    TrackInstance plantInstances[3];Reanimation plantRig;plantRig.def.mTracks={3,plantTracks};plantRig.mTrackInstances=plantInstances;app.reanims[90]=&plantRig;
+    auto* pod=board.plant(1,2);pod->mSeedType=static_cast<SeedType>(0);pod->mHeadReanimID=90;SandboxPlants::Assign(pod,101);
+    assert(plantInstances[0].mImageOverride->path.ends_with("pulse-pod-head.png"));
+    assert(plantInstances[1].mRenderGroup==RENDER_GROUP_HIDDEN);
+    assert(plantInstances[2].mRenderGroup==RENDER_GROUP_HIDDEN);
+    pod->mBlinkCountdown=4;SandboxPlants::Tick(&board);
+    assert(plantInstances[0].mImageOverride->path.ends_with("pulse-pod-blink.png"));
+
+    // Three independent Arc Orchid heads retain their own face bones, while
+    // all three incompatible legacy mouth pivots remain hidden.
+    Track tripleTracks[]={{"anim_face1"},{"anim_face2"},{"anim_face3"},{"ThreePeater_mouth1"},{"ThreePeater_mouth2"},{"ThreePeater_mouth3"}};
+    TrackInstance tripleInstances[6];Reanimation tripleRig;tripleRig.def.mTracks={6,tripleTracks};tripleRig.mTrackInstances=tripleInstances;app.reanims[91]=&tripleRig;
+    auto* orchid=board.plant(2,2);orchid->mSeedType=static_cast<SeedType>(18);orchid->mHeadReanimID=91;orchid->mHeadReanimID2=91;orchid->mHeadReanimID3=91;SandboxPlants::Assign(orchid,104);
+    for(int i=0;i<3;++i)assert(tripleInstances[i].mImageOverride->path.ends_with("arc-orchid-small-head.png"));
+    for(int i=3;i<6;++i)assert(tripleInstances[i].mRenderGroup==RENDER_GROUP_HIDDEN);
+
+    // Each zombie has its own head, jaw, torso, four arm seams, hand and all
+    // six walking-leg seams. The
+    // custom head owns its own headset/hair, so the native hair bone is hidden
+    // rather than drawing a pasted legacy wig over the new silhouette.
+    Track zombieTracks[]={{"anim_head1"},{"anim_head2"},{"Zombie_body"},{"anim_innerarm1"},{"anim_innerarm2"},{"Zombie_outerarm_upper"},{"Zombie_outerarm_lower"},{"Zombie_outerarm_hand"},{"Zombie_innerleg_upper"},{"Zombie_innerleg_lower"},{"Zombie_innerleg_foot"},{"Zombie_outerleg_upper"},{"Zombie_outerleg_lower"},{"Zombie_outerleg_foot"},{"anim_hair"},{"Zombie_tie"},{"anim_cone"},{"anim_bucket"}};
+    TrackInstance zombieInstances[18];Reanimation zombieRig;zombieRig.def.mTracks={18,zombieTracks};zombieRig.mTrackInstances=zombieInstances;app.reanims[92]=&zombieRig;
+    for(const auto& d:SandboxZombies::Definitions){
+        for(auto& track:zombieInstances){track.mImageOverride=nullptr;track.mRenderGroup=0;}
+        auto* z=board.AddZombieInRow(ZOMBIE_NORMAL,2,0);z->mBodyReanimID=92;SandboxZombies::Assign(z,d.id);
+        for(int i=0;i<=13;++i)assert(zombieInstances[i].mImageOverride);
+        assert(zombieInstances[14].mRenderGroup==RENDER_GROUP_HIDDEN);
+        if(d.id==202)assert(zombieInstances[15].mRenderGroup==RENDER_GROUP_HIDDEN);else assert(zombieInstances[15].mImageOverride);
+        z->mBodyHealth=z->mBodyMaxHealth/2;z->mHasArm=false;SandboxZombies::RefreshDamageArt(z);
+        assert(zombieInstances[2].mImageOverride->path.ends_with("-body-damage1.png"));
+        assert(zombieInstances[5].mImageOverride->path.ends_with("-outer-upper-damaged.png"));
+        assert(zombieInstances[5].mRenderGroup!=RENDER_GROUP_HIDDEN);
+        assert(zombieInstances[6].mRenderGroup==RENDER_GROUP_HIDDEN);
+        assert(zombieInstances[7].mRenderGroup==RENDER_GROUP_HIDDEN);
+        if(d.armor){
+            const int prop=d.base==2?16:17;z->mHelmHealth=d.armor/2;SandboxZombies::RefreshDamageArt(z);
+            assert(zombieInstances[prop].mImageOverride->path.ends_with("-prop-damage1.png"));
+            assert(SandboxZombies::DetachedArmor(z)->path.ends_with("-prop-damage2.png"));
+        }else assert(!SandboxZombies::DetachedArmor(z));
+    }
+    SandboxZombies::Reset();app.reanims.clear();
+
+    // Sprite drawing translates once and the muzzle follows the live head
+    // bone's front edge, not a detached legacy mouth pivot.
+    Sexy::Graphics g(nullptr);g.mTransX=170;g.mTransY=250;SandboxArt::Sprite(&g,"pulse",12,12,22,22);near(testBlits.back().matrix.m02,182);near(testBlits.back().matrix.m12,262);
+    Reanimation face;face.track="anim_face";face.matrix={0,-0.72f,60,0.72f,0,40};float x=0,y=0;
+    assert(SandboxArt::TrackPoint(&face,"anim_face",70,65,67,32.5f,x,y));near(x,60);near(y,63.04f);
+    app.reanims[1]=&face;auto* muzzle=board.plant(3,1);muzzle->mHeadReanimID=1;SandboxPlants::Assign(muzzle,101);
+    auto* shot=board.AddProjectile(0,0,0,1,PROJECTILE_PEA);SandboxPlants::OnFired(muzzle,shot,nullptr);
+    near(shot->mPosX+12,muzzle->mX+60);near(shot->mPosY+12,muzzle->mY+63.04f);assert(SandboxPlants::ShotRadius(shot)==12);
+    g.mTransX=shot->mX;g.mTransY=shot->mY;testBlits.clear();assert(SandboxPlants::DrawShot(&g,shot));assert(testBlits.back().path.ends_with("vfx-pulse.png"));
+
+    // Root links and hit effects render only in their own row and clear on reset.
+    auto* hub=board.plant(1,3);SandboxPlants::Assign(hub,103);auto* linked=board.plant(2,3);SandboxPlants::Assign(linked,101);
+    SandboxPlants::RebuildRootNetworks(&board);testBlits.clear();SandboxPlants::DrawEffects(&g,&board,3);assert(!testBlits.empty());
+    auto* enemy=board.AddZombieInRow(ZOMBIE_NORMAL,3,0);auto* hit=board.AddProjectile(150,340,0,3,PROJECTILE_PEA);SandboxPlants::OnFired(linked,hit,enemy);SandboxPlants::Impact(hit,enemy);
+    testBlits.clear();SandboxPlants::DrawEffects(&g,&board,2);assert(testBlits.empty());SandboxPlants::DrawEffects(&g,&board,3);assert(!testBlits.empty());
+    SandboxPlants::Reset();testBlits.clear();SandboxPlants::DrawEffects(&g,&board,3);assert(testBlits.empty());
+
+    std::cout<<"Visual coordinate contracts passed\n";
 }

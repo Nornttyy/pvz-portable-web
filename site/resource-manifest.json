@@ -5,12 +5,12 @@
   "revision": "8ba94e95cfe7d0de5682f8258d3b932dbdac885c",
   "sourceArchiveSha256": "ae862d48a42dc3c99fbc5fbd7b9d18a01bd088843ee82f0673cd486d31a754e2",
   "bundle": {
-    "url": "resources/game-67fff9f87f87.zip",
-    "size": 54038823,
-    "sha256": "67fff9f87f87015661f652b67af80214325117148526bf82e296642ec57cbbcf"
+    "url": "resources/game-cf440a72205b.zip",
+    "size": 56308681,
+    "sha256": "cf440a72205b848b3dfc0ed964dba220697ad208cb8b8ae416186e29d4d1acf0"
   },
-  "totalFiles": 3158,
-  "totalBytes": 65776278,
+  "totalFiles": 3164,
+  "totalBytes": 68043277,
   "compatibility": [
     {
       "path": "properties/partner_logo_.gif",
@@ -23,257 +23,6 @@
       "reason": "Native case-insensitive PAK index resolves alpha-mask probes for uppercase animation image IDs. Loose-file std::filesystem::exists failed on mixed-case masks, exposing black JPG backgrounds. Sky pixels and menu animation remain unchanged."
     }
   ],
-  "originalPlants": {
-    "source": "Built-in image_gen; mechanically cropped and resized for original native bone pivots",
-    "files": [
-      "images/sandbox/acid-pea-blink.png",
-      "images/sandbox/acid-pea-head.png",
-      "images/sandbox/acid-pea-mouth.png",
-      "images/sandbox/armored-cone-zombie-body.png",
-      "images/sandbox/armored-cone-zombie-hand.png",
-      "images/sandbox/armored-cone-zombie-head.png",
-      "images/sandbox/armored-cone-zombie-inner-lower.png",
-      "images/sandbox/armored-cone-zombie-inner-upper.png",
-      "images/sandbox/armored-cone-zombie-jaw.png",
-      "images/sandbox/armored-cone-zombie-outer-lower.png",
-      "images/sandbox/armored-cone-zombie-outer-upper-damaged.png",
-      "images/sandbox/armored-cone-zombie-outer-upper.png",
-      "images/sandbox/armored-cone-zombie-prop-damage1.png",
-      "images/sandbox/armored-cone-zombie-prop-damage2.png",
-      "images/sandbox/armored-cone-zombie-prop.png",
-      "images/sandbox/battery-zombie-battery.png",
-      "images/sandbox/battery-zombie-body.png",
-      "images/sandbox/battery-zombie-hand.png",
-      "images/sandbox/battery-zombie-head.png",
-      "images/sandbox/battery-zombie-inner-lower.png",
-      "images/sandbox/battery-zombie-inner-upper.png",
-      "images/sandbox/battery-zombie-jaw.png",
-      "images/sandbox/battery-zombie-outer-lower.png",
-      "images/sandbox/battery-zombie-outer-upper-damaged.png",
-      "images/sandbox/battery-zombie-outer-upper.png",
-      "images/sandbox/battery-zombie-prop.png",
-      "images/sandbox/bell-zombie-body.png",
-      "images/sandbox/bell-zombie-hand.png",
-      "images/sandbox/bell-zombie-head.png",
-      "images/sandbox/bell-zombie-inner-lower.png",
-      "images/sandbox/bell-zombie-inner-upper.png",
-      "images/sandbox/bell-zombie-jaw.png",
-      "images/sandbox/bell-zombie-outer-lower.png",
-      "images/sandbox/bell-zombie-outer-upper-damaged.png",
-      "images/sandbox/bell-zombie-outer-upper.png",
-      "images/sandbox/bell-zombie-prop.png",
-      "images/sandbox/echo-lily-blink.png",
-      "images/sandbox/echo-lily-head.png",
-      "images/sandbox/echo-lily-mouth.png",
-      "images/sandbox/electric-pea-blink.png",
-      "images/sandbox/electric-pea-head.png",
-      "images/sandbox/electric-pea-mouth.png",
-      "images/sandbox/fire-blink.png",
-      "images/sandbox/fire-gatling-barrel.png",
-      "images/sandbox/fire-gatling-blink.png",
-      "images/sandbox/fire-gatling-head.png",
-      "images/sandbox/fire-gatling-mouth.png",
-      "images/sandbox/fire-gatling-overlay.png",
-      "images/sandbox/fire-head.png",
-      "images/sandbox/fire-mouth.png",
-      "images/sandbox/fire-small-blink.png",
-      "images/sandbox/fire-small-head.png",
-      "images/sandbox/fire-small-mouth.png",
-      "images/sandbox/gum-zombie-body.png",
-      "images/sandbox/gum-zombie-gum.png",
-      "images/sandbox/gum-zombie-hand.png",
-      "images/sandbox/gum-zombie-head.png",
-      "images/sandbox/gum-zombie-inner-lower.png",
-      "images/sandbox/gum-zombie-inner-upper.png",
-      "images/sandbox/gum-zombie-jaw.png",
-      "images/sandbox/gum-zombie-outer-lower.png",
-      "images/sandbox/gum-zombie-outer-upper-damaged.png",
-      "images/sandbox/gum-zombie-outer-upper.png",
-      "images/sandbox/gum-zombie-prop.png",
-      "images/sandbox/heavy-pea-blink.png",
-      "images/sandbox/heavy-pea-head.png",
-      "images/sandbox/heavy-pea-mouth.png",
-      "images/sandbox/ice-blink.png",
-      "images/sandbox/ice-bucket-zombie-body.png",
-      "images/sandbox/ice-bucket-zombie-hand.png",
-      "images/sandbox/ice-bucket-zombie-head.png",
-      "images/sandbox/ice-bucket-zombie-inner-lower.png",
-      "images/sandbox/ice-bucket-zombie-inner-upper.png",
-      "images/sandbox/ice-bucket-zombie-jaw.png",
-      "images/sandbox/ice-bucket-zombie-outer-lower.png",
-      "images/sandbox/ice-bucket-zombie-outer-upper-damaged.png",
-      "images/sandbox/ice-bucket-zombie-outer-upper.png",
-      "images/sandbox/ice-bucket-zombie-prop-damage1.png",
-      "images/sandbox/ice-bucket-zombie-prop-damage2.png",
-      "images/sandbox/ice-bucket-zombie-prop.png",
-      "images/sandbox/ice-gatling-barrel.png",
-      "images/sandbox/ice-gatling-blink.png",
-      "images/sandbox/ice-gatling-head.png",
-      "images/sandbox/ice-gatling-mouth.png",
-      "images/sandbox/ice-gatling-overlay.png",
-      "images/sandbox/ice-head.png",
-      "images/sandbox/ice-mouth.png",
-      "images/sandbox/ice-small-blink.png",
-      "images/sandbox/ice-small-head.png",
-      "images/sandbox/ice-small-mouth.png",
-      "images/sandbox/ink-painter-body.png",
-      "images/sandbox/ink-painter-hand.png",
-      "images/sandbox/ink-painter-hat.png",
-      "images/sandbox/ink-painter-head.png",
-      "images/sandbox/ink-painter-inner-lower.png",
-      "images/sandbox/ink-painter-inner-upper.png",
-      "images/sandbox/ink-painter-jaw.png",
-      "images/sandbox/ink-painter-outer-lower.png",
-      "images/sandbox/ink-painter-outer-upper-damaged.png",
-      "images/sandbox/ink-painter-outer-upper.png",
-      "images/sandbox/light-zombie-body.png",
-      "images/sandbox/light-zombie-hand.png",
-      "images/sandbox/light-zombie-hat.png",
-      "images/sandbox/light-zombie-head.png",
-      "images/sandbox/light-zombie-inner-lower.png",
-      "images/sandbox/light-zombie-inner-upper.png",
-      "images/sandbox/light-zombie-jaw.png",
-      "images/sandbox/light-zombie-outer-lower.png",
-      "images/sandbox/light-zombie-outer-upper-damaged.png",
-      "images/sandbox/light-zombie-outer-upper.png",
-      "images/sandbox/light-zombie-prop.png",
-      "images/sandbox/paper-thrower-body.png",
-      "images/sandbox/paper-thrower-hand.png",
-      "images/sandbox/paper-thrower-hat.png",
-      "images/sandbox/paper-thrower-head.png",
-      "images/sandbox/paper-thrower-inner-lower.png",
-      "images/sandbox/paper-thrower-inner-upper.png",
-      "images/sandbox/paper-thrower-jaw.png",
-      "images/sandbox/paper-thrower-outer-lower.png",
-      "images/sandbox/paper-thrower-outer-upper-damaged.png",
-      "images/sandbox/paper-thrower-outer-upper.png",
-      "images/sandbox/parcel-zombie-body.png",
-      "images/sandbox/parcel-zombie-hand.png",
-      "images/sandbox/parcel-zombie-head.png",
-      "images/sandbox/parcel-zombie-inner-lower.png",
-      "images/sandbox/parcel-zombie-inner-upper.png",
-      "images/sandbox/parcel-zombie-jaw.png",
-      "images/sandbox/parcel-zombie-outer-lower.png",
-      "images/sandbox/parcel-zombie-outer-upper-damaged.png",
-      "images/sandbox/parcel-zombie-outer-upper.png",
-      "images/sandbox/parcel-zombie-prop-damage1.png",
-      "images/sandbox/parcel-zombie-prop-damage2.png",
-      "images/sandbox/parcel-zombie-prop.png",
-      "images/sandbox/relay-mushroom-blink.png",
-      "images/sandbox/relay-mushroom-cap.png",
-      "images/sandbox/relay-mushroom-head.png",
-      "images/sandbox/relay-mushroom-stem.png",
-      "images/sandbox/repair-zombie-body.png",
-      "images/sandbox/repair-zombie-hand.png",
-      "images/sandbox/repair-zombie-head.png",
-      "images/sandbox/repair-zombie-inner-lower.png",
-      "images/sandbox/repair-zombie-inner-upper.png",
-      "images/sandbox/repair-zombie-jaw.png",
-      "images/sandbox/repair-zombie-outer-lower.png",
-      "images/sandbox/repair-zombie-outer-upper-damaged.png",
-      "images/sandbox/repair-zombie-outer-upper.png",
-      "images/sandbox/repair-zombie-prop-damage1.png",
-      "images/sandbox/repair-zombie-prop-damage2.png",
-      "images/sandbox/repair-zombie-prop.png",
-      "images/sandbox/rhythm-flower-blink.png",
-      "images/sandbox/rhythm-flower-head.png",
-      "images/sandbox/scatter-pea-blink.png",
-      "images/sandbox/scatter-pea-head.png",
-      "images/sandbox/scatter-pea-mouth.png",
-      "images/sandbox/seeker-pea-blink.png",
-      "images/sandbox/seeker-pea-head.png",
-      "images/sandbox/seeker-pea-mouth.png",
-      "images/sandbox/smoke-zombie-body.png",
-      "images/sandbox/smoke-zombie-hand.png",
-      "images/sandbox/smoke-zombie-hat.png",
-      "images/sandbox/smoke-zombie-head.png",
-      "images/sandbox/smoke-zombie-inner-lower.png",
-      "images/sandbox/smoke-zombie-inner-upper.png",
-      "images/sandbox/smoke-zombie-jaw.png",
-      "images/sandbox/smoke-zombie-outer-lower.png",
-      "images/sandbox/smoke-zombie-outer-upper-damaged.png",
-      "images/sandbox/smoke-zombie-outer-upper.png",
-      "images/sandbox/smoke-zombie-prop.png",
-      "images/sandbox/spring-nut-blink.png",
-      "images/sandbox/spring-nut-cracked1.png",
-      "images/sandbox/spring-nut-cracked2.png",
-      "images/sandbox/spring-nut-head.png",
-      "images/sandbox/storm-mushroom-0-blink.png",
-      "images/sandbox/storm-mushroom-0-cap.png",
-      "images/sandbox/storm-mushroom-0-head.png",
-      "images/sandbox/storm-mushroom-0-stem.png",
-      "images/sandbox/storm-mushroom-1-blink.png",
-      "images/sandbox/storm-mushroom-1-cap.png",
-      "images/sandbox/storm-mushroom-1-head.png",
-      "images/sandbox/storm-mushroom-1-stem.png",
-      "images/sandbox/storm-mushroom-2-blink.png",
-      "images/sandbox/storm-mushroom-2-cap.png",
-      "images/sandbox/storm-mushroom-2-head.png",
-      "images/sandbox/storm-mushroom-2-stem.png",
-      "images/sandbox/tiny-pea-blink.png",
-      "images/sandbox/tiny-pea-head.png",
-      "images/sandbox/tiny-pea-mouth.png",
-      "images/sandbox/twin-zombie-body.png",
-      "images/sandbox/twin-zombie-hand.png",
-      "images/sandbox/twin-zombie-hat.png",
-      "images/sandbox/twin-zombie-head.png",
-      "images/sandbox/twin-zombie-inner-lower.png",
-      "images/sandbox/twin-zombie-inner-upper.png",
-      "images/sandbox/twin-zombie-jaw.png",
-      "images/sandbox/twin-zombie-outer-lower.png",
-      "images/sandbox/twin-zombie-outer-upper-damaged.png",
-      "images/sandbox/twin-zombie-outer-upper.png",
-      "images/sandbox/twin-zombie-prop.png",
-      "images/sandbox/vfx-acid-hit-0.png",
-      "images/sandbox/vfx-acid-hit-1.png",
-      "images/sandbox/vfx-acid.png",
-      "images/sandbox/vfx-charge.png",
-      "images/sandbox/vfx-electric-hit-0.png",
-      "images/sandbox/vfx-electric-hit-1.png",
-      "images/sandbox/vfx-electric.png",
-      "images/sandbox/vfx-fire-hit-0.png",
-      "images/sandbox/vfx-fire-hit-1.png",
-      "images/sandbox/vfx-fire.png",
-      "images/sandbox/vfx-gum.png",
-      "images/sandbox/vfx-heavy-hit-0.png",
-      "images/sandbox/vfx-heavy-hit-1.png",
-      "images/sandbox/vfx-heavy.png",
-      "images/sandbox/vfx-ice-hit-0.png",
-      "images/sandbox/vfx-ice-hit-1.png",
-      "images/sandbox/vfx-ice.png",
-      "images/sandbox/vfx-ink-hit-0.png",
-      "images/sandbox/vfx-ink-hit-1.png",
-      "images/sandbox/vfx-ink-ready.png",
-      "images/sandbox/vfx-ink-shot.png",
-      "images/sandbox/vfx-link-0.png",
-      "images/sandbox/vfx-link-1.png",
-      "images/sandbox/vfx-muzzle-ice.png",
-      "images/sandbox/vfx-muzzle-warm.png",
-      "images/sandbox/vfx-notes.png",
-      "images/sandbox/vfx-paper-hit-0.png",
-      "images/sandbox/vfx-paper-hit-1.png",
-      "images/sandbox/vfx-paper-ready.png",
-      "images/sandbox/vfx-paper-shot.png",
-      "images/sandbox/vfx-poison.png",
-      "images/sandbox/vfx-repair.png",
-      "images/sandbox/vfx-scatter-hit-0.png",
-      "images/sandbox/vfx-scatter-hit-1.png",
-      "images/sandbox/vfx-scatter.png",
-      "images/sandbox/vfx-seeker-hit-0.png",
-      "images/sandbox/vfx-seeker-hit-1.png",
-      "images/sandbox/vfx-seeker.png",
-      "images/sandbox/vfx-smoke-0.png",
-      "images/sandbox/vfx-smoke-1.png",
-      "images/sandbox/vfx-smoke-2.png",
-      "images/sandbox/vfx-sonic-0.png",
-      "images/sandbox/vfx-sonic-1.png",
-      "images/sandbox/vfx-spring-0.png",
-      "images/sandbox/vfx-spring-1.png",
-      "images/sandbox/vfx-tiny-hit-0.png",
-      "images/sandbox/vfx-tiny-hit-1.png",
-      "images/sandbox/vfx-tiny.png"
-    ]
-  },
   "localization": {
     "locale": "zh-CN",
     "source": "https://github.com/Bamcane/re-plants-vs-zombies",
@@ -14960,1244 +14709,1535 @@
       "sha256": "29b374bccb5485caf49f55dce198dfc53432daa24a4e61f56d82ef3a9364696f"
     },
     {
-      "path": "images/sandbox/acid-pea-blink.png",
-      "size": 7743,
-      "sha256": "517aac999fbd488cfd19210c8c807f5b7e9e39e8b0a4e1b6564d981bb0d07de3"
+      "path": "images/sandbox/amber-gourd-blink.png",
+      "size": 9223,
+      "sha256": "480b03df342802c1d9f0b7b76502308fac0ab6e0c05bcbd131b4552f0accbefc"
     },
     {
-      "path": "images/sandbox/acid-pea-head.png",
-      "size": 8026,
-      "sha256": "27985c09a76729dca70dd69f96341b5d551def3934684cb95dd4d615521576bb"
+      "path": "images/sandbox/amber-gourd-head.png",
+      "size": 9064,
+      "sha256": "fb053d7075961444f230f1b7ae6f98cafca33cf0d3096ab12a7a214e1d5b8c5b"
     },
     {
-      "path": "images/sandbox/acid-pea-mouth.png",
-      "size": 3771,
-      "sha256": "61c5de7ae0c21c0e364abdd670ff23bbf559235236a220f0b7597f29307833e5"
+      "path": "images/sandbox/amber-gourd-mouth.png",
+      "size": 3848,
+      "sha256": "2b6b0565ba313d523205cacc0314d7368a7f9266e30b8511ab0dda52076277a7"
     },
     {
-      "path": "images/sandbox/armored-cone-zombie-body.png",
-      "size": 6008,
-      "sha256": "6d14d86fca080526c484a9d83c7d7be65c646f2f91922c55fbdc7630be2fa23e"
+      "path": "images/sandbox/arc-orchid-small-blink.png",
+      "size": 2396,
+      "sha256": "b4d1c1ca7986ab970f83405df266035bb73b049716fddd515bec6f3b1a6282d6"
     },
     {
-      "path": "images/sandbox/armored-cone-zombie-hand.png",
-      "size": 1928,
-      "sha256": "38d1cc623572801abda48b607f969bb56736a7ae24c8bdddd663ab5365b4fb3f"
+      "path": "images/sandbox/arc-orchid-small-head.png",
+      "size": 2457,
+      "sha256": "e085b1b6fd767b7311909ac5dd7587b8995dc8851a3c798f464baeee81e3e64b"
     },
     {
-      "path": "images/sandbox/armored-cone-zombie-head.png",
-      "size": 5185,
-      "sha256": "2d10d22a0ec751a2fe8f7b0e2ecbbe4cb0a8dd729983d717e9d199d0ef243b7f"
+      "path": "images/sandbox/arc-orchid-small-mouth.png",
+      "size": 2031,
+      "sha256": "c9f6455351f0ce8b46f96a71891bdba83600ac0dac406b938f5b4faf7348fd6f"
     },
     {
-      "path": "images/sandbox/armored-cone-zombie-inner-lower.png",
-      "size": 1062,
-      "sha256": "35ae4c7f4c5355c76464bfb2c11e90d7c79c7057f6bccfef3249e4008b5493a7"
+      "path": "images/sandbox/bolt-thrower-body-damage1.png",
+      "size": 7997,
+      "sha256": "05fe3032ac359945fd426418ba036d7ac3cf83654e2eadf72223c16825316581"
     },
     {
-      "path": "images/sandbox/armored-cone-zombie-inner-upper.png",
-      "size": 826,
-      "sha256": "86915d8dcde87ddc8e0ad6edda9298d56c8bdde88270628b4eed5582831ebc98"
+      "path": "images/sandbox/bolt-thrower-body-damage2.png",
+      "size": 8292,
+      "sha256": "5876cf39f740733368ff389003291e1558abe32c1d297f96fee235ad2b229d50"
     },
     {
-      "path": "images/sandbox/armored-cone-zombie-jaw.png",
-      "size": 1472,
-      "sha256": "8026b63666b7a8d55a8ce7e814b8a74a4ede41a66757649ee12f6f1d752c7f8a"
+      "path": "images/sandbox/bolt-thrower-body.png",
+      "size": 8017,
+      "sha256": "6efa60820acf088a327fd08f8affdadeb405918194e56d45ef3f366bc5722198"
     },
     {
-      "path": "images/sandbox/armored-cone-zombie-outer-lower.png",
-      "size": 1220,
-      "sha256": "6955cf0075ca39a94cf8fbc2e45b8a673eedcfaa2ee85432f55eeb6b93f5fb02"
+      "path": "images/sandbox/bolt-thrower-hand.png",
+      "size": 1663,
+      "sha256": "368826ff85e7b471af77a803e3d341f4281f14009a4d3415746bbaba7d1c5fd7"
     },
     {
-      "path": "images/sandbox/armored-cone-zombie-outer-upper-damaged.png",
-      "size": 1480,
-      "sha256": "27b408afc68346272644dc4564a988ed8dbb5a4fd0ac95a857b5ff0d1c288f3f"
+      "path": "images/sandbox/bolt-thrower-head.png",
+      "size": 5689,
+      "sha256": "32fbd767b302919044c940f44ae57515fb00d7f00c01dd91b2f6ae981d42c19e"
     },
     {
-      "path": "images/sandbox/armored-cone-zombie-outer-upper.png",
-      "size": 1429,
-      "sha256": "0970e53b305f1441d94738c93524330112f8134c22cd0b82372a5db4a3950a4d"
+      "path": "images/sandbox/bolt-thrower-inner-leg-foot.png",
+      "size": 1140,
+      "sha256": "f7feffad755f7143dc1729e2f00f08a1d9433861313bc9026e4bcae1481ad4d6"
     },
     {
-      "path": "images/sandbox/armored-cone-zombie-prop-damage1.png",
-      "size": 5440,
-      "sha256": "91c44a21f057a00f44a5f146248f94a7b5cf18cf13b3a875dff6918678df17e8"
+      "path": "images/sandbox/bolt-thrower-inner-leg-lower.png",
+      "size": 2518,
+      "sha256": "44b95d165aaa5dd833f337917cc0db8a1285beb8a53aa735bf8ebf971648601b"
     },
     {
-      "path": "images/sandbox/armored-cone-zombie-prop-damage2.png",
-      "size": 5660,
-      "sha256": "43f7bb30798389c3b4a137c61e075fc664bc3a5f481f8600fe72eb3e67165a90"
+      "path": "images/sandbox/bolt-thrower-inner-leg-upper.png",
+      "size": 1051,
+      "sha256": "afd57c5fe078db269913d102eccf6d2dd73e2f73c6fe61d1afce069440a4d6a9"
     },
     {
-      "path": "images/sandbox/armored-cone-zombie-prop.png",
-      "size": 5198,
-      "sha256": "ec14bf47cf9aea97ca95a88b840c65601f7b25c852a715747d0896288add322d"
+      "path": "images/sandbox/bolt-thrower-inner-lower.png",
+      "size": 1119,
+      "sha256": "86e16fea9129165c1a10c5bf15e4a295b764168f7565a1bda6e3041ff966dfb0"
     },
     {
-      "path": "images/sandbox/battery-zombie-battery.png",
-      "size": 894,
-      "sha256": "389c70760cd881030a4d25168ccd5cf2bd68d3ccc141bb3abad1cc8d21075c34"
+      "path": "images/sandbox/bolt-thrower-inner-upper.png",
+      "size": 1027,
+      "sha256": "29604e7f58ab6c10a8dd8805f0cd9af2c375f1118b8e0e090eb0d841ade59e05"
     },
     {
-      "path": "images/sandbox/battery-zombie-body.png",
-      "size": 6536,
-      "sha256": "31ba40bd5044ebdf24dda0460f825cb7362be8b9f3a8f16dd524ea900d5e1c03"
+      "path": "images/sandbox/bolt-thrower-jaw.png",
+      "size": 1085,
+      "sha256": "a5b148ea6407825420cded68eadb9f900a3b5cab38928a2d083be76b1aa2917c"
     },
     {
-      "path": "images/sandbox/battery-zombie-hand.png",
-      "size": 1928,
-      "sha256": "38d1cc623572801abda48b607f969bb56736a7ae24c8bdddd663ab5365b4fb3f"
+      "path": "images/sandbox/bolt-thrower-outer-leg-foot.png",
+      "size": 1972,
+      "sha256": "99f2ae14db1816a1f0fa5169f291267ce93ad16ac3a0322ef5efa84f332e7673"
     },
     {
-      "path": "images/sandbox/battery-zombie-head.png",
-      "size": 5185,
-      "sha256": "2d10d22a0ec751a2fe8f7b0e2ecbbe4cb0a8dd729983d717e9d199d0ef243b7f"
+      "path": "images/sandbox/bolt-thrower-outer-leg-lower.png",
+      "size": 1680,
+      "sha256": "516240c1a0143466d282bb2971818dfca33f29682589db88c3ed8ca71a2eeff6"
     },
     {
-      "path": "images/sandbox/battery-zombie-inner-lower.png",
-      "size": 1148,
-      "sha256": "6b350a1da4e5e1c2bfe6344b1822932f3060773a95fc62b0801067ad8123de6d"
+      "path": "images/sandbox/bolt-thrower-outer-leg-upper.png",
+      "size": 2051,
+      "sha256": "ed1f9eadbeb5685437fc5e7a6033c318662fe2bb7b19d5daf83fed3809597c5a"
     },
     {
-      "path": "images/sandbox/battery-zombie-inner-upper.png",
-      "size": 932,
-      "sha256": "ee4f9add55ad32acabc132c7342de5b87c4f2e33f2497bbdb7e3da4c05d56591"
+      "path": "images/sandbox/bolt-thrower-outer-lower.png",
+      "size": 1281,
+      "sha256": "46deccedfa34d598a2eacd4ab726fb2eae96d505ead5da598c881091c580f885"
     },
     {
-      "path": "images/sandbox/battery-zombie-jaw.png",
-      "size": 1472,
-      "sha256": "8026b63666b7a8d55a8ce7e814b8a74a4ede41a66757649ee12f6f1d752c7f8a"
+      "path": "images/sandbox/bolt-thrower-outer-upper-damaged.png",
+      "size": 1457,
+      "sha256": "a7ab3226e1ee86f497d57f3c817b971b14a875110f0a6a57d530ad82d55ae6d9"
     },
     {
-      "path": "images/sandbox/battery-zombie-outer-lower.png",
-      "size": 1288,
-      "sha256": "cb9e3fdc20b5a87697fe533cb22a7e7b5f9c2db331ca5dd51b537844440e2066"
+      "path": "images/sandbox/bolt-thrower-outer-upper.png",
+      "size": 1444,
+      "sha256": "2e29d44bf94b30de8113d53d67281ccf9e9f236aebdd320361c851a1832aea78"
     },
     {
-      "path": "images/sandbox/battery-zombie-outer-upper-damaged.png",
-      "size": 1527,
-      "sha256": "53376d34d6f54e57baab7b5b14035c9704774320e1a8bc85c42f9de5656d0395"
+      "path": "images/sandbox/bolt-thrower-pack.png",
+      "size": 1442,
+      "sha256": "d5c835f941f741152b5d98485ce43fad2596ad9e59a1d041765e3e137f4c6875"
     },
     {
-      "path": "images/sandbox/battery-zombie-outer-upper.png",
-      "size": 1510,
-      "sha256": "0a9691e2e9afa054f7ba8be2e0d475c7df33dd314b8e7a6cdd4256c26312f875"
+      "path": "images/sandbox/cable-cap-blink.png",
+      "size": 4126,
+      "sha256": "8fc1c59bf144967efcda2d5f995f27002c70a960f0521d657fdd24bdf59c29d0"
     },
     {
-      "path": "images/sandbox/battery-zombie-prop.png",
-      "size": 5782,
-      "sha256": "7be3e766f461d488149ffc12c9ba74ac833fed7ce6cca215b1f6ed9ccbc1272f"
+      "path": "images/sandbox/cable-cap-cap.png",
+      "size": 7853,
+      "sha256": "e38f17a7660976203ff91ae5271cb1a4cb3479e49e9866330a57bf1c0e02ff59"
     },
     {
-      "path": "images/sandbox/bell-zombie-body.png",
-      "size": 5945,
-      "sha256": "07cf50187122a3ebac152cac873e55099a232381fdd31f13ad26e208f0639769"
+      "path": "images/sandbox/cable-cap-head.png",
+      "size": 4103,
+      "sha256": "61978abb2984f2257e26a67cfd20269e20c7cfd45520a735f1f45a9fd6f97f07"
     },
     {
-      "path": "images/sandbox/bell-zombie-hand.png",
-      "size": 1928,
-      "sha256": "38d1cc623572801abda48b607f969bb56736a7ae24c8bdddd663ab5365b4fb3f"
+      "path": "images/sandbox/cable-cap-stem.png",
+      "size": 304,
+      "sha256": "e38b80d716d53b48466a5ebca71457daed1e5d0ccf392c9c8aa20a67e8103bd9"
     },
     {
-      "path": "images/sandbox/bell-zombie-head.png",
-      "size": 5185,
-      "sha256": "2d10d22a0ec751a2fe8f7b0e2ecbbe4cb0a8dd729983d717e9d199d0ef243b7f"
+      "path": "images/sandbox/cable-hook-body-damage1.png",
+      "size": 7556,
+      "sha256": "d9e8fff8d21871a6565bcaaa10252620ea3722618488e3c2d0a096609b6ed854"
     },
     {
-      "path": "images/sandbox/bell-zombie-inner-lower.png",
-      "size": 1170,
-      "sha256": "1fd550ce78663d6683c8bf1833edc2e915339599176dea033ac2260d238bdc48"
+      "path": "images/sandbox/cable-hook-body-damage2.png",
+      "size": 8095,
+      "sha256": "d12c97b4fa3089de5d4bea13d952ab1ef66adaa2db43c3032ada0b14c3013aaa"
     },
     {
-      "path": "images/sandbox/bell-zombie-inner-upper.png",
-      "size": 908,
-      "sha256": "096631ad9b2163bdd587551dddc1aeffeb83d30e05d43a8554dd1fa6320b313a"
+      "path": "images/sandbox/cable-hook-body.png",
+      "size": 7514,
+      "sha256": "5cdfb183ea4a48a99078c486cb102c00e47602e9166fd6e0664447e29b179701"
     },
     {
-      "path": "images/sandbox/bell-zombie-jaw.png",
-      "size": 1472,
-      "sha256": "8026b63666b7a8d55a8ce7e814b8a74a4ede41a66757649ee12f6f1d752c7f8a"
+      "path": "images/sandbox/cable-hook-hand.png",
+      "size": 1565,
+      "sha256": "b1e2b58f2346ef77c9753015c7a27b11f7476f9b7ec33b1f669fc1e230338e62"
     },
     {
-      "path": "images/sandbox/bell-zombie-outer-lower.png",
-      "size": 1332,
-      "sha256": "c7f78ce2065679dcd67ac6b59212f94bcec1961de843186d51fd1860e5e436ec"
+      "path": "images/sandbox/cable-hook-head.png",
+      "size": 5266,
+      "sha256": "1729f8c1686edf23490575462fff21b91a4c993655f269340fd16360e752748a"
     },
     {
-      "path": "images/sandbox/bell-zombie-outer-upper-damaged.png",
-      "size": 1429,
-      "sha256": "9567d683d17ef104b3252ab4e2e0d2f2041560b6663a01673675d9b99951b56a"
+      "path": "images/sandbox/cable-hook-inner-leg-foot.png",
+      "size": 1150,
+      "sha256": "cc5539fc8fc48d4af18ab0604dd48b89ff986b75485e7789afbc11400ae8f53a"
     },
     {
-      "path": "images/sandbox/bell-zombie-outer-upper.png",
-      "size": 1432,
-      "sha256": "5728f37d1b41a1a419f1dfacf520dbeab7470f6751ac7b0e365891c8077395ff"
+      "path": "images/sandbox/cable-hook-inner-leg-lower.png",
+      "size": 2778,
+      "sha256": "bd67a55d9206cde0b916f8fcce9b812fb353f1220f839d35b0cdafb13c449701"
     },
     {
-      "path": "images/sandbox/bell-zombie-prop.png",
-      "size": 3910,
-      "sha256": "7859c2f58070e08c76c9659c12a7117813540375a2f3cffabc6990a642a1d681"
+      "path": "images/sandbox/cable-hook-inner-leg-upper.png",
+      "size": 1063,
+      "sha256": "1bb3850690c9c70eac0b14eb24238b8cf5dbf765d1324eeed5e1993a6aa07329"
     },
     {
-      "path": "images/sandbox/echo-lily-blink.png",
-      "size": 8225,
-      "sha256": "ccc0a32a6ffbc11b96e9edfeaa190b5da5c892aa421b714420cde4fcf8e914d4"
+      "path": "images/sandbox/cable-hook-inner-lower.png",
+      "size": 1114,
+      "sha256": "c7b0b7f2153892fce00f4e8d0475e18420febff31bc08faebe30933b339a3e85"
     },
     {
-      "path": "images/sandbox/echo-lily-head.png",
-      "size": 8358,
-      "sha256": "16d452e4009da03df2230f9b55d037223540d3243666ff1f762ee9938e867c53"
+      "path": "images/sandbox/cable-hook-inner-upper.png",
+      "size": 1025,
+      "sha256": "40bcd4bcf79729ebecb951257ffa157c84c3afa939424534e9064986712ac0ee"
     },
     {
-      "path": "images/sandbox/echo-lily-mouth.png",
-      "size": 4269,
-      "sha256": "ee3fbe74b3db1e1c08f6023c8730ba9655aa0366a9c46bbb77d458552cf6716d"
-    },
-    {
-      "path": "images/sandbox/electric-pea-blink.png",
-      "size": 8008,
-      "sha256": "c0bc33c0ee8156665ee5842cb6560d62297debb719ddf3acb2ce9b8af7328c66"
-    },
-    {
-      "path": "images/sandbox/electric-pea-head.png",
-      "size": 8257,
-      "sha256": "c645c861e8ce586fc32727c311269af5c3df8949f81280d661f1f8c538b33209"
-    },
-    {
-      "path": "images/sandbox/electric-pea-mouth.png",
-      "size": 4012,
-      "sha256": "3bb8571b27d2d4fae25b3a7c1ff3723407e8d9a921264bc4531dd4ec8f9b1f69"
-    },
-    {
-      "path": "images/sandbox/fire-blink.png",
-      "size": 7711,
-      "sha256": "7f1c25988d2c01974ed78ad4b86bfc033c1ede467d684f754367b958fc01ef1e"
-    },
-    {
-      "path": "images/sandbox/fire-gatling-barrel.png",
-      "size": 1798,
-      "sha256": "f875acb059c8f577e80aa59a15a605530d15136aa35c6a0edeb2570663fb70de"
-    },
-    {
-      "path": "images/sandbox/fire-gatling-blink.png",
-      "size": 7947,
-      "sha256": "a8e77640eb9935a947e05344a081a003076c7888e3123f180cee938a228eabf5"
-    },
-    {
-      "path": "images/sandbox/fire-gatling-head.png",
-      "size": 8190,
-      "sha256": "75d0e2ebd0031a80db2cd02e7edfbdf3da5007fe9e4a9ae82b788767f2eea0c0"
-    },
-    {
-      "path": "images/sandbox/fire-gatling-mouth.png",
-      "size": 5245,
-      "sha256": "61e1fb114f31677913a68330d292ab14c01a6f36f6691eda8fd0e799d6ea57ea"
-    },
-    {
-      "path": "images/sandbox/fire-gatling-overlay.png",
-      "size": 4060,
-      "sha256": "88b118ee7aa0ceaf41d1b0faf631bb0efde964639bb97fd026a5575b87977677"
-    },
-    {
-      "path": "images/sandbox/fire-head.png",
-      "size": 7975,
-      "sha256": "4b9e8f6e57aac44defcc096604b35ede3ca2ffacbc232d5076187e9d4c2c57e7"
-    },
-    {
-      "path": "images/sandbox/fire-mouth.png",
-      "size": 3787,
-      "sha256": "4485c709e83705d28c67804c0258a3a5c2435ee6114c9c5bbc34e531a987ea85"
-    },
-    {
-      "path": "images/sandbox/fire-small-blink.png",
-      "size": 2117,
-      "sha256": "6964eb9688b0d015daa5ae62e685b76d61308d611614a098dfaf024f9abbd05e"
-    },
-    {
-      "path": "images/sandbox/fire-small-head.png",
-      "size": 2077,
-      "sha256": "1e306b83acdbbb392ac2279ff410cfebd1c505ad057deb235cdc9cbab50b270c"
-    },
-    {
-      "path": "images/sandbox/fire-small-mouth.png",
-      "size": 2073,
-      "sha256": "b5c36d4e3b8b4abc0e280d3f84896669286f146ca6595c6ebe4d9375a68ca1e2"
-    },
-    {
-      "path": "images/sandbox/gum-zombie-body.png",
-      "size": 7049,
-      "sha256": "37e0373efa1ec571cef929c9a97d45e9ccd3510347c5f9bc93bb564a7c32f47c"
-    },
-    {
-      "path": "images/sandbox/gum-zombie-gum.png",
-      "size": 1047,
-      "sha256": "1269eccefc12f120ca7cbfc66c2f864bea6d71c75f31d845b687bfcc96b3369a"
-    },
-    {
-      "path": "images/sandbox/gum-zombie-hand.png",
-      "size": 1928,
-      "sha256": "38d1cc623572801abda48b607f969bb56736a7ae24c8bdddd663ab5365b4fb3f"
-    },
-    {
-      "path": "images/sandbox/gum-zombie-head.png",
-      "size": 5185,
-      "sha256": "2d10d22a0ec751a2fe8f7b0e2ecbbe4cb0a8dd729983d717e9d199d0ef243b7f"
-    },
-    {
-      "path": "images/sandbox/gum-zombie-inner-lower.png",
-      "size": 1252,
-      "sha256": "9122d4cab1a843c672e6b6af6b518c34fa8b12c7ee864bbfca5a3042a8111b8a"
-    },
-    {
-      "path": "images/sandbox/gum-zombie-inner-upper.png",
-      "size": 912,
-      "sha256": "cb493873095dbf28ea650bcbe07b1782da14b4ddb44a35c1f496a46a85c36312"
-    },
-    {
-      "path": "images/sandbox/gum-zombie-jaw.png",
-      "size": 1472,
-      "sha256": "8026b63666b7a8d55a8ce7e814b8a74a4ede41a66757649ee12f6f1d752c7f8a"
-    },
-    {
-      "path": "images/sandbox/gum-zombie-outer-lower.png",
-      "size": 1418,
-      "sha256": "6d776442fb97f3fc0f32b10b086e46d2a0c955714651502ad829ebb4605624f7"
-    },
-    {
-      "path": "images/sandbox/gum-zombie-outer-upper-damaged.png",
-      "size": 1539,
-      "sha256": "27396b1000a7fc0cb6e3aa0f8f865a6cb7706d861b570eb96a37b649fcefa93b"
-    },
-    {
-      "path": "images/sandbox/gum-zombie-outer-upper.png",
-      "size": 1498,
-      "sha256": "6419cfb861972055b47be3d33bd8b610d16c5aaf998bec9d2ee71682bfb09ec5"
-    },
-    {
-      "path": "images/sandbox/gum-zombie-prop.png",
-      "size": 6225,
-      "sha256": "b45996593854520f393b3bbf20a78de513c7c080c1c660903a660aa80fc5569d"
-    },
-    {
-      "path": "images/sandbox/heavy-pea-blink.png",
-      "size": 8355,
-      "sha256": "e9228e6d66d6ed8a20d64ae7018976fa938e8defb70e83020274a63fa15ba551"
-    },
-    {
-      "path": "images/sandbox/heavy-pea-head.png",
-      "size": 8371,
-      "sha256": "9ce55b5b39236a75ca1a82936cb9b9efa2ba90de8ac0af65edb7b84ef3f27742"
-    },
-    {
-      "path": "images/sandbox/heavy-pea-mouth.png",
-      "size": 3629,
-      "sha256": "d2fa6826b5fd43f3e8aab846d57f4bffc1088a08a31f91874046c14e0d37958d"
-    },
-    {
-      "path": "images/sandbox/ice-blink.png",
-      "size": 8000,
-      "sha256": "8857721a0e9e24f894028d376fa1efbcb2209799ac6682fa07b7ad12daa73075"
-    },
-    {
-      "path": "images/sandbox/ice-bucket-zombie-body.png",
-      "size": 6183,
-      "sha256": "21b4dd1701b0a20ccede385fe5f2a1d189918c05b0897175928c9030697d9c03"
-    },
-    {
-      "path": "images/sandbox/ice-bucket-zombie-hand.png",
-      "size": 1928,
-      "sha256": "38d1cc623572801abda48b607f969bb56736a7ae24c8bdddd663ab5365b4fb3f"
-    },
-    {
-      "path": "images/sandbox/ice-bucket-zombie-head.png",
-      "size": 5185,
-      "sha256": "2d10d22a0ec751a2fe8f7b0e2ecbbe4cb0a8dd729983d717e9d199d0ef243b7f"
-    },
-    {
-      "path": "images/sandbox/ice-bucket-zombie-inner-lower.png",
-      "size": 1244,
-      "sha256": "103c99a14fb0da537e87b35ecc9af9a90205aa4d5ed65023ef6be75cb9b8210b"
-    },
-    {
-      "path": "images/sandbox/ice-bucket-zombie-inner-upper.png",
-      "size": 938,
-      "sha256": "dc5dbd63d560242893b4b062452dafa2a3ab7130429bd8d65847d7ca888e4026"
-    },
-    {
-      "path": "images/sandbox/ice-bucket-zombie-jaw.png",
-      "size": 1472,
-      "sha256": "8026b63666b7a8d55a8ce7e814b8a74a4ede41a66757649ee12f6f1d752c7f8a"
-    },
-    {
-      "path": "images/sandbox/ice-bucket-zombie-outer-lower.png",
-      "size": 1400,
-      "sha256": "c29961a6bc473d27d2a7711351673f9e5a370f4456dc10102b2034135213315c"
-    },
-    {
-      "path": "images/sandbox/ice-bucket-zombie-outer-upper-damaged.png",
-      "size": 1476,
-      "sha256": "7ab30c92e50ac0d844364a847208a10cc6e3ac5e1e8523b2a4979a544fe71a8a"
-    },
-    {
-      "path": "images/sandbox/ice-bucket-zombie-outer-upper.png",
-      "size": 1502,
-      "sha256": "7b9c8ae79d5c07401bcb78643e56db221c3d63f1e0c99052711da352b7d5cb6a"
-    },
-    {
-      "path": "images/sandbox/ice-bucket-zombie-prop-damage1.png",
-      "size": 8809,
-      "sha256": "b6f861603783440b4ab2a35c2c8462a881d641f266f8dba5e7cb6a095b43fe63"
-    },
-    {
-      "path": "images/sandbox/ice-bucket-zombie-prop-damage2.png",
-      "size": 6962,
-      "sha256": "f79b72c84c3debe22d497397ef3a9165927ef9ad9187ca01e6f1d71b20a3b14b"
-    },
-    {
-      "path": "images/sandbox/ice-bucket-zombie-prop.png",
-      "size": 8708,
-      "sha256": "304bc580e887159f0903e7ca86268544b94dd542f5372f18ed5e7d3d16fd59c2"
-    },
-    {
-      "path": "images/sandbox/ice-gatling-barrel.png",
-      "size": 1798,
-      "sha256": "f875acb059c8f577e80aa59a15a605530d15136aa35c6a0edeb2570663fb70de"
-    },
-    {
-      "path": "images/sandbox/ice-gatling-blink.png",
-      "size": 8231,
-      "sha256": "31fcc5580f882d58a78b0adeb20b3db025548a34378cfe1ce880ca91b9d30960"
-    },
-    {
-      "path": "images/sandbox/ice-gatling-head.png",
-      "size": 8558,
-      "sha256": "484e903ea5f41e83990036d10e3f20aa65e4d07ccbe618e13e16c2b1dc0e6b74"
-    },
-    {
-      "path": "images/sandbox/ice-gatling-mouth.png",
-      "size": 5245,
-      "sha256": "61e1fb114f31677913a68330d292ab14c01a6f36f6691eda8fd0e799d6ea57ea"
-    },
-    {
-      "path": "images/sandbox/ice-gatling-overlay.png",
-      "size": 4060,
-      "sha256": "88b118ee7aa0ceaf41d1b0faf631bb0efde964639bb97fd026a5575b87977677"
-    },
-    {
-      "path": "images/sandbox/ice-head.png",
-      "size": 8212,
-      "sha256": "0ac8fcd03a44ea0fa49338ac64da99699ccddb49da271eead9cbdaca9cfd1327"
-    },
-    {
-      "path": "images/sandbox/ice-mouth.png",
-      "size": 3972,
-      "sha256": "0522a02b398bb1dea1452f74b3557089e4706b2f33aa37a58cfdc868e138a0fe"
-    },
-    {
-      "path": "images/sandbox/ice-small-blink.png",
-      "size": 2166,
-      "sha256": "6c25ddb5387352423155ada78f7df1f78f354be547c246a5f002fa67e9505269"
-    },
-    {
-      "path": "images/sandbox/ice-small-head.png",
-      "size": 2193,
-      "sha256": "fa4ce84c9b1ee5d1004c8778222ca17dc4bde7c358ffa3fa05f7919952400719"
-    },
-    {
-      "path": "images/sandbox/ice-small-mouth.png",
-      "size": 2123,
-      "sha256": "87dca6d42324d3236c92b1db3db8194bfcb3d052eff27d91d1d94127600f0095"
-    },
-    {
-      "path": "images/sandbox/ink-painter-body.png",
-      "size": 6703,
-      "sha256": "54496c7ff1d8531d24cc00b9d468139c79e8bc570ea313990770de3ed76989a5"
-    },
-    {
-      "path": "images/sandbox/ink-painter-hand.png",
-      "size": 1928,
-      "sha256": "38d1cc623572801abda48b607f969bb56736a7ae24c8bdddd663ab5365b4fb3f"
-    },
-    {
-      "path": "images/sandbox/ink-painter-hat.png",
-      "size": 1908,
-      "sha256": "b05e2f26e25af3586fa0e31dcd49d78cd69aeb2a9cdd67cb01902cee03a4dbff"
-    },
-    {
-      "path": "images/sandbox/ink-painter-head.png",
-      "size": 5185,
-      "sha256": "2d10d22a0ec751a2fe8f7b0e2ecbbe4cb0a8dd729983d717e9d199d0ef243b7f"
-    },
-    {
-      "path": "images/sandbox/ink-painter-inner-lower.png",
-      "size": 1157,
-      "sha256": "ab10ca175d6693315074b0ba9fde3d223d1e7763e00cf3916ec7867782fff316"
-    },
-    {
-      "path": "images/sandbox/ink-painter-inner-upper.png",
-      "size": 883,
-      "sha256": "946ce3e0065dbd6308ef355c03d8f4528c721301e7c7126c62315a08e62569b0"
-    },
-    {
-      "path": "images/sandbox/ink-painter-jaw.png",
-      "size": 1472,
-      "sha256": "8026b63666b7a8d55a8ce7e814b8a74a4ede41a66757649ee12f6f1d752c7f8a"
-    },
-    {
-      "path": "images/sandbox/ink-painter-outer-lower.png",
-      "size": 1309,
-      "sha256": "e49a8e357ec52541280f2df1c03628306eca5c5e5578278bd81278b0f9d02150"
-    },
-    {
-      "path": "images/sandbox/ink-painter-outer-upper-damaged.png",
-      "size": 1475,
-      "sha256": "c998db4bee272525da8f8dccedf96731bf881cafdf9bab575a7d380d425282d0"
-    },
-    {
-      "path": "images/sandbox/ink-painter-outer-upper.png",
-      "size": 984,
-      "sha256": "f78e85ed935615c450841623b82b1cae378094bc55a63eba7ae3e540fa922c9b"
-    },
-    {
-      "path": "images/sandbox/light-zombie-body.png",
-      "size": 6360,
-      "sha256": "5f1837492dce77703187192312ad4e078b0086c8bfaebb9645c90d838721e171"
-    },
-    {
-      "path": "images/sandbox/light-zombie-hand.png",
-      "size": 1928,
-      "sha256": "38d1cc623572801abda48b607f969bb56736a7ae24c8bdddd663ab5365b4fb3f"
-    },
-    {
-      "path": "images/sandbox/light-zombie-hat.png",
-      "size": 2437,
-      "sha256": "b52eeb2e76782e18efb2b41be7ecedde6be369a94f7d77eaf0d223377780bc0c"
-    },
-    {
-      "path": "images/sandbox/light-zombie-head.png",
-      "size": 5185,
-      "sha256": "2d10d22a0ec751a2fe8f7b0e2ecbbe4cb0a8dd729983d717e9d199d0ef243b7f"
-    },
-    {
-      "path": "images/sandbox/light-zombie-inner-lower.png",
-      "size": 1208,
-      "sha256": "52d057942f9bae89a8b1b59274b4afcce6819fc13ab4a7aade9c81622406250d"
-    },
-    {
-      "path": "images/sandbox/light-zombie-inner-upper.png",
-      "size": 945,
-      "sha256": "58ef5c1105d228ba0c8d0c32e711fdf343452b4ddcb8eb6ecd1d273d707d91a7"
-    },
-    {
-      "path": "images/sandbox/light-zombie-jaw.png",
-      "size": 1472,
-      "sha256": "8026b63666b7a8d55a8ce7e814b8a74a4ede41a66757649ee12f6f1d752c7f8a"
-    },
-    {
-      "path": "images/sandbox/light-zombie-outer-lower.png",
-      "size": 1367,
-      "sha256": "121f16b936083d9f4d4ff9dfd41df811f7f3e1c7b15a91921d5655bdd25efcfa"
-    },
-    {
-      "path": "images/sandbox/light-zombie-outer-upper-damaged.png",
-      "size": 1517,
-      "sha256": "6851c5e55c958fe593dec1e5052bb6f92e767ed2688a8403c74a3cc8c7b59a86"
-    },
-    {
-      "path": "images/sandbox/light-zombie-outer-upper.png",
-      "size": 1576,
-      "sha256": "214993d8a6f201c2389d2f8896f8f2bd39c5e23c0f490e046d0c696a0ce3616e"
-    },
-    {
-      "path": "images/sandbox/light-zombie-prop.png",
-      "size": 3527,
-      "sha256": "c3207372398103b0658ce67b7e7a267ad1605b6fd3837cdb804437c08251338f"
-    },
-    {
-      "path": "images/sandbox/paper-thrower-body.png",
-      "size": 6280,
-      "sha256": "825ce4406cad544137561c948e77c9a12886e00eb4ac2b499137895cf7dbfa47"
-    },
-    {
-      "path": "images/sandbox/paper-thrower-hand.png",
-      "size": 1928,
-      "sha256": "38d1cc623572801abda48b607f969bb56736a7ae24c8bdddd663ab5365b4fb3f"
-    },
-    {
-      "path": "images/sandbox/paper-thrower-hat.png",
-      "size": 2322,
-      "sha256": "22a5055a2a5dff8a357c744c1018ce90fcb06fd61283201ff86dd716681b237c"
-    },
-    {
-      "path": "images/sandbox/paper-thrower-head.png",
-      "size": 5185,
-      "sha256": "2d10d22a0ec751a2fe8f7b0e2ecbbe4cb0a8dd729983d717e9d199d0ef243b7f"
-    },
-    {
-      "path": "images/sandbox/paper-thrower-inner-lower.png",
-      "size": 1104,
-      "sha256": "f2dd505b69e635356a012c951c72b018561330f2ce8adb6cdc2405c843cbd52c"
-    },
-    {
-      "path": "images/sandbox/paper-thrower-inner-upper.png",
-      "size": 855,
-      "sha256": "5b0fe908ecb12d6771b24908195228bbcc5df2f0644aa273d69f68435a5b51ac"
-    },
-    {
-      "path": "images/sandbox/paper-thrower-jaw.png",
-      "size": 1472,
-      "sha256": "8026b63666b7a8d55a8ce7e814b8a74a4ede41a66757649ee12f6f1d752c7f8a"
-    },
-    {
-      "path": "images/sandbox/paper-thrower-outer-lower.png",
-      "size": 1257,
-      "sha256": "3787c44e14ad4a33511906c2d9a65b1a8c26b4fb44d6a8bb048df59c53c53a0c"
-    },
-    {
-      "path": "images/sandbox/paper-thrower-outer-upper-damaged.png",
-      "size": 1378,
-      "sha256": "0bc80853e818064eb38eb1a2462fb50342867add3fa655d6ebf03cc9bd7bd439"
-    },
-    {
-      "path": "images/sandbox/paper-thrower-outer-upper.png",
-      "size": 1320,
-      "sha256": "8f195c8cab10d8ced52a2eed681244a58fd7635255911521134ea861dea0c1d3"
-    },
-    {
-      "path": "images/sandbox/parcel-zombie-body.png",
-      "size": 6182,
-      "sha256": "c7d60075824ac870bf16002833f629658740ce20f40b62dbf7f4adc7e89191d1"
-    },
-    {
-      "path": "images/sandbox/parcel-zombie-hand.png",
-      "size": 1928,
-      "sha256": "38d1cc623572801abda48b607f969bb56736a7ae24c8bdddd663ab5365b4fb3f"
-    },
-    {
-      "path": "images/sandbox/parcel-zombie-head.png",
-      "size": 5185,
-      "sha256": "2d10d22a0ec751a2fe8f7b0e2ecbbe4cb0a8dd729983d717e9d199d0ef243b7f"
-    },
-    {
-      "path": "images/sandbox/parcel-zombie-inner-lower.png",
-      "size": 1057,
-      "sha256": "eddc6f86887d08219cb03bdb6e1b0c5aaa5cf3144604242d6680cd07e449167d"
-    },
-    {
-      "path": "images/sandbox/parcel-zombie-inner-upper.png",
-      "size": 781,
-      "sha256": "ec78b268898ff0d73f6668818e9ad9c3c859d355124d3d952014cf807947da4f"
-    },
-    {
-      "path": "images/sandbox/parcel-zombie-jaw.png",
-      "size": 1472,
-      "sha256": "8026b63666b7a8d55a8ce7e814b8a74a4ede41a66757649ee12f6f1d752c7f8a"
-    },
-    {
-      "path": "images/sandbox/parcel-zombie-outer-lower.png",
-      "size": 1253,
-      "sha256": "e493e1de46c87d877cb366d9df14f480e672af85bf5b17cf345d10e8ebedc3fd"
-    },
-    {
-      "path": "images/sandbox/parcel-zombie-outer-upper-damaged.png",
-      "size": 1470,
-      "sha256": "4f3a7912d3ca5da24fa96ab8ec038232d7996125ddb81299f5be73a199fd31ce"
-    },
-    {
-      "path": "images/sandbox/parcel-zombie-outer-upper.png",
-      "size": 1460,
-      "sha256": "da9ef3b230fd77721b235a5420e8994da956c63f0e37795f7e269e434ff56e4b"
-    },
-    {
-      "path": "images/sandbox/parcel-zombie-prop-damage1.png",
-      "size": 5927,
-      "sha256": "ac3b10c0473de19bc089d096e65949b4b9a229fe45ce05c94ef9d3088d0b5d79"
-    },
-    {
-      "path": "images/sandbox/parcel-zombie-prop-damage2.png",
-      "size": 6315,
-      "sha256": "f1ebaae85b08c4fa0a0073341a9b774f558fe48ce05302f99df729d7821cfc73"
-    },
-    {
-      "path": "images/sandbox/parcel-zombie-prop.png",
-      "size": 6085,
-      "sha256": "6ce47ff87dba42983be84acfbc46ee3a9e8b06cfcae449b1b7f9d18975424a51"
-    },
-    {
-      "path": "images/sandbox/relay-mushroom-blink.png",
-      "size": 3776,
-      "sha256": "c71a6ad34b87e94bef2f663f690fd76d584fc3a420595c7ff34f0d2788ec9682"
-    },
-    {
-      "path": "images/sandbox/relay-mushroom-cap.png",
-      "size": 8099,
-      "sha256": "b59c554e5a9417f944663ade98c1cf9ffcaaf051cab4502b2fb08c6534e9a6e3"
-    },
-    {
-      "path": "images/sandbox/relay-mushroom-head.png",
-      "size": 3814,
-      "sha256": "c66df030c7216ead54f30e1c89f510b47c689ad0f083d65a16ea89423d8fef2e"
-    },
-    {
-      "path": "images/sandbox/relay-mushroom-stem.png",
-      "size": 310,
-      "sha256": "c99bf9914dd8613e69ca160fb06a9274a5661fe7678290eb145f0f7dc51de8c2"
-    },
-    {
-      "path": "images/sandbox/repair-zombie-body.png",
-      "size": 6490,
-      "sha256": "47fc11cb0d3b7bba064799c1c35eb627aabd833783b9600639d3b266b0934e36"
-    },
-    {
-      "path": "images/sandbox/repair-zombie-hand.png",
-      "size": 1928,
-      "sha256": "38d1cc623572801abda48b607f969bb56736a7ae24c8bdddd663ab5365b4fb3f"
-    },
-    {
-      "path": "images/sandbox/repair-zombie-head.png",
-      "size": 5185,
-      "sha256": "2d10d22a0ec751a2fe8f7b0e2ecbbe4cb0a8dd729983d717e9d199d0ef243b7f"
-    },
-    {
-      "path": "images/sandbox/repair-zombie-inner-lower.png",
-      "size": 1166,
-      "sha256": "2a9ea5255fe760732837a0f7fb60df15de5c58dc4d6430ecdd8248b19c0d2702"
-    },
-    {
-      "path": "images/sandbox/repair-zombie-inner-upper.png",
-      "size": 887,
-      "sha256": "9ba572bea5fb6c90873ddd371cd843cf5e9eeedd6ceb9882f00991bdb661db31"
-    },
-    {
-      "path": "images/sandbox/repair-zombie-jaw.png",
-      "size": 1472,
-      "sha256": "8026b63666b7a8d55a8ce7e814b8a74a4ede41a66757649ee12f6f1d752c7f8a"
-    },
-    {
-      "path": "images/sandbox/repair-zombie-outer-lower.png",
-      "size": 1370,
-      "sha256": "b86aac8b2053eafcdaba684fb504aa15584d0c67d420302d5db7b855a879b4e3"
-    },
-    {
-      "path": "images/sandbox/repair-zombie-outer-upper-damaged.png",
-      "size": 1423,
-      "sha256": "d276967d95a0513ee1c415f145db0866937089a31de13b27918ffa8072a41e6f"
-    },
-    {
-      "path": "images/sandbox/repair-zombie-outer-upper.png",
-      "size": 1416,
-      "sha256": "febd949becd0337d3cd2cb9ef36a8f2980573a8791aa10c6d402a882538437d9"
-    },
-    {
-      "path": "images/sandbox/repair-zombie-prop-damage1.png",
-      "size": 8477,
-      "sha256": "6b0d408027f195c01325ae2aa09eaa2fbdebd50726ed7ed7aa68ddbd5ffec6bf"
-    },
-    {
-      "path": "images/sandbox/repair-zombie-prop-damage2.png",
-      "size": 6955,
-      "sha256": "21271a1c192679f958675d5f6e0b96395b2a7fbf67687fd50a4dc543b2868142"
-    },
-    {
-      "path": "images/sandbox/repair-zombie-prop.png",
-      "size": 8376,
-      "sha256": "66a9017ef98854c433bdd1772c9985fcbe302a34e4e5feb36c91043b6d298ce2"
-    },
-    {
-      "path": "images/sandbox/rhythm-flower-blink.png",
-      "size": 5892,
-      "sha256": "69b612b2cdfba0dfaf2df8bc942f53c8092e6ad6a5e0f12f44efba5e3d2b1336"
-    },
-    {
-      "path": "images/sandbox/rhythm-flower-head.png",
-      "size": 5908,
-      "sha256": "8b4f8bb347fde1ee0fc00dfcb787baf6586d4227a0cb2cb27a340eeca9c257f5"
-    },
-    {
-      "path": "images/sandbox/scatter-pea-blink.png",
-      "size": 8166,
-      "sha256": "950666a25d59fb9b28658e6d1b90754c2ec01dcfac9711ab23f23f8fd9b91e3d"
-    },
-    {
-      "path": "images/sandbox/scatter-pea-head.png",
-      "size": 8367,
-      "sha256": "dd6e0097d638f6c75ba3d9f64af3ddeafaa5973ab4d7decfc4619427049ba65d"
-    },
-    {
-      "path": "images/sandbox/scatter-pea-mouth.png",
-      "size": 3950,
-      "sha256": "743a5b65da35af7e2dd0d51808875fae6f804364568456b616050a8c39a052fa"
-    },
-    {
-      "path": "images/sandbox/seeker-pea-blink.png",
-      "size": 8451,
-      "sha256": "162b491b11191ba1666b25abf10947235fa0971d8b9a131a96b5242711688146"
-    },
-    {
-      "path": "images/sandbox/seeker-pea-head.png",
-      "size": 8524,
-      "sha256": "cb431c82fadcaf1c96170e51b82bb2f993b65673ca9f558a42a388b6f641106b"
-    },
-    {
-      "path": "images/sandbox/seeker-pea-mouth.png",
-      "size": 3805,
-      "sha256": "22896266046385642462735bf6beaaa7f87c3d8c0473450b0fd8269da226dd15"
-    },
-    {
-      "path": "images/sandbox/smoke-zombie-body.png",
-      "size": 5911,
-      "sha256": "f44f98f51ba8830237e37ed042c496e42f804e44e6679a1cdb94ad0c7dfd42d7"
-    },
-    {
-      "path": "images/sandbox/smoke-zombie-hand.png",
-      "size": 1928,
-      "sha256": "38d1cc623572801abda48b607f969bb56736a7ae24c8bdddd663ab5365b4fb3f"
-    },
-    {
-      "path": "images/sandbox/smoke-zombie-hat.png",
-      "size": 1925,
-      "sha256": "c93dd0d1f716c484dcc54b593ec56ab028bcc4bbb5f8277fc2cf6faa7f24ea74"
-    },
-    {
-      "path": "images/sandbox/smoke-zombie-head.png",
-      "size": 5185,
-      "sha256": "2d10d22a0ec751a2fe8f7b0e2ecbbe4cb0a8dd729983d717e9d199d0ef243b7f"
-    },
-    {
-      "path": "images/sandbox/smoke-zombie-inner-lower.png",
-      "size": 1080,
-      "sha256": "465658195711ab8a3c468a486210c89a9a9fc37c5420c6e9afc76370b3277d92"
-    },
-    {
-      "path": "images/sandbox/smoke-zombie-inner-upper.png",
-      "size": 799,
-      "sha256": "35cc3343ed998a6b4e2834457c1ac841cd99feec17b20c33a020b403352b644f"
-    },
-    {
-      "path": "images/sandbox/smoke-zombie-jaw.png",
-      "size": 1472,
-      "sha256": "8026b63666b7a8d55a8ce7e814b8a74a4ede41a66757649ee12f6f1d752c7f8a"
-    },
-    {
-      "path": "images/sandbox/smoke-zombie-outer-lower.png",
+      "path": "images/sandbox/cable-hook-jaw.png",
       "size": 1230,
-      "sha256": "1c2773351c50d8e72ae208b63d14acd20ad8f3ad4d2b2e1abe81aa7493a0e31c"
+      "sha256": "d72a00d85dc0bcbecd71627a5109314f0245ae14acb3646ae4df906cf33259ac"
     },
     {
-      "path": "images/sandbox/smoke-zombie-outer-upper-damaged.png",
-      "size": 1357,
-      "sha256": "78502298c6b2785d3085dad4f82b44f8ac3e8b7d026d8b2a097df4e5e1506946"
+      "path": "images/sandbox/cable-hook-outer-leg-foot.png",
+      "size": 1922,
+      "sha256": "b61576b9330d089e912be4dcb66e6ed1c11c1d2f286fc1908a1edf23d680f69e"
     },
     {
-      "path": "images/sandbox/smoke-zombie-outer-upper.png",
-      "size": 1342,
-      "sha256": "e157e120f4114914d0accf43529e3a9678f44e1c66ac1dea34f379525f13d663"
+      "path": "images/sandbox/cable-hook-outer-leg-lower.png",
+      "size": 1772,
+      "sha256": "ca1541e6df5b78b563c73833266b10d34445093d46e9796768b194b84b81825a"
     },
     {
-      "path": "images/sandbox/smoke-zombie-prop.png",
-      "size": 3340,
-      "sha256": "82036312ce6a4f034c91081d5529e3143437f226e5aaf6b33d5c32a87973677c"
+      "path": "images/sandbox/cable-hook-outer-leg-upper.png",
+      "size": 2048,
+      "sha256": "b887dec1df53df1a3ff00a452f27d4fb54c12482518ebb88d9565ba08f57ceba"
     },
     {
-      "path": "images/sandbox/spring-nut-blink.png",
-      "size": 16591,
-      "sha256": "038d67c4927f3edafc3f3442db1943c6a516fc6b05633773babd186abd1660ad"
+      "path": "images/sandbox/cable-hook-outer-lower.png",
+      "size": 1108,
+      "sha256": "f16e8c092cd5be88155898374d88e805cedfd882bf83732017bba732a25ba2ba"
     },
     {
-      "path": "images/sandbox/spring-nut-cracked1.png",
-      "size": 17104,
-      "sha256": "b76846b0d7c22546802263e064a2e31a18da48468f55d4c5917cd48146449424"
+      "path": "images/sandbox/cable-hook-outer-upper-damaged.png",
+      "size": 1409,
+      "sha256": "e750dfb4c24d54e470601a40b24ed38b1057205530bf166e6446c818b54b1928"
     },
     {
-      "path": "images/sandbox/spring-nut-cracked2.png",
-      "size": 16755,
-      "sha256": "90c12e02fe5685f65e9387c48d1a06bae3ca4c0788701862a9e9c25685654f43"
+      "path": "images/sandbox/cable-hook-outer-upper.png",
+      "size": 1432,
+      "sha256": "1108ca519c3389685ea257da6d1880ca29c224c96359b18b1d079ce9ff7a2d95"
     },
     {
-      "path": "images/sandbox/spring-nut-head.png",
-      "size": 16757,
-      "sha256": "986d5e8ee01850bedb59e93a63e25f869e2585deb2b9bb179385236eb01594e6"
+      "path": "images/sandbox/cable-hook-pack.png",
+      "size": 1405,
+      "sha256": "8b7bb6c7dc5896c2e0285d7bde14618955e1645d3304e74cf44bdca8c1171eea"
     },
     {
-      "path": "images/sandbox/storm-mushroom-0-blink.png",
-      "size": 3447,
-      "sha256": "6dc4eb16177904312c5936bd76dc20a3a8b173278d42dc01baff2f2e8cce9593"
+      "path": "images/sandbox/holo-decoy-body-damage1.png",
+      "size": 8308,
+      "sha256": "6ce2d9ad9592df0f7a4a90a16fbbe6a8051a6e0d676b88871126af9166b676df"
     },
     {
-      "path": "images/sandbox/storm-mushroom-0-cap.png",
-      "size": 7478,
-      "sha256": "d05e0547b3086c819afe5cf67e29cdaf687efc49c8eb0df748041327e7774455"
+      "path": "images/sandbox/holo-decoy-body-damage2.png",
+      "size": 9653,
+      "sha256": "d469e03d0ac6ecfc7e04a756ad37d74e0873f2d469ba4081d0584694a31218e0"
     },
     {
-      "path": "images/sandbox/storm-mushroom-0-head.png",
-      "size": 3490,
-      "sha256": "443dd6740267bc76a7add2953c0d2c2582c901568aa34088e7aedfa059d72a39"
+      "path": "images/sandbox/holo-decoy-body.png",
+      "size": 7711,
+      "sha256": "3ee3bba097105db2be5998231b6130f673335871beda474415f521e362ca32fa"
     },
     {
-      "path": "images/sandbox/storm-mushroom-0-stem.png",
-      "size": 244,
-      "sha256": "7e1d20038a05b8addf4c61260a6027baee791ed3e7f698ac7042a844eaa9e598"
+      "path": "images/sandbox/holo-decoy-hand.png",
+      "size": 1318,
+      "sha256": "e268c8b14684ca8eb84f90ceadb0daf91536f17c030940b6ae4161ab43d4508a"
     },
     {
-      "path": "images/sandbox/storm-mushroom-1-blink.png",
-      "size": 3505,
-      "sha256": "c5eca912c12619f7a313b98f881cec00b145caa835c1f143d1b80b7dc4a0f0bd"
+      "path": "images/sandbox/holo-decoy-head.png",
+      "size": 6344,
+      "sha256": "6845d0c29409994b0b1d8b093dce9207d8753d96d33556c0402c6c6f495eb96d"
     },
     {
-      "path": "images/sandbox/storm-mushroom-1-cap.png",
-      "size": 8731,
-      "sha256": "261594a4fa01f5ebf93fc5274309637288e16a7f0a1802b36ddc5293446dd34c"
+      "path": "images/sandbox/holo-decoy-inner-leg-foot.png",
+      "size": 1123,
+      "sha256": "e488501624b94fe91dd69007c8bdd18ef9895d187b43c9299411a106f11c4536"
     },
     {
-      "path": "images/sandbox/storm-mushroom-1-head.png",
-      "size": 3584,
-      "sha256": "f9e98a2ab9ae58e3d952f425248b832556bfdf8a1a98691673f53bcc27df26e0"
+      "path": "images/sandbox/holo-decoy-inner-leg-lower.png",
+      "size": 2525,
+      "sha256": "d6c3d8645f600dcc10a3f7f9102fcf742b71006e172838222f35340a35ebf7f6"
     },
     {
-      "path": "images/sandbox/storm-mushroom-1-stem.png",
-      "size": 319,
-      "sha256": "bfbf60cd04988192daf9f53b6404c0819bdc5c7b3c4c9d73b81dd79c3581aec5"
+      "path": "images/sandbox/holo-decoy-inner-leg-upper.png",
+      "size": 1108,
+      "sha256": "2c27d37f1bfd5e89a92b285ef165137a7918d73060cbf3f829890721adf28b6e"
     },
     {
-      "path": "images/sandbox/storm-mushroom-2-blink.png",
-      "size": 3468,
-      "sha256": "f4635689c30b222589adab9b438b5e2837ce376198c650699809ea76d828507e"
+      "path": "images/sandbox/holo-decoy-inner-lower.png",
+      "size": 979,
+      "sha256": "4fc4496df77cd7273ee861fe20ec90d1a51ad86ca6c9e447dcfec6ed5e2f6def"
     },
     {
-      "path": "images/sandbox/storm-mushroom-2-cap.png",
-      "size": 10294,
-      "sha256": "8fc7e1cb363f19489c4bfa197d46bcb8cb795c7b60ab254fc82f54376f151a86"
+      "path": "images/sandbox/holo-decoy-inner-upper.png",
+      "size": 974,
+      "sha256": "94391fcbc8aa645165c22d1cb09a96e5dda6e4ca6d46fe78ee862e3e7fbdfe05"
     },
     {
-      "path": "images/sandbox/storm-mushroom-2-head.png",
-      "size": 3551,
-      "sha256": "c6e07861a6c529cca1f7927f9651f618fdc16cedbe8081de4eb3ebc2f93521f5"
+      "path": "images/sandbox/holo-decoy-jaw.png",
+      "size": 1127,
+      "sha256": "55caf53db0453cbccc90a3cdea7ee57538c23ceb8859949cbf1eede3dbb165db"
     },
     {
-      "path": "images/sandbox/storm-mushroom-2-stem.png",
-      "size": 325,
-      "sha256": "ae7952780d9a8116e0e712ae18a2046cc69197cbabf7ef5ba3fe0f8cff471a11"
+      "path": "images/sandbox/holo-decoy-outer-leg-foot.png",
+      "size": 1909,
+      "sha256": "f3c0577967b04fd52384668f10cd0728722d1931194fce8389115231fbb2045b"
     },
     {
-      "path": "images/sandbox/tiny-pea-blink.png",
-      "size": 8241,
-      "sha256": "0974ed4cec5fd268f7720033fb3437bc939c978b38f3f3e39dcdb5f30ec7cf22"
+      "path": "images/sandbox/holo-decoy-outer-leg-lower.png",
+      "size": 1787,
+      "sha256": "d647d01105a3ebce4dfc0414da4562510bf27f1918edbddbf09e9a3e379b2cb5"
     },
     {
-      "path": "images/sandbox/tiny-pea-head.png",
-      "size": 8481,
-      "sha256": "4afc735198faed67618c4cb9dd3ba7f21f3408c33712756fe6988b9574a1ed71"
-    },
-    {
-      "path": "images/sandbox/tiny-pea-mouth.png",
-      "size": 3778,
-      "sha256": "b444f40d71998d9d8151092421a024c6cce554aa55716c7fbf8716e0a91c8dfb"
-    },
-    {
-      "path": "images/sandbox/twin-zombie-body.png",
-      "size": 5992,
-      "sha256": "f2eac6da9a353c470a38b5e824a46b673ea08d2aca9f7159a93ada366cd28ef8"
-    },
-    {
-      "path": "images/sandbox/twin-zombie-hand.png",
+      "path": "images/sandbox/holo-decoy-outer-leg-upper.png",
       "size": 1928,
-      "sha256": "38d1cc623572801abda48b607f969bb56736a7ae24c8bdddd663ab5365b4fb3f"
+      "sha256": "6ff2d0aefe19a1e214370448dfa646317279e713f003a235320bfc75a414b3ce"
     },
     {
-      "path": "images/sandbox/twin-zombie-hat.png",
-      "size": 2161,
-      "sha256": "4469a51f8d1a8547cbc7bce46334df246f161732e7403a1889f7c784ac8f99d2"
+      "path": "images/sandbox/holo-decoy-outer-lower.png",
+      "size": 1179,
+      "sha256": "31c5f54c49b9afb40732a34350426f8807675d18ae6fc5d2f596e4fa36203619"
     },
     {
-      "path": "images/sandbox/twin-zombie-head.png",
-      "size": 5185,
-      "sha256": "2d10d22a0ec751a2fe8f7b0e2ecbbe4cb0a8dd729983d717e9d199d0ef243b7f"
+      "path": "images/sandbox/holo-decoy-outer-upper-damaged.png",
+      "size": 1498,
+      "sha256": "5e9a5c21d955997f08210394b8b497b061dffa482743b908154c14c523383c41"
     },
     {
-      "path": "images/sandbox/twin-zombie-inner-lower.png",
-      "size": 1092,
-      "sha256": "308ae6d68a9e0e3ed98d5d03dcd8f98aae20b96854793d307e59a7c8078c8f45"
+      "path": "images/sandbox/holo-decoy-outer-upper.png",
+      "size": 1465,
+      "sha256": "f520f548975386d9ded0ad719ad122d729ddf342e113d22a5267b01695161fbd"
     },
     {
-      "path": "images/sandbox/twin-zombie-inner-upper.png",
-      "size": 823,
-      "sha256": "0826999ac6a74f8472008d0fd4a8ec4ce7bf6f8516801398703976926c04d9c6"
+      "path": "images/sandbox/holo-decoy-pack.png",
+      "size": 1421,
+      "sha256": "8c95f14ecf6e9121a404e6896f348b707960e8bfd9e92631c4c91d5f1d57d522"
     },
     {
-      "path": "images/sandbox/twin-zombie-jaw.png",
-      "size": 1472,
-      "sha256": "8026b63666b7a8d55a8ce7e814b8a74a4ede41a66757649ee12f6f1d752c7f8a"
+      "path": "images/sandbox/hover-drone-body-damage1.png",
+      "size": 7541,
+      "sha256": "93e46c31fd26f625aa4e7248ed2aaaa42ca7d9abb7ade383cfd01d9b983e68b5"
     },
     {
-      "path": "images/sandbox/twin-zombie-outer-lower.png",
-      "size": 1275,
-      "sha256": "db9cec0934f47c3c26fc4f74225496f1950526e943e3be1ff9a2bc61343fb372"
+      "path": "images/sandbox/hover-drone-body-damage2.png",
+      "size": 7525,
+      "sha256": "fdd12562aeb9bee6a400ce42bf1d3c8513be0395deeee742f8fb5baa73c6e746"
     },
     {
-      "path": "images/sandbox/twin-zombie-outer-upper-damaged.png",
-      "size": 1403,
-      "sha256": "357c51b9ffc0b4dc368aefff56a0dea54df8151f72ad79aca35c92034f93ac61"
+      "path": "images/sandbox/hover-drone-body.png",
+      "size": 7571,
+      "sha256": "221db4a56d2f1a15cee30532dcb34e8a212cc592b8911f069defe681fadd1a7b"
     },
     {
-      "path": "images/sandbox/twin-zombie-outer-upper.png",
-      "size": 1353,
-      "sha256": "8dba518a4ef994b6ee433b22a3d0575e0338ad2ad40536bbed5e8c286e39de6b"
+      "path": "images/sandbox/hover-drone-hand.png",
+      "size": 1631,
+      "sha256": "80f890790b7dd544a97d885fcdb4ac912ad581fa2067ffec0d35965cd6f05b5b"
     },
     {
-      "path": "images/sandbox/twin-zombie-prop.png",
-      "size": 3456,
-      "sha256": "c6e1a118adf08760430413a3a1ea164f81d6db59e7899b518981d6c6fe5b0dc9"
+      "path": "images/sandbox/hover-drone-head.png",
+      "size": 5125,
+      "sha256": "32cb9aa55f690bf338bd5ee4373d511527f535b10b0822508de0f9fa45c1eee5"
     },
     {
-      "path": "images/sandbox/vfx-acid-hit-0.png",
-      "size": 8894,
-      "sha256": "ce36fc26d69e8f8599903f949be6367fea53398737ef1413d31648087bd45e41"
+      "path": "images/sandbox/hover-drone-inner-leg-foot.png",
+      "size": 1116,
+      "sha256": "b1f2f3c6ee43d4271f2ba13f95ee8e7e740cced5259759139e22f2055a840570"
     },
     {
-      "path": "images/sandbox/vfx-acid-hit-1.png",
-      "size": 11336,
-      "sha256": "c5cf402e58511bed8fc0fec7d8a463d3be2e9f01bd5ec0a08d7ac457f9b1ede3"
+      "path": "images/sandbox/hover-drone-inner-leg-lower.png",
+      "size": 2491,
+      "sha256": "2a0e971a861be64adfae68f81d01751e82909db7c176a14e48eda1024829e582"
     },
     {
-      "path": "images/sandbox/vfx-acid.png",
-      "size": 4114,
-      "sha256": "f0e67c358349f72f7c1292c0f0bc78e9d0617f1e1d0b23afd386421ed0bd36d2"
+      "path": "images/sandbox/hover-drone-inner-leg-upper.png",
+      "size": 1095,
+      "sha256": "f896eb28fc12b67e281fed22f6e66f2d7d1ca1e30a4c47c59a047828cb8e94e6"
     },
     {
-      "path": "images/sandbox/vfx-charge.png",
-      "size": 6919,
-      "sha256": "4ab13c404d744557d8ac3f278c06cb763fa2cb94249a4472dde3d9bab96ae614"
+      "path": "images/sandbox/hover-drone-inner-lower.png",
+      "size": 1075,
+      "sha256": "0aac386295e7eeb71e28f45e9d2adf85f1f8ce2775829852291e2130d75f89d0"
     },
     {
-      "path": "images/sandbox/vfx-electric-hit-0.png",
-      "size": 7685,
-      "sha256": "25776d4fca5b16432c836e3954120931155827a0690ecb9faea4a66ce3ee1749"
+      "path": "images/sandbox/hover-drone-inner-upper.png",
+      "size": 866,
+      "sha256": "94d064795fc478d52fe6327f01c7aaef5b99bbf16866d70c5ffc41a161076060"
     },
     {
-      "path": "images/sandbox/vfx-electric-hit-1.png",
-      "size": 11393,
-      "sha256": "b34e6f1c9a473999072bdc20494f5bb26bda9c88e933ab717f1d6215b7ccf684"
+      "path": "images/sandbox/hover-drone-jaw.png",
+      "size": 1100,
+      "sha256": "14c5da7b6cc28a44d063a88bbb6b436d19ed1c292e661bf59ec44b8c364f2d48"
     },
     {
-      "path": "images/sandbox/vfx-electric.png",
-      "size": 4211,
-      "sha256": "aa7ea63d0e1019fc3b972c466c2015260ed80f066e427ca346c8f36517d4578f"
+      "path": "images/sandbox/hover-drone-outer-leg-foot.png",
+      "size": 1833,
+      "sha256": "607681efd1aeff26af4777d8912df39b8485eb883b4e0afdbea8ad80bbc962f8"
     },
     {
-      "path": "images/sandbox/vfx-fire-hit-0.png",
-      "size": 5454,
-      "sha256": "d6bb90d2e568c9cf9dc4d9f5f21e04a2c43af5c3de9be06ad1052b3873a09838"
+      "path": "images/sandbox/hover-drone-outer-leg-lower.png",
+      "size": 1725,
+      "sha256": "8b39896bfa35e569a161d98e4cf5082c1cfac32b369de1d18bcaaf26888be511"
     },
     {
-      "path": "images/sandbox/vfx-fire-hit-1.png",
-      "size": 10991,
-      "sha256": "51ea42e87fe6c0012b34edd857ab33f83d4c31bb7eb2c1837f094ef4120724a9"
+      "path": "images/sandbox/hover-drone-outer-leg-upper.png",
+      "size": 1916,
+      "sha256": "2e8e5651a74f28bc7b11d2becf706f95556439370484f53c6a874d10542fb238"
     },
     {
-      "path": "images/sandbox/vfx-fire.png",
-      "size": 4822,
-      "sha256": "e1165474dca02ae2e4727a26ff528eba05d26d3f38b46c96d25d561bd7fd21c3"
+      "path": "images/sandbox/hover-drone-outer-lower.png",
+      "size": 1277,
+      "sha256": "33828112178cab9facfa6eac130e2a7815a6b2ef3b4a4e742e89313dcecbfdd5"
     },
     {
-      "path": "images/sandbox/vfx-gum.png",
-      "size": 5204,
-      "sha256": "342ef173ce8cb3f68223c6fb43cb5245dc674f2a3ecca049c1ae17e8fead6d62"
+      "path": "images/sandbox/hover-drone-outer-upper-damaged.png",
+      "size": 1474,
+      "sha256": "f9394af74d749c381717976352dda96e9c3ac737d93dc53858f8b7329b557a3b"
     },
     {
-      "path": "images/sandbox/vfx-heavy-hit-0.png",
-      "size": 8968,
-      "sha256": "dc4149b2a0571da8c7eee16bdbf05997c6d616ce4ab29eb8df6115debdcc3ccd"
+      "path": "images/sandbox/hover-drone-outer-upper.png",
+      "size": 1425,
+      "sha256": "be064b131dc079cbb90ce4a4b32560c2929fe220fcba0bb8ed74deb6f7ae3c01"
     },
     {
-      "path": "images/sandbox/vfx-heavy-hit-1.png",
-      "size": 12175,
-      "sha256": "416540a14eecace56a5967abe24f1747ed345a443adefb29007078d01e858d0a"
+      "path": "images/sandbox/hover-drone-pack.png",
+      "size": 1294,
+      "sha256": "00b797aad52ae05dc98e7397a0089843f1f44804b116b53c5569fa039b55f448"
     },
     {
-      "path": "images/sandbox/vfx-heavy.png",
-      "size": 4138,
-      "sha256": "405dde5fbbf582cb4bbbdf230c53f27f1ed6c82ad0e42680b3f159f24b6fc773"
+      "path": "images/sandbox/jammer-aerial-body-damage1.png",
+      "size": 7869,
+      "sha256": "f981a417145b0b813a3b7d5097d199086fa8ba3b3168b930da1031e0cef16e47"
     },
     {
-      "path": "images/sandbox/vfx-ice-hit-0.png",
-      "size": 6724,
-      "sha256": "dc21502d920ed4dd39cb12673c7e707a45c312e8e00c2bb727d04d8a8052244f"
+      "path": "images/sandbox/jammer-aerial-body-damage2.png",
+      "size": 7302,
+      "sha256": "13859088994a4cd1129436e9e9f6254c656c2cd5cb8726921e0b94f2a2845a5f"
     },
     {
-      "path": "images/sandbox/vfx-ice-hit-1.png",
-      "size": 11607,
-      "sha256": "805afc0bdb7d3c2bb41ee13ff1d10f7a1e4d34683db304ab582dda8dd7fc44cb"
+      "path": "images/sandbox/jammer-aerial-body.png",
+      "size": 7730,
+      "sha256": "c84b251caa717735bacf3868acea8323a497e9cafb6aaddaee4c60984211c389"
     },
     {
-      "path": "images/sandbox/vfx-ice.png",
-      "size": 4147,
-      "sha256": "694d4ff190ee8d9828fede29faf3316ecec0112fc0e70975f7fb57a3479e6f58"
+      "path": "images/sandbox/jammer-aerial-hand.png",
+      "size": 1369,
+      "sha256": "2e95db803e4947a4daf8e0e07789ec3cf01380973e2143520ae644db97543378"
     },
     {
-      "path": "images/sandbox/vfx-ink-hit-0.png",
-      "size": 7765,
-      "sha256": "4a68c361747749f5e8c8f0c2e31405c74c33d8a3d137c2d039e8f347341464b0"
+      "path": "images/sandbox/jammer-aerial-head.png",
+      "size": 5363,
+      "sha256": "5080b70cba240da6794bb3dc241b45385357b70156f7c6da367815702110d03c"
     },
     {
-      "path": "images/sandbox/vfx-ink-hit-1.png",
+      "path": "images/sandbox/jammer-aerial-inner-leg-foot.png",
+      "size": 1171,
+      "sha256": "a672af191366ff33fa7316691d4115fa8342588416230acfd372ff9357896d4d"
+    },
+    {
+      "path": "images/sandbox/jammer-aerial-inner-leg-lower.png",
+      "size": 2499,
+      "sha256": "498d8f32203ca2fe825111c1b129dac5aee366d33da8644ce525f738aab30fb2"
+    },
+    {
+      "path": "images/sandbox/jammer-aerial-inner-leg-upper.png",
+      "size": 1069,
+      "sha256": "b58b9424635dfdfcbcd0faeaec785fde571b02e37a3d95389fdb42d4522136d2"
+    },
+    {
+      "path": "images/sandbox/jammer-aerial-inner-lower.png",
+      "size": 1083,
+      "sha256": "6748a2e8c8652e9b7d75997267458165fa33cd67d3e3d61c6efe03cd33bf5d51"
+    },
+    {
+      "path": "images/sandbox/jammer-aerial-inner-upper.png",
+      "size": 1057,
+      "sha256": "17abfe8a0b9e179cb1e7de0479b1f1c808f85725bd781e0d73bff7b49b2bc9bc"
+    },
+    {
+      "path": "images/sandbox/jammer-aerial-jaw.png",
+      "size": 1230,
+      "sha256": "272aef83c7e63c686208c9acb39dc4b97dc036fa46565b6ed1603672c2d029a7"
+    },
+    {
+      "path": "images/sandbox/jammer-aerial-outer-leg-foot.png",
+      "size": 1997,
+      "sha256": "07733562244b267ca5cff65c958a05f9309abd6206d18bd2dd2d809377e5a596"
+    },
+    {
+      "path": "images/sandbox/jammer-aerial-outer-leg-lower.png",
+      "size": 1843,
+      "sha256": "893cb8dfbb2a941d9cc2519af9c5674128c52958a3ae4f94f53d84b8331cfcfb"
+    },
+    {
+      "path": "images/sandbox/jammer-aerial-outer-leg-upper.png",
+      "size": 1987,
+      "sha256": "c326a471b3111c98caa5be82b50212b0b0488b43f31ba6e290be3ccda632393f"
+    },
+    {
+      "path": "images/sandbox/jammer-aerial-outer-lower.png",
+      "size": 1146,
+      "sha256": "95e46d4cf56519d72d73d3ff4e627b85833180f9cbc046b8d2d91cd189e98523"
+    },
+    {
+      "path": "images/sandbox/jammer-aerial-outer-upper-damaged.png",
+      "size": 1503,
+      "sha256": "e8f4ce27cdeef1f647650c6a69ede83d1944aacc25b486e7fbd15f358d5dc632"
+    },
+    {
+      "path": "images/sandbox/jammer-aerial-outer-upper.png",
+      "size": 1474,
+      "sha256": "dbe7c04418d4c4cd094d90a6aebeade630fd0eae6eb5a29242cca030219ea65c"
+    },
+    {
+      "path": "images/sandbox/jammer-aerial-pack.png",
+      "size": 1279,
+      "sha256": "c9e8c6b8a079ea46cddc62bf7774abaec79c31fa927ff5039f66f5de961a90aa"
+    },
+    {
+      "path": "images/sandbox/leak-pack-body-damage1.png",
+      "size": 7397,
+      "sha256": "223c9fe23444657bb1b6d7cafc6de41480f923e63d29f430d7a42c489a9bd79f"
+    },
+    {
+      "path": "images/sandbox/leak-pack-body-damage2.png",
+      "size": 7773,
+      "sha256": "2d9ec380155f68597dce7a42b8eb82b038b30e27f67554e4a00bf87341ec43a6"
+    },
+    {
+      "path": "images/sandbox/leak-pack-body.png",
+      "size": 7186,
+      "sha256": "ad1f8a7e33003be43c33e9370c535bfae41e133bf17341035eccf9a5798a83a7"
+    },
+    {
+      "path": "images/sandbox/leak-pack-hand.png",
+      "size": 1609,
+      "sha256": "6e098cfc0bb32a163346baeeb8d44fb03066ad13578f4ef76a1762d4e0f1a8b2"
+    },
+    {
+      "path": "images/sandbox/leak-pack-head.png",
+      "size": 5269,
+      "sha256": "d3ea97e6d3c98d5282a8ff33abb62e977defb08f04de34799d2d620d44c1467b"
+    },
+    {
+      "path": "images/sandbox/leak-pack-inner-leg-foot.png",
+      "size": 1068,
+      "sha256": "ef86e4920a554d798561c6352721d0c1559dde86742392e1440c6ae91055230e"
+    },
+    {
+      "path": "images/sandbox/leak-pack-inner-leg-lower.png",
+      "size": 2308,
+      "sha256": "adb8243954debe888c2b831736fa233ad20195aad45344b3fc41347f246da701"
+    },
+    {
+      "path": "images/sandbox/leak-pack-inner-leg-upper.png",
+      "size": 929,
+      "sha256": "d3845de18e6b0b87cf6483c764e64f6c7a7d995fa5cd4449fea467243f98c488"
+    },
+    {
+      "path": "images/sandbox/leak-pack-inner-lower.png",
+      "size": 1108,
+      "sha256": "3b7585429990c11592893532c03c3871e2e4ad2dbc4057978dd075e20f2d87c2"
+    },
+    {
+      "path": "images/sandbox/leak-pack-inner-upper.png",
+      "size": 945,
+      "sha256": "5377a8fb59fd6e3dd56e85e41fa9c07f8ed47c062fcc3dee338feb80da2c4685"
+    },
+    {
+      "path": "images/sandbox/leak-pack-jaw.png",
+      "size": 1102,
+      "sha256": "1f83b7fda62c6a9c14045764344344ff16e3b33b7152a3b84d0fb9cbb5b10099"
+    },
+    {
+      "path": "images/sandbox/leak-pack-outer-leg-foot.png",
+      "size": 1880,
+      "sha256": "d85babee716408151561442654d4d0a0cc2d9499a250b3847f51e8229d083a8a"
+    },
+    {
+      "path": "images/sandbox/leak-pack-outer-leg-lower.png",
+      "size": 1630,
+      "sha256": "0d7d480eb98d00ba0afd252d0c0024d866833e0f89c4845a9bdf15deedc118df"
+    },
+    {
+      "path": "images/sandbox/leak-pack-outer-leg-upper.png",
+      "size": 1817,
+      "sha256": "4412fb03bb0b0b63750fee72ad010ac9a36f15259a96a5da6d8e164335543d90"
+    },
+    {
+      "path": "images/sandbox/leak-pack-outer-lower.png",
+      "size": 1208,
+      "sha256": "b413ab561792e832c14d87b6a14cc13fc283dd32397a16247dff82e6d5df005e"
+    },
+    {
+      "path": "images/sandbox/leak-pack-outer-upper-damaged.png",
+      "size": 1264,
+      "sha256": "276c69e5cfe7c428865cdcdd64784481bd0793594c7cb2190dbfc8bd0d7d43a7"
+    },
+    {
+      "path": "images/sandbox/leak-pack-outer-upper.png",
+      "size": 1258,
+      "sha256": "96ba6bef9cfc2d99c9568cf7c031f69f4bc24b3da9ebc56b79e56b0f5f631c70"
+    },
+    {
+      "path": "images/sandbox/leak-pack-pack.png",
+      "size": 1438,
+      "sha256": "eba2b1e764e602bbbdec3b27fa0febf89dea809ca0aad787ecc82a2af732b055"
+    },
+    {
+      "path": "images/sandbox/magnet-maw-blink.png",
+      "size": 10107,
+      "sha256": "e8e632bc18a0aece16876a5475bd4f467a75a479a38f268445e5fc65c2811d6a"
+    },
+    {
+      "path": "images/sandbox/magnet-maw-head.png",
+      "size": 9592,
+      "sha256": "7dc1c45be685d79f2a3a5df0af156f5a360a0ee95a850cb23b4485f53aeaec61"
+    },
+    {
+      "path": "images/sandbox/magnet-maw-mouth.png",
+      "size": 3985,
+      "sha256": "4c2b97ec59994214562940a65946f50e40624b3826ae66bcc64c173e43361a10"
+    },
+    {
+      "path": "images/sandbox/magnet-salvager-body-damage1.png",
+      "size": 8016,
+      "sha256": "57b4edcbad99384a9c9c028b037e55c95653213b9d39e63de8d3cdfbb6992a7b"
+    },
+    {
+      "path": "images/sandbox/magnet-salvager-body-damage2.png",
+      "size": 8037,
+      "sha256": "b03b53379af76530601beb5cf496b2c9d5731b60dd30a9d5cc54c287dce34e09"
+    },
+    {
+      "path": "images/sandbox/magnet-salvager-body.png",
       "size": 7746,
-      "sha256": "818d58a26ba07892d8a0bd9e4cb736cfc6cb5387a93a32044d70fc358ef26060"
+      "sha256": "0cc09ccd3a1aede5a22bb9b0ecf08b3d7be8d9942fd207340b7599c4c934f44e"
     },
     {
-      "path": "images/sandbox/vfx-ink-ready.png",
-      "size": 2821,
-      "sha256": "db3775f443643ce27cbfd3c65e0dfa0623894c6cb11b394e920e18e3fbfce8e9"
+      "path": "images/sandbox/magnet-salvager-hand.png",
+      "size": 1484,
+      "sha256": "9afe0fdf50ba7f206273dd4ada18b01fb20d98708be0eb4d6598ffe86be34766"
     },
     {
-      "path": "images/sandbox/vfx-ink-shot.png",
-      "size": 3444,
-      "sha256": "73cd34a19b5ec2b42f3f3608488e63d36fa1fc2c501fbcdb47c799ef6a1ecf61"
+      "path": "images/sandbox/magnet-salvager-head.png",
+      "size": 5591,
+      "sha256": "59aba5c1c9336689447ef0f5e323e3e98994e00493e98e8199251aae28c85a34"
+    },
+    {
+      "path": "images/sandbox/magnet-salvager-inner-leg-foot.png",
+      "size": 1212,
+      "sha256": "4bda620806794754a04751305b0965ea08f5ea17d8d97535ea1c6dcee8638841"
+    },
+    {
+      "path": "images/sandbox/magnet-salvager-inner-leg-lower.png",
+      "size": 2761,
+      "sha256": "5e80f8f9ea4946e13b5dc84be1df2c89dd438e78e6fcb7368fb2a7a4c47d71a2"
+    },
+    {
+      "path": "images/sandbox/magnet-salvager-inner-leg-upper.png",
+      "size": 1102,
+      "sha256": "df641b9372760aed1d530c994a9d5649d60272b728f5464c3e2c3bb7cae022d1"
+    },
+    {
+      "path": "images/sandbox/magnet-salvager-inner-lower.png",
+      "size": 1131,
+      "sha256": "5e651dcd4fc0501648dfd7759f5ab15a425bb6bed92b7db9c28e69f07c4be9e5"
+    },
+    {
+      "path": "images/sandbox/magnet-salvager-inner-upper.png",
+      "size": 1038,
+      "sha256": "fc01d3852bc96bd1c3affa90c3d391c4c611cded1ac313c82299558c2ebadf9e"
+    },
+    {
+      "path": "images/sandbox/magnet-salvager-jaw.png",
+      "size": 1193,
+      "sha256": "6e7d9ef261e23d8fc2183a02a8f21977e62085750e75f04e0e9b70cfd1776666"
+    },
+    {
+      "path": "images/sandbox/magnet-salvager-outer-leg-foot.png",
+      "size": 2085,
+      "sha256": "1d95407404a74f29c77cc24e0dc49c360da3fe664aeffdcc7b97931bf16d993c"
+    },
+    {
+      "path": "images/sandbox/magnet-salvager-outer-leg-lower.png",
+      "size": 1849,
+      "sha256": "b64b09d1cf7a0d0b0e1dcb3249a5a2cf08beb65fdcae3609bd062adfae8b0287"
+    },
+    {
+      "path": "images/sandbox/magnet-salvager-outer-leg-upper.png",
+      "size": 2074,
+      "sha256": "f931ae7459af9416158bc1ea5be93c0057dddae6e20323ab381bf56f89c5582f"
+    },
+    {
+      "path": "images/sandbox/magnet-salvager-outer-lower.png",
+      "size": 1410,
+      "sha256": "38c9d6a40b2e0224b54aca86a9b0cef3d8b5178b2cfdbf27fe14217fbc726da9"
+    },
+    {
+      "path": "images/sandbox/magnet-salvager-outer-upper-damaged.png",
+      "size": 1614,
+      "sha256": "55efef46e7998ff541179b8317a8290bfb23b322c0bd92edfaaea8c37b565e2e"
+    },
+    {
+      "path": "images/sandbox/magnet-salvager-outer-upper.png",
+      "size": 1508,
+      "sha256": "8c267a697668aef4373be624a189674b082e517437c1366048f5a7298aee78b5"
+    },
+    {
+      "path": "images/sandbox/magnet-salvager-pack.png",
+      "size": 1505,
+      "sha256": "ea7d66a6ec681331478861d26dae4855d37f432bfc110c93e82ef2739a19c2c3"
+    },
+    {
+      "path": "images/sandbox/prism-reed-blink.png",
+      "size": 8036,
+      "sha256": "5767dcf82f005eb389e4b7b98849ef5e8039383ada71d4fe92e87779dcf67452"
+    },
+    {
+      "path": "images/sandbox/prism-reed-head.png",
+      "size": 8474,
+      "sha256": "428f6fbd0a9aca739c1d17c3ca509182a5717daf158b20f79993bbaecc87b046"
+    },
+    {
+      "path": "images/sandbox/prism-reed-mouth.png",
+      "size": 3913,
+      "sha256": "73f71bdc37e5ba6de69dde0e49c7bd9ecd12e37c9905332f140709d43db155f2"
+    },
+    {
+      "path": "images/sandbox/pulse-pod-blink.png",
+      "size": 8417,
+      "sha256": "666bb286c26027dc78465523f53daed511be529ac3028fa79230b88371d3511b"
+    },
+    {
+      "path": "images/sandbox/pulse-pod-head.png",
+      "size": 8625,
+      "sha256": "a7643fac26bfa72ae7c927491cb120dfbd94bb462fbe5fce56b94f579b0f2edb"
+    },
+    {
+      "path": "images/sandbox/pulse-pod-mouth.png",
+      "size": 3767,
+      "sha256": "ccd19b0971b56e4b27d1b578e86fb787d77619c34b49cafb54985fce7e23378c"
+    },
+    {
+      "path": "images/sandbox/repair-moss-blink.png",
+      "size": 5218,
+      "sha256": "7a0b4e6dc0762fdd404043140fe55ec7241250440c49793d2862510645b1aab8"
+    },
+    {
+      "path": "images/sandbox/repair-moss-head.png",
+      "size": 5273,
+      "sha256": "b10892c47aa88cd380cc2415e417395c7e5f7117c01b27cfbe4ea5cbc5febf37"
+    },
+    {
+      "path": "images/sandbox/scout-bloom-blink.png",
+      "size": 8141,
+      "sha256": "936329b723a2840554a53b25d7eb610178e04d4655900619e0dbe1733846e490"
+    },
+    {
+      "path": "images/sandbox/scout-bloom-head.png",
+      "size": 8069,
+      "sha256": "058d2d05488263dc60c37524ea1fb9b4885f03c7f2fc76e741ff5e7d897f7ece"
+    },
+    {
+      "path": "images/sandbox/scout-bloom-mouth.png",
+      "size": 3471,
+      "sha256": "11dbaced20cf073331ec57139ad3ccfc19bca9908275b538f8064e43b6135494"
+    },
+    {
+      "path": "images/sandbox/sunwheel-blink.png",
+      "size": 5392,
+      "sha256": "50191a9abc81432505da46f551d9683a9b8fb69b066881baa636b9beeab72607"
+    },
+    {
+      "path": "images/sandbox/sunwheel-head.png",
+      "size": 5515,
+      "sha256": "d64fce257b32b8da8e4c701cc6b3dd00becdd51577d2bfd7ee000bbaba6c9ddd"
+    },
+    {
+      "path": "images/sandbox/thornshell-cracked1.png",
+      "size": 16955,
+      "sha256": "af6cd0d0c5f31e656347ae7b8bef47c4f6c71b0e6783f8dd4cf8b61ed9ba34dc"
+    },
+    {
+      "path": "images/sandbox/thornshell-cracked2.png",
+      "size": 14064,
+      "sha256": "77b059748e9410601273bed7bd8844535a4cbd025cd79af2593ea840537f3695"
+    },
+    {
+      "path": "images/sandbox/thornshell-head.png",
+      "size": 21105,
+      "sha256": "811f98ff3422dd8c0a69a99aba2dc25176bd8db7b794dac6b06327a5f552fedd"
+    },
+    {
+      "path": "images/sandbox/turbine-boot-body-damage1.png",
+      "size": 7570,
+      "sha256": "620defa5685c33795ac1201f15b3de9e9c658da3b8f5a5dd2c817ca2520ade4a"
+    },
+    {
+      "path": "images/sandbox/turbine-boot-body-damage2.png",
+      "size": 7597,
+      "sha256": "e309a92bd81937387604eaaffb17beb04fa307611cebb7907a9f3488c3bcc49f"
+    },
+    {
+      "path": "images/sandbox/turbine-boot-body.png",
+      "size": 7296,
+      "sha256": "780bb4a29abab97e2f47a55dd92e06a487981526e7794b9afb36187942ad46af"
+    },
+    {
+      "path": "images/sandbox/turbine-boot-hand.png",
+      "size": 1498,
+      "sha256": "d7d5729e4d6cd2670427caeec7c12c7d7ec261781fd667be2badbc8e7172f34c"
+    },
+    {
+      "path": "images/sandbox/turbine-boot-head.png",
+      "size": 5627,
+      "sha256": "c5ca10433eb8d72b139081adc99e36ddd60ac196ac7e48ada3920cd3f0903081"
+    },
+    {
+      "path": "images/sandbox/turbine-boot-inner-leg-foot.png",
+      "size": 1178,
+      "sha256": "09eab1a1d42d888cab258aed8e0081a9076c888d0c1583d35d2d67b56d8434d1"
+    },
+    {
+      "path": "images/sandbox/turbine-boot-inner-leg-lower.png",
+      "size": 2224,
+      "sha256": "bb950c001f7bf8414b6c1f1618ea90d957370d56b5b3a5bc721773424cd473b5"
+    },
+    {
+      "path": "images/sandbox/turbine-boot-inner-leg-upper.png",
+      "size": 992,
+      "sha256": "5e613315425f239a0ba651fee8601caa7237fbe9d9b379ea4b713d82c2cb4e9f"
+    },
+    {
+      "path": "images/sandbox/turbine-boot-inner-lower.png",
+      "size": 814,
+      "sha256": "9c1a2e0e254289e21865b2d3ec3f7b8677e581c44ab08fa34f06ed5b082b3154"
+    },
+    {
+      "path": "images/sandbox/turbine-boot-inner-upper.png",
+      "size": 861,
+      "sha256": "b6f9881cdb0cef145dd74d1e241fd045316662e3b6eaef872e1d5fe92dbc2cd1"
+    },
+    {
+      "path": "images/sandbox/turbine-boot-jaw.png",
+      "size": 1097,
+      "sha256": "445150d8d6254022f4bd54a0fda4b559c6926058dfaa34d42f8177ac69660f3d"
+    },
+    {
+      "path": "images/sandbox/turbine-boot-outer-leg-foot.png",
+      "size": 2011,
+      "sha256": "d795e544c2d279cf6732c4c4a4f482b20c9f1d37ea7995f142752030e798fad8"
+    },
+    {
+      "path": "images/sandbox/turbine-boot-outer-leg-lower.png",
+      "size": 1453,
+      "sha256": "8f746ca11eeff3f11010c70ab76abf3f5637faec80764ce371e651c520725afd"
+    },
+    {
+      "path": "images/sandbox/turbine-boot-outer-leg-upper.png",
+      "size": 1859,
+      "sha256": "1ca9ba4967fbcc82b2f47dff2e578b0bbad8984d347d2f0351cb3bc3dbb6bc29"
+    },
+    {
+      "path": "images/sandbox/turbine-boot-outer-lower.png",
+      "size": 852,
+      "sha256": "c284432a2bfaeb4339dfae555fa3d66f20c40bd8a8306e022cf93d89dcb1d1db"
+    },
+    {
+      "path": "images/sandbox/turbine-boot-outer-upper-damaged.png",
+      "size": 1426,
+      "sha256": "51205c9f0ccc4025a82b8c7bd95fd9659b2a9b5f19eef7244deaaa02df75c156"
+    },
+    {
+      "path": "images/sandbox/turbine-boot-outer-upper.png",
+      "size": 1286,
+      "sha256": "fccab4b81257781dbe280382f2ef3bdcd69063eec2e15e2e0c682c6f22ba34b8"
+    },
+    {
+      "path": "images/sandbox/vfx-arc-hit-0.png",
+      "size": 72812,
+      "sha256": "f2bd0c04243f7ce084015147984ff87241c02a99d9829c7ad93e46bbaa72a9be"
+    },
+    {
+      "path": "images/sandbox/vfx-arc-hit-1.png",
+      "size": 104212,
+      "sha256": "5993529d64715ea5d0713db0bfcb1ce55739b03a40d1521da28a5638993aa305"
+    },
+    {
+      "path": "images/sandbox/vfx-arc.png",
+      "size": 52807,
+      "sha256": "0fa44f5371cb82a00b1b7ad510a9043a927b3cdc2cd532ed964aa1b1c702b60f"
+    },
+    {
+      "path": "images/sandbox/vfx-battery-core.png",
+      "size": 65208,
+      "sha256": "4c047f295c4003d74e3e6fde9393bfbde6a130f15dabcb16dd67579fb55f7cd5"
+    },
+    {
+      "path": "images/sandbox/vfx-bolt-hit-0.png",
+      "size": 63635,
+      "sha256": "964cd0360a2edcca6a1bcf1048796d3b6b2d290f2fa4b18ae7747c79a05c2c82"
+    },
+    {
+      "path": "images/sandbox/vfx-bolt-ready.png",
+      "size": 35969,
+      "sha256": "88d116f60a47e67322ddff54484e6cbf586d079b981056cf30f9d446d4124727"
+    },
+    {
+      "path": "images/sandbox/vfx-bolt-shot.png",
+      "size": 58902,
+      "sha256": "c74bdba6b65bbda8f33dfa7b93778bd3ce002ba78ed2c016a3621ce70a839965"
+    },
+    {
+      "path": "images/sandbox/vfx-drone-hum.png",
+      "size": 54546,
+      "sha256": "49e365aecbb1e2d87829d4ac0c97dc285d3fc95f7888b1f33f3154c4a04c4a49"
+    },
+    {
+      "path": "images/sandbox/vfx-holo-glitch.png",
+      "size": 73608,
+      "sha256": "cb340497f5d2793a64250040ae3819f9398df14312e754bb28d676ebbea28028"
+    },
+    {
+      "path": "images/sandbox/vfx-holo-ready.png",
+      "size": 169996,
+      "sha256": "b537118c475223936410de4d0b6e7e79d22cc72771f315b6dd27dea6a02402d8"
+    },
+    {
+      "path": "images/sandbox/vfx-hook-line.png",
+      "size": 17561,
+      "sha256": "71f0a8c30a2236885d22455a9704535758de7944e1914444734dbea1fc1b8b4d"
+    },
+    {
+      "path": "images/sandbox/vfx-hook-snap.png",
+      "size": 85376,
+      "sha256": "2c04ec2487d270dad809edf741b63956635d3fee12cfadd22c4300456e03dcdf"
+    },
+    {
+      "path": "images/sandbox/vfx-jam-wave.png",
+      "size": 145402,
+      "sha256": "6ce21c13fc8ba7d14502309c92d145a3d46695ae501e80daaef13b0ebb232d7f"
     },
     {
       "path": "images/sandbox/vfx-link-0.png",
-      "size": 3141,
-      "sha256": "6aedafb78ab090c37a5c55324b7759ddeaec7a71777395548778f46234b75e89"
+      "size": 44534,
+      "sha256": "9f58a888879bca356020934b03d19399441c6de88eae5ffd5c473fd99cf41ab3"
     },
     {
       "path": "images/sandbox/vfx-link-1.png",
-      "size": 3688,
-      "sha256": "af5a4f3586485b9a9956e2f5ea4ad8ea7674358afbfa42e7879c7788fa0b43b7"
+      "size": 59038,
+      "sha256": "97546d23fb5226279685f6ac087c0885d5fa86c0f11ed1c8025f17cd6810cd2b"
     },
     {
-      "path": "images/sandbox/vfx-muzzle-ice.png",
-      "size": 2464,
-      "sha256": "6544c8181a2268c6eb5cfffc585ba040cb14a10f9231f62dc0c4b9f5c327b3d4"
+      "path": "images/sandbox/vfx-magnet-field.png",
+      "size": 113750,
+      "sha256": "31a8bbc53b8c15336617c952f9aec2adb5d44d231bc896afb1ba9b738ef76687"
     },
     {
-      "path": "images/sandbox/vfx-muzzle-warm.png",
-      "size": 2559,
-      "sha256": "020b1810db656e7e0a3e40679130fca413a947b67109dd2b094112b8bef771fe"
+      "path": "images/sandbox/vfx-magnet-hit-0.png",
+      "size": 78899,
+      "sha256": "0defb7e43d0768e0d59684e84776d68624c8c2b0d9a4a384835d0f6f9a01cc10"
     },
     {
-      "path": "images/sandbox/vfx-notes.png",
-      "size": 3166,
-      "sha256": "6780e1d9ce591b62bd80ff34467393da362253757224019bc6863ab3d20560e7"
+      "path": "images/sandbox/vfx-magnet-hit-1.png",
+      "size": 109056,
+      "sha256": "1ce60fa2c60bc090c86536502997df083549794394bba9c12a237338abd9edfb"
     },
     {
-      "path": "images/sandbox/vfx-paper-hit-0.png",
-      "size": 8356,
-      "sha256": "259704e184fac6e24601db6c9346e8365a8e4177b5a77c27e3f1d468cce18a61"
+      "path": "images/sandbox/vfx-magnet.png",
+      "size": 65978,
+      "sha256": "b5ce4a6653bb64f1d15c7b37b3714082c5786571e9047d4502ce0c034f4c4b87"
     },
     {
-      "path": "images/sandbox/vfx-paper-hit-1.png",
-      "size": 6656,
-      "sha256": "593f2fb616098371de85e057eb05c9fc9f50611f4b2b888489edc5cd10b6937d"
+      "path": "images/sandbox/vfx-prism-beam.png",
+      "size": 27885,
+      "sha256": "63a60d1cf28109306ed98e4046bb78920776f976d551ec0e106bf99745508284"
     },
     {
-      "path": "images/sandbox/vfx-paper-ready.png",
-      "size": 4412,
-      "sha256": "3a57b9c2e842ba42b4fe08b2b860b045bf602e28b5bcc9a852bfdf1035958165"
+      "path": "images/sandbox/vfx-prism-muzzle.png",
+      "size": 39938,
+      "sha256": "84061d883999cd5757edec1aa0e5f8356bede8f40e1785300bbe9b67ae8d2984"
     },
     {
-      "path": "images/sandbox/vfx-paper-shot.png",
-      "size": 4409,
-      "sha256": "bee06f485e6c6a2d8b3c7673b55d082c5183dafeb27363364781df7215f146e8"
+      "path": "images/sandbox/vfx-pulse-hit-0.png",
+      "size": 36023,
+      "sha256": "dd260471def8c60b7f5189b7f0b93e1b4cbe577ff58ccf9101d035f038a6d59a"
     },
     {
-      "path": "images/sandbox/vfx-poison.png",
-      "size": 3375,
-      "sha256": "ab533c9648b4664e54deab4bb12747af98e479db72d27bdc91ff7ce1d7cfd773"
+      "path": "images/sandbox/vfx-pulse-hit-1.png",
+      "size": 98901,
+      "sha256": "42ee16c34719e5a9f7df0dfe343e45598602fc2f9a0613650c710ef8036ae39f"
     },
     {
-      "path": "images/sandbox/vfx-repair.png",
-      "size": 3108,
-      "sha256": "dc19e8eff49e2d1522d949d92894d746b4f8fc40df05cf7f43d8c3af9877eb32"
+      "path": "images/sandbox/vfx-pulse.png",
+      "size": 44806,
+      "sha256": "91c693cf8102726efd02ff92c64efa71e59188176f3b11b3bff13066a29ee6cd"
     },
     {
-      "path": "images/sandbox/vfx-scatter-hit-0.png",
-      "size": 8006,
-      "sha256": "2fe37abccd5472ce5df6426be9298060363357b29b2162308292253b157c1a90"
+      "path": "images/sandbox/vfx-repair-pulse.png",
+      "size": 84710,
+      "sha256": "3c5ba2a7494d66ba95078606dc5ee72e9de7c9243b4861371ac33847b64e7535"
     },
     {
-      "path": "images/sandbox/vfx-scatter-hit-1.png",
-      "size": 11013,
-      "sha256": "15f433c9df20e795a4d3e920e94bc72b9c319abd3a421df65bba76b0dec360e6"
+      "path": "images/sandbox/vfx-resin-hit-0.png",
+      "size": 44203,
+      "sha256": "76b523b6fa3e29d2c0a4c6d5015721d46f28f24e3d83c25b09c9a04a2e536a4a"
     },
     {
-      "path": "images/sandbox/vfx-scatter.png",
-      "size": 1581,
-      "sha256": "ace76d668436b66888112efe5ca4ffa7d2d0390820f3757dd6cc5442a9447431"
+      "path": "images/sandbox/vfx-resin-hit-1.png",
+      "size": 72305,
+      "sha256": "64045a4ac1530e0c0dd3b61835b233ee99476f7adaaac92e0cb5aa553aaaf3a4"
     },
     {
-      "path": "images/sandbox/vfx-seeker-hit-0.png",
-      "size": 7930,
-      "sha256": "f514c86b1444f6d45c8a4f6ad6951b175bd26ae8b7c923096b34a0ee6d291c2d"
+      "path": "images/sandbox/vfx-resin.png",
+      "size": 37514,
+      "sha256": "a8429a719c64c079ed43c4083f8df3b787f47e2e46e13cb7145425e8fd5ac9b8"
     },
     {
-      "path": "images/sandbox/vfx-seeker-hit-1.png",
-      "size": 10978,
-      "sha256": "a290942071e7f2ee5d33107f2e90862df85f8ccab59e22beda9563790fa70c4f"
+      "path": "images/sandbox/vfx-root-charge-off.png",
+      "size": 44014,
+      "sha256": "dc273a511b0df2a9ae4de3cc027b0b14b8b3a205f46fe91275efeb84332c66ae"
     },
     {
-      "path": "images/sandbox/vfx-seeker.png",
-      "size": 3881,
-      "sha256": "f590796c26d6f30f260efcca90623f56cb06035d20bc4a87af9a200f590e46ae"
+      "path": "images/sandbox/vfx-root-charge-on.png",
+      "size": 53986,
+      "sha256": "c81ed9473fb8c56afcac6c16110632791a9e8aee6dc1a414273fe64268a89cdf"
     },
     {
-      "path": "images/sandbox/vfx-smoke-0.png",
-      "size": 6532,
-      "sha256": "f0cdd4f85ba1882ac7fa8078b639ba2c2be8910ff014a1b57a151b4ac37496ce"
+      "path": "images/sandbox/vfx-root-resonance.png",
+      "size": 109754,
+      "sha256": "0cd2f3bbb2f5cd28016cc664ac05b5320cf2303a5ad57ed59ff1d34bbf9fded9"
     },
     {
-      "path": "images/sandbox/vfx-smoke-1.png",
-      "size": 12865,
-      "sha256": "b1cf47f86e53bda15cc4ad13cce5f4caa0d8e8822b16c13187ee077bc246f01f"
+      "path": "images/sandbox/vfx-scout-hit-0.png",
+      "size": 33336,
+      "sha256": "338666e4687f41ac7c60bcdc4f074d5dc544f1feee7a1278e25d2e4ed1ca843e"
     },
     {
-      "path": "images/sandbox/vfx-smoke-2.png",
-      "size": 8347,
-      "sha256": "a75ca68e3f6959cc797e3efef67820bf316ac63d7690ae8379a88294c74f8d0f"
+      "path": "images/sandbox/vfx-scout-hit-1.png",
+      "size": 74736,
+      "sha256": "5d012cba21fce69b6b82692a424bfbffa4cfeaebf154147f316d6ae2c4007713"
     },
     {
-      "path": "images/sandbox/vfx-sonic-0.png",
-      "size": 3373,
-      "sha256": "9483ac5c8729c620121bb17eefc538e6d6702672b99b5ee32b2eb8116b047cdb"
+      "path": "images/sandbox/vfx-scout.png",
+      "size": 34393,
+      "sha256": "d2ccad3317b339c72d7afe2bcf2e18365feedeb87446525fee7ce29555ba4cdf"
     },
     {
-      "path": "images/sandbox/vfx-sonic-1.png",
-      "size": 5580,
-      "sha256": "f8c51dde40dc589ede2abccaeec00f2c96f2907cdfc0036b35042aee8f25fb60"
+      "path": "images/sandbox/vfx-tech-muzzle.png",
+      "size": 64706,
+      "sha256": "8859e1b0adfb8aaa606ec2b8fec9d5e0d4803b7151a6d0f0732452d9df190933"
     },
     {
-      "path": "images/sandbox/vfx-spring-0.png",
-      "size": 6359,
-      "sha256": "7a88b4fadf1216a7fe3c449b6cb706bd1a86745725c396a34429bcb5e464cf11"
+      "path": "images/sandbox/vfx-tech-spark.png",
+      "size": 49968,
+      "sha256": "7e9a7b0245bc824094e9f8b5b33fa4b08907a37ffe349eb1f3a5056ca0126c3f"
     },
     {
-      "path": "images/sandbox/vfx-spring-1.png",
-      "size": 5988,
-      "sha256": "ed91274882e4297523f9e5f5a08932af5ca22c6ecb3b9aa858e016baceac3a36"
+      "path": "images/sandbox/vfx-thorn-hit.png",
+      "size": 84770,
+      "sha256": "e47a32415bc6214ff6046d98e240f183662d8d56db78b88808a640a920fa9a0c"
     },
     {
-      "path": "images/sandbox/vfx-tiny-hit-0.png",
+      "path": "images/sandbox/vfx-turbine-burst.png",
+      "size": 101217,
+      "sha256": "14af7b68c452c9b7b0a849fdbc5e3eb44dda1cb5c49db8280db9a654dae570af"
+    },
+    {
+      "path": "images/sandbox/weld-shield-body-damage1.png",
+      "size": 7778,
+      "sha256": "3c7b8b8dd8578b015349cee64ffaba703271667e707f4a6f37c56af0cddbe9bc"
+    },
+    {
+      "path": "images/sandbox/weld-shield-body-damage2.png",
+      "size": 7251,
+      "sha256": "0f31dfa208fd66d259950ff4315853e01198b2f8eaad4c2b5f32ab5d7d4ffe4a"
+    },
+    {
+      "path": "images/sandbox/weld-shield-body.png",
+      "size": 7315,
+      "sha256": "9ed6743d112cc7110de1bdb122bfa45b12c64037bcbab90b2207cd9df047f283"
+    },
+    {
+      "path": "images/sandbox/weld-shield-hand.png",
+      "size": 1515,
+      "sha256": "6cefd4a866a394b123c66756b6ea82f08789c915e2a3a03d31e2fca84999e55e"
+    },
+    {
+      "path": "images/sandbox/weld-shield-head.png",
+      "size": 5491,
+      "sha256": "eaae8b4d15b169bbfe1efdfc476efb550eba01872c8524cdb59997d6728227db"
+    },
+    {
+      "path": "images/sandbox/weld-shield-inner-leg-foot.png",
+      "size": 1070,
+      "sha256": "ce455c9abfdf0cfff5d766cf0ccb6a1b72fed5ee1cccefbee1975236a9d2fdb9"
+    },
+    {
+      "path": "images/sandbox/weld-shield-inner-leg-lower.png",
+      "size": 2445,
+      "sha256": "ac0d3553f01d347da40868d71b6dce331c0dd173bda1e2ee8d6002b231c8ba94"
+    },
+    {
+      "path": "images/sandbox/weld-shield-inner-leg-upper.png",
+      "size": 999,
+      "sha256": "250133de283224a46c397122c79a023d497ed99c01b241d542a7f38561a9b82d"
+    },
+    {
+      "path": "images/sandbox/weld-shield-inner-lower.png",
+      "size": 885,
+      "sha256": "e5d24ae113348344ec6d878f0a49d96da73517c6221e42453669b2ba556dbf02"
+    },
+    {
+      "path": "images/sandbox/weld-shield-inner-upper.png",
+      "size": 929,
+      "sha256": "f861527759abad46910e41e3ad3b9bef3d8ed7462726670b320c15786e172d0b"
+    },
+    {
+      "path": "images/sandbox/weld-shield-jaw.png",
+      "size": 1049,
+      "sha256": "efeaf367b9ef4963265fd6342c5085de8c281d8c0f017fd0f5d3977e76c955de"
+    },
+    {
+      "path": "images/sandbox/weld-shield-outer-leg-foot.png",
+      "size": 1849,
+      "sha256": "a418bf6738bb42fb0367e8cb3ce0552ef974eee0800f47ed3fc08116c627c0f6"
+    },
+    {
+      "path": "images/sandbox/weld-shield-outer-leg-lower.png",
+      "size": 1621,
+      "sha256": "5f3d3e5e37ddc1de3e193718b2ce545ce4ba2a4aec3a37540a44ea862ba62322"
+    },
+    {
+      "path": "images/sandbox/weld-shield-outer-leg-upper.png",
+      "size": 1966,
+      "sha256": "8f87a3b848530a8890d9301cf4c386399555d2629b18e533619339d205b7b205"
+    },
+    {
+      "path": "images/sandbox/weld-shield-outer-lower.png",
+      "size": 1076,
+      "sha256": "d758997011b2e1c75972edd881c23954e3243549924535fd4ebc54d65ae4febd"
+    },
+    {
+      "path": "images/sandbox/weld-shield-outer-upper-damaged.png",
+      "size": 1564,
+      "sha256": "c9a30490c8b8345c3e94a91702664af117fa22dc05adda87b25513ea7c315212"
+    },
+    {
+      "path": "images/sandbox/weld-shield-outer-upper.png",
+      "size": 1356,
+      "sha256": "2b9593e369032fac7fed4fdcf03533bcc0937635e7e5504e2fb89ed0526970e6"
+    },
+    {
+      "path": "images/sandbox/weld-shield-pack.png",
+      "size": 1316,
+      "sha256": "379399cf4fc90c5904fdedf93ac8d6a6fc6b1d195fe962fab0e54e615a379d3b"
+    },
+    {
+      "path": "images/sandbox/weld-shield-prop-damage1.png",
+      "size": 6914,
+      "sha256": "f2a69a1519d7c800c8074bac7d482b7bec4ef546953d2434f952d6fe91399d3e"
+    },
+    {
+      "path": "images/sandbox/weld-shield-prop-damage2.png",
+      "size": 5854,
+      "sha256": "c2dda55bd387ccfcf4928a1ff4b1805bb7c98e48590456f1fa9b134812657734"
+    },
+    {
+      "path": "images/sandbox/weld-shield-prop.png",
+      "size": 7570,
+      "sha256": "20ccdb4a681c149602bfe8af2f79d3f40745f04bbd5bf0439db0306b32fcc724"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-body-damage1.png",
+      "size": 7346,
+      "sha256": "f6eba7308a2aca78a32d453f9b41b3465aac124a8f91db232b5c45f37f42479f"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-body-damage2.png",
+      "size": 7817,
+      "sha256": "7549832055f0c949dd31b4f6efb64c17ddce6955d8ddb23a9e831602f92a0cd3"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-body.png",
       "size": 7269,
-      "sha256": "0bfe8e1942177d26f351621bd518cedcf6f12a5eb9a72199c7615b51ae8bb688"
+      "sha256": "86c686289ef48705f19d49f55590e5d66726d125468328fed41f3ef206b99100"
     },
     {
-      "path": "images/sandbox/vfx-tiny-hit-1.png",
-      "size": 11174,
-      "sha256": "efdebeebe20d148539730093edb3c424a2ae71bb10e17819839757ea044f4116"
+      "path": "images/sandbox/wrench-tech-hand.png",
+      "size": 1663,
+      "sha256": "b490880b59bd13b776a08aee4056e176ca808d00f9f60bf56590eea24312ec01"
     },
     {
-      "path": "images/sandbox/vfx-tiny.png",
-      "size": 1099,
-      "sha256": "072fc72207261894f2e0fbe0f473dba652074c90225006923b1f61d4e145e1a5"
+      "path": "images/sandbox/wrench-tech-head.png",
+      "size": 5346,
+      "sha256": "a9e42078c4c593458d6d9a177b2bfd610e2b77458688623169cb1c1e7cd1e1c1"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-inner-leg-foot.png",
+      "size": 1156,
+      "sha256": "e76ebc6522b254e2ff77c0a85332f62e1ed742298d1b05438d0bffc7347504c5"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-inner-leg-lower.png",
+      "size": 2612,
+      "sha256": "28ed3d79df1d310feffe281f42ed5c8c48b32ff9136847124707acacba803c00"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-inner-leg-upper.png",
+      "size": 988,
+      "sha256": "a393cde65c76d6389133490fb01524a1c6f815a42947c880f54f8a92003e91ea"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-inner-lower.png",
+      "size": 1111,
+      "sha256": "2d20c2eb03ad800129ff19f15933148040d84a895c8a5d4bd89fc8970dfb53d9"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-inner-upper.png",
+      "size": 982,
+      "sha256": "c2cbe37affdd69327f1afe4b057f3df7229267df2b7ddee8dfc1d9de63e3d6e3"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-jaw.png",
+      "size": 1159,
+      "sha256": "9977b5d79db360bc56bfa6304a1f0c9b4ca5f9d11e4bdf7b8ccb215149f7d24b"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-outer-leg-foot.png",
+      "size": 1939,
+      "sha256": "07624c6982ad3eed942cbd3506cd6a934acba025f17f5b73d0cf6f7d11a44b14"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-outer-leg-lower.png",
+      "size": 1786,
+      "sha256": "4bad921c74f18c91229f42bbf879d2a786a7b1f348610e8dc3f2532ba7b84228"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-outer-leg-upper.png",
+      "size": 1761,
+      "sha256": "626d7904c0a7edb1f33a7263f49104a5b42a68e2e0f603a02498bcb01f3283bf"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-outer-lower.png",
+      "size": 1234,
+      "sha256": "0b9b78bea1643eff3fef8802dd50b4d4fa4e0ae5d3014371b490698ee119d878"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-outer-upper-damaged.png",
+      "size": 1540,
+      "sha256": "a3b47c3f31f85f9f63666db7aecd1dc8711229e73a41befa46e3040c89e0e3ff"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-outer-upper.png",
+      "size": 1451,
+      "sha256": "91ff3dc410b3d77ee08f9ed5f2ae18af7d97d845e1def231bf792e195d054f01"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-pack.png",
+      "size": 1428,
+      "sha256": "244ae5ed6edfb256fdf9c07967dfbad1ad5fff6b01ec0935aaf77fc791e409b2"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-prop-damage1.png",
+      "size": 6875,
+      "sha256": "660d96463b6b2b8628e1b2a25af3361a16c3df3c32763dca6d1c77a508ae5d59"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-prop-damage2.png",
+      "size": 7885,
+      "sha256": "9b1247e8c82c4d8a66a485071bc8f54ddc75d0ddc874c5213a3821e939be0558"
+    },
+    {
+      "path": "images/sandbox/wrench-tech-prop.png",
+      "size": 6272,
+      "sha256": "3e3e705548818896e2f39613027b286d5dd252d25fa1125c36766df49f1c4e93"
     }
   ],
   "delivery": "bundled",
   "sandboxExpansion": {
-    "addedPlants": 9,
-    "addedZombies": 12,
-    "totalCustomPlants": 17,
-    "totalCustomZombies": 12,
-    "parts": 246,
-    "vfxParts": 48,
-    "source": "Built-in image_gen edits with native joint registration; matching head/blink/mouth sets, three-stage storm mushroom, two ranged zombie rigs and damaged arms; original Gatling hardware reused unchanged; separate rig parts and 48 projectile/VFX sprites; prompts in art/expansion"
+    "addedPlants": 10,
+    "addedZombies": 10,
+    "totalCustomPlants": 10,
+    "totalCustomZombies": 10,
+    "parts": 214,
+    "vfxParts": 38,
+    "source": "Built-in image generation, exported as separate transparent skeletal rig pieces at native track dimensions. Source atlas and extraction manifests live in art/tech; no legacy expansion art is bundled."
+  },
+  "technologyGarden": {
+    "addedPlants": 10,
+    "addedZombies": 10,
+    "totalCustomPlants": 10,
+    "totalCustomZombies": 10,
+    "files": [
+      "images/sandbox/amber-gourd-blink.png",
+      "images/sandbox/amber-gourd-head.png",
+      "images/sandbox/amber-gourd-mouth.png",
+      "images/sandbox/arc-orchid-small-blink.png",
+      "images/sandbox/arc-orchid-small-head.png",
+      "images/sandbox/arc-orchid-small-mouth.png",
+      "images/sandbox/bolt-thrower-body-damage1.png",
+      "images/sandbox/bolt-thrower-body-damage2.png",
+      "images/sandbox/bolt-thrower-body.png",
+      "images/sandbox/bolt-thrower-hand.png",
+      "images/sandbox/bolt-thrower-head.png",
+      "images/sandbox/bolt-thrower-inner-leg-foot.png",
+      "images/sandbox/bolt-thrower-inner-leg-lower.png",
+      "images/sandbox/bolt-thrower-inner-leg-upper.png",
+      "images/sandbox/bolt-thrower-inner-lower.png",
+      "images/sandbox/bolt-thrower-inner-upper.png",
+      "images/sandbox/bolt-thrower-jaw.png",
+      "images/sandbox/bolt-thrower-outer-leg-foot.png",
+      "images/sandbox/bolt-thrower-outer-leg-lower.png",
+      "images/sandbox/bolt-thrower-outer-leg-upper.png",
+      "images/sandbox/bolt-thrower-outer-lower.png",
+      "images/sandbox/bolt-thrower-outer-upper-damaged.png",
+      "images/sandbox/bolt-thrower-outer-upper.png",
+      "images/sandbox/bolt-thrower-pack.png",
+      "images/sandbox/cable-cap-blink.png",
+      "images/sandbox/cable-cap-cap.png",
+      "images/sandbox/cable-cap-head.png",
+      "images/sandbox/cable-cap-stem.png",
+      "images/sandbox/cable-hook-body-damage1.png",
+      "images/sandbox/cable-hook-body-damage2.png",
+      "images/sandbox/cable-hook-body.png",
+      "images/sandbox/cable-hook-hand.png",
+      "images/sandbox/cable-hook-head.png",
+      "images/sandbox/cable-hook-inner-leg-foot.png",
+      "images/sandbox/cable-hook-inner-leg-lower.png",
+      "images/sandbox/cable-hook-inner-leg-upper.png",
+      "images/sandbox/cable-hook-inner-lower.png",
+      "images/sandbox/cable-hook-inner-upper.png",
+      "images/sandbox/cable-hook-jaw.png",
+      "images/sandbox/cable-hook-outer-leg-foot.png",
+      "images/sandbox/cable-hook-outer-leg-lower.png",
+      "images/sandbox/cable-hook-outer-leg-upper.png",
+      "images/sandbox/cable-hook-outer-lower.png",
+      "images/sandbox/cable-hook-outer-upper-damaged.png",
+      "images/sandbox/cable-hook-outer-upper.png",
+      "images/sandbox/cable-hook-pack.png",
+      "images/sandbox/holo-decoy-body-damage1.png",
+      "images/sandbox/holo-decoy-body-damage2.png",
+      "images/sandbox/holo-decoy-body.png",
+      "images/sandbox/holo-decoy-hand.png",
+      "images/sandbox/holo-decoy-head.png",
+      "images/sandbox/holo-decoy-inner-leg-foot.png",
+      "images/sandbox/holo-decoy-inner-leg-lower.png",
+      "images/sandbox/holo-decoy-inner-leg-upper.png",
+      "images/sandbox/holo-decoy-inner-lower.png",
+      "images/sandbox/holo-decoy-inner-upper.png",
+      "images/sandbox/holo-decoy-jaw.png",
+      "images/sandbox/holo-decoy-outer-leg-foot.png",
+      "images/sandbox/holo-decoy-outer-leg-lower.png",
+      "images/sandbox/holo-decoy-outer-leg-upper.png",
+      "images/sandbox/holo-decoy-outer-lower.png",
+      "images/sandbox/holo-decoy-outer-upper-damaged.png",
+      "images/sandbox/holo-decoy-outer-upper.png",
+      "images/sandbox/holo-decoy-pack.png",
+      "images/sandbox/hover-drone-body-damage1.png",
+      "images/sandbox/hover-drone-body-damage2.png",
+      "images/sandbox/hover-drone-body.png",
+      "images/sandbox/hover-drone-hand.png",
+      "images/sandbox/hover-drone-head.png",
+      "images/sandbox/hover-drone-inner-leg-foot.png",
+      "images/sandbox/hover-drone-inner-leg-lower.png",
+      "images/sandbox/hover-drone-inner-leg-upper.png",
+      "images/sandbox/hover-drone-inner-lower.png",
+      "images/sandbox/hover-drone-inner-upper.png",
+      "images/sandbox/hover-drone-jaw.png",
+      "images/sandbox/hover-drone-outer-leg-foot.png",
+      "images/sandbox/hover-drone-outer-leg-lower.png",
+      "images/sandbox/hover-drone-outer-leg-upper.png",
+      "images/sandbox/hover-drone-outer-lower.png",
+      "images/sandbox/hover-drone-outer-upper-damaged.png",
+      "images/sandbox/hover-drone-outer-upper.png",
+      "images/sandbox/hover-drone-pack.png",
+      "images/sandbox/jammer-aerial-body-damage1.png",
+      "images/sandbox/jammer-aerial-body-damage2.png",
+      "images/sandbox/jammer-aerial-body.png",
+      "images/sandbox/jammer-aerial-hand.png",
+      "images/sandbox/jammer-aerial-head.png",
+      "images/sandbox/jammer-aerial-inner-leg-foot.png",
+      "images/sandbox/jammer-aerial-inner-leg-lower.png",
+      "images/sandbox/jammer-aerial-inner-leg-upper.png",
+      "images/sandbox/jammer-aerial-inner-lower.png",
+      "images/sandbox/jammer-aerial-inner-upper.png",
+      "images/sandbox/jammer-aerial-jaw.png",
+      "images/sandbox/jammer-aerial-outer-leg-foot.png",
+      "images/sandbox/jammer-aerial-outer-leg-lower.png",
+      "images/sandbox/jammer-aerial-outer-leg-upper.png",
+      "images/sandbox/jammer-aerial-outer-lower.png",
+      "images/sandbox/jammer-aerial-outer-upper-damaged.png",
+      "images/sandbox/jammer-aerial-outer-upper.png",
+      "images/sandbox/jammer-aerial-pack.png",
+      "images/sandbox/leak-pack-body-damage1.png",
+      "images/sandbox/leak-pack-body-damage2.png",
+      "images/sandbox/leak-pack-body.png",
+      "images/sandbox/leak-pack-hand.png",
+      "images/sandbox/leak-pack-head.png",
+      "images/sandbox/leak-pack-inner-leg-foot.png",
+      "images/sandbox/leak-pack-inner-leg-lower.png",
+      "images/sandbox/leak-pack-inner-leg-upper.png",
+      "images/sandbox/leak-pack-inner-lower.png",
+      "images/sandbox/leak-pack-inner-upper.png",
+      "images/sandbox/leak-pack-jaw.png",
+      "images/sandbox/leak-pack-outer-leg-foot.png",
+      "images/sandbox/leak-pack-outer-leg-lower.png",
+      "images/sandbox/leak-pack-outer-leg-upper.png",
+      "images/sandbox/leak-pack-outer-lower.png",
+      "images/sandbox/leak-pack-outer-upper-damaged.png",
+      "images/sandbox/leak-pack-outer-upper.png",
+      "images/sandbox/leak-pack-pack.png",
+      "images/sandbox/magnet-maw-blink.png",
+      "images/sandbox/magnet-maw-head.png",
+      "images/sandbox/magnet-maw-mouth.png",
+      "images/sandbox/magnet-salvager-body-damage1.png",
+      "images/sandbox/magnet-salvager-body-damage2.png",
+      "images/sandbox/magnet-salvager-body.png",
+      "images/sandbox/magnet-salvager-hand.png",
+      "images/sandbox/magnet-salvager-head.png",
+      "images/sandbox/magnet-salvager-inner-leg-foot.png",
+      "images/sandbox/magnet-salvager-inner-leg-lower.png",
+      "images/sandbox/magnet-salvager-inner-leg-upper.png",
+      "images/sandbox/magnet-salvager-inner-lower.png",
+      "images/sandbox/magnet-salvager-inner-upper.png",
+      "images/sandbox/magnet-salvager-jaw.png",
+      "images/sandbox/magnet-salvager-outer-leg-foot.png",
+      "images/sandbox/magnet-salvager-outer-leg-lower.png",
+      "images/sandbox/magnet-salvager-outer-leg-upper.png",
+      "images/sandbox/magnet-salvager-outer-lower.png",
+      "images/sandbox/magnet-salvager-outer-upper-damaged.png",
+      "images/sandbox/magnet-salvager-outer-upper.png",
+      "images/sandbox/magnet-salvager-pack.png",
+      "images/sandbox/prism-reed-blink.png",
+      "images/sandbox/prism-reed-head.png",
+      "images/sandbox/prism-reed-mouth.png",
+      "images/sandbox/pulse-pod-blink.png",
+      "images/sandbox/pulse-pod-head.png",
+      "images/sandbox/pulse-pod-mouth.png",
+      "images/sandbox/repair-moss-blink.png",
+      "images/sandbox/repair-moss-head.png",
+      "images/sandbox/scout-bloom-blink.png",
+      "images/sandbox/scout-bloom-head.png",
+      "images/sandbox/scout-bloom-mouth.png",
+      "images/sandbox/sunwheel-blink.png",
+      "images/sandbox/sunwheel-head.png",
+      "images/sandbox/thornshell-cracked1.png",
+      "images/sandbox/thornshell-cracked2.png",
+      "images/sandbox/thornshell-head.png",
+      "images/sandbox/turbine-boot-body-damage1.png",
+      "images/sandbox/turbine-boot-body-damage2.png",
+      "images/sandbox/turbine-boot-body.png",
+      "images/sandbox/turbine-boot-hand.png",
+      "images/sandbox/turbine-boot-head.png",
+      "images/sandbox/turbine-boot-inner-leg-foot.png",
+      "images/sandbox/turbine-boot-inner-leg-lower.png",
+      "images/sandbox/turbine-boot-inner-leg-upper.png",
+      "images/sandbox/turbine-boot-inner-lower.png",
+      "images/sandbox/turbine-boot-inner-upper.png",
+      "images/sandbox/turbine-boot-jaw.png",
+      "images/sandbox/turbine-boot-outer-leg-foot.png",
+      "images/sandbox/turbine-boot-outer-leg-lower.png",
+      "images/sandbox/turbine-boot-outer-leg-upper.png",
+      "images/sandbox/turbine-boot-outer-lower.png",
+      "images/sandbox/turbine-boot-outer-upper-damaged.png",
+      "images/sandbox/turbine-boot-outer-upper.png",
+      "images/sandbox/vfx-arc-hit-0.png",
+      "images/sandbox/vfx-arc-hit-1.png",
+      "images/sandbox/vfx-arc.png",
+      "images/sandbox/vfx-battery-core.png",
+      "images/sandbox/vfx-bolt-hit-0.png",
+      "images/sandbox/vfx-bolt-ready.png",
+      "images/sandbox/vfx-bolt-shot.png",
+      "images/sandbox/vfx-drone-hum.png",
+      "images/sandbox/vfx-holo-glitch.png",
+      "images/sandbox/vfx-holo-ready.png",
+      "images/sandbox/vfx-hook-line.png",
+      "images/sandbox/vfx-hook-snap.png",
+      "images/sandbox/vfx-jam-wave.png",
+      "images/sandbox/vfx-link-0.png",
+      "images/sandbox/vfx-link-1.png",
+      "images/sandbox/vfx-magnet-field.png",
+      "images/sandbox/vfx-magnet-hit-0.png",
+      "images/sandbox/vfx-magnet-hit-1.png",
+      "images/sandbox/vfx-magnet.png",
+      "images/sandbox/vfx-prism-beam.png",
+      "images/sandbox/vfx-prism-muzzle.png",
+      "images/sandbox/vfx-pulse-hit-0.png",
+      "images/sandbox/vfx-pulse-hit-1.png",
+      "images/sandbox/vfx-pulse.png",
+      "images/sandbox/vfx-repair-pulse.png",
+      "images/sandbox/vfx-resin-hit-0.png",
+      "images/sandbox/vfx-resin-hit-1.png",
+      "images/sandbox/vfx-resin.png",
+      "images/sandbox/vfx-root-charge-off.png",
+      "images/sandbox/vfx-root-charge-on.png",
+      "images/sandbox/vfx-root-resonance.png",
+      "images/sandbox/vfx-scout-hit-0.png",
+      "images/sandbox/vfx-scout-hit-1.png",
+      "images/sandbox/vfx-scout.png",
+      "images/sandbox/vfx-tech-muzzle.png",
+      "images/sandbox/vfx-tech-spark.png",
+      "images/sandbox/vfx-thorn-hit.png",
+      "images/sandbox/vfx-turbine-burst.png",
+      "images/sandbox/weld-shield-body-damage1.png",
+      "images/sandbox/weld-shield-body-damage2.png",
+      "images/sandbox/weld-shield-body.png",
+      "images/sandbox/weld-shield-hand.png",
+      "images/sandbox/weld-shield-head.png",
+      "images/sandbox/weld-shield-inner-leg-foot.png",
+      "images/sandbox/weld-shield-inner-leg-lower.png",
+      "images/sandbox/weld-shield-inner-leg-upper.png",
+      "images/sandbox/weld-shield-inner-lower.png",
+      "images/sandbox/weld-shield-inner-upper.png",
+      "images/sandbox/weld-shield-jaw.png",
+      "images/sandbox/weld-shield-outer-leg-foot.png",
+      "images/sandbox/weld-shield-outer-leg-lower.png",
+      "images/sandbox/weld-shield-outer-leg-upper.png",
+      "images/sandbox/weld-shield-outer-lower.png",
+      "images/sandbox/weld-shield-outer-upper-damaged.png",
+      "images/sandbox/weld-shield-outer-upper.png",
+      "images/sandbox/weld-shield-pack.png",
+      "images/sandbox/weld-shield-prop-damage1.png",
+      "images/sandbox/weld-shield-prop-damage2.png",
+      "images/sandbox/weld-shield-prop.png",
+      "images/sandbox/wrench-tech-body-damage1.png",
+      "images/sandbox/wrench-tech-body-damage2.png",
+      "images/sandbox/wrench-tech-body.png",
+      "images/sandbox/wrench-tech-hand.png",
+      "images/sandbox/wrench-tech-head.png",
+      "images/sandbox/wrench-tech-inner-leg-foot.png",
+      "images/sandbox/wrench-tech-inner-leg-lower.png",
+      "images/sandbox/wrench-tech-inner-leg-upper.png",
+      "images/sandbox/wrench-tech-inner-lower.png",
+      "images/sandbox/wrench-tech-inner-upper.png",
+      "images/sandbox/wrench-tech-jaw.png",
+      "images/sandbox/wrench-tech-outer-leg-foot.png",
+      "images/sandbox/wrench-tech-outer-leg-lower.png",
+      "images/sandbox/wrench-tech-outer-leg-upper.png",
+      "images/sandbox/wrench-tech-outer-lower.png",
+      "images/sandbox/wrench-tech-outer-upper-damaged.png",
+      "images/sandbox/wrench-tech-outer-upper.png",
+      "images/sandbox/wrench-tech-pack.png",
+      "images/sandbox/wrench-tech-prop-damage1.png",
+      "images/sandbox/wrench-tech-prop-damage2.png",
+      "images/sandbox/wrench-tech-prop.png"
+    ],
+    "mechanic": "根网共振：菌缆菇连接相邻科技植物，三格能量由玩家点按启动；干扰、断缆和修复都有独立特效。"
   }
 }

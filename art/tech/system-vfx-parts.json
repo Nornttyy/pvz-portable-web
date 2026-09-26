@@ -1,0 +1,222 @@
+[
+  {
+    "file": "vfx-link-0.png",
+    "width": 221,
+    "height": 123,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      1,
+      1
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-link-1.png",
+    "width": 235,
+    "height": 130,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      1,
+      2
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-root-charge-off.png",
+    "width": 226,
+    "height": 159,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      1,
+      3
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-root-charge-on.png",
+    "width": 182,
+    "height": 181,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      1,
+      4
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-root-resonance.png",
+    "width": 242,
+    "height": 241,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      2,
+      1
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-prism-beam.png",
+    "width": 281,
+    "height": 72,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      2,
+      2
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-prism-muzzle.png",
+    "width": 257,
+    "height": 138,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      2,
+      3
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-thorn-hit.png",
+    "width": 228,
+    "height": 229,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      2,
+      4
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-tech-spark.png",
+    "width": 234,
+    "height": 163,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      3,
+      1
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-turbine-burst.png",
+    "width": 281,
+    "height": 178,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      3,
+      2
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-hook-snap.png",
+    "width": 281,
+    "height": 231,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      3,
+      3
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-bolt-hit-0.png",
+    "width": 231,
+    "height": 190,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      3,
+      4
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-hook-line.png",
+    "width": 255,
+    "height": 48,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      4,
+      1
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-bolt-ready.png",
+    "width": 251,
+    "height": 131,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      4,
+      2
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-bolt-shot.png",
+    "width": 244,
+    "height": 133,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      4,
+      3
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-magnet-field.png",
+    "width": 241,
+    "height": 239,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      4,
+      4
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-holo-glitch.png",
+    "width": 251,
+    "height": 184,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      5,
+      1
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-battery-core.png",
+    "width": 243,
+    "height": 190,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      5,
+      2
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-repair-pulse.png",
+    "width": 273,
+    "height": 188,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      5,
+      3
+    ],
+    "role": "system-effect"
+  },
+  {
+    "file": "vfx-drone-hum.png",
+    "width": 255,
+    "height": 122,
+    "source": "art/tech/generated/system-vfx-atlas-v1.png",
+    "gridCell": [
+      5,
+      4
+    ],
+    "role": "system-effect"
+  }
+]
