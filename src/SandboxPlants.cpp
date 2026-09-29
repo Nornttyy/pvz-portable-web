@@ -136,8 +136,12 @@ void AdjustShadow(const Plant* p,float& x,float& y,float& scale){
  // Native center-scaled shadow keeps its center while its width follows the body.
  scale*=d->id==111?1.0f+GrowthStage(p)*0.18f:d->scale;
 }
-float ShotScale(const Projectile* p){auto i=shots.find(p);return i==shots.end()?1.0f:i->second.id==113?0.55f:i->second.id==115?0.7f:i->second.id==114?1.1f:1.0f;}
+float ShotScale(const Projectile* p){auto i=shots.find(p);return i==shots.end()||p->mProjectileType==PROJECTILE_FIREBALL?1.0f:i->second.id==113?0.55f:i->second.id==115?0.7f:i->second.id==114?1.1f:1.0f;}
 bool HasShot(const Projectile* p){return shots.contains(p);}
+bool UsesCustomShotArt(const Projectile* p){
+ const auto it=shots.find(p);
+ return it!=shots.end()&&SandboxVisualRules::UsesCustomShotArt(it->second.id,p->mProjectileType==PROJECTILE_FIREBALL,p->mProjectileType==PROJECTILE_SNOWPEA);
+}
 int ShotRadius(const Projectile* p){auto it=shots.find(p);return it==shots.end()?12:std::max(5,int(SandboxVisualRules::Shots[Art(p,it->second.id)].h*0.45f));}
 int NextShot(Plant* p){
  if(!gSandboxEnabled)return 0;auto it=states.find(p);if(it==states.end())return 0;
@@ -155,7 +159,7 @@ void OnFired(Plant* p,Projectile* shot,Zombie* target){
   shot->mPosY=p->mY+SandboxVisualRules::GroundY+(shot->mPosY-p->mY-SandboxVisualRules::GroundY)*d->scale;
  }
  shot->mX=int(shot->mPosX);shot->mY=int(shot->mPosY+shot->mPosZ);
- EffectAt(shot->mPosX+12,shot->mPosY+shot->mPosZ+12,p->mRow,Art(shot,d->id),true);
+ if(UsesCustomShotArt(shot))EffectAt(shot->mPosX+12,shot->mPosY+shot->mPosZ+12,p->mRow,Art(shot,d->id),true);
  if(d->id==116&&target){shot->mMotionType=MOTION_HOMING;shot->mTargetZombieID=p->mBoard->ZombieGetID(target);shot->mVelX=3.0f;}
  if(d->id==114){shot->mMotionType=MOTION_STAR;shot->mVelX=2.2f;shot->mVelY=0;}
  if(d->id==115){
@@ -184,8 +188,9 @@ void UpdateShot(Projectile* p){
 bool Impact(Projectile* p,Zombie* target){
  auto it=shots.find(p);if(it==shots.end())return false;
  const auto shot=it->second;
- EffectAt(p->mPosX+12,p->mPosY+p->mPosZ+12,target?target->mRow:p->mRow,Art(p,shot.id));
- // The original eight keep their native fire splash / ice slow combat, only their artwork changes.
+ if(UsesCustomShotArt(p))EffectAt(p->mPosX+12,p->mPosY+p->mPosZ+12,target?target->mRow:p->mRow,Art(p,shot.id));
+ // Damage dispatch is independent of artwork: native splash/slow for the first
+ // eight, custom damage and abilities for the others even when they reuse peas.
  if(shot.id<112&&shot.id!=111)return false;
  if(!target)return true;
  if(shot.id==112||shot.id==111){
@@ -293,7 +298,8 @@ void DrawEffects(Sexy::Graphics* graphics,Board* b,int row){
   SandboxArt::Sprite(g,"poison",z->mPosX+42,z->mPosY+40-(b->mMainCounter%40)*0.25f,15,20,0,170);
 }
 bool DrawShot(Sexy::Graphics* g,const Projectile* p){
- const auto it=shots.find(p);if(it==shots.end())return false;
+ if(!UsesCustomShotArt(p))return false;
+ const auto it=shots.find(p);
  const auto& a=SandboxVisualRules::Shots[Art(p,it->second.id)];
  const float angle=p->mMotionType==MOTION_HOMING?std::atan2(p->mVelY,p->mVelX):0;
  const float ox=a.w*0.5f-a.coreX,oy=a.h*0.5f-a.coreY,c=std::cos(angle),s=std::sin(angle);

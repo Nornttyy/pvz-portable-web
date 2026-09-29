@@ -2,7 +2,7 @@
 
 网址：https://nornttyy.github.io/pvz-portable-web/
 
-默认入口已接入中文版的原生主菜单沙盒、18 种原创植物、10 种原创僵尸、分件动画与按钮居中修复。保留原 800 × 600 画布和游戏内 UI，不跳转到另一套沙盒画面。
+默认入口已接入中文版的原生主菜单沙盒、17 种原创植物、12 种原创僵尸、分件动画与按钮居中修复。主菜单保留原 800 × 600 画布，沙盒增加左侧目录后为 1024 × 600；沿用游戏内 UI，不跳转到另一套沙盒画面。
 
 沙盒补字沿用同一套位图字库的偏旁，修复「焰」字过大、风格不一致和覆盖相邻文字的问题；保留原字号、基线和字距，不需要变更素材包。
 
@@ -12,7 +12,15 @@
 2. 完成加载后点击「开始游戏」，从本体主菜单进入「沙盒模式」。
 3. 浏览器允许时会记住资源，下次优先使用缓存；无痕或存储受限时自动重新下载。
 
-网站托管项目当前整套素材，保留原有场景、角色分件、动画、字体、音乐与音效。打包时校验全部 3046 个文件，包括 40 个生成的子弹与技能特效素材，发布与运行时均校验包散列。素材与代码的权利说明分别保留，详见来源与许可页。
+网站托管项目当前整套素材，保留原有场景、角色分件、动画、字体、音乐与音效。打包时校验全部 3158 个文件，包括 48 个生成的子弹与技能特效素材，发布与运行时均校验包散列。素材与代码的权利说明分别保留，详见来源与许可页。
+
+## 子弹素材复用（2026-09-29）
+
+- 火焰、寒冰、双发、三线、机枪和冰火双发：使用原生寒冰弹、火球分件动画及对应命中特效。
+- 小豌豆、重炮、散射、追击：使用原生绿色豌豆，分别保留 0.55、1.1、0.7、1 倍绘制比例；缩放围绕原有子弹中心，不移动发射口。
+- 雷电蘑菇、电能豌豆、腐化豌豆：保留专属弹体、跳电与腐蚀效果；经火炬转化后的火球使用原生动画。
+- 不改伤害、攻速、追踪、推退和碰撞范围。原生弹不再叠加自制炮口闪光或命中贴图，火球动画在炮口校准后创建。
+- 只更新引擎和网页版本号，不更换资源包，不清除存档。
 
 `classic.html` 保留之前的年度版 `main.pak` + `properties/` 导入流程和固定上游引擎。
 
@@ -41,14 +49,17 @@ node --test tests/pages.test.mjs
 - 工具链：Emscripten 4.0.16、CMake 3.31.6、Ninja 1.11.1.4、libopenmpt 0.8.4。使用上游 `wasm/build-wasm.sh` 或在配置好 Emscripten 和 openmpt 的环境执行：
 
 ```sh
-emcmake cmake -S . -B build-wasm -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_ROOT_PATH=/path/to/openmpt-prefix
+emcmake cmake -S . -B build-wasm -G Ninja -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_FIND_ROOT_PATH=/path/to/openmpt-prefix \
+  -DOpenMPT_INCLUDE_DIR=/path/to/openmpt-prefix/include \
+  -DOpenMPT_LIBRARY=/path/to/openmpt-prefix/lib/libopenmpt.a
 cmake --build build-wasm
 ```
 
-将 `build-wasm/pvz-portable.js` 与 `.wasm` 放入 `site/sandbox-engine/`，更新构建散列后验证。许可和署名入口保留在 `site/credits.html`；旧引擎文件与散列保持不变。
+将 `build-wasm/pvz-portable.js` 与 `.wasm` 放入 `site/sandbox-engine/`，更新构建散列后验证。配置输出必须包含 `using libopenmpt` 和 MO3 支持，避免重新编译时丢失背景音乐解码器。许可和署名入口保留在 `site/credits.html`；旧引擎文件与散列保持不变。
 
 ## 验证范围
 
 自动测试覆盖真实 WASM 初始化及沙盒接口、完整素材包校验、GitHub 子路径引用、无素材选择步骤、首次自动下载/错误重试/缓存读取、缓存禁用和超时、存档路径保护与加载状态转换。
 
-自动测试不是浏览器画面或通关验收；本次环境无可连接浏览器。部署后另外检查公网入口与 JS / WASM / 资源清单的实际 HTTP 响应及散列。
+自动测试不是浏览器画面或通关验收。子弹更新另用 Chrome 实际加载 WASM，检查原生主菜单、沙盒发射、冰火三线、散射追踪、专属弹及火炬转化的截图和运行错误；发布时复核公网文件散列。

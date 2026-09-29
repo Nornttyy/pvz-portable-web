@@ -4683,7 +4683,6 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
     const int sandboxShot = SandboxPlants::NextShot(this);
     if (sandboxShot == 1) aProjectileType = ProjectileType::PROJECTILE_SNOWPEA;
 	Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder - 1, theRow, aProjectileType);
-    if (sandboxShot == 2) aProjectile->ConvertToFireball(mPlantCol);
 	aProjectile->mDamageRangeFlags = GetDamageRangeFlags(thePlantWeapon);
 
 	if (mSeedType == SeedType::SEED_CABBAGEPULT || mSeedType == SeedType::SEED_KERNELPULT ||
@@ -4774,6 +4773,9 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
 		aProjectile->mCobTargetRow = mBoard->PixelToGridYKeepOnBoard(mTargetX, mTargetY);
 	}
     SandboxPlants::OnFired(this,aProjectile,theTargetZombie);
+    // Create the native fire attachment at the final animated muzzle position,
+    // not at the pre-adjustment origin for the first visible frame.
+    if (sandboxShot == 2) aProjectile->ConvertToFireball(mPlantCol);
 }
 
 Zombie* Plant::FindTargetZombie(int theRow, PlantWeapon thePlantWeapon)

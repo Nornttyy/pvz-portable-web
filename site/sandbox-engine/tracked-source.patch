@@ -203,7 +203,7 @@ index 665fcca..98ac916 100644
  
  	if (mApp->mGameScene == GameScenes::SCENE_LEVEL_INTRO &&
 diff --git a/src/Lawn/Plant.cpp b/src/Lawn/Plant.cpp
-index c934659..06c9612 100644
+index c934659..a024233 100644
 --- a/src/Lawn/Plant.cpp
 +++ b/src/Lawn/Plant.cpp
 @@ -30,6 +30,7 @@
@@ -246,39 +246,41 @@ index c934659..06c9612 100644
  	if (aShadowType == 0)
  	{
  		PvzpDrawImageCelCenterScaledF(g, IMAGE_PLANTSHADOW, theOffsetX + aShadowOffsetX, theOffsetY + aShadowOffsetY, 0, aScale, aScale);
-@@ -4675,7 +4680,10 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
+@@ -4675,6 +4680,8 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
  		mApp->AddPvzpParticle(aOriginX + 27, aOriginY + 13, aRenderPosition, ParticleEffect::PARTICLE_PUFFSHROOM_MUZZLE);
  	}
  
 +    const int sandboxShot = SandboxPlants::NextShot(this);
 +    if (sandboxShot == 1) aProjectileType = ProjectileType::PROJECTILE_SNOWPEA;
  	Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder - 1, theRow, aProjectileType);
-+    if (sandboxShot == 2) aProjectile->ConvertToFireball(mPlantCol);
  	aProjectile->mDamageRangeFlags = GetDamageRangeFlags(thePlantWeapon);
  
- 	if (mSeedType == SeedType::SEED_CABBAGEPULT || mSeedType == SeedType::SEED_KERNELPULT ||
-@@ -4765,6 +4773,7 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
+@@ -4765,6 +4772,10 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
  		aProjectile->mCobTargetX = mTargetX - 40;
  		aProjectile->mCobTargetRow = mBoard->PixelToGridYKeepOnBoard(mTargetX, mTargetY);
  	}
 +    SandboxPlants::OnFired(this,aProjectile,theTargetZombie);
++    // Create the native fire attachment at the final animated muzzle position,
++    // not at the pre-adjustment origin for the first visible frame.
++    if (sandboxShot == 2) aProjectile->ConvertToFireball(mPlantCol);
  }
  
  Zombie* Plant::FindTargetZombie(int theRow, PlantWeapon thePlantWeapon)
 diff --git a/src/Lawn/Projectile.cpp b/src/Lawn/Projectile.cpp
-index 4500f46..ac7d6f3 100644
+index 4500f46..7f07d76 100644
 --- a/src/Lawn/Projectile.cpp
 +++ b/src/Lawn/Projectile.cpp
-@@ -25,6 +25,8 @@
+@@ -25,6 +25,9 @@
  #include "Cutscene.h"
  #include "Projectile.h"
  #include "../LawnApp.h"
 +#include "../SandboxPlants.h"
++#include "../SandboxVisualRules.h"
 +#include "../SandboxZombies.h"
  #include "../Resources.h"
  #include "../GameConstants.h"
  #include "../PvzpLib/PvzpFoley.h"
-@@ -156,6 +158,7 @@ void Projectile::ProjectileInitialize(int theX, int theY, int theRenderOrder, in
+@@ -156,6 +159,7 @@ void Projectile::ProjectileInitialize(int theX, int theY, int theRenderOrder, in
  
  Plant* Projectile::FindCollisionTargetPlant()
  {
@@ -286,7 +288,7 @@ index 4500f46..ac7d6f3 100644
  	Rect aProjectileRect = GetProjectileRect();
  
  	for (Plant* aPlant : mBoard->mPlants)
-@@ -311,6 +314,7 @@ void Projectile::CheckForCollision()
+@@ -311,6 +315,7 @@ void Projectile::CheckForCollision()
  		Plant* aPlant = FindCollisionTargetPlant();
  		if (aPlant)
  		{
@@ -294,7 +296,7 @@ index 4500f46..ac7d6f3 100644
  			const ProjectileDefinition& aProjectileDef = GetProjectileDef();
  			aPlant->mPlantHealth -= aProjectileDef.mDamage;
  			aPlant->mEatenFlashCountdown = std::max(aPlant->mEatenFlashCountdown, 25);
-@@ -824,7 +828,8 @@ void Projectile::DoImpact(Zombie* theZombie)
+@@ -824,7 +829,8 @@ void Projectile::DoImpact(Zombie* theZombie)
  {
  	PlayImpactSound(theZombie);
  
@@ -304,7 +306,7 @@ index 4500f46..ac7d6f3 100644
  	{
  		if (mProjectileType == ProjectileType::PROJECTILE_FIREBALL && theZombie)
  		{
-@@ -833,12 +838,13 @@ void Projectile::DoImpact(Zombie* theZombie)
+@@ -833,12 +839,15 @@ void Projectile::DoImpact(Zombie* theZombie)
  
  		DoSplashDamage(theZombie);
  	}
@@ -315,11 +317,13 @@ index 4500f46..ac7d6f3 100644
  		theZombie->TakeDamage(GetProjectileDef().mDamage, aDamageFlags);
  	}
  
-+    if (SandboxPlants::HasShot(this)) { Die(); return; }
++    // Artwork ownership is not damage ownership. Reused peas still need the
++    // native pea/ice splat or fire impact, even when damage is handled above.
++    if (SandboxPlants::UsesCustomShotArt(this)) { Die(); return; }
  	float aLastPosX = mPosX - mVelX;
  	float aLastPosY = mPosY + mPosZ - mVelY - mVelZ;
  	ParticleEffect aEffect = ParticleEffect::PARTICLE_NONE;
-@@ -939,6 +945,7 @@ void Projectile::DoImpact(Zombie* theZombie)
+@@ -939,6 +948,7 @@ void Projectile::DoImpact(Zombie* theZombie)
  
  void Projectile::Update()
  {
@@ -327,7 +331,7 @@ index 4500f46..ac7d6f3 100644
  	mProjectileAge++;
  	if (mApp->mGameScene != GameScenes::SCENE_PLAYING && !mBoard->mCutScene->ShouldRunUpsellBoard())
  		return;
-@@ -974,6 +981,8 @@ void Projectile::Update()
+@@ -974,10 +984,16 @@ void Projectile::Update()
  
  void Projectile::Draw(Graphics* g)
  {
@@ -336,7 +340,47 @@ index 4500f46..ac7d6f3 100644
  	const ProjectileDefinition& aProjectileDef = GetProjectileDef();
  
  	Image* aImage = nullptr;
-@@ -1146,11 +1155,14 @@ void Projectile::DrawShadow(Graphics* g)
+ 	float aScale = 1.0f;
++	const bool aNativeCustomPea = SandboxPlants::HasShot(this) &&
++		(mProjectileType == PROJECTILE_PEA || mProjectileType == PROJECTILE_SNOWPEA);
++	// Round peas keep their native highlight while homing changes only the path.
++	const float aRotation = aNativeCustomPea ? 0.0f : mRotation;
+ 	switch (mProjectileType)
+ 	{
+ 	case ProjectileType::PROJECTILE_COBBIG:
+@@ -1034,6 +1050,7 @@ void Projectile::Draw(Graphics* g)
+ 	}
+ 
+ 	bool aMirror = false;
++	if (aNativeCustomPea) aScale *= SandboxPlants::ShotScale(this);
+ 	if (mMotionType == ProjectileMotion::MOTION_BEE_BACKWARDS)
+ 	{
+ 		aMirror = true;
+@@ -1047,7 +1064,7 @@ void Projectile::Draw(Graphics* g)
+ 		int aCelWidth = aImage->GetCelWidth();
+ 		int aCelHeight = aImage->GetCelHeight();
+ 		Rect aSrcRect(aCelWidth * mFrame, aCelHeight * aProjectileDef.mImageRow, aCelWidth, aCelHeight);
+-		if (FloatApproxEqual(mRotation, 0.0f) && FloatApproxEqual(aScale, 1.0f))
++		if (FloatApproxEqual(aRotation, 0.0f) && FloatApproxEqual(aScale, 1.0f))
+ 		{
+ 			Rect aDestRect(0, 0, aCelWidth, aCelHeight);
+ 			g->DrawImageMirror(aImage, aDestRect, aSrcRect, aMirror);
+@@ -1056,8 +1073,13 @@ void Projectile::Draw(Graphics* g)
+ 		{
+ 			float aOffsetX = mPosX + aCelWidth * 0.5f;
+ 			float aOffsetY = mPosZ + mPosY + aCelHeight * 0.5f;
++			if (aNativeCustomPea)
++			{
++				aOffsetX = mPosX + SandboxVisualRules::NativePeaOffset(aCelWidth, aScale);
++				aOffsetY = mPosY + mPosZ + SandboxVisualRules::NativePeaOffset(aCelHeight, aScale);
++			}
+ 			SexyTransform2D aTransform;
+-			PvzpScaleRotateTransformMatrix(aTransform, aOffsetX + mBoard->mX, aOffsetY + mBoard->mY, mRotation, aScale, aScale);
++			PvzpScaleRotateTransformMatrix(aTransform, aOffsetX + mBoard->mX, aOffsetY + mBoard->mY, aRotation, aScale, aScale);
+ 			PvzpBltMatrix(g, aImage, aTransform, g->mClipRect, Color::White, g->mDrawMode, aSrcRect);
+ 		}
+ 	}
+@@ -1146,11 +1168,14 @@ void Projectile::DrawShadow(Graphics* g)
  		aScale *= 200.0f / (aHeight + 200.0f);
  	}
  
@@ -351,7 +395,7 @@ index 4500f46..ac7d6f3 100644
  	mDead = true;
  
  	if (mProjectileType == ProjectileType::PROJECTILE_PUFF || mProjectileType == ProjectileType::PROJECTILE_SNOWPEA)
-@@ -1166,6 +1178,10 @@ void Projectile::Die()
+@@ -1166,6 +1191,10 @@ void Projectile::Die()
  
  Rect Projectile::GetProjectileRect()
  {

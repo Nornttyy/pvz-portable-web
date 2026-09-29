@@ -16,4 +16,13 @@ inline constexpr ShotArt Shots[]{
 };
 constexpr int HeadForRow(int plantRow,int shotRow){return shotRow>plantRow?1:shotRow<plantRow?3:2;}
 constexpr int ArtIndex(int id,bool fire,bool ice){return fire?0:ice?1:id==111?2:id>=112&&id<=117?id-110:3;}
+// Reuse the actual native projectile renderer (including fire reanimations and splats).
+// Only electricity and corrosion need bespoke projectile artwork. Torchwood wins
+// over that artwork if it changes the projectile's element during flight.
+constexpr bool UsesCustomShotArt(int id,bool fire,bool ice){
+ return !fire&&!ice&&(id==111||id==112||id==117);
+}
+constexpr float NativePeaOffset(float celSize,float scale){
+ return PeaCenter+(celSize*0.5f-PeaCenter)*scale;
+}
 }

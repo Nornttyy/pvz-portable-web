@@ -55,6 +55,7 @@ void AdjustScale(const Plant* plant,float& x,float& y,float& sx,float& sy);
 void AdjustShadow(const Plant* plant,float& x,float& y,float& scale);
 bool DrawShot(Sexy::Graphics* g,const Projectile* shot);
 bool HasShot(const Projectile* shot);
+bool UsesCustomShotArt(const Projectile* shot);
 float ShotScale(const Projectile* shot);
 int ShotRadius(const Projectile* shot);
 }

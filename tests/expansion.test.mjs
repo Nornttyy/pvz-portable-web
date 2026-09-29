@@ -88,3 +88,16 @@ test('expansion is sandbox-only and stepping/clear operations clean up special s
  assert.match(cpp,/SandboxZombies::Reset\(\)/);assert.match(cpp,/SandboxZombies::Base\(type\)/);
  const render=(await read('src/SandboxPlants.cpp')).toString();assert.match(render,/DrawFit/);assert.match(render,/starts_with\("GatlingPea_barrel"\)/);
 });
+test('native projectile integration retains splats, centered scaling and fire attachments',async()=>{
+ const render=(await read('src/Lawn/Projectile.cpp')).toString();
+ const impact=render.slice(render.indexOf('void Projectile::DoImpact('),render.indexOf('void Projectile::Draw('));
+ assert.match(impact,/if \(SandboxPlants::UsesCustomShotArt\(this\)\) \{ Die\(\); return; \}/);
+ assert.doesNotMatch(impact,/if \(SandboxPlants::HasShot\(this\)\)/);
+ for(const effect of ['PARTICLE_PEA_SPLAT','PARTICLE_SNOWPEA_SPLAT','REANIM_JALAPENO_FIRE'])assert.ok(impact.includes(effect));
+ const draw=render.slice(render.indexOf('void Projectile::Draw('),render.indexOf('void Projectile::DrawShadow('));
+ assert.match(draw,/if \(SandboxPlants::DrawShot\(g,this\)\) return;/);
+ for(const native of ['IMAGE_PROJECTILEPEA','IMAGE_PROJECTILESNOWPEA','AttachmentDraw','SandboxPlants::ShotScale(this)','SandboxVisualRules::NativePeaOffset'])assert.ok(draw.includes(native));
+ const source=(await read('src/Lawn/Plant.cpp')).toString();
+ const plant=source.slice(source.indexOf('void Plant::Fire('),source.indexOf('Zombie* Plant::FindTargetZombie('));
+ assert.ok(plant.indexOf('aProjectile->ConvertToFireball(mPlantCol)')>plant.indexOf('SandboxPlants::OnFired(this,aProjectile,theTargetZombie)'),'fire attaches only after muzzle correction');
+});

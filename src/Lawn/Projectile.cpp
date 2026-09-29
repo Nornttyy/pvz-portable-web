@@ -26,6 +26,7 @@
 #include "Projectile.h"
 #include "../LawnApp.h"
 #include "../SandboxPlants.h"
+#include "../SandboxVisualRules.h"
 #include "../SandboxZombies.h"
 #include "../Resources.h"
 #include "../GameConstants.h"
@@ -844,7 +845,9 @@ void Projectile::DoImpact(Zombie* theZombie)
 		theZombie->TakeDamage(GetProjectileDef().mDamage, aDamageFlags);
 	}
 
-    if (SandboxPlants::HasShot(this)) { Die(); return; }
+    // Artwork ownership is not damage ownership. Reused peas still need the
+    // native pea/ice splat or fire impact, even when damage is handled above.
+    if (SandboxPlants::UsesCustomShotArt(this)) { Die(); return; }
 	float aLastPosX = mPosX - mVelX;
 	float aLastPosY = mPosY + mPosZ - mVelY - mVelZ;
 	ParticleEffect aEffect = ParticleEffect::PARTICLE_NONE;
@@ -987,6 +990,10 @@ void Projectile::Draw(Graphics* g)
 
 	Image* aImage = nullptr;
 	float aScale = 1.0f;
+	const bool aNativeCustomPea = SandboxPlants::HasShot(this) &&
+		(mProjectileType == PROJECTILE_PEA || mProjectileType == PROJECTILE_SNOWPEA);
+	// Round peas keep their native highlight while homing changes only the path.
+	const float aRotation = aNativeCustomPea ? 0.0f : mRotation;
 	switch (mProjectileType)
 	{
 	case ProjectileType::PROJECTILE_COBBIG:
@@ -1043,6 +1050,7 @@ void Projectile::Draw(Graphics* g)
 	}
 
 	bool aMirror = false;
+	if (aNativeCustomPea) aScale *= SandboxPlants::ShotScale(this);
 	if (mMotionType == ProjectileMotion::MOTION_BEE_BACKWARDS)
 	{
 		aMirror = true;
@@ -1056,7 +1064,7 @@ void Projectile::Draw(Graphics* g)
 		int aCelWidth = aImage->GetCelWidth();
 		int aCelHeight = aImage->GetCelHeight();
 		Rect aSrcRect(aCelWidth * mFrame, aCelHeight * aProjectileDef.mImageRow, aCelWidth, aCelHeight);
-		if (FloatApproxEqual(mRotation, 0.0f) && FloatApproxEqual(aScale, 1.0f))
+		if (FloatApproxEqual(aRotation, 0.0f) && FloatApproxEqual(aScale, 1.0f))
 		{
 			Rect aDestRect(0, 0, aCelWidth, aCelHeight);
 			g->DrawImageMirror(aImage, aDestRect, aSrcRect, aMirror);
@@ -1065,8 +1073,13 @@ void Projectile::Draw(Graphics* g)
 		{
 			float aOffsetX = mPosX + aCelWidth * 0.5f;
 			float aOffsetY = mPosZ + mPosY + aCelHeight * 0.5f;
+			if (aNativeCustomPea)
+			{
+				aOffsetX = mPosX + SandboxVisualRules::NativePeaOffset(aCelWidth, aScale);
+				aOffsetY = mPosY + mPosZ + SandboxVisualRules::NativePeaOffset(aCelHeight, aScale);
+			}
 			SexyTransform2D aTransform;
-			PvzpScaleRotateTransformMatrix(aTransform, aOffsetX + mBoard->mX, aOffsetY + mBoard->mY, mRotation, aScale, aScale);
+			PvzpScaleRotateTransformMatrix(aTransform, aOffsetX + mBoard->mX, aOffsetY + mBoard->mY, aRotation, aScale, aScale);
 			PvzpBltMatrix(g, aImage, aTransform, g->mClipRect, Color::White, g->mDrawMode, aSrcRect);
 		}
 	}
