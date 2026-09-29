@@ -15,6 +15,14 @@ int main(){
    for(int j=0;j<6;++j)assert(!overlaps(b,Hotbar(j)));
  }
  for(int i=0;i<6;++i)assert(!overlaps(Hotbar(i),Shovel));
+ for(auto a:{NativeFilter,CustomFilter,FusionFilter}){
+  assert(a.x>=0&&a.x+a.w<=SidebarWidth&&a.y+a.h<PrevPage.y);
+  for(auto b:{NativeFilter,CustomFilter,FusionFilter})if(a.x!=b.x)assert(!overlaps(a,b));
+ }
+ for(int row=0;row<RecipesPerPage;++row)for(int part=0;part<3;++part){
+  const auto a=RecipeCard(row,part);assert(a.x>=0&&a.x+a.w<SidebarWidth&&a.y>=118&&a.y+a.h<NativeFilter.y);
+  for(int r=0;r<=row;++r)for(int p=0;p<3;++p)if(r!=row||p!=part)assert(!overlaps(a,RecipeCard(r,p)));
+ }
  for(bool pool:{false,true})for(int row=0;row<(pool?6:5);++row)for(int col=0;col<9;++col){
    const int x=WorldOffset+40+col*80+40,y=80+row*(pool?85:100)+40;
    assert(x>=SidebarWidth);assert(Cell(x-WorldOffset,y,pool)==row*9+col);

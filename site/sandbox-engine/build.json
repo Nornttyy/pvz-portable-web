@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "local-only integrated main menu sandbox",
+  "mode": "bundled Chinese main-menu sandbox with native-part fusion",
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 277234,
-      "sha256": "a00f918426ea1d6ef93cb1f883b8d35f9d56fd00b3e820e694485edb8db5f6cd"
+      "size": 277762,
+      "sha256": "5caa94a46318b408132e54428457f179685ecd5434f3914eb8dafea815e2be8e"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7376208,
-      "sha256": "3f8678c76e1cd8a8d51d69df52a0b68735259c08f28529a30679e07717204e19"
+      "size": 7392613,
+      "sha256": "538cdee7eea1bc5aef047bd955924d16aaf3c2f2e1f568b01f5fb5c2ee7fe112"
     }
   ]
 }

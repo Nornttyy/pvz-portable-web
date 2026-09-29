@@ -1,6 +1,7 @@
 // Original local sandbox extension. SPDX-License-Identifier: LGPL-3.0-or-later
 #include "Sandbox.h"
 #include "SandboxRules.h"
+#include "SandboxFusion.h"
 #include "SandboxUIRules.h"
 #include "LawnApp.h"
 #include "Lawn/Board.h"
@@ -29,6 +30,7 @@
 bool gSandboxEnabled = false;
 static bool paused = true, stepOnce = false, awake = true;
 static bool stackPlants = false, continuousZombies = false;
+static bool fusionEnabled = true;
 static int mapType = 0, escaped = 0;
 static int sessionRevision = 0;
 static std::unique_ptr<PlayerInfo> sandboxProfile;
@@ -66,6 +68,7 @@ bool SandboxEnter() {
     awake = true;
     stackPlants = false;
     continuousZombies = false;
+    fusionEnabled = true;
     CanvasSize(SandboxUIRules::CanvasWidth);
     SandboxStart(0);
     return true;
@@ -176,9 +179,49 @@ static void ClearEnemies(Board* board) {
     board->ProcessDeleteQueue();
     SandboxZombies::Reset();
 }
+// Preview and placement share exactly the same target/terrain checks. Never
+// consume a lily pad, flowerpot, pumpkin or an ambiguous stack of main plants.
+static Plant* FindFusionTarget(Board* board,int type,int col,int row,int& result) {
+    result=0;
+    if(!fusionEnabled||stackPlants||!SandboxRules::ValidPlant(type)||!SandboxRules::ValidCell(col,row,mapType==1))return nullptr;
+    SandboxRules::StackSite site;
+    site.water=board->IsPoolSquare(col,row);
+    site.blocked=board->GetGraveStoneAt(col,row)||board->GetCraterAt(col,row)||board->GetScaryPotAt(col,row)||board->IsIceAt(col,row);
+    Plant* target=nullptr;
+    for(auto* p:board->mPlants){
+        if(p->mDead||p->mRow!=row||p->NotOnGround())continue;
+        if(p->mSeedType==SEED_COBCANNON&&p->mPlantCol==col-1)site.blocked=true;
+        if(p->mPlantCol!=col)continue;
+        site.lily|=p->mSeedType==SEED_LILYPAD;
+        site.pot|=p->mSeedType==SEED_FLOWERPOT;
+        if(SandboxFusion::SupportLayer(p->mSeedType))continue;
+        if(target)return nullptr;
+        target=p;
+    }
+    if(!target||target->mPlantHealth<=0)return nullptr;
+    const int candidate=SandboxFusion::Result(SandboxPlants::Type(target),type);
+    if(!candidate||!SandboxRules::StackTerrainAllows(SandboxPlants::Base(candidate),col,site))return nullptr;
+    result=candidate;
+    return target;
+}
 static int PlacePlant(Board* board, int type, int col, int row) {
     if (!SandboxRules::ValidPlant(type) || !SandboxRules::ValidCell(col, row, mapType == 1)) return -2;
-    if (PlantCount(board) >= SandboxRules::MaxPlants || board->mPlants.mSize >= board->mPlants.mMaxSize - 8) return -3;
+    if (board->mPlants.mSize >= board->mPlants.mMaxSize - 8) return -3;
+    int fusedType=0;
+    if(auto* target=FindFusionTarget(board,type,col,row,fusedType)){
+        const auto resultSeed=static_cast<SeedType>(SandboxPlants::Base(fusedType));
+        Plant::PreloadPlantResources(resultSeed);
+        // Allocate before consuming anything; a failed placement must be harmless.
+        auto* fused=board->AddPlant(col,row,resultSeed,SEED_NONE);
+        if(!fused)return -3;
+        SandboxPlants::Assign(fused,fusedType);
+        fused->mPlantHealth=SandboxFusion::InheritedHealth(target->mPlantHealth,target->mPlantMaxHealth,fused->mPlantMaxHealth);
+        target->Die();
+        if(awake&&fused->mIsAsleep)fused->SetSleeping(false);
+        board->MarkAllDirty();
+        return fusedType;
+    }
+    if (PlantCount(board) >= SandboxRules::MaxPlants) return -3;
     const auto seed = static_cast<SeedType>(SandboxPlants::Base(type));
     if (seed == SEED_COBCANNON && col >= 8) return -4;
     if (seed == SEED_CATTAIL && !board->IsPoolSquare(col, row)) return -4;
@@ -237,7 +280,7 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
     auto* board = ActiveBoard();
     if (!board) return -1;
     switch (command) {
-    case 0: return 1 | (paused ? 2 : 0) | (mapType == 1 ? 4 : 0) | (awake ? 8 : 0) | (stackPlants ? 16 : 0) | (continuousZombies ? 32 : 0);
+    case 0: return 1 | (paused ? 2 : 0) | (mapType == 1 ? 4 : 0) | (awake ? 8 : 0) | (stackPlants ? 16 : 0) | (continuousZombies ? 32 : 0) | (fusionEnabled ? 64 : 0);
     case 1: return PlacePlant(board, type, col, row);
     case 2: return Spawn(board, type, col, row);
     case 3: {
@@ -277,8 +320,10 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
     case 16: SandboxUIFeedback(type); return 1;
     case 17: return SandboxUIHasUnsaved() ? 1 : 0;
     case 18: return sessionRevision;
-    case 19: stackPlants = type != 0; return 1;
+    case 19: stackPlants = type != 0; if(stackPlants)fusionEnabled=false; return 1;
     case 20: continuousZombies = type != 0; return 1;
+    case 21: fusionEnabled = type != 0; if(fusionEnabled)stackPlants=false; return 1;
+    case 22: { int result=0; FindFusionTarget(board,type,col,row,result); return result; }
     default: return -2;
     }
 }

@@ -3,6 +3,8 @@ namespace Sexy { class Image;class MemoryImage;class Graphics; }
 class Reanimation;
 namespace SandboxArt {
 Sexy::Image* Image(const char* family,const char* part);
+// Original reanimation PNG, unchanged. Used for native-part fusion attachments.
+Sexy::Image* NativeImage(const char* file);
 void DrawFit(Sexy::Graphics* g,Sexy::MemoryImage* image,int x,int y,int width,int height,float scale=1.0f);
 // Coordinates are relative to the caller's Graphics frame, exactly once.
 void Sprite(Sexy::Graphics* g,const char* part,float cx,float cy,float width,float height,float angle=0,int alpha=255);

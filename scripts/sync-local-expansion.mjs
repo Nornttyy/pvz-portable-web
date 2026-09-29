@@ -11,6 +11,8 @@ assert.equal(createHash('sha256').update(bytes).digest('hex'),manifest.bundle.sh
 const parts=[...JSON.parse(await readFile(new URL('art/expansion/parts.json',root))),...JSON.parse(await readFile(new URL('art/expansion/vfx-parts.json',root)))];
 await mkdir(new URL('resources/source/images/sandbox/',target),{recursive:true});
 for(const part of parts)await copyFile(new URL('art/expansion/parts/'+part.file,root),new URL('resources/source/images/sandbox/'+part.file,target));
+for(const part of JSON.parse(await readFile(new URL('art/fusion/parts.json',root))))
+ await copyFile(new URL('art/fusion/parts/'+part.file,root),new URL('resources/source/images/sandbox/'+part.file,target));
 const backup=new URL('resources/pre-expansion-resources.zip',target);
 try{await access(backup);}catch{await copyFile(new URL('resources/local-resources.zip',target),backup);}
 await copyFile(new URL('resources/expansion-resources.zip',target),new URL('resources/local-resources.zip',target));

@@ -11,6 +11,11 @@
 #include <algorithm>
 #include <cmath>
 namespace SandboxArt {
+Sexy::Image* NativeImage(const char* file){
+ static std::map<std::string,std::unique_ptr<Sexy::GLImage>> cache;
+ const auto path=std::string("reanim/")+file;
+ auto& image=cache[path];if(!image)image.reset(gLawnApp->GetImage(path));return image.get();
+}
 Sexy::Image* Image(const char* family,const char* part){
  static std::map<std::string,std::unique_ptr<Sexy::GLImage>> cache;
  const auto file=std::string("images/sandbox/")+family+"-"+part+".png";

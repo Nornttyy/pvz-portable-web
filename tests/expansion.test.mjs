@@ -10,27 +10,41 @@ import {createHash} from 'node:crypto';
 import {ORIGINAL_PLANTS,ORIGINAL_ZOMBIES,ZOMBIES,validateLayout} from '../web/sandbox-data.mjs';
 const run=promisify(execFile),root=fileURLToPath(new URL('../',import.meta.url));
 const read=name=>readFile(join(root,name));
-test('actual production combat modules pass 30 native simulation scenarios',async()=>{
+test('actual production combat modules pass 36 native simulation scenarios',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'pvz-expansion-combat-')),binary=join(dir,'combat');
  // Copy source unmodified only to let the compiler resolve state doubles before engine headers.
  for(const f of ['SandboxPlants.cpp','SandboxZombies.cpp'])await copyFile(join(root,'src',f),join(dir,f));
  await run(process.env.CXX||'c++',['-std=c++20','-Itests/combat-stubs','-Isrc',join(dir,'SandboxPlants.cpp'),join(dir,'SandboxZombies.cpp'),'tests/expansion-combat.cpp','-o',binary],{cwd:root});
- const result=await run(binary);assert.match(result.stdout,/30 production combat scenarios passed/);
+ const result=await run(binary);assert.match(result.stdout,/36 production combat scenarios passed/);
 });
-test('17 active custom plants and 12 zombies agree in native and web catalogs',async()=>{
- assert.deepEqual(ORIGINAL_PLANTS.map(x=>x.id),Array.from({length:18},(_,i)=>100+i).filter(id=>id!==109));
+test('19 active custom plants and 12 zombies agree in native and web catalogs',async()=>{
+ assert.deepEqual(ORIGINAL_PLANTS.map(x=>x.id),Array.from({length:20},(_,i)=>100+i).filter(id=>id!==109));
  assert.deepEqual(ORIGINAL_ZOMBIES.map(x=>x.id),Array.from({length:12},(_,i)=>200+i));assert.equal(ZOMBIES.length,35);
  for(const [defs,file]of [[ORIGINAL_PLANTS,'SandboxPlants.h'],[ORIGINAL_ZOMBIES,'SandboxZombies.h']]){
   const source=(await read('src/'+file)).toString();for(const d of defs){assert.ok(source.includes(d.name));assert.ok(source.includes(d.note));}
  }
  for(const p of ORIGINAL_PLANTS)assert.equal(validateLayout({schema:1,map:0,plants:[{type:p.id,col:0,row:0}]}).plants[0].type,p.id);
- assert.throws(()=>validateLayout({schema:1,map:0,plants:[{type:118,col:0,row:0}]}));
+ assert.throws(()=>validateLayout({schema:1,map:0,plants:[{type:120,col:0,row:0}]}));
  assert.doesNotThrow(()=>validateLayout({schema:1,map:0,plants:[{type:111,col:0,row:0},{type:35,col:0,row:0}]}));
  assert.equal(validateLayout({schema:1,map:0,plants:[{type:109,col:0,row:0}]}).plants[0].type,3);
 });
 test('generated production parts preserve native bone canvases and exclude empty sprites',async()=>{
  const parts=JSON.parse(await read('art/expansion/parts.json'));assert.equal(parts.length,198);
  for(const part of parts){const png=await read('art/expansion/parts/'+part.file);assert.equal(png.readUInt32BE(16),part.width);assert.equal(png.readUInt32BE(20),part.height);assert.equal(png[25],6);const[x,y,w,h]=part.ink;assert.ok(w>0&&h>0&&x>=0&&y>=0&&x+w<=part.width&&y+h<=part.height,part.file);}
+});
+test('native fusion excludes rejected redraw; independent draft ships nine RGBA parts',async()=>{
+ const parts=JSON.parse(await read('art/fusion/parts.json'));assert.equal(parts.length,9);
+ const manifest=JSON.parse(await read('site/resource-manifest.json'));
+ assert.ok(!manifest.files.some(f=>f.path.includes('walnut-pea-')));
+ for(const p of parts){
+  const png=await read('art/fusion/parts/'+p.file);assert.equal(png[25],6);assert.equal(png.readUInt32BE(16),p.width);assert.equal(png.readUInt32BE(20),p.height);
+  assert.equal(createHash('sha256').update(png).digest('hex'),manifest.files.find(f=>f.path==='images/sandbox/'+p.file).sha256);
+ }
+ const fusion=(await read('src/SandboxFusion.h')).toString();assert.match(fusion,/\{0,3,118\}/);assert.doesNotMatch(fusion,/\{0,3,114\}|\{0,18,115\}/);
+ assert.ok(!fusion.includes(',119}'),'independent plant is not locked behind a fusion recipe');
+ const render=(await read('src/SandboxPlants.cpp')).toString();assert.ok(render.includes('NutMouthMatrix'));assert.ok(render.includes('anim->Draw(g)'));
+ assert.ok(render.includes('PeaShooter_mouth.png'));assert.ok(!render.includes('"walnut-pea"'));
+ assert.match((await read('src/Lawn/Plant.cpp')).toString(),/SandboxPlants::Type\(this\)!=118/);
 });
 test('persistent native sidebar fits both rosters and keeps the lawn in original units',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'pvz-sidebar-')),binary=join(dir,'sidebar');

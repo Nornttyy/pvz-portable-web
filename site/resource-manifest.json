@@ -5,12 +5,12 @@
   "revision": "8ba94e95cfe7d0de5682f8258d3b932dbdac885c",
   "sourceArchiveSha256": "ae862d48a42dc3c99fbc5fbd7b9d18a01bd088843ee82f0673cd486d31a754e2",
   "bundle": {
-    "url": "resources/game-67fff9f87f87.zip",
-    "size": 54038823,
-    "sha256": "67fff9f87f87015661f652b67af80214325117148526bf82e296642ec57cbbcf"
+    "url": "resources/game-825132f632df.zip",
+    "size": 54265882,
+    "sha256": "825132f632dfc2d895601131d47fba440333e3726913d068789ea29f00885d61"
   },
-  "totalFiles": 3158,
-  "totalBytes": 65776278,
+  "totalFiles": 3167,
+  "totalBytes": 66001960,
   "compatibility": [
     {
       "path": "properties/partner_logo_.gif",
@@ -62,6 +62,15 @@
       "images/sandbox/bell-zombie-outer-upper-damaged.png",
       "images/sandbox/bell-zombie-outer-upper.png",
       "images/sandbox/bell-zombie-prop.png",
+      "images/sandbox/dandelion-blink.png",
+      "images/sandbox/dandelion-empty.png",
+      "images/sandbox/dandelion-head.png",
+      "images/sandbox/dandelion-hit.png",
+      "images/sandbox/dandelion-left.png",
+      "images/sandbox/dandelion-right.png",
+      "images/sandbox/dandelion-seed.png",
+      "images/sandbox/dandelion-stem.png",
+      "images/sandbox/dandelion-tuft.png",
       "images/sandbox/echo-lily-blink.png",
       "images/sandbox/echo-lily-head.png",
       "images/sandbox/echo-lily-mouth.png",
@@ -15140,6 +15149,51 @@
       "sha256": "7859c2f58070e08c76c9659c12a7117813540375a2f3cffabc6990a642a1d681"
     },
     {
+      "path": "images/sandbox/dandelion-blink.png",
+      "size": 66827,
+      "sha256": "fe1b6e425cc188e271ffd55d0df2fd8809eb9239de3bb1da432d86daf06fcacf"
+    },
+    {
+      "path": "images/sandbox/dandelion-empty.png",
+      "size": 43326,
+      "sha256": "ea93a94c0cdc8d52d6a3e1a302c4e2aad22c4f1a85b2ec7522b06eefeec658ff"
+    },
+    {
+      "path": "images/sandbox/dandelion-head.png",
+      "size": 67253,
+      "sha256": "221c3ba4589b276c2d99a1fb0dcabde4c36e8b3b9514b1553d1a3f8d3d81a0fb"
+    },
+    {
+      "path": "images/sandbox/dandelion-hit.png",
+      "size": 8393,
+      "sha256": "45ffe4c3dcdbea9f1012af26e16d880d7c968b62c4a5c10f3d55638ca4a7f8cc"
+    },
+    {
+      "path": "images/sandbox/dandelion-left.png",
+      "size": 13662,
+      "sha256": "fe8c119375d79b02af8f8f46e8a5543f9a8be8a8993029a3420ff7dc0684887e"
+    },
+    {
+      "path": "images/sandbox/dandelion-right.png",
+      "size": 13378,
+      "sha256": "df625c0ed5e052d855fbacbc865d98e1646095979e63ca052cc311aae09e7b16"
+    },
+    {
+      "path": "images/sandbox/dandelion-seed.png",
+      "size": 3753,
+      "sha256": "e0033d7415075f94ac4b316c2582572e40471dc1f8d50a5b1b159ece7bf8b081"
+    },
+    {
+      "path": "images/sandbox/dandelion-stem.png",
+      "size": 6715,
+      "sha256": "e23a2809e49cd3a76d7678b317b3b2b0ddb52cce416a95b4bc26600feebd4a06"
+    },
+    {
+      "path": "images/sandbox/dandelion-tuft.png",
+      "size": 2375,
+      "sha256": "11de403d77d8db117f57f079cfcd8d8424baab76f99fda45f89bc1e7a35b2300"
+    },
+    {
       "path": "images/sandbox/echo-lily-blink.png",
       "size": 8225,
       "sha256": "ccc0a32a6ffbc11b96e9edfeaa190b5da5c892aa421b714420cde4fcf8e914d4"
@@ -16192,12 +16246,13 @@
   ],
   "delivery": "bundled",
   "sandboxExpansion": {
-    "addedPlants": 9,
+    "addedPlants": 11,
     "addedZombies": 12,
-    "totalCustomPlants": 17,
+    "totalCustomPlants": 19,
     "totalCustomZombies": 12,
-    "parts": 246,
+    "parts": 255,
     "vfxParts": 48,
-    "source": "Built-in image_gen edits with native joint registration; matching head/blink/mouth sets, three-stage storm mushroom, two ranged zombie rigs and damaged arms; original Gatling hardware reused unchanged; separate rig parts and 48 projectile/VFX sprites; prompts in art/expansion"
+    "newRigParts": 9,
+    "source": "Native-part Walnut Peashooter: original Wallnut animation, body, cracks and blink with original PeaShooter mouth attached to anim_face; original pea and impact retained. Generated Dandelion draft remains for independent seed-storage gameplay. Rejected walnut redraw excluded. Existing expansion retained; prompts in art/expansion and art/fusion."
   }
 }

@@ -13,11 +13,13 @@ const read=name=>readFile(join(root,name),'utf8');
 const plant=(type=0,col=0,row=0)=>({type,col,row});
 test('production placement function and repeat state machine pass native tests',async()=>{
  const src=await read('src/Sandbox.cpp'),dir=await mkdtemp(join(tmpdir(),'pvz-placement-'));
- const start=src.indexOf('static int PlacePlant('),end=src.indexOf('static int Spawn(',start);
+ const start=src.indexOf('static Plant* FindFusionTarget('),end=src.indexOf('static int Spawn(',start);
  assert.ok(start>0&&end>start);
  await writeFile(join(dir,'placement-under-test.inc'),src.slice(start,end));
  await run('c++',['-std=c++20','-Isrc','-I'+dir,'tests/sandbox-placement-native.cpp','-o',join(dir,'placement')],{cwd:root});
- assert.match((await run(join(dir,'placement'))).stdout,/Production placement.*passed/);
+ const result=await run(join(dir,'placement'));
+ assert.match(result.stdout,/Production placement.*passed/);
+ assert.match(result.stdout,/Production fusion: ordered recipes.*passed/);
 });
 test('stacked formations round-trip duplicates, mixed units, shells and two-cell cannons',()=>{
  for(const plants of [[plant(),plant()],[plant(),plant(105),plant(30),plant(30)],[plant(47),plant(0,1)]]){
@@ -46,8 +48,9 @@ test('storage bridge restores stacking before planting and detects stacks even a
    calls.push([cmd,type,col,row]);
    if(cmd===0)return flags;if(cmd===18)return 1;
    if(cmd===8){plants=[];return 1;}
-   if(cmd===19){flags=type?flags|16:flags&~16;return 1;}
-   if(cmd===1){assert.ok(flags&16);plants.push({type,col,row});return 1;}
+   if(cmd===19){flags=type?(flags|16)&~64:flags&~16;return 1;}
+   if(cmd===21){flags=type?(flags|64)&~16:flags&~64;return 1;}
+   if(cmd===1){assert.ok(flags&16);assert.equal(flags&64,0);plants.push({type,col,row});return 1;}
    return 1;
  },_pvz_sandbox_plant_data(i,field){const p=plants[i];return p?[p.type,p.col,p.row][field]:-1;}};
  const context=vm.createContext({Module,validateLayout,requiresStacking,LAYOUT_KEY,
@@ -60,4 +63,12 @@ test('storage bridge restores stacking before planting and detects stacks even a
  assert.deepEqual(plants,[plant(),plant()]);
  const enable=calls.findIndex(([cmd,type])=>cmd===19&&type===1),place=calls.findIndex(([cmd])=>cmd===1);
  assert.ok(enable>=0&&place>enable);
+ const noFusion=calls.findIndex(([cmd,type])=>cmd===21&&type===0);assert.ok(noFusion>=0&&noFusion<place);
+});
+test('fusion setting is optional, validated and retained without mutating legacy formations',()=>{
+ const old={schema:1,map:0,plants:[plant(114)]};assert.deepEqual(validateLayout(old),old);
+ for(const fusion of [true,false])assert.equal(validateLayout({...old,fusion}).fusion,fusion);
+ for(const fusion of ['yes',1,null])assert.throws(()=>validateLayout({...old,fusion}));
+ assert.throws(()=>validateLayout({...old,stacked:true,fusion:true}));
+ assert.equal(validateLayout({...old,stacked:true,fusion:false}).fusion,false);
 });

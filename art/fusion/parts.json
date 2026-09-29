@@ -1,0 +1,164 @@
+[
+  {
+    "cell" : [
+      0,
+      0,
+      438,
+      501
+    ],
+    "file" : "dandelion-head.png",
+    "height" : 192,
+    "ink" : [
+      2,
+      2,
+      185,
+      188
+    ],
+    "source" : "dandelion-v1.png",
+    "width" : 189
+  },
+  {
+    "cell" : [
+      438,
+      0,
+      398,
+      501
+    ],
+    "file" : "dandelion-blink.png",
+    "height" : 192,
+    "ink" : [
+      2,
+      2,
+      187,
+      188
+    ],
+    "source" : "dandelion-v1.png",
+    "width" : 191
+  },
+  {
+    "cell" : [
+      836,
+      0,
+      418,
+      501
+    ],
+    "file" : "dandelion-empty.png",
+    "height" : 192,
+    "ink" : [
+      2,
+      2,
+      170,
+      188
+    ],
+    "source" : "dandelion-v1.png",
+    "width" : 174
+  },
+  {
+    "cell" : [
+      0,
+      501,
+      418,
+      433
+    ],
+    "file" : "dandelion-stem.png",
+    "height" : 112,
+    "ink" : [
+      2,
+      2,
+      46,
+      108
+    ],
+    "source" : "dandelion-v1.png",
+    "width" : 50
+  },
+  {
+    "cell" : [
+      418,
+      501,
+      418,
+      433
+    ],
+    "file" : "dandelion-left.png",
+    "height" : 98,
+    "ink" : [
+      2,
+      2,
+      108,
+      94
+    ],
+    "source" : "dandelion-v1.png",
+    "width" : 112
+  },
+  {
+    "cell" : [
+      836,
+      501,
+      418,
+      433
+    ],
+    "file" : "dandelion-right.png",
+    "height" : 99,
+    "ink" : [
+      2,
+      2,
+      108,
+      95
+    ],
+    "source" : "dandelion-v1.png",
+    "width" : 112
+  },
+  {
+    "cell" : [
+      0,
+      934,
+      418,
+      320
+    ],
+    "file" : "dandelion-seed.png",
+    "height" : 41,
+    "ink" : [
+      2,
+      2,
+      60,
+      37
+    ],
+    "source" : "dandelion-v1.png",
+    "width" : 64
+  },
+  {
+    "cell" : [
+      418,
+      934,
+      418,
+      320
+    ],
+    "file" : "dandelion-hit.png",
+    "height" : 63,
+    "ink" : [
+      2,
+      2,
+      76,
+      59
+    ],
+    "source" : "dandelion-v1.png",
+    "width" : 80
+  },
+  {
+    "cell" : [
+      836,
+      934,
+      418,
+      320
+    ],
+    "file" : "dandelion-tuft.png",
+    "height" : 40,
+    "ink" : [
+      2,
+      2,
+      30,
+      36
+    ],
+    "source" : "dandelion-v1.png",
+    "width" : 34
+  }
+]

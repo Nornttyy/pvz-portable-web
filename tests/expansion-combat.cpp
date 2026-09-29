@@ -12,6 +12,7 @@
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 namespace SandboxArt {
 Sexy::Image* Image(const char*,const char*){return nullptr;}void DrawFit(Sexy::Graphics*,Sexy::MemoryImage*,int,int,int,int,float){}
+Sexy::Image* NativeImage(const char*){return nullptr;}
 void Sprite(Sexy::Graphics*,const char*,float,float,float,float,float,int){}
 void Link(Sexy::Graphics*,float,float,float,float,int,int){}
 bool TrackPoint(Reanimation*,const char*,float,float,float,float,float&,float&){return false;}
@@ -25,8 +26,8 @@ struct World:Board{
 };
 int main(){
  for(bool slow:{false,true}){int counter=150,at25=0,at50=0,tick=0;while(counter>0){if(slow&&tick%3==0&&SandboxCombatRules::CanSlow(counter))++counter;else if(!slow&&tick%2==0&&SandboxCombatRules::CanHaste(counter))--counter;--counter;if(counter==25)++at25;if(counter==50)++at50;++tick;}assert(at25==1&&at50==1);}
- assert(SandboxPlants::Definitions.size()==17);assert(SandboxZombies::Definitions.size()==12);
- for(int i=108;i<118;++i)assert(SandboxRules::ValidPlant(i)==(i!=109));assert(!SandboxRules::ValidPlant(118));
+ assert(SandboxPlants::Definitions.size()==19);assert(SandboxZombies::Definitions.size()==12);
+ for(int i=108;i<120;++i)assert(SandboxRules::ValidPlant(i)==(i!=109));assert(!SandboxRules::ValidPlant(120));
  for(int i=200;i<212;++i)assert(SandboxRules::ValidZombie(i));assert(!SandboxRules::ValidZombie(212));
  for(int i=0;i<18;++i){auto b=SandboxUIRules::SidebarPlant(i);assert(b.x>=0&&b.x+b.w<=SandboxUIRules::SidebarWidth&&b.y+b.h<520);}
  {World w;auto* p=w.add(107);assert(SandboxPlants::NextShot(p)==1);assert(SandboxPlants::NextShot(p)==2);assert(SandboxPlants::NextShot(p)==1);}
@@ -59,5 +60,11 @@ int main(){
  {World w;auto* rear=w.add(0,1);auto* front=w.add(3,2);auto* shell=w.add(30,2);w.enemy(210,400);w.step(190);auto* s=w.mProjectiles.values.back();s->mPosX=front->mX+70;assert(SandboxZombies::CollisionTarget(s)==shell);shell->mDead=true;assert(SandboxZombies::CollisionTarget(s)==front);front->mDead=true;assert(!SandboxZombies::CollisionTarget(s));s->mPosX=rear->mX+70;assert(SandboxZombies::CollisionTarget(s)==rear);s->mRow=1;assert(!SandboxZombies::CollisionTarget(s));}
  {World w;auto* p=w.add(0);w.enemy(211,400);w.step(220);assert(w.mProjectiles.mSize==1);auto* s=w.mProjectiles.values.back();SandboxZombies::Impact(s,p);assert(p->mPlantHealth==288&&SandboxZombies::AttackSlowed(p));w.mPaused=true;w.step(1000);assert(SandboxZombies::AttackSlowed(p));w.mPaused=false;w.step(240);assert(!SandboxZombies::AttackSlowed(p));}
  {World w;w.add(0);auto* z=w.enemy(210,400);z->mMindControlled=true;w.step(1000);assert(w.mProjectiles.mSize==0);z->mMindControlled=false;w.mProjectiles.mSize=w.mProjectiles.mMaxSize-8;w.step(190);assert(w.ownedShots.empty());SandboxZombies::Reset();assert(SandboxZombies::Speed(z)==1);}
- std::cout<<"30 production combat scenarios passed; growth, ranged projectiles, pause, cleanup, caps, roles and IDs verified\n";
+ {World w;auto* p=w.add(118);assert(p->mSeedType==3&&p->mPlantHealth==2400&&p->mPlantMaxHealth==2400&&p->mLaunchRate==200);auto* s=w.fire(p,nullptr);assert(!SandboxPlants::UsesCustomShotArt(s)&&!SandboxPlants::Impact(s,nullptr));w.enemy();w.step(100);assert(w.mProjectiles.mSize==2);w.step(200);assert(w.mProjectiles.mSize==3);p->mSquished=true;w.step(400);assert(w.mProjectiles.mSize==3);}
+ {World w;auto* p=w.add(119);w.step(1000);assert(w.mProjectiles.mSize==0);auto* z=w.enemy();w.step(37);assert(w.mProjectiles.mSize==3);for(auto* s:w.mProjectiles){assert(SandboxPlants::UsesCustomShotArt(s));SandboxPlants::Impact(s,z);}assert(z->mBodyHealth==928);w.mPaused=true;w.step(500);assert(w.mProjectiles.mSize==3);w.mPaused=false;w.step(124);assert(w.mProjectiles.mSize==4);assert(p->mLaunchCounter==9999);}
+ {World w;w.add(119);auto* z=w.enemy();w.step(1);assert(w.mProjectiles.mSize==1);z->mDead=true;w.step(50);assert(w.mProjectiles.mSize==1);w.enemy();w.step(19);assert(w.mProjectiles.mSize==3);}
+ {World w;w.add(119);w.enemy();w.mProjectiles.mSize=w.mProjectiles.mMaxSize-8;w.step(100);assert(w.ownedShots.empty());w.mProjectiles.mSize=0;w.step(37);assert(w.mProjectiles.mSize==3);}
+ {World w;auto* p=w.add(119);w.enemy();p->mIsAsleep=true;w.step(500);assert(w.mProjectiles.mSize==0);p->mIsAsleep=false;w.step();assert(w.mProjectiles.mSize==1);auto* s=w.mProjectiles.values.back();s->mProjectileType=PROJECTILE_FIREBALL;assert(!SandboxPlants::UsesCustomShotArt(s)&&!SandboxPlants::Impact(s,nullptr));}
+ {World w;auto* p=w.add(119);w.enemy();p->mSquished=true;w.step(500);assert(w.mProjectiles.mSize==0);p->mSquished=false;p->airborne=true;w.step(500);assert(w.mProjectiles.mSize==0);p->airborne=false;w.step();assert(w.mProjectiles.mSize==1);}
+ std::cout<<"36 production combat scenarios passed; growth, ranged projectiles, pause, cleanup, caps, roles, fusion and independent plants verified\n";
 }

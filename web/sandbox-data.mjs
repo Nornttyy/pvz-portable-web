@@ -15,6 +15,8 @@ export const ORIGINAL_PLANTS = [
   [112,0,'电能豌豆','电击跳向附近两只敌人'],[113,0,'小豌豆','体型小 · 攻速快 · 单发伤害低'],
   [114,0,'重炮豌豆','慢速重击 · 推退敌人'],[115,0,'散射豌豆','三发散射 · 攻击相邻三路'],
   [116,0,'追击豌豆','子弹转向 · 自动追击敌人'],[117,0,'腐化豌豆','命中后持续伤害 · 再次命中刷新'],
+  [118,3,'坚果豌豆','豌豆与坚果合成 · 厚壳防守 · 普通豌豆弹'],
+  [119,0,'储种花','直接种植 · 储存三粒种子 · 遇敌连续发射'],
 ].map(([id,base,name,note])=>({id,base,name,note}));
 export const PLANTS = [...plantNames.map((name,id) => ({id,name,note:notes[id] ?? '免费 · 无冷却'})),...ORIGINAL_PLANTS];
 const validPlant = id => (id>=0&&id<48)||ORIGINAL_PLANTS.some(p=>p.id===id);
@@ -55,6 +57,8 @@ export function requiresStacking(plants) {
 export function validateLayout(value) {
   if (value?.schema !== 1 || ![0,1].includes(value.map) || !Array.isArray(value.plants) || value.plants.length > 180) throw Error('不是支持的沙盒阵型文件');
   if(value.stacked!==undefined&&typeof value.stacked!=='boolean')throw Error('同格种植设置无效');
+  if(value.fusion!==undefined&&typeof value.fusion!=='boolean')throw Error('融合设置无效');
+  if(value.stacked&&value.fusion)throw Error('融合和同格种植不能同时开启');
   const stacked=value.stacked===true;
   const seen = new Set();
   const plants = value.plants.map(p=>{
@@ -90,5 +94,5 @@ export function validateLayout(value) {
       if(water&&!right.types?.has(16)) throw Error('玉米加农炮的第二格缺少睡莲');
     }
   }
-  return {schema:1,map:value.map,...(stacked?{stacked:true}:{}),plants:plants.sort((a,b)=>layer(a)-layer(b))};
+  return {schema:1,map:value.map,...(stacked?{stacked:true}:{}),...(value.fusion!==undefined?{fusion:value.fusion}:{}),plants:plants.sort((a,b)=>layer(a)-layer(b))};
 }

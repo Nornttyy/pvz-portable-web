@@ -5,12 +5,34 @@
 #include "SandboxPlants.h"
 #include "SandboxZombies.h"
 #include "SandboxVisualRules.h"
+#include "SandboxNewPlantRules.h"
 #include <cassert>
 #include <cmath>
 #include <iostream>
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
+ // Native walnut pixels and damage frames are unchanged. The attached original
+ // pea mouth and bullet birth use the same native bone transform.
+ {Board w;Sexy::Graphics rig(nullptr);rig.mTransX=200;rig.mTransY=300;
+  auto* nut=w.plant(2,2);SandboxPlants::Assign(nut,118);testBlits.clear();
+  assert(SandboxPlants::DrawBody(&rig,nut,0,0));assert(testBlits.size()==2);
+  near(testBlits[0].matrix.m02,241.4f);assert(testBlits[0].path.ends_with("reanim/Wallnut_body.png"));assert(testBlits[1].path.ends_with("reanim/PeaShooter_mouth.png"));
+  nut->mPlantHealth=1500;testBlits.clear();SandboxPlants::DrawBody(&rig,nut,0,0);assert(testBlits[0].path.ends_with("Wallnut_cracked1.png"));
+  nut->mPlantHealth=500;testBlits.clear();SandboxPlants::DrawBody(&rig,nut,0,0);assert(testBlits[0].path.ends_with("Wallnut_cracked2.png"));
+  auto* shot=w.AddProjectile(0,0,0,2,PROJECTILE_PEA);SandboxPlants::OnFired(nut,shot,nullptr);
+  SandboxPlants::DrawBody(&rig,nut,0,0);const auto mouth=testBlits.back().matrix;
+  near(shot->mPosX+12,nut->mX+mouth.m02-200+mouth.m00*14.5f);near(shot->mPosY+12,nut->mY+mouth.m12-300+mouth.m10*14.5f);
+  // Rotated/scaled idle frame (and support offset) must carry the muzzle too.
+  Reanimation nutAnim;nutAnim.track="anim_face";nutAnim.matrix={0.65f,-0.1f,43,0.1f,0.7f,32};app.reanims[92]=&nutAnim;nut->mBodyReanimID=92;
+  SandboxPlants::OnFired(nut,shot,nullptr);SandboxPlants::DrawBody(&rig,nut,0,0);const auto moving=testBlits.back().matrix;
+  near(shot->mPosX+12,nut->mX+moving.m02-200+moving.m00*14.5f);near(shot->mPosY+12,nut->mY+moving.m12-300+moving.m10*14.5f);
+  nut->mBodyReanimID=0;app.reanims.clear();assert(SandboxPlants::DrawBody(&rig,nut,0,0,true));near(testBlits.back().matrix.m11,0.719f*0.85f*0.25f);
+  auto* flower=w.plant(1,1);SandboxPlants::Assign(flower,119);testBlits.clear();assert(SandboxPlants::DrawBody(&rig,flower,0,0));assert(testBlits.size()==7);
+  auto* seed=w.AddProjectile(100,200,0,1,PROJECTILE_PEA);SandboxPlants::OnFired(flower,seed,nullptr);rig.mTransX=seed->mX;rig.mTransY=seed->mY;
+  assert(SandboxPlants::DrawShot(&rig,seed));assert(testBlits.back().path.ends_with("dandelion-seed.png"));near(testBlits.back().matrix.m02+8,seed->mPosX+12);near(testBlits.back().matrix.m12,seed->mPosY+12);
+  assert(SandboxPlants::ShotRadius(seed)==7);seed->mProjectileType=PROJECTILE_FIREBALL;assert(!SandboxPlants::DrawShot(&rig,seed));
+  SandboxPlants::Reset();testBlits.clear();}
  // Actual production Skin() is exercised through Assign, including stale override removal.
  Board skinBoard;
  Track tracks[]={{"anim_face"},{"GatlingPea_mouth"},{"GatlingPea_barrel1"},{"GatlingPea_barrel2"},{"GatlingPea_barrel3"},{"GatlingPea_barrel4"},{"GatlingPea_mouth_overlay"},{"GatlingPea_helmet"},{"unrelated_mouth_decoration"}};

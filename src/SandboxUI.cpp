@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 #include "Sandbox.h"
 #include "SandboxRules.h"
+#include "SandboxFusion.h"
 #include "SandboxUIRules.h"
 #include "SandboxPlants.h"
 #include "SandboxZombies.h"
@@ -22,6 +23,7 @@
 #include "widget/Dialog.h"
 #include "widget/Widget.h"
 #include <array>
+#include <algorithm>
 #include <format>
 #include <memory>
 #include <chrono>
@@ -119,10 +121,19 @@ std::string SelectedName() {
     if(auto* custom=SandboxZombies::Find(selectedZombie))return custom->name;
     return std::string(PvzpStringTranslate(std::string("[")+GetZombieDefinition(static_cast<ZombieType>(selectedZombie)).mZombieName+"]"));
 }
+std::string PlantName(int type){
+    const auto* custom=SandboxPlants::Find(type);
+    return custom?custom->name:Plant::GetNameString(static_cast<SeedType>(type));
+}
 bool Place(int cell, bool erase=false) {
     if(cell<0)return false;
     const int result=Command(erase||tool==EraseTool?3:tool==PlantTool?1:2,tool==PlantTool?selectedPlant:selectedZombie,cell%9,cell/9);
-    if(result>0)dirty=true;
+    if(result>0){
+        dirty=true;
+        if(const auto* fused=SandboxPlants::Find(result)){
+            Say(fused->name);gLawnApp->PlaySample(SOUND_PLANTGROW);
+        }
+    }
     else if(result==-3)Say("数量已满，请先清理场地");
     else if(result==-5)Say("这只僵尸不能放在此处");
     else Say("不能放在这里，请检查位置和底座");
@@ -215,11 +226,11 @@ void SandboxDrawUI(Graphics* g) {
     Button(g,Control(2),"菜单",panel==3);
     Button(g,Control(3),flags&2?"开始":"暂停");
     Button(g,Control(4),std::format("{}x",static_cast<int>(gLawnApp->mUpdateMultiplier)));
-    Button(g,Control(5),"每路一只");
+    Button(g,Control(5),flags&64?"合成：开":"合成：关",flags&64);
     Button(g,Control(6),flags&32?"连放：开":"连放：关",flags&32);
     Button(g,Control(7),flags&16?"同格：开":"同格：关",flags&16);
 
-    std::string title=catalog==2?"所有僵尸":plantPage?"原创植物":"所有植物";
+    std::string title=catalog==3?"合成配方":catalog==2?"所有僵尸":plantPage?"原创植物":"所有植物";
     std::string hoverName;
     if(catalog==2){
         const int count=int(Zombies.size()+SandboxZombies::Definitions.size());
@@ -233,6 +244,22 @@ void SandboxDrawUI(Graphics* g) {
                 else hoverName=PvzpStringTranslate(std::string("[")+GetZombieDefinition(static_cast<ZombieType>(id)).mZombieName+"]");
             }
         }
+    }else if(catalog==3){
+        for(int i=0;i<RecipesPerPage;++i){
+            const int index=catalogPage*RecipesPerPage+i;
+            if(index>=int(SandboxFusion::Recipes.size()))break;
+            const auto& recipe=SandboxFusion::Recipes[index];
+            const std::array<int,3> types{recipe.first,recipe.second,recipe.result};
+            for(int part=0;part<3;++part){
+                const auto b=RecipeCard(i,part);SandboxPlants::DrawCard(g,b.x,b.y,types[part]);
+                if(part<2&&tool==PlantTool&&selectedPlant==types[part])Outline(g,b);
+                if(Hover(b))hoverName=PlantName(types[part]);
+            }
+            PvzpDrawString(g,"+",80,RecipeCard(i,0).y+41,FONT_DWARVENTODCRAFT18,Color(244,215,125),DS_ALIGN_CENTER);
+            PvzpDrawString(g,"=",174,RecipeCard(i,0).y+41,FONT_DWARVENTODCRAFT18,Color(244,215,125),DS_ALIGN_CENTER);
+        }
+        Button(g,PrevPage,"<");Button(g,NextPage,">");
+        PvzpDrawString(g,std::format("{}/{}",catalogPage+1,(SandboxFusion::Recipes.size()+RecipesPerPage-1)/RecipesPerPage),132,578,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
     }else{
         const int count=plantPage?int(SandboxPlants::Definitions.size()):48;
         for(int i=0;i<25&&i+catalogPage*25<count;++i){
@@ -241,11 +268,15 @@ void SandboxDrawUI(Graphics* g) {
             if(tool==PlantTool&&selectedPlant==id)Outline(g,b);
             if(Hover(b)){Outline(g,b);const auto* d=SandboxPlants::Find(id);hoverName=d?d->name:Plant::GetNameString(static_cast<SeedType>(id));}
         }
-        Button(g,NativeFilter,"原版",!plantPage);Button(g,CustomFilter,"原创",plantPage);
         if(!plantPage){
             Button(g,PrevPage,"<");Button(g,NextPage,">");
             PvzpDrawString(g,std::format("{}/2",catalogPage+1),132,578,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
         }
+    }
+    if(catalog!=2){
+        Button(g,NativeFilter,"原版",catalog==1&&!plantPage);
+        Button(g,CustomFilter,"原创",catalog==1&&plantPage);
+        Button(g,FusionFilter,"配方",catalog==3);
     }
     PvzpDrawString(g,title,132,107,FONT_DWARVENTODCRAFT18,Color(92,230,40),DS_ALIGN_CENTER);
     if(!hoverName.empty())PvzpDrawString(g,hoverName,132,catalog==2?578:512,FONT_BRIANNETOD12,Color(244,215,125),DS_ALIGN_CENTER);
@@ -254,8 +285,14 @@ void SandboxDrawUI(Graphics* g) {
         const int cell=Cell(wm->mLastMouseX-WorldOffset,wm->mLastMouseY,bool(flags&4));
         if(cell>=0&&tool!=InteractTool){
             const int h=flags&4?85:100;
-            g->SetColor(tool==EraseTool?Color(220,65,45,70):Color(245,244,103,55));
+            const int fusion=tool==PlantTool?Command(22,selectedPlant,cell%9,cell/9):0;
+            g->SetColor(tool==EraseTool?Color(220,65,45,70):fusion?Color(103,242,80,90):Color(245,244,103,55));
             g->FillRect(WorldOffset+40+cell%9*80,80+cell/9*h,80,h);
+            if(fusion){
+                const int px=std::clamp(wm->mLastMouseX+18,SidebarWidth+2,CanvasWidth-54);
+                const int py=std::clamp(wm->mLastMouseY-76,82,520);
+                SandboxPlants::DrawCard(g,px,py,fusion);
+            }
         }
         if(messageTicks>0)PvzpDrawString(g,message,624,598,FONT_BRIANNETOD12,Color(35,30,17),DS_ALIGN_CENTER);
         return;
@@ -290,11 +327,11 @@ bool SandboxMouseDown(int x,int y,int clicks) {
     }
     for(int i=0;i<ControlCount;++i)if(Control(i).Contains(x,y)){
         StopPainting();gLawnApp->PlaySample(SOUND_GRAVEBUTTON);
-        if(i<2){catalog=i+1;}
+        if(i<2){catalog=i+1;catalogPage=0;}
         else if(i==2)OpenPanel(3);
         else if(i==3)Command(4,flags&2?0:1);
         else if(i==4){int speed=static_cast<int>(gLawnApp->mUpdateMultiplier);Command(5,speed==4?1:speed*2);}
-        else if(i==5)Command(11,selectedZombie);
+        else if(i==5){Command(21,flags&64?0:1);dirty=true;}
         else if(i==6){Command(20,flags&32?0:1);if(!(flags&32))Say("按住连续放置，拖动换位置，松手停止");}
         else {Command(19,flags&16?0:1);dirty=true;if(!(flags&16))Say("同一格可种多株，铲子每次移除一株");}
         return true;
@@ -313,7 +350,24 @@ bool SandboxMouseDown(int x,int y,int clicks) {
                 tool=ZombieTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;
             }
         }else{
-            if(NativeFilter.Contains(x,y)||CustomFilter.Contains(x,y)){plantPage=CustomFilter.Contains(x,y)?1:0;catalogPage=0;return true;}
+            if(FusionFilter.Contains(x,y)){catalog=3;catalogPage=0;return true;}
+            if(NativeFilter.Contains(x,y)||CustomFilter.Contains(x,y)){catalog=1;plantPage=CustomFilter.Contains(x,y)?1:0;catalogPage=0;return true;}
+            if(catalog==3){
+                const int pages=(SandboxFusion::Recipes.size()+RecipesPerPage-1)/RecipesPerPage;
+                if(PrevPage.Contains(x,y)||NextPage.Contains(x,y)){
+                    catalogPage=(catalogPage+(NextPage.Contains(x,y)?1:pages-1))%pages;return true;
+                }
+                for(int i=0;i<RecipesPerPage;++i){
+                    const int index=catalogPage*RecipesPerPage+i;
+                    if(index>=int(SandboxFusion::Recipes.size()))break;
+                    const auto& recipe=SandboxFusion::Recipes[index];
+                    for(int part=0;part<2;++part)if(RecipeCard(i,part).Contains(x,y)){
+                        selectedPlant=part?recipe.second:recipe.first;plants[plantSlot]=selectedPlant;
+                        tool=PlantTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;
+                    }
+                }
+                return true;
+            }
             if(!plantPage&&(PrevPage.Contains(x,y)||NextPage.Contains(x,y))){catalogPage=1-catalogPage;return true;}
             const int count=plantPage?int(SandboxPlants::Definitions.size()):48;
             for(int i=0;i<25&&i+catalogPage*25<count;++i)if(SidebarPlant(i).Contains(x,y)){

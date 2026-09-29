@@ -203,7 +203,7 @@ index 665fcca..98ac916 100644
  
  	if (mApp->mGameScene == GameScenes::SCENE_LEVEL_INTRO &&
 diff --git a/src/Lawn/Plant.cpp b/src/Lawn/Plant.cpp
-index c934659..a024233 100644
+index c934659..60cc06a 100644
 --- a/src/Lawn/Plant.cpp
 +++ b/src/Lawn/Plant.cpp
 @@ -30,6 +30,7 @@
@@ -234,7 +234,7 @@ index c934659..a024233 100644
  
  Reanimation* Plant::AttachBlinkAnim(Reanimation* theReanimBody)
  {
-+    if (SandboxPlants::IsCustom(this)) return nullptr; // Separate generated blink frame, driven by sandbox tick.
++    if (SandboxPlants::IsCustom(this) && SandboxPlants::Type(this)!=118) return nullptr; // Native walnut fusion keeps its original blink attachment.
  	const PlantDefinition& aPlantDef = GetPlantDefinition(mSeedType);
  	LawnApp* aApp = (LawnApp*)gSexyAppBase;
  	Reanimation* aAnimToAttach = theReanimBody;
@@ -246,7 +246,26 @@ index c934659..a024233 100644
  	if (aShadowType == 0)
  	{
  		PvzpDrawImageCelCenterScaledF(g, IMAGE_PLANTSHADOW, theOffsetX + aShadowOffsetX, theOffsetY + aShadowOffsetY, 0, aScale, aScale);
-@@ -4675,6 +4680,8 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
+@@ -3957,6 +3962,7 @@ void Plant::Draw(Graphics* g)
+ 			aOffsetY -= 20.0f;
+ 		}
+ 
++		if (SandboxPlants::DrawBody(g,this,aOffsetX,aOffsetY,true)) return;
+ 		g->SetScale(1.0f, 0.25f, 0.0f, 0.0f);
+ 		DrawSeedType(g, mSeedType, mImitaterType, DrawVariation::VARIATION_NORMAL, aOffsetX, 60.0f + aOffsetY);
+ 		g->SetScale(1.0f, 1.0f, 0.0f, 0.0f);
+@@ -4027,6 +4033,10 @@ void Plant::Draw(Graphics* g)
+ 		{
+ 			mBoard->mChallenge->IZombieDrawPlant(g, this);
+ 		}
++		else if (SandboxPlants::DrawBody(g,this,aOffsetX,aOffsetY))
++		{
++			// New rigs own all body pixels; the native shadow and pumpkin back above remain.
++		}
+ 		else if (mBodyReanimID != ReanimationID::REANIMATIONID_NULL)
+ 		{
+ 			Reanimation* aBodyReanim = mApp->ReanimationTryToGet(mBodyReanimID);
+@@ -4675,6 +4685,8 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
  		mApp->AddPvzpParticle(aOriginX + 27, aOriginY + 13, aRenderPosition, ParticleEffect::PARTICLE_PUFFSHROOM_MUZZLE);
  	}
  
@@ -255,7 +274,7 @@ index c934659..a024233 100644
  	Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder - 1, theRow, aProjectileType);
  	aProjectile->mDamageRangeFlags = GetDamageRangeFlags(thePlantWeapon);
  
-@@ -4765,6 +4772,10 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
+@@ -4765,6 +4777,10 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
  		aProjectile->mCobTargetX = mTargetX - 40;
  		aProjectile->mCobTargetRow = mBoard->PixelToGridYKeepOnBoard(mTargetX, mTargetY);
  	}

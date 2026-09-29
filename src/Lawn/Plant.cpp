@@ -2892,7 +2892,7 @@ bool Plant::NotOnGround()
 
 Reanimation* Plant::AttachBlinkAnim(Reanimation* theReanimBody)
 {
-    if (SandboxPlants::IsCustom(this)) return nullptr; // Separate generated blink frame, driven by sandbox tick.
+    if (SandboxPlants::IsCustom(this) && SandboxPlants::Type(this)!=118) return nullptr; // Native walnut fusion keeps its original blink attachment.
 	const PlantDefinition& aPlantDef = GetPlantDefinition(mSeedType);
 	LawnApp* aApp = (LawnApp*)gSexyAppBase;
 	Reanimation* aAnimToAttach = theReanimBody;
@@ -3962,6 +3962,7 @@ void Plant::Draw(Graphics* g)
 			aOffsetY -= 20.0f;
 		}
 
+		if (SandboxPlants::DrawBody(g,this,aOffsetX,aOffsetY,true)) return;
 		g->SetScale(1.0f, 0.25f, 0.0f, 0.0f);
 		DrawSeedType(g, mSeedType, mImitaterType, DrawVariation::VARIATION_NORMAL, aOffsetX, 60.0f + aOffsetY);
 		g->SetScale(1.0f, 1.0f, 0.0f, 0.0f);
@@ -4031,6 +4032,10 @@ void Plant::Draw(Graphics* g)
 		if (IsInPlay() && mApp->IsIZombieLevel())
 		{
 			mBoard->mChallenge->IZombieDrawPlant(g, this);
+		}
+		else if (SandboxPlants::DrawBody(g,this,aOffsetX,aOffsetY))
+		{
+			// New rigs own all body pixels; the native shadow and pumpkin back above remain.
 		}
 		else if (mBodyReanimID != ReanimationID::REANIMATIONID_NULL)
 		{

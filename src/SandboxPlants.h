@@ -8,7 +8,7 @@ namespace Sexy { class Graphics; }
 namespace SandboxPlants {
 enum class Element { Fire, Ice, Alternating, Native };
 struct Definition { int id, base; Element element; const char* name; const char* note; const char* art=nullptr; int rate=0,damage=20; float scale=1.0f; };
-inline constexpr std::array<Definition,17> Definitions{{
+inline constexpr std::array<Definition,19> Definitions{{
     {100,0,Element::Fire,"火焰豌豆","火球攻击 · 小范围伤害"},
     {101,7,Element::Ice,"双发寒冰","连续两发 · 寒冰减速"},
     {102,7,Element::Fire,"双发火焰","连续两发 · 火球攻击"},
@@ -26,6 +26,8 @@ inline constexpr std::array<Definition,17> Definitions{{
     {115,0,Element::Native,"散射豌豆","三发散射 · 攻击相邻三路","scatter-pea",180,14},
     {116,0,Element::Native,"追击豌豆","子弹转向 · 自动追击敌人","seeker-pea",180,18},
     {117,0,Element::Native,"腐化豌豆","命中后持续伤害 · 再次命中刷新","acid-pea",180,12},
+    {118,3,Element::Native,"坚果豌豆","豌豆与坚果合成 · 厚壳防守 · 普通豌豆弹","native-walnut",200,20},
+    {119,0,Element::Native,"储种花","直接种植 · 储存三粒种子 · 遇敌连续发射","dandelion",160,24},
 }};
 constexpr const Definition* Find(int id) {
     for(const auto& d:Definitions)if(d.id==id)return &d;
@@ -46,6 +48,8 @@ bool IsCustom(const Plant* plant);
 int NextShot(Plant* plant);
 void Tick(Board* board);
 void DrawCard(Sexy::Graphics* g,int x,int y,int id);
+// Complete generated cutout rigs; native shadows/support layers stay in Plant::Draw.
+bool DrawBody(Sexy::Graphics* g,const Plant* plant,float x,float y,bool squished=false);
 void OnFired(Plant* plant,Projectile* shot,Zombie* target);
 bool Impact(Projectile* shot,Zombie* target);
 void ForgetShot(Projectile* shot);
