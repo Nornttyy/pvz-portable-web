@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Chinese adventure and sandbox: four fixed meme characters; infusion retired",
+  "mode": "Abstract adventure: friendly bumping walnut, self-thrower unlock at 1-8, backup-phone zombie; native unlabeled cards and saves preserved",
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 276852,
-      "sha256": "bcb86252dd22212cb98dd43d4cf237f26881cc561d8bfaeb0b90ea3f5097ca49"
+      "size": 276955,
+      "sha256": "be40362cbcbf6969f967ce84b9ad15a298e106b1e0edd93ca2b28ea845da8f83"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7418772,
-      "sha256": "bf1f17ee2885f0b0ce0ec34a36ab920bedbf723a6ab71b1bdad88b692c86b1cd"
+      "size": 7444563,
+      "sha256": "133726d13fa458ebb9ff9def5f04d93c58ddbfdc17c8a24531834fd8012fa1f0"
     }
   ]
 }

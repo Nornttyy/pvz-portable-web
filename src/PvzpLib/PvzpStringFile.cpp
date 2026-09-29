@@ -23,6 +23,7 @@
 #include "PvzpDebug.h"
 #include "PvzpCommon.h"
 #include "PvzpStringFile.h"
+#include "../MemeAdventure.h"
 #include "paklib/PakInterface.h"
 #include "graphics/Font.h"
 
@@ -164,7 +165,7 @@ std::string_view PvzpStringListFind(std::string_view theName)
 	auto anItr = gSexyAppBase->mStringProperties.find(theName);
 	if (anItr != gSexyAppBase->mStringProperties.end())
 	{
-		return anItr->second;
+		return MemeAdventure::Translate(theName,anItr->second);
 	}
 	else
 	{
@@ -191,7 +192,7 @@ std::optional<std::string_view> PvzpStringTryTranslate(std::string_view theStrin
 		std::string_view aName = theString.substr(1, theString.size() - 2);
 		auto anItr = gSexyAppBase->mStringProperties.find(aName);
 		if (anItr != gSexyAppBase->mStringProperties.end())
-			return anItr->second;
+			return MemeAdventure::Translate(aName,anItr->second);
 	}
 	return std::nullopt;
 }

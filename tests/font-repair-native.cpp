@@ -3,7 +3,7 @@
 #include "../src/SandboxFontRules.h"
 #include <cassert>
 #include <iostream>
-namespace Sexy {_Font* FONT_BRIANNETOD12=nullptr;_Font* FONT_DWARVENTODCRAFT18=nullptr;_Font* FONT_DWARVENTODCRAFT24=nullptr;_Font* FONT_DWARVENTODCRAFT18GREENINSET=nullptr;_Font* FONT_DWARVENTODCRAFT18BRIGHTGREENINSET=nullptr;}
+namespace Sexy {_Font* FONT_BRIANNETOD12=nullptr;_Font* FONT_BRIANNETOD16=nullptr;_Font* FONT_DWARVENTODCRAFT18=nullptr;_Font* FONT_DWARVENTODCRAFT24=nullptr;_Font* FONT_DWARVENTODCRAFT18YELLOW=nullptr;_Font* FONT_DWARVENTODCRAFT18GREENINSET=nullptr;_Font* FONT_DWARVENTODCRAFT18BRIGHTGREENINSET=nullptr;_Font* FONT_HOUSEOFTERROR16=nullptr;_Font* FONT_HOUSEOFTERROR28=nullptr;}
 using namespace Sexy;
 void check(int cell,int advance,int offset,int split,bool measured){
     FontData data;data.mFontLayerList.emplace_back();

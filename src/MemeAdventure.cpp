@@ -1,8 +1,7 @@
-// Fixed-character seed drawer. Native adventure progress and seed bank are intact.
+// Adventure replacements retain native seed IDs, tutorial gates and save layout.
 #include "MemeAdventure.h"
 #include "MemeAdventureRules.h"
 #include "Sandbox.h"
-#include "SandboxButton.h"
 #include "SandboxFonts.h"
 #include "LawnApp.h"
 #include "Resources.h"
@@ -13,8 +12,9 @@
 #include "Lawn/SeedPacket.h"
 #include "PvzpLib/PvzpCommon.h"
 #include "graphics/Graphics.h"
-#include "widget/WidgetManager.h"
-#include <format>
+#include "graphics/Font.h"
+#include "misc/SexyMatrix.h"
+#include <map>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #else
@@ -22,99 +22,95 @@
 #endif
 namespace MemeAdventure {
 namespace {
-int power=500,cooldown=0,noticeTime=0;
-bool choosing=false,selected=false,fontsReady=false;
-std::string notice;
 Save pending;
+bool fontsReady=false;
 bool Running(Board* b){return Visible(b)&&!b->mPaused&&!b->mTimeStopCounter&&!b->mLevelComplete&&!b->mLevelAwardSpawned&&b->mApp->GetDialogCount()==0;}
-void Say(const char* text){notice=text;noticeTime=140;}
-bool Unlocked(Board* b,int id){const auto* d=MemeCharacters::Find(id);return d&&(b->mApp->HasFinishedAdventure()||b->mLevel>=d->unlock);}
 }
-void Reset(){power=500;cooldown=0;noticeTime=0;choosing=selected=fontsReady=false;notice.clear();pending={};}
-int UIState(){return choosing?1:selected?2:0;}
-bool Visible(Board* b){return b&&!gSandboxEnabled&&b->mApp->IsAdventureMode()&&b->mApp->mGameScene==SCENE_PLAYING&&!b->HasConveyorBeltSeedBank()&&!b->mApp->IsChallengeWithoutSeedBank()&&!b->mApp->IsWallnutBowlingLevel()&&!b->mApp->IsScaryPotterLevel();}
-bool Cancel(){const bool used=selected||choosing;selected=choosing=false;return used;}
-void Tick(Board* b){if(!Running(b)){Cancel();return;}if(cooldown)--cooldown;if(noticeTime)--noticeTime;SandboxPlants::Tick(b);}
+bool RosterEnabled(){
+ return gLawnApp&&!gSandboxEnabled&&gLawnApp->IsAdventureMode()&&!gLawnApp->IsWallnutBowlingLevel()&&!gLawnApp->IsScaryPotterLevel()&&!gLawnApp->IsWhackAZombieLevel();
+}
+const MemeCharacters::Definition* Replacement(int seed,int imitater){
+ if(!RosterEnabled())return nullptr;
+ return MemeCharacters::ForBase(seed==48?imitater:seed);
+}
+void Reset(){pending={};fontsReady=false;}
+bool Visible(Board* b){return b&&RosterEnabled()&&b->mApp->mGameScene==SCENE_PLAYING;}
+bool Cancel(){return false;} // Selection belongs to the native seed bank again.
+void Tick(Board* b){if(Running(b))SandboxPlants::Tick(b);}
 bool MouseDown(Board* b,int x,int y,int clicks){
- using namespace MemeAdventureRules;
- if(!Running(b)){Cancel();return false;}
- if(clicks<0)return Cancel();
- if(Slot.Contains(x,y)){b->RefreshSeedPacketFromCursor();b->ClearCursor();selected=false;choosing=!choosing;b->mApp->PlaySample(Sexy::SOUND_SEEDLIFT);return true;}
- if(choosing){
-  for(int i=0;i<4;++i)if(CharacterCard(i).Contains(x,y)){
-   const auto& d=MemeCharacters::Definitions[i];
-   if(!Unlocked(b,d.id)){notice=std::format("{} 解锁",b->mApp->GetStageString(d.unlock));noticeTime=140;return true;}
-   if(cooldown){Say("冷却中");return true;}
-   if(!b->CanTakeSunMoney(d.cost)){Say("阳光不足");b->mOutOfMoneyCounter=70;return true;}
-   power=d.id;selected=true;choosing=false;b->mApp->PlaySample(Sexy::SOUND_SEEDLIFT);return true;
-  }
-  choosing=false;
- }
+ if(!Running(b)||clicks<0||b->mCursorObject->mCursorType!=CURSOR_TYPE_NORMAL)return false;
  HitResult hit;b->MouseHitTest(x,y,&hit);if(hit.mObjectType==OBJECT_TYPE_COIN)return false;
- if(!selected)return b->mCursorObject->mCursorType==CURSOR_TYPE_NORMAL&&MemeCharacters::Click(b,x,y);
- if(y<82){selected=false;return false;}
- const auto* d=MemeCharacters::Find(power);if(!d)return true;
- const int col=b->PixelToGridX(x,y),row=b->PixelToGridY(x,y);
- if(col<0||col>=9||row<0||row>=(b->StageHasPool()?6:5)||b->CanPlantAt(col,row,static_cast<SeedType>(d->base))!=PLANTING_OK){Say("这里不能种植");return true;}
- if(cooldown||!Unlocked(b,power)||!b->CanTakeSunMoney(d->cost))return true;
- if(b->mPlants.mSize>=b->mPlants.mMaxSize-8){Say("场地已满");return true;}
- Plant::PreloadPlantResources(static_cast<SeedType>(d->base));
- auto* p=b->AddPlant(col,row,static_cast<SeedType>(d->base),SEED_NONE);if(!p)return true;
- b->TakeSunMoney(d->cost);SandboxPlants::Assign(p,power);cooldown=Cooldown;selected=false;noticeTime=0;
- b->mApp->PlaySample(Sexy::SOUND_PLANTGROW);b->MarkAllDirty();return true;
+ return MemeCharacters::Click(b,x,y);
 }
-void OnPlanted(Plant*){} // Native cards no longer accept infusion.
-void Draw(Board* b,Sexy::Graphics* graphics){
- if(!Visible(b)||b->mLevelComplete||b->mLevelAwardSpawned)return;
- if(!fontsReady){SandboxRepairFonts();fontsReady=true;}
- using namespace Sexy;using namespace MemeAdventureRules;
- Graphics g(*graphics);const auto* wm=b->mApp->mWidgetManager.get();const int mx=wm->mLastMouseX-b->mX,my=wm->mLastMouseY-b->mY;
- SandboxDrawButton(&g,Slot,cooldown?std::format("新品 {}s",(cooldown+99)/100):"新品",false,selected||choosing||Slot.Contains(mx,my));
- if(choosing){
-  // Crop away the seed bank's sun counter before adapting its wooden tray.
-  g.DrawImage(IMAGE_SEEDBANK,Rect(548,82,244,131),Rect(85,0,IMAGE_SEEDBANK->mWidth-85,IMAGE_SEEDBANK->mHeight));
-  const char* hint="选卡后直接种植";
-  for(int i=0;i<4;++i){const auto box=CharacterCard(i);const auto& d=MemeCharacters::Definitions[i];
-   SandboxPlants::DrawCard(&g,box.x+2,box.y+2,d.id);
-   const bool locked=!Unlocked(b,d.id);
-   if(locked||cooldown){g.SetColor(Color(0,0,0,135));g.FillRect(box.x+2,box.y+2,50,70);}
-   PvzpDrawString(&g,locked?b->mApp->GetStageString(d.unlock):std::string(d.shortName),box.x+27,box.y+89,FONT_BRIANNETOD12,Color(244,216,120),DS_ALIGN_CENTER);
-   if(box.Contains(mx,my))hint=d.hint;
-  }
-  PvzpDrawString(&g,hint,670,204,FONT_BRIANNETOD12,Color(244,216,120),DS_ALIGN_CENTER);
- }
- if(selected){const auto* d=MemeCharacters::Find(power);const int col=b->PixelToGridX(mx,my),row=b->PixelToGridY(mx,my);
-  if(d&&col>=0&&col<9&&row>=0&&row<(b->StageHasPool()?6:5)){
-   const bool valid=b->CanPlantAt(col,row,static_cast<SeedType>(d->base))==PLANTING_OK;
-   g.SetColor(valid?Color(100,230,70,85):Color(220,60,40,85));g.FillRect(b->GridToPixelX(col,row),b->GridToPixelY(col,row),80,b->StageHasPool()?85:100);
-  }
-  Graphics cursor(g);cursor.Translate(std::clamp(mx+12,0,748),std::clamp(my-65,0,528));SandboxPlants::DrawCard(&cursor,0,0,power);
- }
- if(noticeTime)PvzpDrawString(&g,notice,400,585,FONT_BRIANNETOD12,Color(255,224,140),DS_ALIGN_CENTER);
+void OnPlanted(Plant* p){
+ if(!p||p->mDead||MemeCharacters::Is(p))return;
+ // Imitaters acquire the new identity when their normal morph creates the plant.
+ if(const auto* d=Replacement(int(p->mSeedType)))MemeCharacters::Assign(p,d->id);
 }
-Save Capture(Board* b){Save out;out.power=power;out.cooldown=cooldown;
+void Draw(Board* b,Sexy::Graphics*){
+ if(Visible(b)&&!fontsReady){SandboxRepairFonts();fontsReady=true;}
+ // No second tray or floating menu: native cards now own every planting action.
+}
+std::string_view Translate(std::string_view key,std::string_view original){
+ if(gSandboxEnabled||RosterEnabled()){
+  if(key=="NEWSPAPER_ZOMBIE")return "读手机僵尸";
+  if(key=="NEWSPAPER_ZOMBIE_DESCRIPTION")return "边走边刷手机。手机碎了就红温冲锋，四秒后掏出备用机继续刷。身体不会回血。";
+ }
+ if(!RosterEnabled())return original;
+ for(const auto& d:MemeCharacters::Definitions){const std::string_view stem=d.key;
+  if(key==stem)return d.name;
+  if(key.starts_with(stem)){const auto suffix=key.substr(stem.size());if(suffix=="_TOOLTIP")return d.hint;if(suffix=="_DESCRIPTION")return d.description;}
+ }
+ // Tutorial/warning text follows the new card names. Do not rewrite unrelated
+ // terms such as twin sunflower, tall-nut, trophies or the bowling mini-game.
+ if(!key.starts_with("ADVICE_")&&!key.starts_with("SEED_CHOOSER_")&&!key.starts_with("TUTORIAL_"))return original;
+ static std::map<std::string,std::string,std::less<>> cache;
+ if(auto found=cache.find(key);found!=cache.end())return found->second;
+ std::string text(original);
+ for(const auto& pair:{std::pair{"豌豆射手","红温豌豆"},std::pair{"向日葵","已读不回花"},std::pair{"小喷菇","显眼包蘑菇"},std::pair{"坚果墙","顶顶坚果"}}){
+  size_t pos=0;const std::string_view from=pair.first,to=pair.second;
+  while((pos=text.find(from,pos))!=std::string::npos){
+   if(from=="向日葵"&&pos>=6&&text.compare(pos-6,6,"双子")==0){pos+=from.size();continue;}
+   text.replace(pos,from.size(),to);pos+=to.size();
+  }
+ }
+ return cache.emplace(std::string(key),std::move(text)).first->second;
+}
+Save Capture(Board* b){Save out;out.power=0;out.cooldown=0;
  for(auto* p:b->mPlants)if(!p->mDead&&MemeCharacters::Is(p))out.plants.push_back({b->mPlants.DataArrayGetID(p),SandboxPlants::SavePower(p)});
  for(auto* shot:b->mProjectiles)if(!shot->mDead&&SandboxPlants::SaveShot(shot)!=100)out.shots.push_back({b->mProjectiles.DataArrayGetID(shot),SandboxPlants::SaveShot(shot)});return out;
 }
 void Load(const Save& save){pending=save;}
 void LoadShots(const std::vector<SavedShot>& shots){pending.shots=shots;}
 void Restore(Board* b){
- power=MemeCharacters::Is(pending.power)?pending.power:500;cooldown=std::clamp(pending.cooldown,0,MemeAdventureRules::Cooldown);selected=choosing=false;
  if(b->mApp->IsAdventureMode())for(const auto& saved:pending.plants)if(auto* p=b->mPlants.DataArrayTryToGet(saved.key)){
   if(MemeCharacters::Is(saved.state[0]))SandboxPlants::RestorePower(p,saved.state);
   else if(SandboxMemeRules::IsResult(saved.state[0])){
-   // Retire old infusion safely: restore native clocks, not HP or level progress.
    p->mLaunchRate=GetPlantDefinition(p->mSeedType).mLaunchRate;p->mLaunchCounter=std::max(100,p->mLaunchRate);p->mShootingCounter=0;
+  }
+ }
+ // Also migrate ordinary plants in pre-mod saves, keeping HP and positions.
+ if(RosterEnabled()){
+  for(auto* p:b->mPlants)OnPlanted(p);
+  if(b->mSeedBank)for(int i=0;i<b->mSeedBank->mNumPackets;++i){auto& card=b->mSeedBank->mSeedPackets[i];
+   if(Replacement(int(card.mPacketType),int(card.mImitaterType))&&card.mRefreshing&&card.mRefreshTime>300){
+    const int left=std::clamp(card.mRefreshTime-card.mRefreshCounter,0,300);card.mRefreshTime=300;card.mRefreshCounter=300-left;
+   }
   }
  }
  if(b->mApp->IsAdventureMode())for(const auto& saved:pending.shots)if(auto* p=b->mProjectiles.DataArrayTryToGet(saved.key))SandboxPlants::RestoreShot(p,saved.percent);
  pending={};
 }
 }
-// Keep the read-only QA ABI; no profile mutation or level-unlock endpoint.
+// Read-only QA ABI; it cannot change player money, progression or gameplay speed.
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_adventure_power_data(int index,int field){
  auto* b=gLawnApp?gLawnApp->mBoard:nullptr;if(!b||gSandboxEnabled)return -1;const auto save=MemeAdventure::Capture(b);
- if(index==-1)return field==0?save.power:field==1?save.cooldown:field==2?b->mSunMoney:field==3?b->mLevel:field==4?int(save.plants.size()):field==5?int(MemeAdventure::Visible(b)):field==6?int(b->mPaused):field==7?MemeAdventure::UIState():-1;
- if(index>=0&&field>=10&&field<=11){int n=0;for(auto* c:b->mCoins)if(!c->mDead&&c->IsSun()&&!c->mIsBeingCollected){if(n++==index)return int(field==10?c->mPosX+30:c->mPosY+30);}return -1;}
- if(index<0||field<0||field>6)return -1;int n=0;for(auto* p:b->mPlants)if(!p->mDead){if(n++!=index)continue;return field==0?SandboxPlants::Type(p):field==1?p->mPlantCol:field==2?p->mRow:field==3?p->mPlantHealth:SandboxPlants::HeatData(p,field-4);}return -1;
+ if(index==-1)return field==0?save.power:field==1?0:field==2?b->mSunMoney:field==3?b->mLevel:field==4?int(save.plants.size()):field==5?int(MemeAdventure::Visible(b)):field==6?int(b->mPaused):field==7?0:field==8?int(b->mTutorialState):field==9?int(b->mApp->mGameScene):-1;
+ if(index>=0&&field>=10&&field<=13){int n=0;for(auto* c:b->mCoins)if(!c->mDead&&(field<12?c->IsSun():c->mType==COIN_FINAL_SEED_PACKET)&&!c->mIsBeingCollected){if(n++==index)return int(field%2==0?c->mPosX+30:c->mPosY+30);}return -1;}
+ if(index<0||field<0||field>9)return -1;int n=0;for(auto* p:b->mPlants)if(!p->mDead){if(n++!=index)continue;return field==0?SandboxPlants::Type(p):field==1?p->mPlantCol:field==2?p->mRow:field==3?p->mPlantHealth:field==7?p->mLaunchCounter:field==8?int(p->mSeedType):field==9?int(p->mIsAsleep):SandboxPlants::HeatData(p,field-4);}return -1;
+}
+extern "C" EMSCRIPTEN_KEEPALIVE int pvz_adventure_seed_data(int index,int field){
+ auto* b=gLawnApp?gLawnApp->mBoard:nullptr;if(!b||gSandboxEnabled||!b->mSeedBank||index<0||index>=b->mSeedBank->mNumPackets)return -1;
+ const auto& card=b->mSeedBank->mSeedPackets[index];const auto* d=MemeAdventure::Replacement(int(card.mPacketType),int(card.mImitaterType));
+ return field==0?(d?d->id:int(card.mPacketType)):field==1?Plant::GetCost(card.mPacketType,card.mImitaterType):field==2?Plant::GetRefreshTime(card.mPacketType,card.mImitaterType):field==3?(card.mRefreshing?card.mRefreshTime-card.mRefreshCounter:0):field==4?int(card.mActive):field==5?b->mSeedBank->mX+card.mX+card.mOffsetX:field==6?b->mSeedBank->mY+card.mY:-1;
 }

@@ -41,6 +41,9 @@
 #include "../../PvzpLib/PvzpStringFile.h"
 #include "widget/WidgetManager.h"
 #include <algorithm>
+#include "../../MemeAdventure.h"
+
+static int AbstractChooserCount(){return MemeAdventure::RosterEnabled()?NUM_SEED_TYPES:NUM_SEEDS_IN_CHOOSER;}
 
 SeedChooserScreen::SeedChooserScreen()
 {
@@ -159,7 +162,7 @@ SeedChooserScreen::SeedChooserScreen()
 
 	DBG_ASSERT(mApp->GetSeedsAvailable() < NUM_SEED_TYPES);
 	memset(mChosenSeeds, 0, sizeof(mChosenSeeds));
-	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
+	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
 	{
 		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
 		aChosenSeed.mSeedType = aSeedType;
@@ -225,7 +228,7 @@ int SeedChooserScreen::PickFromWeightedArrayUsingSpecialRandSeed(PvzpWeightedArr
 void SeedChooserScreen::CrazyDavePickSeeds()
 {
 	PvzpWeightedArray aSeedArray[NUM_SEED_TYPES];
-	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
+	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
 	{
 		aSeedArray[aSeedType].mItem = aSeedType;
 		if (!mApp->HasSeedType(aSeedType) || SeedNotRecommendedToPick(aSeedType) || SeedNotAllowedToPick(aSeedType) || Plant::IsUpgrade(aSeedType) ||
@@ -254,7 +257,7 @@ void SeedChooserScreen::CrazyDavePickSeeds()
 	MTRand aLevelRNG = MTRand(mBoard->GetLevelRandSeed());
 	for (int i = 0; i < 3; i++)
 	{
-		SeedType aPickedSeed = (SeedType)PickFromWeightedArrayUsingSpecialRandSeed(aSeedArray, NUM_SEEDS_IN_CHOOSER, aLevelRNG);
+		SeedType aPickedSeed = (SeedType)PickFromWeightedArrayUsingSpecialRandSeed(aSeedArray, AbstractChooserCount(), aLevelRNG);
 		aSeedArray[aPickedSeed].mWeight = 0;
 		ChosenSeed& aChosenSeed = mChosenSeeds[aPickedSeed];
 
@@ -283,6 +286,7 @@ bool SeedChooserScreen::Has7Rows()
 
 void SeedChooserScreen::GetSeedPositionInChooser(int theIndex, int& x, int& y)
 {
+	if (theIndex == SEED_LEFTPEATER) {x=464;y=132;return;}
 	if (theIndex == SEED_IMITATER)
 	{
 		x = mImitaterButton->mX;
@@ -342,6 +346,7 @@ void SeedChooserScreen::Draw(Graphics* g)
 		return;
 
 	g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_BACKGROUND, 0, 87);
+	if (mApp->HasSeedType(SEED_LEFTPEATER)) g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_IMITATERADDON,459,120);
 	if (mApp->HasSeedType(SEED_IMITATER))
 	{
 		g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_IMITATERADDON, 459, 503);
@@ -384,7 +389,7 @@ void SeedChooserScreen::Draw(Graphics* g)
 		}
 	}
 
-	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
+	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
 	{
 		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
 		ChosenSeedState aSeedState = aChosenSeed.mSeedState;
@@ -408,7 +413,7 @@ void SeedChooserScreen::Draw(Graphics* g)
 	}
 
 	mImitaterButton->Draw(g);
-	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
+	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
 	{
 		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
 		ChosenSeedState aSeedState = aChosenSeed.mSeedState;
@@ -520,7 +525,7 @@ void SeedChooserScreen::Update()
 	mSeedChooserAge++;
 	mToolTip->Update();
 
-	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
+	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
 	{
 		if (mApp->HasSeedType(aSeedType))
 		{
@@ -702,7 +707,7 @@ void SeedChooserScreen::PickRandomSeeds()
 	for (int anIndex = mSeedsInBank; anIndex < mBoard->mSeedBank->mNumPackets; anIndex++)
 	{
 		SeedType aSeedType;
-		do aSeedType = (SeedType)Rand(mApp->GetSeedsAvailable());
+		do aSeedType = (SeedType)Rand(mApp->HasSeedType(SEED_LEFTPEATER)?NUM_SEED_TYPES:mApp->GetSeedsAvailable());
 		while (!mApp->HasSeedType(aSeedType) || aSeedType == SEED_IMITATER || mChosenSeeds[aSeedType].mSeedState != SEED_IN_CHOOSER);
 		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
 		aChosenSeed.mTimeStartMotion = 0;
@@ -714,7 +719,7 @@ void SeedChooserScreen::PickRandomSeeds()
 		aChosenSeed.mSeedIndexInBank = anIndex;
 		mSeedsInBank++;
 	}
-	for (SeedType aSeedFlying = SEED_PEASHOOTER; aSeedFlying < NUM_SEEDS_IN_CHOOSER; aSeedFlying = (SeedType)(aSeedFlying + 1))
+	for (SeedType aSeedFlying = SEED_PEASHOOTER; aSeedFlying < AbstractChooserCount(); aSeedFlying = (SeedType)(aSeedFlying + 1))
 		LandFlyingSeed(mChosenSeeds[aSeedFlying]);
 	CloseSeedChooser();
 }
@@ -767,7 +772,7 @@ SeedType SeedChooserScreen::SeedHitTest(int x, int y)
 {
 	if (mMouseVisible)
 	{
-		for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
+		for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
 		{
 			ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
 			if (!mApp->HasSeedType(aSeedType) || aChosenSeed.mSeedState == SEED_PACKET_HIDDEN) continue;
@@ -779,7 +784,7 @@ SeedType SeedChooserScreen::SeedHitTest(int x, int y)
 
 SeedType SeedChooserScreen::FindSeedInBank(int theIndexInBank)
 {
-	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
+	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
 	{
 		if (mApp->HasSeedType(aSeedType))
 		{
@@ -979,7 +984,7 @@ void SeedChooserScreen::MouseDown(int x, int y, int theClickCount)
 
 	if (mSeedsInFlight > 0)
 	{
-		for (int i = 0; i < NUM_SEEDS_IN_CHOOSER; i++)
+		for (int i = 0; i < AbstractChooserCount(); i++)
 		{
 			LandFlyingSeed(mChosenSeeds[i]);
 		}
@@ -1071,7 +1076,7 @@ void SeedChooserScreen::MouseDown(int x, int y, int theClickCount)
 
 bool SeedChooserScreen::PickedPlantType(SeedType theSeedType)
 {
-	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
+	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
 	{
 		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
 		if (aChosenSeed.mSeedState == SEED_IN_BANK)
@@ -1126,7 +1131,7 @@ void SeedChooserScreen::KeyChar(char theChar)
 
 void SeedChooserScreen::UpdateAfterPurchase()
 {
-	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
+	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
 	{
 		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
 		if (aChosenSeed.mSeedState == SEED_IN_BANK)

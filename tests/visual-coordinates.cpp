@@ -12,6 +12,18 @@
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
+ // Bumping walnut never replaces the native face with a mouth or teeth,
+ // including both original damage stages.
+ for(int stage=0;stage<3;++stage){
+  SandboxPlants::Reset();Board w;auto* p=w.plant(1,2);p->mSeedType=static_cast<SeedType>(3);
+  p->mPlantMaxHealth=4000;p->mPlantHealth=stage==0?4000:stage==1?2000:800;SandboxPlants::Assign(p,501);
+  p->mRecentlyEatenCountdown=50;auto* z=w.AddZombieInRow(ZOMBIE_NORMAL,2,-1);z->mPosX=p->mX-30;z->mIsEating=true;
+  Reanimation body;Track tracks[]={{"anim_face"}};TrackInstance instances[1];body.def.mTracks={1,tracks};body.mTrackInstances=instances;
+  auto* original=SandboxArt::NativeImage(stage==0?"Wallnut_body.png":stage==1?"Wallnut_cracked1.png":"Wallnut_cracked2.png");instances[0].mImageOverride=original;app.reanims[80]=&body;p->mBodyReanimID=80;
+  Sexy::Graphics g(nullptr);for(int tick=0;tick<60;++tick){SandboxPlants::Tick(&w);assert(!SandboxPlants::DrawBody(&g,p,0,0));assert(instances[0].mImageOverride==original);}
+  app.reanims.clear();
+ }
+ SandboxPlants::Reset();
  // Runtime palettes retain native dimensions/alpha, are cached, and never
  // mutate base pixels or the persistent damage override used by AnimateNuts.
  {auto* source=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::NativeImage("Wallnut_cracked1.png"));

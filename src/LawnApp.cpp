@@ -2276,6 +2276,8 @@ int LawnApp::GetSeedsAvailable()
 
 bool LawnApp::HasSeedType(SeedType theSeedType)
 {
+	// Existing unused left-facing shooter ID keeps old saves and enum values intact.
+	if (theSeedType == SEED_LEFTPEATER) return MemeAdventure::RosterEnabled() && mPlayerInfo && (HasFinishedAdventure() || mPlayerInfo->GetLevel() >= 8);
 	if (IsTrialStageLocked() && theSeedType >= SeedType::SEED_JALAPENO)
 		return false;
 

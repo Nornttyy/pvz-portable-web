@@ -13,7 +13,7 @@ index c263ab4..e613ef3 100644
  enum ScaryPotType : int32_t
  {
 diff --git a/src/Lawn/Board.cpp b/src/Lawn/Board.cpp
-index 665fcca..ec1c3b7 100644
+index 665fcca..a6254e7 100644
 --- a/src/Lawn/Board.cpp
 +++ b/src/Lawn/Board.cpp
 @@ -25,6 +25,11 @@
@@ -44,7 +44,15 @@ index 665fcca..ec1c3b7 100644
  	LawnSaveGame(this, theFileName);
  }
  
-@@ -2184,22 +2191,22 @@ void Board::GetPlantsOnLawn(int theGridX, int theGridY, PlantsOnLawn* thePlantOn
+@@ -2021,6 +2028,7 @@ Plant* Board::NewPlant(int theGridX, int theGridY, SeedType theSeedType, SeedTyp
+ 	Plant* aPlant = mPlants.DataArrayAlloc();
+ 	aPlant->mIsOnBoard = true;
+ 	aPlant->PlantInitialize(theGridX, theGridY, theSeedType, theImitaterType);
++	MemeAdventure::OnPlanted(aPlant);
+ 	return aPlant;
+ }
+ 
+@@ -2184,22 +2192,22 @@ void Board::GetPlantsOnLawn(int theGridX, int theGridY, PlantsOnLawn* thePlantOn
  
  		if (Plant::IsFlying(aSeedType))
  		{
@@ -71,7 +79,7 @@ index 665fcca..ec1c3b7 100644
  			thePlantOnLawn->mNormalPlant = aPlant;
  		}
  	}
-@@ -3008,6 +3015,7 @@ void Board::MouseMove(int x, int y)
+@@ -3008,6 +3016,7 @@ void Board::MouseMove(int x, int y)
  
  void Board::MouseDrag(int x, int y)
  {
@@ -79,14 +87,6 @@ index 665fcca..ec1c3b7 100644
  	Widget::MouseDrag(x, y);
  	mChallenge->MouseMove(x, y);
  }
-@@ -3847,6 +3855,7 @@ void Board::MouseDownWithPlant(int x, int y, int theClickCount)
- 	else if (mCursorObject->mCursorType == CursorType::CURSOR_TYPE_PLANT_FROM_BANK)
- 	{
- 		Plant* aPlant = AddPlant(aGridX, aGridY, mCursorObject->mType, mCursorObject->mImitaterType);
-+		MemeAdventure::OnPlanted(aPlant);
- 		if (aIsAwake)
- 		{
- 			aPlant->SetSleeping(false);
 @@ -4362,6 +4371,8 @@ void Board::PickUpTool(GameObjectType theObjectType)
  
  void Board::MouseDown(int x, int y, int theClickCount)
@@ -222,19 +222,20 @@ index 665fcca..ec1c3b7 100644
  
  	if (mApp->mGameScene == GameScenes::SCENE_LEVEL_INTRO &&
 diff --git a/src/Lawn/Plant.cpp b/src/Lawn/Plant.cpp
-index c934659..c517389 100644
+index c934659..50ea453 100644
 --- a/src/Lawn/Plant.cpp
 +++ b/src/Lawn/Plant.cpp
-@@ -30,6 +30,8 @@
+@@ -30,6 +30,9 @@
  #include "Projectile.h"
  #include "SeedPacket.h"
  #include "../LawnApp.h"
 +#include "../SandboxPlants.h"
++#include "../MemeAdventure.h"
 +#include "../SandboxMemeRules.h"
  #include "CursorObject.h"
  #include "../GameConstants.h"
  #include "System/PlayerInfo.h"
-@@ -107,6 +109,7 @@ Plant::Plant()
+@@ -107,6 +110,7 @@ Plant::Plant()
  
  void Plant::PlantInitialize(int theGridX, int theGridY, SeedType theSeedType, SeedType theImitaterType)
  {
@@ -242,7 +243,7 @@ index c934659..c517389 100644
  	mPlantCol = theGridX;
  	mRow = theGridY;
  	if (mBoard)
-@@ -672,6 +675,7 @@ bool Plant::IsSpiky()
+@@ -672,6 +676,7 @@ bool Plant::IsSpiky()
  
  void Plant::DoRowAreaDamage(int theDamage, unsigned int theDamageFlags)
  {
@@ -250,7 +251,7 @@ index c934659..c517389 100644
  	int aDamageRangeFlags = GetDamageRangeFlags(PlantWeapon::WEAPON_PRIMARY);
  	Rect aAttackRect = GetPlantAttackRect(PlantWeapon::WEAPON_PRIMARY);
  
-@@ -735,6 +739,7 @@ bool Plant::FindTargetAndFire(int theRow, PlantWeapon thePlantWeapon)
+@@ -735,6 +740,7 @@ bool Plant::FindTargetAndFire(int theRow, PlantWeapon thePlantWeapon)
  	if (aZombie == nullptr)
  		return false;
  
@@ -258,7 +259,7 @@ index c934659..c517389 100644
  	EndBlink();
  	Reanimation* aBodyReanim = mApp->ReanimationTryToGet(mBodyReanimID);
  	Reanimation* aHeadReanim = mApp->ReanimationTryToGet(mHeadReanimID);
-@@ -911,8 +916,9 @@ bool Plant::FindStarFruitTarget()
+@@ -911,8 +917,9 @@ bool Plant::FindStarFruitTarget()
  
  void Plant::LaunchStarFruit()
  {
@@ -269,7 +270,7 @@ index c934659..c517389 100644
  		PlayBodyReanim("anim_shoot", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 28.0f);
  		mShootingCounter = 40;
  	}
-@@ -927,6 +933,7 @@ void Plant::StarFruitFire()
+@@ -927,6 +934,7 @@ void Plant::StarFruitFire()
  	for (int i = 0; i < 5; i++)
  	{
  		Projectile* aProjectile = mBoard->AddProjectile(mX + 25, mY + 25, mRenderOrder - 1, mRow, ProjectileType::PROJECTILE_STAR);
@@ -277,7 +278,7 @@ index c934659..c517389 100644
  		aProjectile->mDamageRangeFlags = GetDamageRangeFlags(PlantWeapon::WEAPON_PRIMARY);
  		aProjectile->mMotionType = ProjectileMotion::MOTION_STAR;
  
-@@ -944,6 +951,9 @@ void Plant::StarFruitFire()
+@@ -944,6 +952,9 @@ void Plant::StarFruitFire()
  
  void Plant::UpdateShooter()
  {
@@ -287,15 +288,15 @@ index c934659..c517389 100644
  	mLaunchCounter--;
  	if (mLaunchCounter <= 0)
  	{
-@@ -1003,6 +1013,7 @@ bool Plant::MakesSun()
+@@ -1003,6 +1014,7 @@ bool Plant::MakesSun()
  
  void Plant::UpdateProductionPlant()
  {
-+	if (MemeCharacters::Is(this)) return;
++	if (MemeCharacters::Is(this) && !MemeCharacters::Producing(this)) return;
  	if (!IsInPlay() || mApp->IsIZombieLevel() || mApp->mGameMode == GameMode::GAMEMODE_UPSELL || mApp->mGameMode == GameMode::GAMEMODE_INTRO)
  		return;
  
-@@ -1034,6 +1045,8 @@ void Plant::UpdateProductionPlant()
+@@ -1034,6 +1046,8 @@ void Plant::UpdateProductionPlant()
  		mLaunchCounter = RandRangeInt(mLaunchRate - 150, mLaunchRate);
  		mApp->PlayFoley(FoleyType::FOLEY_SPAWN_SUN);
  
@@ -304,7 +305,7 @@ index c934659..c517389 100644
  		if (mSeedType == SeedType::SEED_SUNSHROOM)
  		{
  			if (mState == PlantState::STATE_SUNSHROOM_SMALL)
-@@ -1059,6 +1072,7 @@ void Plant::UpdateProductionPlant()
+@@ -1059,6 +1073,7 @@ void Plant::UpdateProductionPlant()
  			mBoard->AddCoin(mX, mY, (Sexy::Rand(100) < 10) ? CoinType::COIN_GOLD : CoinType::COIN_SILVER, CoinMotion::COIN_MOTION_COIN);
  		}
  
@@ -312,7 +313,7 @@ index c934659..c517389 100644
  		if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BIG_TIME)
  		{
  			if (mSeedType == SeedType::SEED_SUNFLOWER)
-@@ -1123,6 +1137,7 @@ void Plant::UpdateGraveBuster()
+@@ -1123,6 +1138,7 @@ void Plant::UpdateGraveBuster()
  		}
  
  		mApp->AddPvzpParticle(mX + 40, mY + 40, mRenderOrder + 4, ParticleEffect::PARTICLE_GRAVE_BUSTER_DIE);
@@ -320,7 +321,7 @@ index c934659..c517389 100644
  		Die();
  		mBoard->DropLootPiece(mX + 40, mY, 12);
  	}
-@@ -1238,6 +1253,7 @@ void Plant::UpdateTanglekelp()
+@@ -1238,6 +1254,7 @@ void Plant::UpdateTanglekelp()
  			{
  				aZombie->DragUnder();
  				aZombie->PoolSplash(false);
@@ -328,7 +329,7 @@ index c934659..c517389 100644
  			}
  		}
  
-@@ -1267,9 +1283,11 @@ void Plant::UpdateTanglekelp()
+@@ -1267,9 +1284,11 @@ void Plant::UpdateTanglekelp()
  void Plant::SpikeweedAttack()
  {
  	PVZP_ASSERT(IsSpiky());
@@ -340,7 +341,7 @@ index c934659..c517389 100644
  		PlayBodyReanim("anim_attack", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 18.0f);
  		mApp->PlaySample(SOUND_THROW);
  
-@@ -1391,6 +1409,7 @@ void Plant::UpdateTorchwood()
+@@ -1391,6 +1410,7 @@ void Plant::UpdateTorchwood()
  				if (aProjectile->mProjectileType == ProjectileType::PROJECTILE_PEA)
  				{
  					aProjectile->ConvertToFireball(mPlantCol);
@@ -348,7 +349,7 @@ index c934659..c517389 100644
  				}
  				else if (aProjectile->mProjectileType == ProjectileType::PROJECTILE_SNOWPEA)
  				{
-@@ -1419,6 +1438,7 @@ void Plant::DoSquashDamage()
+@@ -1419,6 +1439,7 @@ void Plant::DoSquashDamage()
  			}
  		}
  	}
@@ -356,7 +357,7 @@ index c934659..c517389 100644
  }
  
  Zombie* Plant::FindSquashTarget()
-@@ -1818,7 +1838,8 @@ void Plant::UpdateChomper()
+@@ -1818,7 +1839,8 @@ void Plant::UpdateChomper()
  			}
  
  			mState = PlantState::STATE_CHOMPER_DIGESTING;
@@ -366,7 +367,7 @@ index c934659..c517389 100644
  		}
  	}
  	else if (mState == PlantState::STATE_CHOMPER_DIGESTING)
-@@ -1856,8 +1877,9 @@ MagnetItem* Plant::GetFreeMagnetItem()
+@@ -1856,8 +1878,9 @@ MagnetItem* Plant::GetFreeMagnetItem()
  
  void Plant::MagnetShroomAttactItem(Zombie* theZombie)
  {
@@ -377,7 +378,7 @@ index c934659..c517389 100644
  	PlayBodyReanim("anim_shooting", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 12.0f);
  	mApp->PlayFoley(FoleyType::FOLEY_MAGNETSHROOM);
  
-@@ -2140,8 +2162,9 @@ void Plant::UpdateMagnetShroom()
+@@ -2140,8 +2163,9 @@ void Plant::UpdateMagnetShroom()
  
  		if (aClosestLadder)
  		{
@@ -388,7 +389,7 @@ index c934659..c517389 100644
  			PlayBodyReanim("anim_shooting", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 12.0f);
  			mApp->PlayFoley(FoleyType::FOLEY_MAGNETSHROOM);
  
-@@ -2294,11 +2317,12 @@ void Plant::UpdateGoldMagnetShroom()
+@@ -2294,11 +2318,12 @@ void Plant::UpdateGoldMagnetShroom()
  		{
  			PlayIdleAnim(14.0f);
  			mState = PlantState::STATE_MAGNETSHROOM_CHARGING;
@@ -402,7 +403,7 @@ index c934659..c517389 100644
  		mBoard->ShowCoinBank();
  		mState = PlantState::STATE_MAGNETSHROOM_SUCKING;
  		PlayBodyReanim("anim_attract", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 12.0f);
-@@ -2680,6 +2704,7 @@ void Plant::UpdateReanimColor()
+@@ -2680,6 +2705,7 @@ void Plant::UpdateReanimColor()
  		aColorOverride = Color(255, 255, 255);
  	}
  
@@ -410,7 +411,7 @@ index c934659..c517389 100644
  	aBodyReanim->mColorOverride = aColorOverride;
  
  	if (mHighlighted)
-@@ -2848,6 +2873,7 @@ void Plant::UpdateReanim()
+@@ -2848,6 +2874,7 @@ void Plant::UpdateReanim()
  		aOffsetY += mApp->mZenGarden->PlantPottedDrawHeightOffset(mSeedType, aScaleY);
  	}
  
@@ -418,7 +419,7 @@ index c934659..c517389 100644
  	aBodyReanim->SetPosition(aOffsetX, aOffsetY);
  	aBodyReanim->OverrideScale(aScaleX, aScaleY);
  }
-@@ -2889,6 +2915,7 @@ bool Plant::NotOnGround()
+@@ -2889,6 +2916,7 @@ bool Plant::NotOnGround()
  
  Reanimation* Plant::AttachBlinkAnim(Reanimation* theReanimBody)
  {
@@ -426,7 +427,7 @@ index c934659..c517389 100644
  	const PlantDefinition& aPlantDef = GetPlantDefinition(mSeedType);
  	LawnApp* aApp = (LawnApp*)gSexyAppBase;
  	Reanimation* aAnimToAttach = theReanimBody;
-@@ -3402,7 +3429,7 @@ void Plant::UpdateShooting()
+@@ -3402,7 +3430,7 @@ void Plant::UpdateShooting()
  		if (aBodyReanim->mLoopCount > 0)
  		{
  			mState = PlantState::STATE_COBCANNON_ARMING;
@@ -435,7 +436,7 @@ index c934659..c517389 100644
  			PlayBodyReanim("anim_unarmed_idle", ReanimLoopType::REANIM_LOOP, 20, aBodyReanim->mDefinition->mFPS);
  			return;
  		}
-@@ -3924,6 +3951,7 @@ void Plant::DrawShadow(Sexy::Graphics* g, float theOffsetX, float theOffsetY)
+@@ -3924,6 +3952,7 @@ void Plant::DrawShadow(Sexy::Graphics* g, float theOffsetX, float theOffsetY)
  			return;
  	}
  
@@ -443,7 +444,7 @@ index c934659..c517389 100644
  	if (aShadowType == 0)
  	{
  		PvzpDrawImageCelCenterScaledF(g, IMAGE_PLANTSHADOW, theOffsetX + aShadowOffsetX, theOffsetY + aShadowOffsetY, 0, aScale, aScale);
-@@ -3957,6 +3985,7 @@ void Plant::Draw(Graphics* g)
+@@ -3957,6 +3986,7 @@ void Plant::Draw(Graphics* g)
  			aOffsetY -= 20.0f;
  		}
  
@@ -451,7 +452,7 @@ index c934659..c517389 100644
  		g->SetScale(1.0f, 0.25f, 0.0f, 0.0f);
  		DrawSeedType(g, mSeedType, mImitaterType, DrawVariation::VARIATION_NORMAL, aOffsetX, 60.0f + aOffsetY);
  		g->SetScale(1.0f, 1.0f, 0.0f, 0.0f);
-@@ -4027,6 +4056,10 @@ void Plant::Draw(Graphics* g)
+@@ -4027,6 +4057,10 @@ void Plant::Draw(Graphics* g)
  		{
  			mBoard->mChallenge->IZombieDrawPlant(g, this);
  		}
@@ -462,7 +463,7 @@ index c934659..c517389 100644
  		else if (mBodyReanimID != ReanimationID::REANIMATIONID_NULL)
  		{
  			Reanimation* aBodyReanim = mApp->ReanimationTryToGet(mBodyReanimID);
-@@ -4302,6 +4335,7 @@ void Plant::DoSpecial()
+@@ -4302,6 +4336,7 @@ void Plant::DoSpecial()
  		{
  			mState = PlantState::STATE_DOINGSPECIAL;
  			BlowAwayFliers();
@@ -470,7 +471,7 @@ index c934659..c517389 100644
  		}
  		break;
  	}
-@@ -4316,6 +4350,7 @@ void Plant::DoSpecial()
+@@ -4316,6 +4351,7 @@ void Plant::DoSpecial()
  		mApp->AddPvzpParticle(aPosX, aPosY, static_cast<int>(RenderLayer::RENDER_LAYER_TOP), ParticleEffect::PARTICLE_POWIE);
  		mBoard->ShakeBoard(3, -4);
  
@@ -478,7 +479,7 @@ index c934659..c517389 100644
  		Die();
  		break;
  	}
-@@ -4324,6 +4359,7 @@ void Plant::DoSpecial()
+@@ -4324,6 +4360,7 @@ void Plant::DoSpecial()
  		mApp->PlaySample(SOUND_DOOMSHROOM);
  
  		mBoard->KillAllZombiesInRadius(mRow, aPosX, aPosY, 250, 3, true, aDamageRangeFlags);
@@ -486,7 +487,7 @@ index c934659..c517389 100644
  		KillAllPlantsNearDoom();
  
  		mApp->AddPvzpParticle(aPosX, aPosY, static_cast<int>(RenderLayer::RENDER_LAYER_TOP), ParticleEffect::PARTICLE_DOOM);
-@@ -4344,6 +4380,7 @@ void Plant::DoSpecial()
+@@ -4344,6 +4381,7 @@ void Plant::DoSpecial()
  		BurnRow(mRow);
  		mBoard->mIceTimer[mRow] = 20;
  
@@ -494,7 +495,7 @@ index c934659..c517389 100644
  		Die();
  		break;
  	}
-@@ -4365,6 +4402,7 @@ void Plant::DoSpecial()
+@@ -4365,6 +4403,7 @@ void Plant::DoSpecial()
  		IceZombies();
  		mApp->AddPvzpParticle(aPosX, aPosY, static_cast<int>(RenderLayer::RENDER_LAYER_TOP), ParticleEffect::PARTICLE_ICE_TRAP);
  
@@ -502,7 +503,7 @@ index c934659..c517389 100644
  		Die();
  		break;
  	}
-@@ -4381,6 +4419,7 @@ void Plant::DoSpecial()
+@@ -4381,6 +4420,7 @@ void Plant::DoSpecial()
  		mApp->AddPvzpParticle(aPosX + 20.0f, aPosY, aRenderPosition, ParticleEffect::PARTICLE_POTATO_MINE);
  		mBoard->ShakeBoard(3, -4);
  
@@ -510,7 +511,7 @@ index c934659..c517389 100644
  		Die();
  		break;
  	}
-@@ -4396,6 +4435,7 @@ void Plant::DoSpecial()
+@@ -4396,6 +4436,7 @@ void Plant::DoSpecial()
  		PlayBodyReanim("anim_crumble", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 22.0f);
  		mApp->PlayFoley(FoleyType::FOLEY_COFFEE);
  
@@ -518,7 +519,7 @@ index c934659..c517389 100644
  		break;
  	}
  	default:
-@@ -4405,8 +4445,10 @@ void Plant::DoSpecial()
+@@ -4405,8 +4446,10 @@ void Plant::DoSpecial()
  
  void Plant::ImitaterMorph()
  {
@@ -529,7 +530,7 @@ index c934659..c517389 100644
  
  	FilterEffect aFilter = FilterEffect::FILTER_EFFECT_WASHED_OUT;
  	if (mImitaterType == SeedType::SEED_HYPNOSHROOM || mImitaterType == SeedType::SEED_SQUASH || mImitaterType == SeedType::SEED_POTATOMINE ||
-@@ -4460,6 +4502,7 @@ void Plant::UpdateImitater()
+@@ -4460,6 +4503,7 @@ void Plant::UpdateImitater()
  void Plant::CobCannonFire(int theTargetX, int theTargetY)
  {
  	PVZP_ASSERT(mState == PlantState::STATE_COBCANNON_READY);
@@ -537,7 +538,7 @@ index c934659..c517389 100644
  
  	mState = PlantState::STATE_COBCANNON_FIRING;
  	mShootingCounter = 206;
-@@ -4675,6 +4718,8 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
+@@ -4675,6 +4719,8 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
  		mApp->AddPvzpParticle(aOriginX + 27, aOriginY + 13, aRenderPosition, ParticleEffect::PARTICLE_PUFFSHROOM_MUZZLE);
  	}
  
@@ -546,7 +547,7 @@ index c934659..c517389 100644
  	Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder - 1, theRow, aProjectileType);
  	aProjectile->mDamageRangeFlags = GetDamageRangeFlags(thePlantWeapon);
  
-@@ -4765,6 +4810,10 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
+@@ -4765,6 +4811,10 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
  		aProjectile->mCobTargetX = mTargetX - 40;
  		aProjectile->mCobTargetRow = mBoard->PixelToGridYKeepOnBoard(mTargetX, mTargetY);
  	}
@@ -557,7 +558,7 @@ index c934659..c517389 100644
  }
  
  Zombie* Plant::FindTargetZombie(int theRow, PlantWeapon thePlantWeapon)
-@@ -4930,6 +4979,7 @@ int Plant::DistanceToClosestZombie()
+@@ -4930,6 +4980,7 @@ int Plant::DistanceToClosestZombie()
  
  void Plant::Die()
  {
@@ -565,6 +566,46 @@ index c934659..c517389 100644
  	if (IsOnBoard() && mSeedType == SeedType::SEED_TANGLEKELP)
  	{
  		Zombie* aZombie = mBoard->ZombieTryToGet(mTargetZombieID);
+@@ -4973,6 +5024,7 @@ const PlantDefinition& GetPlantDefinition(SeedType theSeedType)
+ 
+ int Plant::GetCost(SeedType theSeedType, SeedType theImitaterType)
+ {
++	if (const auto* replacement = MemeAdventure::Replacement(int(theSeedType), int(theImitaterType))) return replacement->cost;
+ 	if (gLawnApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED || gLawnApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED_TWIST)
+ 	{
+ 		if (theSeedType == SeedType::SEED_REPEATER)
+@@ -5036,6 +5088,7 @@ int Plant::GetCost(SeedType theSeedType, SeedType theImitaterType)
+ 
+ std::string Plant::GetNameString(SeedType theSeedType, SeedType theImitaterType)
+ {
++	if (const auto* replacement = MemeAdventure::Replacement(int(theSeedType), int(theImitaterType))) return replacement->name;
+ 	const PlantDefinition& aPlantDef = GetPlantDefinition(theSeedType);
+ 	std::string aName = std::format("[{}]", aPlantDef.mPlantName);
+ 	std::string aTranslatedName(PvzpStringTranslate(aName));
+@@ -5053,6 +5106,7 @@ std::string Plant::GetNameString(SeedType theSeedType, SeedType theImitaterType)
+ 
+ std::string Plant::GetToolTip(SeedType theSeedType)
+ {
++	if (const auto* replacement = MemeAdventure::Replacement(int(theSeedType))) return replacement->hint;
+ 	const PlantDefinition& aPlantDef = GetPlantDefinition(theSeedType);
+ 	std::string aToolTip = std::format("[{}_TOOLTIP]", aPlantDef.mPlantName);
+ 	return std::string(PvzpStringTranslate(aToolTip));
+@@ -5060,6 +5114,7 @@ std::string Plant::GetToolTip(SeedType theSeedType)
+ 
+ int Plant::GetRefreshTime(SeedType theSeedType, SeedType theImitaterType)
+ {
++	if (MemeAdventure::Replacement(int(theSeedType), int(theImitaterType))) return 300;
+ 	if (Challenge::IsZombieSeedType(theSeedType))
+ 	{
+ 		return 0;
+@@ -5079,6 +5134,7 @@ int Plant::GetRefreshTime(SeedType theSeedType, SeedType theImitaterType)
+ 
+ bool Plant::IsNocturnal(SeedType theSeedtype)
+ {
++	if (theSeedtype == SEED_PUFFSHROOM && MemeAdventure::Replacement(int(theSeedtype))) return false;
+ 	return
+ 		theSeedtype == SeedType::SEED_PUFFSHROOM ||
+ 		theSeedtype == SeedType::SEED_SEASHROOM ||
 diff --git a/src/Lawn/Projectile.cpp b/src/Lawn/Projectile.cpp
 index 4500f46..7009608 100644
 --- a/src/Lawn/Projectile.cpp
@@ -851,6 +892,68 @@ index 804aeba..9260ff7 100644
  
  	SaveFileHeaderV4 aHeader{};
  	memcpy(aHeader.mMagic, SAVE_FILE_MAGIC_V4, sizeof(aHeader.mMagic));
+diff --git a/src/Lawn/Widget/AlmanacDialog.cpp b/src/Lawn/Widget/AlmanacDialog.cpp
+index 8fb1d2a..ac8aa95 100644
+--- a/src/Lawn/Widget/AlmanacDialog.cpp
++++ b/src/Lawn/Widget/AlmanacDialog.cpp
+@@ -35,6 +35,9 @@
+ #include "../System/ReanimationLawn.h"
+ #include "../../PvzpLib/PvzpStringFile.h"
+ #include "widget/WidgetManager.h"
++#include "../../MemeAdventure.h"
++
++static int AbstractAlmanacCount(){return MemeAdventure::RosterEnabled()?NUM_SEED_TYPES:NUM_ALMANAC_SEEDS;}
+ 
+ bool gZombieDefeated[NUM_ZOMBIE_TYPES] = { false };
+ 
+@@ -279,7 +282,7 @@ void AlmanacDialog::DrawPlants(Graphics* g)
+ 	PvzpDrawString(g, "[SUBURBAN_ALMANAC_PLANTS]", BOARD_WIDTH / 2, 48, Sexy::FONT_HOUSEOFTERROR20, Color(213, 159, 43), DrawStringJustification::DS_ALIGN_CENTER);
+ 
+ 	SeedType aSeedMouseOn = SeedHitTest(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY);
+-	for (SeedType aSeedType = SeedType::SEED_PEASHOOTER; aSeedType < NUM_ALMANAC_SEEDS; aSeedType = (SeedType)(aSeedType + 1))
++	for (SeedType aSeedType = SeedType::SEED_PEASHOOTER; aSeedType < AbstractAlmanacCount(); aSeedType = (SeedType)(aSeedType + 1))
+ 	{
+ 		int aPosX, aPosY;
+ 		GetSeedPosition(aSeedType, aPosX, aPosY);
+@@ -335,18 +338,19 @@ void AlmanacDialog::DrawPlants(Graphics* g)
+ 	const PlantDefinition& aPlantDef = GetPlantDefinition(mSelectedSeed);
+ 	std::string aName = Plant::GetNameString(mSelectedSeed, SEED_NONE);
+ 	std::string aDescriptionName = std::format("[{}_DESCRIPTION]", aPlantDef.mPlantName);
++	if (const auto* replacement=MemeAdventure::Replacement(int(mSelectedSeed))) aDescriptionName=replacement->description;
+ 	PvzpDrawString(g, aName, 617, 288, Sexy::FONT_DWARVENTODCRAFT18YELLOW, Color::White, DS_ALIGN_CENTER);
+ 	PvzpDrawStringWrapped(g, aDescriptionName, Rect(485, 309, 258, 230), Sexy::FONT_BRIANNETOD12, Color(40, 50, 90), DS_ALIGN_LEFT);
+ 
+ 	if (mSelectedSeed != SeedType::SEED_IMITATER)
+ 	{
+-		std::string aCostStr = PvzpReplaceString(std::format("{{KEYWORD}}{{COST}}:{{STAT}} {}", aPlantDef.mSeedCost), "{COST}", "[COST]");
++		std::string aCostStr = PvzpReplaceString(std::format("{{KEYWORD}}{{COST}}:{{STAT}} {}", Plant::GetCost(mSelectedSeed, SEED_NONE)), "{COST}", "[COST]");
+ 		PvzpDrawStringWrapped(g, aCostStr, Rect(485, 520, 134, 50), Sexy::FONT_BRIANNETOD12, Color::White, DS_ALIGN_LEFT);
+ 
+ 		std::string aRechargeStr = PvzpReplaceString(
+ 			"{KEYWORD}{WAIT_TIME}: {STAT}{WAIT_TIME_LENGTH}",
+ 			"{WAIT_TIME_LENGTH}",
+-			aPlantDef.mRefreshTime == 750 ? "[WAIT_TIME_SHORT]" : aPlantDef.mRefreshTime == 3000 ? "[WAIT_TIME_LONG]" : "[WAIT_TIME_VERY_LONG]"
++			Plant::GetRefreshTime(mSelectedSeed, SEED_NONE) == 300 ? "3 秒" : aPlantDef.mRefreshTime == 750 ? "[WAIT_TIME_SHORT]" : aPlantDef.mRefreshTime == 3000 ? "[WAIT_TIME_LONG]" : "[WAIT_TIME_VERY_LONG]"
+ 		);
+ 		aRechargeStr = PvzpReplaceString(aRechargeStr, "{WAIT_TIME}", "[WAIT_TIME]");
+ 		PvzpDrawStringWrapped(g, aRechargeStr, Rect(600, 520, 139, 50), Sexy::FONT_BRIANNETOD12, Color(40, 50, 90), DS_ALIGN_RIGHT);
+@@ -521,6 +525,7 @@ void AlmanacDialog::Draw(Graphics* g)
+ 
+ void AlmanacDialog::GetSeedPosition(SeedType theSeedType, int& x, int& y)
+ {
++	if (theSeedType==SEED_LEFTPEATER) {x=82;y=15;return;}
+ 	if (theSeedType == SeedType::SEED_IMITATER)
+ 		x = 20, y = 23;
+ 	else
+@@ -534,7 +539,7 @@ SeedType AlmanacDialog::SeedHitTest(int x, int y)
+ {
+ 	if (mMouseVisible && mOpenPage == AlmanacPage::ALMANAC_PAGE_PLANTS)
+ 	{
+-		for (SeedType aSeedType = SeedType::SEED_PEASHOOTER; aSeedType < NUM_ALMANAC_SEEDS; aSeedType = (SeedType)(aSeedType + 1))
++		for (SeedType aSeedType = SeedType::SEED_PEASHOOTER; aSeedType < AbstractAlmanacCount(); aSeedType = (SeedType)(aSeedType + 1))
+ 		{
+ 			if (mApp->HasSeedType(aSeedType))
+ 			{
 diff --git a/src/Lawn/Widget/GameSelector.cpp b/src/Lawn/Widget/GameSelector.cpp
 index e30bd35..c34de83 100644
 --- a/src/Lawn/Widget/GameSelector.cpp
@@ -956,8 +1059,155 @@ index d017de9..260efd1 100644
  	Widget*                     mOverlayWidget;
  	bool                        mStartingGame;
  	int                         mStartingGameCounter;
+diff --git a/src/Lawn/Widget/SeedChooserScreen.cpp b/src/Lawn/Widget/SeedChooserScreen.cpp
+index b284e6a..45539ae 100644
+--- a/src/Lawn/Widget/SeedChooserScreen.cpp
++++ b/src/Lawn/Widget/SeedChooserScreen.cpp
+@@ -41,6 +41,9 @@
+ #include "../../PvzpLib/PvzpStringFile.h"
+ #include "widget/WidgetManager.h"
+ #include <algorithm>
++#include "../../MemeAdventure.h"
++
++static int AbstractChooserCount(){return MemeAdventure::RosterEnabled()?NUM_SEED_TYPES:NUM_SEEDS_IN_CHOOSER;}
+ 
+ SeedChooserScreen::SeedChooserScreen()
+ {
+@@ -159,7 +162,7 @@ SeedChooserScreen::SeedChooserScreen()
+ 
+ 	DBG_ASSERT(mApp->GetSeedsAvailable() < NUM_SEED_TYPES);
+ 	memset(mChosenSeeds, 0, sizeof(mChosenSeeds));
+-	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
++	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
+ 	{
+ 		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
+ 		aChosenSeed.mSeedType = aSeedType;
+@@ -225,7 +228,7 @@ int SeedChooserScreen::PickFromWeightedArrayUsingSpecialRandSeed(PvzpWeightedArr
+ void SeedChooserScreen::CrazyDavePickSeeds()
+ {
+ 	PvzpWeightedArray aSeedArray[NUM_SEED_TYPES];
+-	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
++	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
+ 	{
+ 		aSeedArray[aSeedType].mItem = aSeedType;
+ 		if (!mApp->HasSeedType(aSeedType) || SeedNotRecommendedToPick(aSeedType) || SeedNotAllowedToPick(aSeedType) || Plant::IsUpgrade(aSeedType) ||
+@@ -254,7 +257,7 @@ void SeedChooserScreen::CrazyDavePickSeeds()
+ 	MTRand aLevelRNG = MTRand(mBoard->GetLevelRandSeed());
+ 	for (int i = 0; i < 3; i++)
+ 	{
+-		SeedType aPickedSeed = (SeedType)PickFromWeightedArrayUsingSpecialRandSeed(aSeedArray, NUM_SEEDS_IN_CHOOSER, aLevelRNG);
++		SeedType aPickedSeed = (SeedType)PickFromWeightedArrayUsingSpecialRandSeed(aSeedArray, AbstractChooserCount(), aLevelRNG);
+ 		aSeedArray[aPickedSeed].mWeight = 0;
+ 		ChosenSeed& aChosenSeed = mChosenSeeds[aPickedSeed];
+ 
+@@ -283,6 +286,7 @@ bool SeedChooserScreen::Has7Rows()
+ 
+ void SeedChooserScreen::GetSeedPositionInChooser(int theIndex, int& x, int& y)
+ {
++	if (theIndex == SEED_LEFTPEATER) {x=464;y=132;return;}
+ 	if (theIndex == SEED_IMITATER)
+ 	{
+ 		x = mImitaterButton->mX;
+@@ -342,6 +346,7 @@ void SeedChooserScreen::Draw(Graphics* g)
+ 		return;
+ 
+ 	g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_BACKGROUND, 0, 87);
++	if (mApp->HasSeedType(SEED_LEFTPEATER)) g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_IMITATERADDON,459,120);
+ 	if (mApp->HasSeedType(SEED_IMITATER))
+ 	{
+ 		g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_IMITATERADDON, 459, 503);
+@@ -384,7 +389,7 @@ void SeedChooserScreen::Draw(Graphics* g)
+ 		}
+ 	}
+ 
+-	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
++	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
+ 	{
+ 		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
+ 		ChosenSeedState aSeedState = aChosenSeed.mSeedState;
+@@ -408,7 +413,7 @@ void SeedChooserScreen::Draw(Graphics* g)
+ 	}
+ 
+ 	mImitaterButton->Draw(g);
+-	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
++	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
+ 	{
+ 		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
+ 		ChosenSeedState aSeedState = aChosenSeed.mSeedState;
+@@ -520,7 +525,7 @@ void SeedChooserScreen::Update()
+ 	mSeedChooserAge++;
+ 	mToolTip->Update();
+ 
+-	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
++	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
+ 	{
+ 		if (mApp->HasSeedType(aSeedType))
+ 		{
+@@ -702,7 +707,7 @@ void SeedChooserScreen::PickRandomSeeds()
+ 	for (int anIndex = mSeedsInBank; anIndex < mBoard->mSeedBank->mNumPackets; anIndex++)
+ 	{
+ 		SeedType aSeedType;
+-		do aSeedType = (SeedType)Rand(mApp->GetSeedsAvailable());
++		do aSeedType = (SeedType)Rand(mApp->HasSeedType(SEED_LEFTPEATER)?NUM_SEED_TYPES:mApp->GetSeedsAvailable());
+ 		while (!mApp->HasSeedType(aSeedType) || aSeedType == SEED_IMITATER || mChosenSeeds[aSeedType].mSeedState != SEED_IN_CHOOSER);
+ 		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
+ 		aChosenSeed.mTimeStartMotion = 0;
+@@ -714,7 +719,7 @@ void SeedChooserScreen::PickRandomSeeds()
+ 		aChosenSeed.mSeedIndexInBank = anIndex;
+ 		mSeedsInBank++;
+ 	}
+-	for (SeedType aSeedFlying = SEED_PEASHOOTER; aSeedFlying < NUM_SEEDS_IN_CHOOSER; aSeedFlying = (SeedType)(aSeedFlying + 1))
++	for (SeedType aSeedFlying = SEED_PEASHOOTER; aSeedFlying < AbstractChooserCount(); aSeedFlying = (SeedType)(aSeedFlying + 1))
+ 		LandFlyingSeed(mChosenSeeds[aSeedFlying]);
+ 	CloseSeedChooser();
+ }
+@@ -767,7 +772,7 @@ SeedType SeedChooserScreen::SeedHitTest(int x, int y)
+ {
+ 	if (mMouseVisible)
+ 	{
+-		for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
++		for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
+ 		{
+ 			ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
+ 			if (!mApp->HasSeedType(aSeedType) || aChosenSeed.mSeedState == SEED_PACKET_HIDDEN) continue;
+@@ -779,7 +784,7 @@ SeedType SeedChooserScreen::SeedHitTest(int x, int y)
+ 
+ SeedType SeedChooserScreen::FindSeedInBank(int theIndexInBank)
+ {
+-	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
++	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
+ 	{
+ 		if (mApp->HasSeedType(aSeedType))
+ 		{
+@@ -979,7 +984,7 @@ void SeedChooserScreen::MouseDown(int x, int y, int theClickCount)
+ 
+ 	if (mSeedsInFlight > 0)
+ 	{
+-		for (int i = 0; i < NUM_SEEDS_IN_CHOOSER; i++)
++		for (int i = 0; i < AbstractChooserCount(); i++)
+ 		{
+ 			LandFlyingSeed(mChosenSeeds[i]);
+ 		}
+@@ -1071,7 +1076,7 @@ void SeedChooserScreen::MouseDown(int x, int y, int theClickCount)
+ 
+ bool SeedChooserScreen::PickedPlantType(SeedType theSeedType)
+ {
+-	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
++	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
+ 	{
+ 		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
+ 		if (aChosenSeed.mSeedState == SEED_IN_BANK)
+@@ -1126,7 +1131,7 @@ void SeedChooserScreen::KeyChar(char theChar)
+ 
+ void SeedChooserScreen::UpdateAfterPurchase()
+ {
+-	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < NUM_SEEDS_IN_CHOOSER; aSeedType = (SeedType)(aSeedType + 1))
++	for (SeedType aSeedType = SEED_PEASHOOTER; aSeedType < AbstractChooserCount(); aSeedType = (SeedType)(aSeedType + 1))
+ 	{
+ 		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
+ 		if (aChosenSeed.mSeedState == SEED_IN_BANK)
 diff --git a/src/Lawn/Zombie.cpp b/src/Lawn/Zombie.cpp
-index c140a3d..6e9f2d6 100644
+index c140a3d..554c6ec 100644
 --- a/src/Lawn/Zombie.cpp
 +++ b/src/Lawn/Zombie.cpp
 @@ -32,6 +32,8 @@
@@ -969,7 +1219,22 @@ index c140a3d..6e9f2d6 100644
  #include "../Resources.h"
  #include "System/PlayerInfo.h"
  #include "System/Zombatar.h"
-@@ -4137,6 +4139,7 @@ void Zombie::UpdateZombieWalking()
+@@ -1687,12 +1689,14 @@ void Zombie::UpdateZombieFlyer()
+ 
+ void Zombie::UpdateZombieNewspaper()
+ {
++	SandboxZombies::RecoverPhone(this);
+ 	if (mZombiePhase == ZombiePhase::PHASE_NEWSPAPER_MADDENING)
+ 	{
+ 		Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+ 		if (aBodyReanim->mLoopCount > 0)
+ 		{
+ 			mZombiePhase = ZombiePhase::PHASE_NEWSPAPER_MAD;
++			if (SandboxZombies::IsPhone(this)) mPhaseCounter = 400;
+ 			if (mBoard->CountZombiesOnScreen() <= 10 && mHasHead)
+ 			{
+ 				mApp->PlayFoley(FoleyType::FOLEY_NEWSPAPER_RARRGH);
+@@ -4137,6 +4141,7 @@ void Zombie::UpdateZombieWalking()
  			}
  		}
  
@@ -977,7 +1242,7 @@ index c140a3d..6e9f2d6 100644
  		if (IsWalkingBackwards() || mZombiePhase == ZombiePhase::PHASE_DANCER_DANCING_IN)
  		{
  			mPosX += aSpeed;
-@@ -4831,6 +4834,7 @@ void Zombie::AnimateChewSound()
+@@ -4831,6 +4836,7 @@ void Zombie::AnimateChewSound()
  		if (aPlant->mSeedType == SeedType::SEED_HYPNOSHROOM && !aPlant->mIsAsleep)
  		{
  			mApp->PlayFoley(FoleyType::FOLEY_FLOOP);
@@ -985,7 +1250,7 @@ index c140a3d..6e9f2d6 100644
  			aPlant->Die();
  
  			StartMindControlled();
-@@ -6289,6 +6293,7 @@ void Zombie::DrawButter(Graphics* g, const ZombieDrawPosition& theDrawPos)
+@@ -6289,6 +6295,7 @@ void Zombie::DrawButter(Graphics* g, const ZombieDrawPosition& theDrawPos)
  
  void Zombie::Draw(Graphics* g)
  {
@@ -993,7 +1258,7 @@ index c140a3d..6e9f2d6 100644
  	if (mZombieHeight == ZombieHeight::HEIGHT_GETTING_BUNGEE_DROPPED)
  		return;
  
-@@ -6342,6 +6347,8 @@ void Zombie::Draw(Graphics* g)
+@@ -6342,6 +6349,8 @@ void Zombie::Draw(Graphics* g)
  
  bool Zombie::CanTargetPlant(Plant* thePlant, ZombieAttackType theAttackType)
  {
@@ -1002,7 +1267,7 @@ index c140a3d..6e9f2d6 100644
  	if (mApp->IsWallnutBowlingLevel() && theAttackType != ZombieAttackType::ATTACKTYPE_VAULT)
  		return false;
  
-@@ -7276,6 +7283,7 @@ bool Zombie::TrySpawnLevelAward()
+@@ -7276,6 +7285,7 @@ bool Zombie::TrySpawnLevelAward()
  
  void Zombie::DropLoot()
  {
@@ -1010,7 +1275,15 @@ index c140a3d..6e9f2d6 100644
  	if (!IsOnBoard())
  		return;
  
-@@ -7709,6 +7717,7 @@ void Zombie::DropHelm(unsigned int theDamageFlags)
+@@ -7573,6 +7583,7 @@ void Zombie::DropShield(unsigned int theDamageFlags)
+ 			float aPosX, aPosY;
+ 			GetTrackPosition("Zombie_paper_paper", aPosX, aPosY);
+ 			PvzpParticleSystem* aParticle = mApp->AddPvzpParticle(aPosX, aPosY, mRenderOrder + 1, ParticleEffect::PARTICLE_ZOMBIE_NEWSPAPER);
++			if (aParticle && SandboxZombies::IsPhone(this)) aParticle->OverrideImage(nullptr, SandboxZombies::DetachedArmor(this));
+ 			OverrideParticleScale(aParticle);
+ 		}
+ 
+@@ -7709,6 +7720,7 @@ void Zombie::DropHelm(unsigned int theDamageFlags)
  	{
  		PvzpParticleSystem* aParticle = mApp->AddPvzpParticle(aPosX, aPosY, mRenderOrder + 1, aEffect);
  		OverrideParticleScale(aParticle);
@@ -1018,7 +1291,7 @@ index c140a3d..6e9f2d6 100644
  	}
  
  	mHelmType = HelmType::HELMTYPE_NONE;
-@@ -7969,6 +7978,7 @@ void Zombie::TakeBodyDamage(int theDamage, unsigned int theDamageFlags)
+@@ -7969,6 +7981,7 @@ void Zombie::TakeBodyDamage(int theDamage, unsigned int theDamageFlags)
  
  void Zombie::TakeDamage(int theDamage, unsigned int theDamageFlags)
  {
@@ -1026,7 +1299,7 @@ index c140a3d..6e9f2d6 100644
  	if (mZombiePhase == ZombiePhase::PHASE_JACK_IN_THE_BOX_POPPING || IsDeadOrDying())
  		return;
  
-@@ -8025,6 +8035,7 @@ float Zombie::GetPosYBasedOnRow(int theRow)
+@@ -8025,6 +8038,7 @@ float Zombie::GetPosYBasedOnRow(int theRow)
  
  Zombie::~Zombie()
  {
@@ -1035,7 +1308,7 @@ index c140a3d..6e9f2d6 100644
  	StopZombieSound();
  }
 diff --git a/src/LawnApp.cpp b/src/LawnApp.cpp
-index d360a2f..e7299a5 100644
+index d360a2f..e11e16b 100644
 --- a/src/LawnApp.cpp
 +++ b/src/LawnApp.cpp
 @@ -24,6 +24,10 @@
@@ -1086,6 +1359,45 @@ index d360a2f..e7299a5 100644
  	if (mBoard == nullptr || !mBoard->mLevelComplete)
  		return;
  
+@@ -2267,6 +2276,8 @@ int LawnApp::GetSeedsAvailable()
+ 
+ bool LawnApp::HasSeedType(SeedType theSeedType)
+ {
++	// Existing unused left-facing shooter ID keeps old saves and enum values intact.
++	if (theSeedType == SEED_LEFTPEATER) return MemeAdventure::RosterEnabled() && mPlayerInfo && (HasFinishedAdventure() || mPlayerInfo->GetLevel() >= 8);
+ 	if (IsTrialStageLocked() && theSeedType >= SeedType::SEED_JALAPENO)
+ 		return false;
+ 
+diff --git a/src/PvzpLib/PvzpStringFile.cpp b/src/PvzpLib/PvzpStringFile.cpp
+index 3cc24b4..9155aaf 100644
+--- a/src/PvzpLib/PvzpStringFile.cpp
++++ b/src/PvzpLib/PvzpStringFile.cpp
+@@ -23,6 +23,7 @@
+ #include "PvzpDebug.h"
+ #include "PvzpCommon.h"
+ #include "PvzpStringFile.h"
++#include "../MemeAdventure.h"
+ #include "paklib/PakInterface.h"
+ #include "graphics/Font.h"
+ 
+@@ -164,7 +165,7 @@ std::string_view PvzpStringListFind(std::string_view theName)
+ 	auto anItr = gSexyAppBase->mStringProperties.find(theName);
+ 	if (anItr != gSexyAppBase->mStringProperties.end())
+ 	{
+-		return anItr->second;
++		return MemeAdventure::Translate(theName,anItr->second);
+ 	}
+ 	else
+ 	{
+@@ -191,7 +192,7 @@ std::optional<std::string_view> PvzpStringTryTranslate(std::string_view theStrin
+ 		std::string_view aName = theString.substr(1, theString.size() - 2);
+ 		auto anItr = gSexyAppBase->mStringProperties.find(aName);
+ 		if (anItr != gSexyAppBase->mStringProperties.end())
+-			return anItr->second;
++			return MemeAdventure::Translate(aName,anItr->second);
+ 	}
+ 	return std::nullopt;
+ }
 diff --git a/src/PvzpLib/Reanimator.cpp b/src/PvzpLib/Reanimator.cpp
 index 3126c58..58d694b 100644
 --- a/src/PvzpLib/Reanimator.cpp

@@ -31,6 +31,7 @@
 #include "SeedPacket.h"
 #include "../LawnApp.h"
 #include "../SandboxPlants.h"
+#include "../MemeAdventure.h"
 #include "../SandboxMemeRules.h"
 #include "CursorObject.h"
 #include "../GameConstants.h"
@@ -1013,7 +1014,7 @@ bool Plant::MakesSun()
 
 void Plant::UpdateProductionPlant()
 {
-	if (MemeCharacters::Is(this)) return;
+	if (MemeCharacters::Is(this) && !MemeCharacters::Producing(this)) return;
 	if (!IsInPlay() || mApp->IsIZombieLevel() || mApp->mGameMode == GameMode::GAMEMODE_UPSELL || mApp->mGameMode == GameMode::GAMEMODE_INTRO)
 		return;
 
@@ -5023,6 +5024,7 @@ const PlantDefinition& GetPlantDefinition(SeedType theSeedType)
 
 int Plant::GetCost(SeedType theSeedType, SeedType theImitaterType)
 {
+	if (const auto* replacement = MemeAdventure::Replacement(int(theSeedType), int(theImitaterType))) return replacement->cost;
 	if (gLawnApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED || gLawnApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED_TWIST)
 	{
 		if (theSeedType == SeedType::SEED_REPEATER)
@@ -5086,6 +5088,7 @@ int Plant::GetCost(SeedType theSeedType, SeedType theImitaterType)
 
 std::string Plant::GetNameString(SeedType theSeedType, SeedType theImitaterType)
 {
+	if (const auto* replacement = MemeAdventure::Replacement(int(theSeedType), int(theImitaterType))) return replacement->name;
 	const PlantDefinition& aPlantDef = GetPlantDefinition(theSeedType);
 	std::string aName = std::format("[{}]", aPlantDef.mPlantName);
 	std::string aTranslatedName(PvzpStringTranslate(aName));
@@ -5103,6 +5106,7 @@ std::string Plant::GetNameString(SeedType theSeedType, SeedType theImitaterType)
 
 std::string Plant::GetToolTip(SeedType theSeedType)
 {
+	if (const auto* replacement = MemeAdventure::Replacement(int(theSeedType))) return replacement->hint;
 	const PlantDefinition& aPlantDef = GetPlantDefinition(theSeedType);
 	std::string aToolTip = std::format("[{}_TOOLTIP]", aPlantDef.mPlantName);
 	return std::string(PvzpStringTranslate(aToolTip));
@@ -5110,6 +5114,7 @@ std::string Plant::GetToolTip(SeedType theSeedType)
 
 int Plant::GetRefreshTime(SeedType theSeedType, SeedType theImitaterType)
 {
+	if (MemeAdventure::Replacement(int(theSeedType), int(theImitaterType))) return 300;
 	if (Challenge::IsZombieSeedType(theSeedType))
 	{
 		return 0;
@@ -5129,6 +5134,7 @@ int Plant::GetRefreshTime(SeedType theSeedType, SeedType theImitaterType)
 
 bool Plant::IsNocturnal(SeedType theSeedtype)
 {
+	if (theSeedtype == SEED_PUFFSHROOM && MemeAdventure::Replacement(int(theSeedtype))) return false;
 	return
 		theSeedtype == SeedType::SEED_PUFFSHROOM ||
 		theSeedtype == SeedType::SEED_SEASHROOM ||

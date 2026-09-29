@@ -1,6 +1,7 @@
 // Per-instance atlas parts; original image definitions remain untouched.
 #include "SandboxArt.h"
 #include "SandboxMemeRules.h"
+#include "AbstractPhonePixels.h"
 #include "LawnApp.h"
 #include "graphics/GLImage.h"
 #include "graphics/Graphics.h"
@@ -12,6 +13,25 @@
 #include <algorithm>
 #include <cmath>
 namespace SandboxArt {
+Sexy::Image* Phone(int damage){
+ damage=std::clamp(damage,0,2);static std::unique_ptr<Sexy::MemoryImage> images[3];auto& im=images[damage];if(im)return im.get();
+ using namespace AbstractPhonePixels;im=std::make_unique<Sexy::MemoryImage>();im->Create(Width,Height);auto* out=im->GetBits();std::copy(Pixels,Pixels+Width*Height,out);
+ // Cracks are a small native-resolution damage effect, not a second character redraw.
+ auto line=[&](int x0,int y0,int x1,int y1){const int steps=std::max(std::abs(x1-x0),std::abs(y1-y0));for(int i=0;i<=steps;++i){const int x=x0+(x1-x0)*i/steps,y=y0+(y1-y0)*i/steps;if(x>=0&&x<Width&&y>=0&&y<Height&&(out[y*Width+x]>>24)>128)out[y*Width+x]=0xffb7c5b2;}};
+ if(damage){line(45,35,50,47);line(50,47,42,58);line(50,47,66,41);}
+ if(damage==2){line(50,47,29,41);line(34,43,25,54);line(52,45,61,30);}
+ im->BitsChanged();return im.get();
+}
+Sexy::Image* PhoneHands(const char* file){
+ static std::map<std::string,std::unique_ptr<Sexy::MemoryImage>> images;auto& out=images[file];if(out)return out.get();
+ auto* source=dynamic_cast<Sexy::MemoryImage*>(NativeImage(file));if(!source)return nullptr;const int w=source->mWidth,h=source->mHeight;const auto* in=source->GetBits();
+ out=std::make_unique<Sexy::MemoryImage>();out->Create(w,h);auto* bits=out->GetBits();std::fill(bits,bits+w*h,0u);
+ // Preserve the exact original green fingers and their two-pixel outline, removing paper between them.
+ for(int y=0;y<h;++y)for(int x=0;x<w;++x){const auto px=in[y*w+x];const int r=(px>>16)&255,g=(px>>8)&255,b=px&255;
+  if((px>>24)>80&&g>r+8&&g>b+3)for(int yy=std::max(0,y-2);yy<std::min(h,y+3);++yy)for(int xx=std::max(0,x-2);xx<std::min(w,x+3);++xx)bits[yy*w+xx]=in[yy*w+xx];
+ }
+ out->BitsChanged();return out.get();
+}
 Sexy::Image* NativeImage(const char* file){
  static std::map<std::string,std::unique_ptr<Sexy::GLImage>> cache;
  const auto path=std::string("reanim/")+file;

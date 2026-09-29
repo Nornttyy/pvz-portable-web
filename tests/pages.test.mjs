@@ -5,6 +5,7 @@ import './website-loading.test.mjs';
 import './automatic-resources.test.mjs';
 import './font-repair.test.mjs';
 import './expansion.test.mjs';
+import './adventure-replacements.test.mjs';
 import './sandbox-placement.test.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';

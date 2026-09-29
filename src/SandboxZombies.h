@@ -21,5 +21,7 @@ void ForgetShot(Projectile* shot);
 void ForgetPlant(Plant* plant);
 bool AttackSlowed(const Plant* plant);
 void RefreshDamageArt(Zombie* zombie);
+bool IsPhone(const Zombie* zombie);
+void RecoverPhone(Zombie* zombie);
 Sexy::Image* DetachedArmor(const Zombie* zombie);
 }

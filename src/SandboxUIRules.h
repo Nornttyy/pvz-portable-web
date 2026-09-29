@@ -39,7 +39,7 @@ inline constexpr Box NativeFilter{7,520,78,30},PowerFilter{93,520,78,30},FusionF
 inline constexpr int RecipesPerPage=5;
 constexpr Box PowerCard(int i){return {23+i*84,126,50,70};}
 constexpr Box PowerBase(int i){return {11+(i%4)*65,252+(i/4)*80,50,70};}
-constexpr Box Character(int i){return {10,122+i*92,244,86};}
+constexpr Box Character(int i){return SidebarPlant(i);}
 constexpr Box RecipeCard(int row,int part){return {8+part*94,118+row*78,50,70};}
 inline constexpr Box PrevPage{7,557,70,30},NextPage{187,557,70,30};
 constexpr Box PlantCard(int i) { return {185+(i%8)*54, 128+(i/8)*70, 50, 70}; }

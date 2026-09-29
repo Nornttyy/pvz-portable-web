@@ -1,6 +1,6 @@
 # 网梗之力：素材沿用记录
 
-以下全文为已退役融合版本的历史素材和测试记录。当前版本改为四个可直接种植的独立角色，融合入口已撤下；沿用原版骨骼与效果，新增各自战斗机制。最新规则、存档和测试说明见 [WEBSITE.md](../../WEBSITE.md)，当前实机检查脚本为 `scripts/qa-fixed-characters.mjs`。
+以下全文为已退役融合版本的历史素材和测试记录。当前版本使用原生卡槽中的替换植物及新增植物，融合入口已撤下。最新规则见 [WEBSITE.md](../../WEBSITE.md)，本批素材记录见 [abstract/README.md](../abstract/README.md)，当前实机检查脚本为 `scripts/qa-abstract.mjs` 和 `scripts/qa-adventure-replacements.mjs`。
 
 本轮不使用图片生成，不加新的角色 PNG，不改动资源包。力量卡 ID 180 不是植物；0、1、3 与力量合成后分别变为 120、121、122。旧内容和存档格式保持兼容。
 

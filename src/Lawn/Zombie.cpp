@@ -1689,12 +1689,14 @@ void Zombie::UpdateZombieFlyer()
 
 void Zombie::UpdateZombieNewspaper()
 {
+	SandboxZombies::RecoverPhone(this);
 	if (mZombiePhase == ZombiePhase::PHASE_NEWSPAPER_MADDENING)
 	{
 		Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
 		if (aBodyReanim->mLoopCount > 0)
 		{
 			mZombiePhase = ZombiePhase::PHASE_NEWSPAPER_MAD;
+			if (SandboxZombies::IsPhone(this)) mPhaseCounter = 400;
 			if (mBoard->CountZombiesOnScreen() <= 10 && mHasHead)
 			{
 				mApp->PlayFoley(FoleyType::FOLEY_NEWSPAPER_RARRGH);
@@ -7581,6 +7583,7 @@ void Zombie::DropShield(unsigned int theDamageFlags)
 			float aPosX, aPosY;
 			GetTrackPosition("Zombie_paper_paper", aPosX, aPosY);
 			PvzpParticleSystem* aParticle = mApp->AddPvzpParticle(aPosX, aPosY, mRenderOrder + 1, ParticleEffect::PARTICLE_ZOMBIE_NEWSPAPER);
+			if (aParticle && SandboxZombies::IsPhone(this)) aParticle->OverrideImage(nullptr, SandboxZombies::DetachedArmor(this));
 			OverrideParticleScale(aParticle);
 		}
 

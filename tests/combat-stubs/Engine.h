@@ -11,6 +11,7 @@ enum SeedType {SEED_PEASHOOTER=0,SEED_NONE=-1};
 enum ZombieType {ZOMBIE_NORMAL=0,ZOMBIE_IMP=24,ZOMBIE_GARGANTUAR=23,ZOMBIE_REDEYE_GARGANTUAR=32,ZOMBIE_ZAMBONI=12};
 enum ZombieID : unsigned { ZOMBIEID_NULL=0 };
 constexpr int PHASE_ZOMBIE_NORMAL=0,HEIGHT_ZOMBIE_NORMAL=0;
+constexpr int PHASE_NEWSPAPER_MAD=2,PHASE_NEWSPAPER_READING=3,SHIELDTYPE_NEWSPAPER=1;
 enum ReanimationType {REANIM_ZOMBIE,REANIM_FLAG};
 enum ProjectileType {PROJECTILE_PEA,PROJECTILE_SNOWPEA,PROJECTILE_FIREBALL,PROJECTILE_ZOMBIE_PEA};
 enum ProjectileMotion {MOTION_STRAIGHT,MOTION_STAR,MOTION_HOMING,MOTION_THREEPEATER,MOTION_BACKWARDS};
@@ -35,6 +36,7 @@ struct Graphics{
  void DrawImage(Image*,Rect,Rect){};
 };
 inline Image* IMAGE_SEEDS=nullptr;inline int FONT_BRIANNETOD12=0;
+inline Image* IMAGE_PROJECTILEPEA=nullptr;
 }
 struct Track{const char* mName="";};
 struct TrackGroup{int count=0;Track* tracks=nullptr;};
@@ -53,7 +55,7 @@ struct Reanimation{
  void GetTrackMatrix(int,Sexy::SexyTransform2D& out){out=matrix;}void GetCurrentTransform(int,ReanimatorTransform* out){*out=pose;}
 };
 struct ReanimatorCache{std::unique_ptr<Sexy::MemoryImage> MakeBlankMemoryImage(int,int){return std::make_unique<Sexy::MemoryImage>();}};
-struct LawnApp{ReanimatorCache cache;ReanimatorCache* mReanimatorCache=&cache;std::map<int,Reanimation*> reanims;Reanimation* ReanimationTryToGet(int id){return reanims.contains(id)?reanims.at(id):nullptr;}Sexy::GLImage* GetImage(std::string file){auto* im=new Sexy::GLImage;im->path=file;return im;}void PlayFoley(int){}};
+struct LawnApp{bool adventure=true;bool IsAdventureMode(){return adventure;}ReanimatorCache cache;ReanimatorCache* mReanimatorCache=&cache;std::map<int,Reanimation*> reanims;Reanimation* ReanimationTryToGet(int id){return reanims.contains(id)?reanims.at(id):nullptr;}Sexy::GLImage* GetImage(std::string file){auto* im=new Sexy::GLImage;im->path=file;return im;}void PlayFoley(int){}};
 extern LawnApp* gLawnApp;
 class Board;
 class Zombie{
@@ -63,6 +65,8 @@ public:
  float mPosX=0,mPosY=0,mScaleZombie=1;int mX=0,mY=0,mRow=0,mBodyReanimID=0,mBodyHealth=1000,mBodyMaxHealth=1000,mHelmHealth=0,mHelmMaxHealth=0;
  bool mDead=false,mMindControlled=false,mHasHead=true,mHasArm=true,mIsEating=false;int chill=0,mIceTrapCounter=0,mButteredCounter=0,mRenderOrder=0;
  int mZombiePhase=0,mZombieHeight=0;bool mInPool=false;
+ int mPhaseCounter=0,mShieldHealth=0,mShieldMaxHealth=0,mShieldType=0;
+ void StopEating(){mIsEating=false;}void AttachShield(){}void PickRandomSpeed(){}
  void SetRow(int row){mRow=row;}
  bool IsOnBoard(){return true;}
  void StartWalkAnim(int){}

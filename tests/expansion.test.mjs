@@ -17,7 +17,7 @@ test('meme powers exercise real production combat and preserve native pixel shad
  assert.match((await run(binary)).stdout,/Meme powers:.*passed/);
 });
 test('power token is not a plant or a save entry; only results round-trip',()=>{
- for(const type of [500,501,502,503])assert.equal(validateLayout({schema:1,map:0,plants:[{type,col:0,row:0}]}).plants[0].type,type);
+ for(const type of [500,501,502,503,504])assert.equal(validateLayout({schema:1,map:0,plants:[{type,col:0,row:0}]}).plants[0].type,type);
  assert.throws(()=>validateLayout({schema:1,map:0,plants:[{type:180,col:0,row:0}]}));
 });
 test('persistent native sidebar fits both rosters and keeps the lawn in original units',async()=>{
@@ -45,8 +45,8 @@ test('native projectile integration retains splats, centered scaling and fire at
  const plant=source.slice(source.indexOf('void Plant::Fire('),source.indexOf('Zombie* Plant::FindTargetZombie('));
  assert.ok(plant.indexOf('aProjectile->ConvertToFireball(mPlantCol)')>plant.indexOf('SandboxPlants::OnFired(this,aProjectile,theTargetZombie)'),'fire attaches only after muzzle correction');
 });
-test('four fixed characters replace infusion; old results migrate without losing plants',async()=>{
- assert.equal(ORIGINAL_PLANTS.length,4);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,502,503]);assert.deepEqual(ORIGINAL_ZOMBIES,[]);assert.equal(ZOMBIES.length,23);
+test('five mechanic characters replace infusion; old results migrate without losing plants',async()=>{
+ assert.equal(ORIGINAL_PLANTS.length,5);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,502,503,504]);assert.deepEqual(ORIGINAL_ZOMBIES,[]);assert.equal(ZOMBIES.length,23);
  const bases=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
  for(let id=100;id<120;++id)assert.equal(validateLayout({schema:1,map:0,plants:[{type:id,col:0,row:0}]}).plants[0].type,bases[id-100]);
  for(const p of RETIRED_PLANTS){
@@ -60,15 +60,25 @@ test('four fixed characters replace infusion; old results migrate without losing
  const code=(await read('src/SandboxPlants.cpp')).toString();assert.doesNotMatch(code,/NutMouthMatrix|dandelion|poison|echo-lily|Rig\(/);
  assert.doesNotMatch((await read('src/SandboxUI.cpp')).toString(),/Button\(g,CustomFilter/);
 });
-test('adventure wires independent slot, optional save chunk and actual combat ticks',async()=>{
+test('adventure replaces native cards, preserving optional saves and combat ticks',async()=>{
  const adventure=(await read('src/MemeAdventure.cpp')).toString(),save=(await read('src/Lawn/System/SaveGame.cpp')).toString();
- assert.match(adventure,/TakeSunMoney\(d->cost\)/);assert.match(adventure,/cooldown=Cooldown/);assert.match(adventure,/SandboxPlants::Tick\(b\)/);
+ assert.doesNotMatch(adventure,/TakeSunMoney|SandboxDrawButton|选卡后直接种植/);assert.match(adventure,/SandboxPlants::Tick\(b\)/);
  assert.match(save,/SAVE4_CHUNK_MEME_POWERS = 21/);assert.match(save,/MemeAdventure::Restore\(theBoard\)/);
  assert.match(save,/SAVE4_CHUNK_MEME_PROJECTILES = 22/);assert.match(save,/MemeAdventure::LoadShots\(save.shots\)/);
- assert.match(adventure,/CURSOR_TYPE_NORMAL/);assert.match(adventure,/void OnPlanted\(Plant\*\)\{\}/);
+ assert.match(adventure,/CURSOR_TYPE_NORMAL/);assert.match(adventure,/MemeCharacters::Assign\(p,d->id\)/);
  assert.match(adventure,/GetPlantDefinition\(p->mSeedType\).mLaunchRate/);
  const board=(await read('src/Lawn/Board.cpp')).toString();assert.match(board,/MemeAdventure::OnPlanted\(aPlant\)/);
  const plants=(await read('src/Lawn/Plant.cpp')).toString();
+ assert.match(plants,/MemeAdventure::Replacement\(int\(theSeedType\), int\(theImitaterType\)\)\) return 300/);
+ assert.match(plants,/MemeCharacters::Is\(this\) && !MemeCharacters::Producing\(this\)/);
+ assert.match(adventure,/for\(auto\* p:b->mPlants\)OnPlanted\(p\)/);
+ assert.doesNotMatch((await read('src/Lawn/SeedPacket.cpp')).toString(),/MemeAdventure::DrawCardName/);
+ assert.doesNotMatch(adventure,/void DrawCardName/);
+ const characters=(await read('src/MemeCharacters.cpp')).toString();
+ assert.doesNotMatch(characters,/NutJaw|d->shortName/);
+ assert.doesNotMatch((await read('src/SandboxArt.cpp')).toString(),/NutJaw|for\(int tooth/);
+ assert.doesNotMatch((await read('src/SandboxUI.cpp')).toString(),/PvzpDrawString\(g,d.name|Say\(fused->name\)/);
+ assert.match((await read('src/PvzpLib/PvzpStringFile.cpp')).toString(),/MemeAdventure::Translate\(theName,anItr->second\)/);
  const special=plants.slice(plants.indexOf('void Plant::DoSpecial()'),plants.indexOf('void Plant::ImitaterMorph()'));
  assert.doesNotMatch(special,/void Plant::DoSpecial\(\)\s*\{\s*SandboxPlants::OneShot/);
  assert.match(special,/BurnRow\(mRow\);\s*mBoard->mIceTimer\[mRow\] = 20;\s*SandboxPlants::OneShot\(this\)/);

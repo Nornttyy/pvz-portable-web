@@ -6,6 +6,9 @@
 #include "SandboxUIRules.h"
 #include "SandboxPlants.h"
 #include "SandboxZombies.h"
+#include "SandboxArt.h"
+#include "PvzpLib/Reanimator.h"
+#include "graphics/MemoryImage.h"
 #include "SandboxButton.h"
 #include "SandboxFonts.h"
 #include "LawnApp.h"
@@ -87,6 +90,18 @@ void StorageAction(int action) {
 void Portrait(Graphics* g, Box b, int type) {
     const float scale=b.w/76.0f;
     g->DrawImage(IMAGE_ALMANAC_ZOMBIEWINDOW,b.x,b.y,b.w,b.h);
+    if(type==5){
+        static std::unique_ptr<MemoryImage> portrait;
+        if(!portrait){
+            portrait=gLawnApp->mReanimatorCache->MakeBlankMemoryImage(200,210);Graphics art(portrait.get());art.SetLinearBlend(true);
+            Reanimation rig;rig.ReanimationInitializeType(40,40,REANIM_ZOMBIE_NEWSPAPER);rig.SetFramesForLayer("anim_idle");
+            rig.SetImageOverride("Zombie_paper_paper",SandboxArt::Phone());
+            rig.SetImageOverride("Zombie_paper_hands",SandboxArt::PhoneHands("Zombie_paper_hands.png"));
+            rig.SetImageOverride("Zombie_paper_hands2",SandboxArt::PhoneHands("Zombie_paper_hands2.png"));rig.Draw(&art);
+        }
+        Graphics clipped(*g);clipped.SetClipRect(b.x+2,b.y+2,b.w-4,b.h-4);SandboxArt::DrawFit(&clipped,portrait.get(),b.x+4,b.y+5,b.w-8,b.h-10);
+        g->DrawImage(IMAGE_ALMANAC_ZOMBIEWINDOW2,b.x,b.y,b.w,b.h);return;
+    }
     if(SandboxZombies::Find(type)){
         Graphics clipped(*g);clipped.SetClipRect(b.x+2,b.y+2,b.w-4,b.h-4);
         SandboxZombies::DrawPortrait(&clipped,b.x,b.y,b.w,b.h,type);
@@ -135,7 +150,7 @@ bool Place(int cell, bool erase=false) {
     if(result>0){
         dirty=true;
         if(const auto* fused=SandboxPlants::Find(result)){
-            Say(fused->name);gLawnApp->PlaySample(SOUND_PLANTGROW);
+            gLawnApp->PlaySample(SOUND_PLANTGROW);
         }
     }
     else if(result==-3)Say("数量已满，请先清理场地");
@@ -235,7 +250,7 @@ void SandboxDrawUI(Graphics* g) {
     Button(g,Control(6),flags&32?"连放：开":"连放：关",flags&32);
     Button(g,Control(7),flags&16?"同格：开":"同格：关",flags&16);
 
-    std::string title=catalog==4?"网梗植物":catalog==2?"所有僵尸":"所有植物";
+    std::string title=catalog==4?"新增植物":catalog==2?"所有僵尸":"所有植物";
     std::string hoverName;
     if(catalog==2){
         const int count=int(Zombies.size()+SandboxZombies::Definitions.size());
@@ -250,15 +265,12 @@ void SandboxDrawUI(Graphics* g) {
             }
         }
     }else if(catalog==4){
-        const char* tips[]{"过热自伤，及时点击降温","点上半向上，下半向下","定时引来邻路步行僵尸","装死放行，再向后反击"};
-        for(int i=0;i<4;++i){
+        for(int i=0;i<int(MemeCharacters::Definitions.size());++i){
             const auto box=Character(i);const auto& d=MemeCharacters::Definitions[i];
             SandboxPlants::DrawCard(g,box.x,box.y,d.id);
             if(tool==PlantTool&&selectedPlant==d.id)Outline(g,{box.x,box.y,50,70});
-            PvzpDrawString(g,d.name,158,box.y+24,FONT_BRIANNETOD12,Color(244,215,125),DS_ALIGN_CENTER);
-            PvzpDrawString(g,tips[i],158,box.y+49,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
+            if(Hover(box))hoverName=d.name;
         }
-        PvzpDrawString(g,"切到「操作」后点击植物",132,579,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
     }else{
         const auto direct=DirectPlants();const int count=plantPage?int(direct.size()):48;
         for(int i=0;i<25&&i+catalogPage*25<count;++i){
@@ -274,7 +286,7 @@ void SandboxDrawUI(Graphics* g) {
     }
     if(catalog!=2){
         Button(g,NativeFilter,"原版",catalog==1&&!plantPage);
-        Button(g,PowerFilter,"网梗",catalog==4);
+        Button(g,PowerFilter,"新卡",catalog==4);
         Button(g,FusionFilter,"操作",tool==InteractTool);
     }
     PvzpDrawString(g,title,132,107,FONT_DWARVENTODCRAFT18,Color(92,230,40),DS_ALIGN_CENTER);
@@ -353,7 +365,7 @@ bool SandboxMouseDown(int x,int y,int clicks) {
             if(FusionFilter.Contains(x,y)){tool=InteractTool;return true;}
             if(NativeFilter.Contains(x,y)){catalog=1;plantPage=0;catalogPage=0;return true;}
             if(catalog==4){
-                for(int i=0;i<4;++i)if(Character(i).Contains(x,y)){selectedPlant=500+i;plants[plantSlot]=selectedPlant;tool=PlantTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;}
+                for(int i=0;i<int(MemeCharacters::Definitions.size());++i)if(Character(i).Contains(x,y)){selectedPlant=MemeCharacters::Definitions[i].id;plants[plantSlot]=selectedPlant;tool=PlantTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;}
                 return true;
             }
             if(!plantPage&&(PrevPage.Contains(x,y)||NextPage.Contains(x,y))){catalogPage=1-catalogPage;return true;}

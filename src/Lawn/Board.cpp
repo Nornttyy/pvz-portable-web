@@ -2028,6 +2028,7 @@ Plant* Board::NewPlant(int theGridX, int theGridY, SeedType theSeedType, SeedTyp
 	Plant* aPlant = mPlants.DataArrayAlloc();
 	aPlant->mIsOnBoard = true;
 	aPlant->PlantInitialize(theGridX, theGridY, theSeedType, theImitaterType);
+	MemeAdventure::OnPlanted(aPlant);
 	return aPlant;
 }
 
@@ -3855,7 +3856,6 @@ void Board::MouseDownWithPlant(int x, int y, int theClickCount)
 	else if (mCursorObject->mCursorType == CursorType::CURSOR_TYPE_PLANT_FROM_BANK)
 	{
 		Plant* aPlant = AddPlant(aGridX, aGridY, mCursorObject->mType, mCursorObject->mImitaterType);
-		MemeAdventure::OnPlanted(aPlant);
 		if (aIsAwake)
 		{
 			aPlant->SetSleeping(false);

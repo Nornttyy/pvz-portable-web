@@ -10,11 +10,12 @@ namespace Sexy { class Graphics; class Color; }
 namespace SandboxPlants {
 enum class Element { Fire, Ice, Alternating, Native };
 struct Definition { int id, base; Element element; const char* name; const char* note; const char* art=nullptr; int rate=0,damage=20; float scale=1.0f; };
-inline constexpr std::array<Definition,148> Definitions{{
+inline constexpr std::array<Definition,149> Definitions{{
     {500,0,Element::Native,"红温豌豆","点击降温 · 过热会自伤"},
-    {501,3,Element::Native,"甩锅坚果","点上半向上 · 下半向下"},
-    {502,8,Element::Native,"显眼包蘑菇","吸引邻路普通步行僵尸"},
-    {503,1,Element::Native,"已读不回花","装死放行 · 回身三连击"},
+    {501,3,Element::Native,"顶顶坚果","被啃后向前撞"},
+    {502,8,Element::Native,"显眼包蘑菇","近距离射击 · 吸引邻路僵尸"},
+    {503,1,Element::Native,"已读不回花","平时产阳光 · 装死后反击"},
+    {504,52,Element::Native,"豌豆吐射手","射手飞出去，豌豆留原地"},
     {120,0,Element::Native,"红温豌豆","持续攻击升温 · 红温连发 · 喘气停火","native-power"},
     {121,1,Element::Native,"红温向日葵","生产升温 · 集中产出 · 休息恢复","native-power"},
     {122,3,Element::Native,"红温坚果","受伤升温 · 爆发推退 · 冷静后再发动","native-power"},

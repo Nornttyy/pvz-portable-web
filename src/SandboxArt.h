@@ -7,6 +7,8 @@ Sexy::Image* Image(const char* family,const char* part);
 Sexy::Image* NativeImage(const char* file);
 Sexy::Image* PowerNative(const char* file,int level,int power);
 Sexy::Image* WarmNative(const char* file,int level);
+Sexy::Image* Phone(int damage=0);
+Sexy::Image* PhoneHands(const char* file);
 void DrawFit(Sexy::Graphics* g,Sexy::MemoryImage* image,int x,int y,int width,int height,float scale=1.0f);
 // Coordinates are relative to the caller's Graphics frame, exactly once.
 void Sprite(Sexy::Graphics* g,const char* part,float cx,float cy,float width,float height,float angle=0,int alpha=255);
