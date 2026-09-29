@@ -33,6 +33,7 @@
 #include "Projectile.h"
 #include "../LawnApp.h"
 #include "../SandboxZombies.h"
+#include "../SandboxPlants.h"
 #include "../Resources.h"
 #include "System/PlayerInfo.h"
 #include "System/Zombatar.h"
@@ -4833,6 +4834,7 @@ void Zombie::AnimateChewSound()
 		if (aPlant->mSeedType == SeedType::SEED_HYPNOSHROOM && !aPlant->mIsAsleep)
 		{
 			mApp->PlayFoley(FoleyType::FOLEY_FLOOP);
+			SandboxPlants::OneShot(aPlant,this);
 			aPlant->Die();
 
 			StartMindControlled();

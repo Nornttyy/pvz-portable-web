@@ -26,6 +26,7 @@
 #include "ZenGarden.h"
 #include "BoardInclude.h"
 #include "../Sandbox.h"
+#include "../MemeAdventure.h"
 #include "../SandboxUIRules.h"
 #include "../SandboxPlants.h"
 #include "../SandboxZombies.h"
@@ -239,7 +240,7 @@ Board::Board(LawnApp* theApp)
 	}
 }
 
-Board::~Board() = default;
+Board::~Board() { MemeAdventure::Reset(); SandboxPlants::Reset(); SandboxZombies::Reset(); }
 
 void BoardInitForPlayer()
 {
@@ -3854,6 +3855,7 @@ void Board::MouseDownWithPlant(int x, int y, int theClickCount)
 	else if (mCursorObject->mCursorType == CursorType::CURSOR_TYPE_PLANT_FROM_BANK)
 	{
 		Plant* aPlant = AddPlant(aGridX, aGridY, mCursorObject->mType, mCursorObject->mImitaterType);
+		MemeAdventure::OnPlanted(aPlant);
 		if (aIsAwake)
 		{
 			aPlant->SetSleeping(false);
@@ -4370,6 +4372,7 @@ void Board::PickUpTool(GameObjectType theObjectType)
 void Board::MouseDown(int x, int y, int theClickCount)
 {
 	if (SandboxMouseDown(x + (gSandboxEnabled ? mX : 0), y + (gSandboxEnabled ? mY : 0), theClickCount)) return;
+	if (MemeAdventure::MouseDown(this,x,y,theClickCount)) return;
 	UpdateMousePosition();
 	Widget::MouseDown(x, y, theClickCount);
 	mIgnoreMouseUp = !CanInteractWithBoardButtons();
@@ -6297,7 +6300,7 @@ void Board::DrawGameObjects(Graphics* g)
 	AddGameObjectRenderItemCursorPreview(aRenderList, aRenderItemCount, RenderObjectType::RENDER_ITEM_CURSOR_PREVIEW, mCursorPreview.get());
 
     // Effects join the native row-sorted world pass, never the UI overlay.
-    if(gSandboxEnabled) for(int row=0;row<(StageHasPool()?6:5);++row){
+    if(gSandboxEnabled||MemeAdventure::Visible(this)) for(int row=0;row<(StageHasPool()?6:5);++row){
         RenderItem& effect=aRenderList[aRenderItemCount++];
         effect.mRenderObjectType=RENDER_ITEM_SANDBOX_EFFECTS;
         effect.mBoardGridY=row;
@@ -7457,6 +7460,7 @@ void Board::DrawUITop(Graphics* g)
 	}
 
 	mToolTip->Draw(g);
+	MemeAdventure::Draw(this,g);
 	DrawDebugText(g);
 	DrawDebugObjectRects(g);
 }
@@ -7654,6 +7658,7 @@ void Board::DoTypingCheck(KeyCode theKey)
 void Board::KeyDown(KeyCode theKey)
 {
 	if (gSandboxEnabled) { SandboxKeyDown(theKey); return; }
+	if (theKey==KeyCode::KEYCODE_ESCAPE&&MemeAdventure::Cancel()) return;
 	DoTypingCheck(theKey);
 
 	if (mApp->mGameScene == GameScenes::SCENE_LEVEL_INTRO &&

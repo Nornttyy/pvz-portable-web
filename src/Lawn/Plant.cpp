@@ -31,6 +31,7 @@
 #include "SeedPacket.h"
 #include "../LawnApp.h"
 #include "../SandboxPlants.h"
+#include "../SandboxMemeRules.h"
 #include "CursorObject.h"
 #include "../GameConstants.h"
 #include "System/PlayerInfo.h"
@@ -674,6 +675,7 @@ bool Plant::IsSpiky()
 
 void Plant::DoRowAreaDamage(int theDamage, unsigned int theDamageFlags)
 {
+	theDamage = SandboxPlants::NativeDamage(this,theDamage);
 	int aDamageRangeFlags = GetDamageRangeFlags(PlantWeapon::WEAPON_PRIMARY);
 	Rect aAttackRect = GetPlantAttackRect(PlantWeapon::WEAPON_PRIMARY);
 
@@ -737,6 +739,7 @@ bool Plant::FindTargetAndFire(int theRow, PlantWeapon thePlantWeapon)
 	if (aZombie == nullptr)
 		return false;
 
+	if(mShootingCounter==0 && !(mSeedType==SEED_CATTAIL&&mLaunchCounter==50) && !(mSeedType==SEED_SPLITPEA&&mLaunchCounter==25)) SandboxPlants::NativeAction(this);
 	EndBlink();
 	Reanimation* aBodyReanim = mApp->ReanimationTryToGet(mBodyReanimID);
 	Reanimation* aHeadReanim = mApp->ReanimationTryToGet(mHeadReanimID);
@@ -913,8 +916,9 @@ bool Plant::FindStarFruitTarget()
 
 void Plant::LaunchStarFruit()
 {
-	if (FindStarFruitTarget())
+	if (SandboxPlants::NativeCanAct(this) && FindStarFruitTarget())
 	{
+		SandboxPlants::NativeAction(this);
 		PlayBodyReanim("anim_shoot", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 28.0f);
 		mShootingCounter = 40;
 	}
@@ -929,6 +933,7 @@ void Plant::StarFruitFire()
 	for (int i = 0; i < 5; i++)
 	{
 		Projectile* aProjectile = mBoard->AddProjectile(mX + 25, mY + 25, mRenderOrder - 1, mRow, ProjectileType::PROJECTILE_STAR);
+		SandboxPlants::OnFired(this,aProjectile,nullptr);
 		aProjectile->mDamageRangeFlags = GetDamageRangeFlags(PlantWeapon::WEAPON_PRIMARY);
 		aProjectile->mMotionType = ProjectileMotion::MOTION_STAR;
 
@@ -946,6 +951,9 @@ void Plant::StarFruitFire()
 
 void Plant::UpdateShooter()
 {
+	if (mLaunchCounter<=1 && !SandboxPlants::NativeCanAct(this)) return;
+	// Let an existing native shooting animation finish before starting another.
+	if (SandboxPlants::IsCustom(this) && !SandboxMemeRules::LegacyBase(SandboxPlants::EffectiveBase(this)) && mShootingCounter > 0 && mLaunchCounter <= 1) mLaunchCounter = 2;
 	mLaunchCounter--;
 	if (mLaunchCounter <= 0)
 	{
@@ -1036,6 +1044,8 @@ void Plant::UpdateProductionPlant()
 		mLaunchCounter = RandRangeInt(mLaunchRate - 150, mLaunchRate);
 		mApp->PlayFoley(FoleyType::FOLEY_SPAWN_SUN);
 
+		const int powerCopies = SandboxPlants::NativeProduction(this);
+		for (int powerCopy=0;powerCopy<powerCopies && mBoard->mCoins.mSize<mBoard->mCoins.mMaxSize-8;++powerCopy) {
 		if (mSeedType == SeedType::SEED_SUNSHROOM)
 		{
 			if (mState == PlantState::STATE_SUNSHROOM_SMALL)
@@ -1061,6 +1071,7 @@ void Plant::UpdateProductionPlant()
 			mBoard->AddCoin(mX, mY, (Sexy::Rand(100) < 10) ? CoinType::COIN_GOLD : CoinType::COIN_SILVER, CoinMotion::COIN_MOTION_COIN);
 		}
 
+		}
 		if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BIG_TIME)
 		{
 			if (mSeedType == SeedType::SEED_SUNFLOWER)
@@ -1125,6 +1136,7 @@ void Plant::UpdateGraveBuster()
 		}
 
 		mApp->AddPvzpParticle(mX + 40, mY + 40, mRenderOrder + 4, ParticleEffect::PARTICLE_GRAVE_BUSTER_DIE);
+		SandboxPlants::OneShot(this);
 		Die();
 		mBoard->DropLootPiece(mX + 40, mY, 12);
 	}
@@ -1240,6 +1252,7 @@ void Plant::UpdateTanglekelp()
 			{
 				aZombie->DragUnder();
 				aZombie->PoolSplash(false);
+				SandboxPlants::OneShot(this, aZombie);
 			}
 		}
 
@@ -1269,9 +1282,11 @@ void Plant::UpdateTanglekelp()
 void Plant::SpikeweedAttack()
 {
 	PVZP_ASSERT(IsSpiky());
+	if (!SandboxPlants::NativeCanAct(this)) return;
 
 	if (mState != PlantState::STATE_SPIKEWEED_ATTACKING)
 	{
+		SandboxPlants::NativeAction(this);
 		PlayBodyReanim("anim_attack", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 18.0f);
 		mApp->PlaySample(SOUND_THROW);
 
@@ -1393,6 +1408,7 @@ void Plant::UpdateTorchwood()
 				if (aProjectile->mProjectileType == ProjectileType::PROJECTILE_PEA)
 				{
 					aProjectile->ConvertToFireball(mPlantCol);
+					SandboxPlants::TorchPower(this,aProjectile);
 				}
 				else if (aProjectile->mProjectileType == ProjectileType::PROJECTILE_SNOWPEA)
 				{
@@ -1421,6 +1437,7 @@ void Plant::DoSquashDamage()
 			}
 		}
 	}
+	SandboxPlants::OneShot(this);
 }
 
 Zombie* Plant::FindSquashTarget()
@@ -1820,7 +1837,8 @@ void Plant::UpdateChomper()
 			}
 
 			mState = PlantState::STATE_CHOMPER_DIGESTING;
-			mStateCountdown = 4000;
+			SandboxPlants::NativeAction(this);
+			mStateCountdown = SandboxPlants::NativeCooldown(this,4000);
 		}
 	}
 	else if (mState == PlantState::STATE_CHOMPER_DIGESTING)
@@ -1858,8 +1876,9 @@ MagnetItem* Plant::GetFreeMagnetItem()
 
 void Plant::MagnetShroomAttactItem(Zombie* theZombie)
 {
+	SandboxPlants::NativeAction(this);
 	mState = PlantState::STATE_MAGNETSHROOM_SUCKING;
-	mStateCountdown = 1500;
+	mStateCountdown = SandboxPlants::NativeCooldown(this,1500);
 	PlayBodyReanim("anim_shooting", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 12.0f);
 	mApp->PlayFoley(FoleyType::FOLEY_MAGNETSHROOM);
 
@@ -2142,8 +2161,9 @@ void Plant::UpdateMagnetShroom()
 
 		if (aClosestLadder)
 		{
+			SandboxPlants::NativeAction(this);
 			mState = PlantState::STATE_MAGNETSHROOM_SUCKING;
-			mStateCountdown = 1500;
+			mStateCountdown = SandboxPlants::NativeCooldown(this,1500);
 			PlayBodyReanim("anim_shooting", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 12.0f);
 			mApp->PlayFoley(FoleyType::FOLEY_MAGNETSHROOM);
 
@@ -2296,11 +2316,12 @@ void Plant::UpdateGoldMagnetShroom()
 		{
 			PlayIdleAnim(14.0f);
 			mState = PlantState::STATE_MAGNETSHROOM_CHARGING;
-			mStateCountdown = RandRangeInt(200, 300);
+			mStateCountdown = SandboxPlants::NativeCooldown(this,RandRangeInt(200, 300));
 		}
 	}
 	else if (!IsAGoldMagnetAboutToSuck() && Sexy::Rand(50) == 0 && FindGoldMagnetTarget())
 	{
+		SandboxPlants::NativeAction(this);
 		mBoard->ShowCoinBank();
 		mState = PlantState::STATE_MAGNETSHROOM_SUCKING;
 		PlayBodyReanim("anim_attract", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 12.0f);
@@ -2682,6 +2703,7 @@ void Plant::UpdateReanimColor()
 		aColorOverride = Color(255, 255, 255);
 	}
 
+	SandboxPlants::NativeTint(this,aColorOverride);
 	aBodyReanim->mColorOverride = aColorOverride;
 
 	if (mHighlighted)
@@ -3406,7 +3428,7 @@ void Plant::UpdateShooting()
 		if (aBodyReanim->mLoopCount > 0)
 		{
 			mState = PlantState::STATE_COBCANNON_ARMING;
-			mStateCountdown = 3000;
+			mStateCountdown = SandboxPlants::NativeCooldown(this,3000);
 			PlayBodyReanim("anim_unarmed_idle", ReanimLoopType::REANIM_LOOP, 20, aBodyReanim->mDefinition->mFPS);
 			return;
 		}
@@ -4312,6 +4334,7 @@ void Plant::DoSpecial()
 		{
 			mState = PlantState::STATE_DOINGSPECIAL;
 			BlowAwayFliers();
+			SandboxPlants::OneShot(this);
 		}
 		break;
 	}
@@ -4326,6 +4349,7 @@ void Plant::DoSpecial()
 		mApp->AddPvzpParticle(aPosX, aPosY, static_cast<int>(RenderLayer::RENDER_LAYER_TOP), ParticleEffect::PARTICLE_POWIE);
 		mBoard->ShakeBoard(3, -4);
 
+		SandboxPlants::OneShot(this);
 		Die();
 		break;
 	}
@@ -4334,6 +4358,7 @@ void Plant::DoSpecial()
 		mApp->PlaySample(SOUND_DOOMSHROOM);
 
 		mBoard->KillAllZombiesInRadius(mRow, aPosX, aPosY, 250, 3, true, aDamageRangeFlags);
+		SandboxPlants::OneShot(this);
 		KillAllPlantsNearDoom();
 
 		mApp->AddPvzpParticle(aPosX, aPosY, static_cast<int>(RenderLayer::RENDER_LAYER_TOP), ParticleEffect::PARTICLE_DOOM);
@@ -4354,6 +4379,7 @@ void Plant::DoSpecial()
 		BurnRow(mRow);
 		mBoard->mIceTimer[mRow] = 20;
 
+		SandboxPlants::OneShot(this);
 		Die();
 		break;
 	}
@@ -4375,6 +4401,7 @@ void Plant::DoSpecial()
 		IceZombies();
 		mApp->AddPvzpParticle(aPosX, aPosY, static_cast<int>(RenderLayer::RENDER_LAYER_TOP), ParticleEffect::PARTICLE_ICE_TRAP);
 
+		SandboxPlants::OneShot(this);
 		Die();
 		break;
 	}
@@ -4391,6 +4418,7 @@ void Plant::DoSpecial()
 		mApp->AddPvzpParticle(aPosX + 20.0f, aPosY, aRenderPosition, ParticleEffect::PARTICLE_POTATO_MINE);
 		mBoard->ShakeBoard(3, -4);
 
+		SandboxPlants::OneShot(this);
 		Die();
 		break;
 	}
@@ -4406,6 +4434,7 @@ void Plant::DoSpecial()
 		PlayBodyReanim("anim_crumble", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 22.0f);
 		mApp->PlayFoley(FoleyType::FOLEY_COFFEE);
 
+		SandboxPlants::OneShot(this);
 		break;
 	}
 	default:
@@ -4415,8 +4444,10 @@ void Plant::DoSpecial()
 
 void Plant::ImitaterMorph()
 {
+	const int inheritedPower=SandboxPlants::Power(this);
 	Die();
 	Plant* aPlant = mBoard->AddPlant(mPlantCol, mRow, mImitaterType, SeedType::SEED_IMITATER);
+	if(inheritedPower)SandboxPlants::Assign(aPlant,SandboxMemeRules::Result(aPlant->mSeedType,inheritedPower));
 
 	FilterEffect aFilter = FilterEffect::FILTER_EFFECT_WASHED_OUT;
 	if (mImitaterType == SeedType::SEED_HYPNOSHROOM || mImitaterType == SeedType::SEED_SQUASH || mImitaterType == SeedType::SEED_POTATOMINE ||
@@ -4470,6 +4501,7 @@ void Plant::UpdateImitater()
 void Plant::CobCannonFire(int theTargetX, int theTargetY)
 {
 	PVZP_ASSERT(mState == PlantState::STATE_COBCANNON_READY);
+	SandboxPlants::NativeAction(this);
 
 	mState = PlantState::STATE_COBCANNON_FIRING;
 	mShootingCounter = 206;
@@ -4946,6 +4978,7 @@ int Plant::DistanceToClosestZombie()
 
 void Plant::Die()
 {
+	SandboxPlants::Forget(this);
 	if (IsOnBoard() && mSeedType == SeedType::SEED_TANGLEKELP)
 	{
 		Zombie* aZombie = mBoard->ZombieTryToGet(mTargetZombieID);

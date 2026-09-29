@@ -477,8 +477,8 @@ void Projectile::DoSplashDamage(Zombie* theZombie)
 		}
 	}
 
-	int aOriginalDamage = aProjectileDef.mDamage;
-	int aSplashDamage = aProjectileDef.mDamage / 3;
+	int aOriginalDamage = SandboxPlants::ShotDamage(this,aProjectileDef.mDamage);
+	int aSplashDamage = aOriginalDamage / 3;
 	int aMaxSplashDamageAmount = aOriginalDamage * 7;
 	if (mProjectileType == ProjectileType::PROJECTILE_FIREBALL)
 	{
@@ -628,7 +628,7 @@ void Projectile::UpdateLobMotion()
 	else if (mProjectileType == ProjectileType::PROJECTILE_COBBIG)
 	{
 		int aBeforeGargantuarCount = mBoard->GetLiveGargantuarCount();
-		mBoard->KillAllZombiesInRadius(mRow, mPosX + 80, mPosY + 40, 115, 1, true, mDamageRangeFlags);
+		mBoard->KillAllZombiesInRadius(mRow, mPosX + 80, mPosY + 40, SandboxPlants::ShotBlastRadius(this,115), 1, true, mDamageRangeFlags);
 		int aAfterGargantuarCount = mBoard->GetLiveGargantuarCount();
 		mBoard->mGargantuarsKillsByCornCob += aBeforeGargantuarCount - aAfterGargantuarCount;
 		if (mBoard->mGargantuarsKillsByCornCob >= 2)
@@ -842,7 +842,7 @@ void Projectile::DoImpact(Zombie* theZombie)
 	else if (!sandboxImpact && theZombie)
 	{
 		unsigned int aDamageFlags = GetDamageFlags(theZombie);
-		theZombie->TakeDamage(GetProjectileDef().mDamage, aDamageFlags);
+		theZombie->TakeDamage(SandboxPlants::ShotDamage(this,GetProjectileDef().mDamage), aDamageFlags);
 	}
 
     // Artwork ownership is not damage ownership. Reused peas still need the

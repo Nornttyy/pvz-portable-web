@@ -6,9 +6,11 @@
 // or implicit Base() matching: a fused plant is never silently treated as a pea.
 namespace SandboxFusion {
 struct Recipe { int first,second,result; };
-inline constexpr std::array<Recipe,4> Recipes{{
- {0,3,118},{0,180,120},{1,180,121},{3,180,122}
-}};
+inline constexpr auto Recipes=[] {
+ std::array<Recipe,144> recipes{};int n=0;
+ for(int power=180;power<=182;++power)for(int base:SandboxMemeRules::Bases)recipes[n++]={base,power,SandboxMemeRules::Result(base,power)};
+ return recipes;
+}();
 constexpr int Result(int first,int second) {
  for(const auto& recipe:Recipes)
   if((recipe.first==first&&recipe.second==second)||(recipe.first==second&&recipe.second==first))return recipe.result;

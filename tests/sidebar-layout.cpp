@@ -1,9 +1,11 @@
 #include "SandboxUIRules.h"
+#include "MemeAdventureRules.h"
 #include <cassert>
 #include <iostream>
 using namespace SandboxUIRules;
 bool overlaps(Box a,Box b){return a.x<b.x+b.w&&b.x<a.x+a.w&&a.y<b.y+b.h&&b.y<a.y+a.h;}
 int main(){
+ for(int n=6;n<=10;++n){const int extra=n<=6?0:n==7?60:n==8?76:n==9?112:153;assert(!overlaps(MemeAdventureRules::Slot,{456+extra,0,82,80}));assert(!overlaps(MemeAdventureRules::Slot,{681,-10,117,46}));}
  static_assert(CanvasWidth==800+WorldOffset&&CanvasHeight==600);
  for(int shake:{0,4,-3,2,-1,0}){assert(BoardX(true,shake)==WorldOffset+shake);assert(BoardX(false,shake)==shake);}
  assert(BoardX(true)==WorldOffset);assert(BoardX(false)==0);
@@ -15,9 +17,9 @@ int main(){
    for(int j=0;j<6;++j)assert(!overlaps(b,Hotbar(j)));
  }
  for(int i=0;i<6;++i)assert(!overlaps(Hotbar(i),Shovel));
- for(auto a:{NativeFilter,CustomFilter,PowerFilter,FusionFilter}){
+ for(auto a:{NativeFilter,PowerFilter,FusionFilter}){
   assert(a.x>=0&&a.x+a.w<=SidebarWidth&&a.y+a.h<PrevPage.y);
-  for(auto b:{NativeFilter,CustomFilter,PowerFilter,FusionFilter})if(a.x!=b.x)assert(!overlaps(a,b));
+  for(auto b:{NativeFilter,PowerFilter,FusionFilter})if(a.x!=b.x)assert(!overlaps(a,b));
  }
  for(int row=0;row<RecipesPerPage;++row)for(int part=0;part<3;++part){
   const auto a=RecipeCard(row,part);assert(a.x>=0&&a.x+a.w<SidebarWidth&&a.y>=118&&a.y+a.h<NativeFilter.y);

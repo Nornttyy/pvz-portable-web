@@ -5,7 +5,7 @@
 #include "SandboxPlants.h"
 #include "SandboxZombies.h"
 #include "SandboxVisualRules.h"
-#include "SandboxNewPlantRules.h"
+#include "SandboxMemeRules.h"
 #include <cassert>
 #include <cmath>
 #include <iostream>
@@ -18,140 +18,64 @@ int main(){
   source->GetBits()[0]=0x80b88742;auto* heated=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::WarmNative("Wallnut_cracked1.png",2));
   assert(source!=heated&&source->GetBits()[0]==0x80b88742&&(heated->GetBits()[0]>>24)==0x80);
   assert(heated==SandboxArt::WarmNative("Wallnut_cracked1.png",2)&&heated->mWidth==source->mWidth&&heated->mHeight==source->mHeight);
-  Board w;auto* p=w.plant(1,1);p->mPlantMaxHealth=4000;p->mPlantHealth=2000;SandboxPlants::Assign(p,122);
+  Board w;auto* p=w.plant(1,1);p->mSeedType=static_cast<SeedType>(3);p->mPlantMaxHealth=4000;p->mPlantHealth=2000;SandboxPlants::Assign(p,122);
   Reanimation body;Track tracks[]={{"anim_face"}};TrackInstance instances[1];body.def.mTracks={1,tracks};body.mTrackInstances=instances;
   instances[0].mImageOverride=source;app.reanims[80]=&body;p->mBodyReanimID=80;Sexy::Graphics g(nullptr);drawnOverrides.clear();
   assert(SandboxPlants::DrawBody(&g,p,0,0));assert(drawnOverrides.back()==heated);assert(instances[0].mImageOverride==source);
   assert(SandboxPlants::KeepsNativeBlink(p));SandboxPlants::Reset();app.reanims.clear();}
- // Native walnut pixels and damage frames are unchanged. The attached original
- // pea mouth and bullet birth use the same native bone transform.
- {Board w;Sexy::Graphics rig(nullptr);rig.mTransX=200;rig.mTransY=300;
-  auto* nut=w.plant(2,2);SandboxPlants::Assign(nut,118);testBlits.clear();
-  assert(SandboxPlants::DrawBody(&rig,nut,0,0));assert(testBlits.size()==2);
-  near(testBlits[0].matrix.m02,241.4f);assert(testBlits[0].path.ends_with("reanim/Wallnut_body.png"));assert(testBlits[1].path.ends_with("reanim/PeaShooter_mouth.png"));
-  nut->mPlantHealth=1500;testBlits.clear();SandboxPlants::DrawBody(&rig,nut,0,0);assert(testBlits[0].path.ends_with("Wallnut_cracked1.png"));
-  nut->mPlantHealth=500;testBlits.clear();SandboxPlants::DrawBody(&rig,nut,0,0);assert(testBlits[0].path.ends_with("Wallnut_cracked2.png"));
-  auto* shot=w.AddProjectile(0,0,0,2,PROJECTILE_PEA);SandboxPlants::OnFired(nut,shot,nullptr);
-  SandboxPlants::DrawBody(&rig,nut,0,0);const auto mouth=testBlits.back().matrix;
-  near(shot->mPosX+12,nut->mX+mouth.m02-200+mouth.m00*14.5f);near(shot->mPosY+12,nut->mY+mouth.m12-300+mouth.m10*14.5f);
-  // Rotated/scaled idle frame (and support offset) must carry the muzzle too.
-  Reanimation nutAnim;nutAnim.track="anim_face";nutAnim.matrix={0.65f,-0.1f,43,0.1f,0.7f,32};app.reanims[92]=&nutAnim;nut->mBodyReanimID=92;
-  SandboxPlants::OnFired(nut,shot,nullptr);SandboxPlants::DrawBody(&rig,nut,0,0);const auto moving=testBlits.back().matrix;
-  near(shot->mPosX+12,nut->mX+moving.m02-200+moving.m00*14.5f);near(shot->mPosY+12,nut->mY+moving.m12-300+moving.m10*14.5f);
-  nut->mBodyReanimID=0;app.reanims.clear();assert(SandboxPlants::DrawBody(&rig,nut,0,0,true));near(testBlits.back().matrix.m11,0.719f*0.85f*0.25f);
-  auto* flower=w.plant(1,1);SandboxPlants::Assign(flower,119);testBlits.clear();assert(SandboxPlants::DrawBody(&rig,flower,0,0));assert(testBlits.size()==7);
-  auto* seed=w.AddProjectile(100,200,0,1,PROJECTILE_PEA);SandboxPlants::OnFired(flower,seed,nullptr);rig.mTransX=seed->mX;rig.mTransY=seed->mY;
-  assert(SandboxPlants::DrawShot(&rig,seed));assert(testBlits.back().path.ends_with("dandelion-seed.png"));near(testBlits.back().matrix.m02+8,seed->mPosX+12);near(testBlits.back().matrix.m12,seed->mPosY+12);
-  assert(SandboxPlants::ShotRadius(seed)==7);seed->mProjectileType=PROJECTILE_FIREBALL;assert(!SandboxPlants::DrawShot(&rig,seed));
-  SandboxPlants::Reset();testBlits.clear();}
- // Actual production Skin() is exercised through Assign, including stale override removal.
- Board skinBoard;
- Track tracks[]={{"anim_face"},{"GatlingPea_mouth"},{"GatlingPea_barrel1"},{"GatlingPea_barrel2"},{"GatlingPea_barrel3"},{"GatlingPea_barrel4"},{"GatlingPea_mouth_overlay"},{"GatlingPea_helmet"},{"unrelated_mouth_decoration"}};
- TrackInstance instances[9];Reanimation skin;skin.def.mTracks={9,tracks};skin.mTrackInstances=instances;
- Sexy::Image stale;for(auto& t:instances){t.mImageOverride=&stale;t.mRenderGroup=7;}
- app.reanims[90]=&skin;auto* gatling=skinBoard.plant(0,0);gatling->mHeadReanimID=90;
- SandboxPlants::Assign(gatling,106);
- assert(instances[0].mImageOverride->path.ends_with("fire-gatling-head.png"));
- for(int i=1;i<=6;++i){assert(instances[i].mImageOverride==nullptr);assert(instances[i].mRenderGroup==7);}
- assert(instances[7].mImageOverride==&stale&&instances[8].mImageOverride==&stale);
- gatling->mBlinkCountdown=4;SandboxPlants::Tick(&skinBoard);
- assert(instances[0].mImageOverride->path.ends_with("fire-gatling-blink.png"));
- SandboxPlants::Reset();app.reanims.clear();
- // Every costume is bound to all four native sleeve bones; faces keep native dimensions.
- Track zTracks[]={{"anim_head1"},{"anim_head2"},{"Zombie_body"},{"anim_innerarm1"},{"anim_innerarm2"},{"Zombie_outerarm_upper"},{"Zombie_outerarm_lower"},{"Zombie_outerarm_hand"},{"anim_hair"},{"Zombie_tie"},{"anim_cone"},{"anim_bucket"}};
- TrackInstance zInstances[12];Reanimation zRig;zRig.def.mTracks={12,zTracks};zRig.mTrackInstances=zInstances;app.reanims[91]=&zRig;
- for(const auto& d:SandboxZombies::Definitions){
-  for(auto& t:zInstances){t.mImageOverride=nullptr;t.mRenderGroup=0;}
-  auto* z=skinBoard.AddZombieInRow(ZOMBIE_NORMAL,2,0);z->mBodyReanimID=91;SandboxZombies::Assign(z,d.id);
-  for(int i=0;i<7;++i)assert(zInstances[i].mImageOverride);
-  assert(zInstances[7].mImageOverride==nullptr); // native hand remains native, no baked projectile
-  if(d.id==210||d.id==211){assert(zInstances[8].mImageOverride->path.ends_with("-hat.png"));assert(zInstances[8].mRenderGroup==0);}
-  z->mHasArm=false;SandboxZombies::RefreshDamageArt(z);assert(zInstances[5].mImageOverride->path.ends_with("-outer-upper-damaged.png"));
-  if(d.armor){
-   int i=d.base==2?10:11;
-   z->mHelmHealth=d.armor/2;SandboxZombies::RefreshDamageArt(z);assert(zInstances[i].mImageOverride->path.ends_with("-prop-damage1.png"));
-   z->mHelmHealth=1;SandboxZombies::RefreshDamageArt(z);assert(zInstances[i].mImageOverride->path.ends_with("-prop-damage2.png"));
-   z->mHelmHealth=d.armor;SandboxZombies::RefreshDamageArt(z);assert(zInstances[i].mImageOverride->path.ends_with("-prop.png"));
-   assert(SandboxZombies::DetachedArmor(z)->path.ends_with("-prop-damage2.png"));
-  }else assert(!SandboxZombies::DetachedArmor(z));
+
+ for(int power:{180,181,182}){
+  auto* source=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::NativeImage("PeaShooter_Head.png"));source->GetBits()[0]=0x8066bc22;
+  auto* palette=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::PowerNative("PeaShooter_Head.png",24,power));
+  assert(palette!=source&&source->GetBits()[0]==0x8066bc22&&(palette->GetBits()[0]>>24)==0x80);
  }
- SandboxZombies::Reset();app.reanims.clear();
- Sexy::Graphics g(nullptr);g.mTransX=170;g.mTransY=250;
- SandboxArt::Sprite(&g,"fire",12,12,30,22);near(testBlits.back().matrix.m02,182);near(testBlits.back().matrix.m12,262);
- Reanimation a;a.track="idle_mouth";a.matrix={0,-0.72f,60,0.72f,0,40};float x,y;
- assert(SandboxArt::TrackPoint(&a,"idle_mouth",35,49,32,24.5f,x,y));near(x,60);near(y,50.44f);
- assert(!SandboxArt::TrackPoint(&a,"missing",35,49,32,24.5f,x,y));a.pose.mFrame=-1;
- assert(!SandboxArt::TrackPoint(&a,"idle_mouth",35,49,32,24.5f,x,y));a.pose.mFrame=0;
- Board board;auto* pea=board.plant(2,2);SandboxPlants::Assign(pea,113);pea->mHeadReanimID=1;app.reanims[1]=&a;
+ // Every supported native face and mouth uses its own canvas, including snow,
+ // threepeater and gatling parts. Applying a power never leaves shared overrides.
+ struct SkinCase {int base;const char* face;const char* image;const char* mouth;const char* mouthImage;};
+ const SkinCase skins[]={{0,"anim_face","PeaShooter_Head.png","idle_mouth","PeaShooter_mouth.png"},
+  {7,"anim_face","PeaShooter_Head.png","idle_mouth","PeaShooter_mouth.png"},
+  {5,"anim_face","SnowPea_head.png","SnowPea_mouth","SnowPea_mouth.png"},
+  {18,"anim_face1","ThreePeater_head.png","ThreePeater_mouth1","ThreePeater_mouth.png"},
+  {40,"GatlingPea_head","GatlingPea_head.png","GatlingPea_barrel3",nullptr},
+  {1,"anim_idle","SunFlower_head.png","leaf",nullptr}};
+ for(int power:{180,181,182})for(const auto& entry:skins){
+  SandboxPlants::Reset();Board w;auto* p=w.plant(1,1);p->mSeedType=static_cast<SeedType>(entry.base);
+  SandboxPlants::Assign(p,SandboxMemeRules::Result(entry.base,power));
+  Reanimation anim;Track tracks[]={{entry.face},{entry.mouth},{"native_stem"}};TrackInstance instances[3];
+  anim.def.mTracks={3,tracks};anim.mTrackInstances=instances;app.reanims[80]=&anim;p->mBodyReanimID=80;
+  auto* untouched=SandboxArt::NativeImage("native-test.png");for(auto& track:instances)track.mImageOverride=untouched;
+  drawnOverrides.clear();Sexy::Graphics g(nullptr);assert(SandboxPlants::DrawBody(&g,p,0,0));
+  const int level=power==180?2:12;assert(drawnOverrides[0]==SandboxArt::PowerNative(entry.image,level,power));
+  assert(drawnOverrides[1]==(entry.mouthImage?SandboxArt::PowerNative(entry.mouthImage,level,power):untouched));
+  assert(drawnOverrides[2]==untouched);for(const auto& track:instances)assert(track.mImageOverride==untouched);
+  app.reanims.clear();
+ }
+ for(int power:{180,181,182})for(int base:{3,23})for(int stage=0;stage<3;++stage){
+  SandboxPlants::Reset();Board w;auto* p=w.plant(1,1);p->mSeedType=static_cast<SeedType>(base);
+  p->mPlantMaxHealth=base==3?4000:8000;p->mPlantHealth=p->mPlantMaxHealth*(3-stage)/3;
+  SandboxPlants::Assign(p,SandboxMemeRules::Result(base,power));
+  Reanimation anim;Track tracks[]={{base==3?"anim_face":"anim_idle"}};TrackInstance instances[1];
+  anim.def.mTracks={1,tracks};anim.mTrackInstances=instances;app.reanims[80]=&anim;p->mBodyReanimID=80;
+  const std::string path=std::string(base==3?"Wallnut_":"Tallnut_")+(stage==0?"body.png":stage==1?"cracked1.png":"cracked2.png");
+  auto* original=SandboxArt::NativeImage(path.c_str());instances[0].mImageOverride=original;
+  drawnOverrides.clear();Sexy::Graphics g(nullptr);assert(SandboxPlants::DrawBody(&g,p,0,0));
+  assert(drawnOverrides[0]==SandboxArt::PowerNative(path.c_str(),power==180?2:12,power));
+  assert(instances[0].mImageOverride==original);app.reanims.clear();
+ }
+ SandboxPlants::Reset();
+ Sexy::Graphics g(nullptr);Reanimation mouth;mouth.track="idle_mouth";mouth.matrix={0,-0.72f,60,0.72f,0,40};
+ Board board;auto* pea=board.plant(2,2);SandboxPlants::Assign(pea,120);pea->mHeadReanimID=1;app.reanims[1]=&mouth;
  auto* shot=board.AddProjectile(0,0,0,2,PROJECTILE_PEA);SandboxPlants::OnFired(pea,shot,nullptr);
- near(shot->mPosX+12,pea->mX+60);near(shot->mPosY+12,pea->mY+50.44f);near(SandboxPlants::ShotScale(shot),0.55f);assert(SandboxPlants::ShotRadius(shot)==5);
- g.mTransX=shot->mX;g.mTransY=shot->mY;testBlits.clear();assert(!SandboxPlants::DrawShot(&g,shot));
- assert(testBlits.empty()); // Falls through to IMAGE_PROJECTILEPEA, not vfx-tiny.
- // Native sprites are 28 x 28; scale around their existing pea core, not top left.
- for(float scale:{0.55f,0.7f,1.0f,1.1f})
-  near(SandboxVisualRules::NativePeaOffset(28,scale)+(12-14)*scale,12);
- auto* three=board.plant(3,2);three->mSeedType=static_cast<SeedType>(18);SandboxPlants::Assign(three,103);
- Reanimation heads[3];for(int i=0;i<3;++i){heads[i].track="ThreePeater_mouth"+std::to_string(i+1);heads[i].matrix.m02=40;heads[i].matrix.m12=70-i*23;app.reanims[i+2]=&heads[i];}
- three->mHeadReanimID=2;three->mHeadReanimID2=3;three->mHeadReanimID3=4;
- float ys[3];for(int row=1;row<=3;++row){auto* s=board.AddProjectile(0,0,0,row,PROJECTILE_PEA);s->mProjectileType=PROJECTILE_SNOWPEA;SandboxPlants::OnFired(three,s,nullptr);ys[row-1]=s->mPosY;assert(SandboxPlants::HasShot(s));}
- assert(ys[0]<ys[1]&&ys[1]<ys[2]);near(ys[1]-ys[0],23);near(ys[2]-ys[1],23);
- // Gatling projectiles leave the front barrel, never from behind its front plate.
- Reanimation barrel;barrel.track="GatlingPea_barrel3";barrel.matrix.m00=0.55f;barrel.matrix.m11=0.55f;barrel.matrix.m02=70.125f;barrel.matrix.m12=27.525f;app.reanims[5]=&barrel;
- auto* gun=board.plant(2,1);SandboxPlants::Assign(gun,105);gun->mHeadReanimID=5;
- auto* gunShot=board.AddProjectile(0,0,0,1,PROJECTILE_PEA);SandboxPlants::OnFired(gun,gunShot,nullptr);
- near(gunShot->mPosX+12,gun->mX+80.30f);near(gunShot->mPosY+12,gun->mY+27.525f);
- // All eight elemental variants use the native renderer AND native impact path.
- // Alternating ice/fire is exercised twice, not inferred from the plant's name.
- SandboxPlants::Reset();testBlits.clear();
- for(int id=100;id<=107;++id){
-  auto* p=board.plant(1,1);SandboxPlants::Assign(p,id);
-  for(int n=0;n<2;++n){
-   auto* s=board.AddProjectile(40,40,0,1,PROJECTILE_PEA);
-   const int element=SandboxPlants::NextShot(p);
-   s->mProjectileType=element==1?PROJECTILE_SNOWPEA:PROJECTILE_FIREBALL;
-   SandboxPlants::OnFired(p,s,nullptr);
-   assert(SandboxPlants::HasShot(s));assert(!SandboxPlants::UsesCustomShotArt(s));
-   assert(!SandboxPlants::DrawShot(&g,s));assert(!SandboxPlants::Impact(s,nullptr));
-   near(SandboxPlants::ShotScale(s),1);
-  }
+ near(shot->mPosX+12,pea->mX+60);near(shot->mPosY+12,pea->mY+50.44f);near(SandboxPlants::ShotScale(shot),1);
+ assert(SandboxPlants::HasShot(shot)&&SandboxPlants::ShotRadius(shot)==12&&!SandboxPlants::DrawShot(&g,shot)&&!SandboxPlants::Impact(shot,nullptr));
+ for(int id=120;id<144;++id){auto* p=board.plant(1,1);p->mSeedType=static_cast<SeedType>(SandboxPlants::Base(id));SandboxPlants::Assign(p,id);
+  assert(SandboxPlants::KeepsNativeBlink(p));float x=0,y=0,sx=1,sy=1;SandboxPlants::AdjustScale(p,x,y,sx,sy);near(x+40*sx,40);near(y+65*sy,65);
  }
- SandboxPlants::DrawEffects(&g,&board,1);assert(testBlits.empty()); // No extra muzzle/hit flash.
- // Ordinary peas preserve their individual sizes and custom combat ownership.
- const float scales[]{0.55f,1.1f,0.7f,1.0f};const int radii[]{5,10,5,8};
- for(int id=113;id<=116;++id){
-  auto* p=board.plant(1,1);SandboxPlants::Assign(p,id);
-  auto* s=board.AddProjectile(40,40,0,1,PROJECTILE_PEA);SandboxPlants::OnFired(p,s,nullptr);
-  assert(!SandboxPlants::DrawShot(&g,s));assert(!SandboxPlants::UsesCustomShotArt(s));
-  assert(SandboxPlants::Impact(s,nullptr));near(SandboxPlants::ShotScale(s),scales[id-113]);
-  assert(SandboxPlants::ShotRadius(s)==radii[id-113]);
-  s->mProjectileType=PROJECTILE_FIREBALL;
-  assert(!SandboxPlants::DrawShot(&g,s));assert(!SandboxPlants::UsesCustomShotArt(s));
-  near(SandboxPlants::ShotScale(s),1);assert(SandboxPlants::ShotRadius(s)==9);
-  assert(SandboxPlants::Impact(s,nullptr)); // Visual conversion does not change damage dispatch.
+ for(int base=0;base<48;++base)if(!SandboxMemeRules::LegacyBase(base))for(int power:{180,181,182}){
+  auto* p=board.plant(1,1);p->mSeedType=static_cast<SeedType>(base);SandboxPlants::Assign(p,SandboxMemeRules::Result(base,power));
+  assert(!SandboxPlants::DrawBody(&g,p,0,0));float x=17,y=23,sx=0.8f,sy=1.2f;SandboxPlants::AdjustScale(p,x,y,sx,sy);
+  near(x,17);near(y,23);near(sx,0.8f);near(sy,1.2f);Sexy::Color tint(255,255,255,177);SandboxPlants::NativeTint(p,tint);
+  assert(tint.mAlpha==177&&(tint.mRed<255||tint.mGreen<255||tint.mBlue<255));
  }
- SandboxPlants::DrawEffects(&g,&board,1);assert(testBlits.empty());
- // Torchwood conversions choose native art dynamically, including special peas.
- for(int id:{111,112,117}){
-  SandboxPlants::Reset();testBlits.clear();auto* p=board.plant(1,1);SandboxPlants::Assign(p,id);
-  auto* s=board.AddProjectile(40,40,0,1,PROJECTILE_PEA);SandboxPlants::OnFired(p,s,nullptr);
-  assert(SandboxPlants::UsesCustomShotArt(s));assert(SandboxPlants::DrawShot(&g,s));assert(testBlits.size()==1);
-  assert(testBlits.back().path.ends_with(id==117?"vfx-acid.png":"vfx-electric.png"));
-  for(auto type:{PROJECTILE_FIREBALL,PROJECTILE_SNOWPEA}){
-   s->mProjectileType=type;testBlits.clear();assert(!SandboxPlants::UsesCustomShotArt(s));
-   assert(!SandboxPlants::DrawShot(&g,s));assert(testBlits.empty());
-  }
-  s->mProjectileType=PROJECTILE_PEA;assert(SandboxPlants::UsesCustomShotArt(s));
- }
- Projectile native;assert(!SandboxPlants::HasShot(&native));assert(!SandboxPlants::UsesCustomShotArt(&native));assert(!SandboxPlants::DrawShot(&g,&native));
- SandboxPlants::Reset();app.reanims.clear();testBlits.clear();auto* acid=board.plant(1,2);SandboxPlants::Assign(acid,117);auto* s=board.AddProjectile(200,230,0,2,PROJECTILE_PEA);SandboxPlants::OnFired(acid,s,nullptr);
- auto* enemy=board.AddZombieInRow(ZOMBIE_NORMAL,2,0);SandboxPlants::Impact(s,enemy);SandboxPlants::DrawEffects(&g,&board,1);assert(testBlits.empty());
- SandboxPlants::DrawEffects(&g,&board,2);assert(!testBlits.empty());bool found=false;for(auto& b:testBlits)if(b.path.ends_with("vfx-acid-hit-0.png"))found=true;assert(found);
- const auto before=testBlits;board.mPaused=true;for(int i=0;i<100;++i)SandboxPlants::Tick(&board);testBlits.clear();SandboxPlants::DrawEffects(&g,&board,2);assert(before.size()==testBlits.size());for(size_t i=0;i<before.size();++i){assert(before[i].path==testBlits[i].path);near(before[i].matrix.m02,testBlits[i].matrix.m02);assert(before[i].alpha==testBlits[i].alpha);}board.mPaused=false;
- // Reusing a round native pea must not disable reverse homing or change its target.
- auto* seeker=board.plant(1,2);SandboxPlants::Assign(seeker,116);auto* reverse=board.AddProjectile(200,230,0,2,PROJECTILE_PEA);SandboxPlants::OnFired(seeker,reverse,enemy);reverse->mVelX=-3;reverse->mVelY=0;reverse->mX=200;reverse->mY=230;g.mTransX=200;g.mTransY=230;testBlits.clear();
- assert(!SandboxPlants::DrawShot(&g,reverse));assert(testBlits.empty());
- assert(reverse->mMotionType==MOTION_HOMING&&reverse->mTargetZombieID==enemy->id);near(reverse->mVelX,-3);
- SandboxPlants::Reset();testBlits.clear();SandboxPlants::DrawEffects(&g,&board,2);assert(testBlits.empty());
- for(int id=112;id<=117;++id){const auto& art=SandboxVisualRules::Shots[SandboxVisualRules::ArtIndex(id,false,false)];assert(art.w<=30&&art.h<=24&&art.coreX>=0&&art.coreX<=art.w);}
- std::cout<<"Visual coordinate contracts passed: matrix pivot, scale, 3 independent mouths, projectile core, all 8 original variants, row effects and reset\n";
+ std::cout<<"Visual coordinate contracts passed\n";
 }

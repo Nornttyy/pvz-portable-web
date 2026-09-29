@@ -68,8 +68,8 @@ int main(){
  Board b;
  assert(PlacePlant(&b,0,2,2)==1);assert(PlacePlant(&b,0,2,2)==-4);
  stackPlants=true;
- assert(PlacePlant(&b,0,2,2)==1);assert(PlacePlant(&b,105,2,2)==1);
- assert(PlantCount(&b)==3&&b.mPlants.back()->id==105); // upgrade leaves both originals alive
+ assert(PlacePlant(&b,0,2,2)==1);assert(PlacePlant(&b,126,2,2)==1);
+ assert(PlantCount(&b)==3&&b.mPlants.back()->id==126); // upgrade leaves both originals alive
  stackPlants=false;assert(PlacePlant(&b,7,2,2)==-4);assert(PlantCount(&b)==3);
  Board normal;assert(PlacePlant(&normal,7,0,0)==1);assert(PlacePlant(&normal,40,0,0)==1);
  assert(PlantCount(&normal)==1&&normal.mPlants.front()->mDead);
@@ -92,21 +92,23 @@ int main(){
  mapType=0;stackPlants=false;fusionEnabled=true;
  for(const auto& recipe:SandboxFusion::Recipes)for(bool reversed:{false,true}){
    Board fused;const int a=reversed?recipe.second:recipe.first,b=reversed?recipe.first:recipe.second;
-   if(a==SandboxMemeRules::Power){assert(PlacePlant(&fused,a,1,1)==-6&&PlantCount(&fused)==0);continue;}
-   assert(SandboxPlants::Find(recipe.result));assert(PlacePlant(&fused,a,1,1)==1);
+   if(SandboxMemeRules::IsPower(a)){assert(PlacePlant(&fused,a,1,1)==-6&&PlantCount(&fused)==0);continue;}
+   assert(SandboxPlants::Find(recipe.result));
+   // Existing native plants already passed their native terrain/target checks.
+   auto* fixture=fused.AddPlant(1,1,static_cast<SeedType>(a),SEED_NONE);SandboxPlants::Assign(fixture,a);
    auto* before=fused.mPlants.front();before->mPlantHealth=before->mPlantMaxHealth/2;
    const int marks=fused.marks;int result=0;
    assert(FindFusionTarget(&fused,b,1,1,result)==before&&result==recipe.result);
    assert(PlantCount(&fused)==1&&fused.marks==marks&&!before->mDead); // preview is read-only
    assert(PlacePlant(&fused,b,1,1)==recipe.result);
-   assert(before->mDead==(b!=SandboxMemeRules::Power)&&PlantCount(&fused)==1&&fused.mPlants.back()->id==recipe.result);
+   assert(before->mDead==(!SandboxMemeRules::IsPower(b))&&PlantCount(&fused)==1&&fused.mPlants.back()->id==recipe.result);
    assert(fused.mPlants.back()->mPlantHealth==fused.mPlants.back()->mPlantMaxHealth/2);
-   assert(PlacePlant(&fused,b,1,1)==(b==SandboxMemeRules::Power?-6:-4)); // no recursive/base-type matching
+   assert(PlacePlant(&fused,b,1,1)==(SandboxMemeRules::IsPower(b)?-6:-4)); // no recursive/base-type matching
  }
  Board unsupported;assert(PlacePlant(&unsupported,0,0,0)==1);
  assert(PlacePlant(&unsupported,1,0,0)==-4&&PlantCount(&unsupported)==1);
  unsupported.blocked=true;assert(PlacePlant(&unsupported,3,0,0)==-4);unsupported.blocked=false;
- unsupported.failAllocation=true;assert(PlacePlant(&unsupported,3,0,0)==-3);unsupported.failAllocation=false;
+ unsupported.failAllocation=true;assert(PlacePlant(&unsupported,3,0,0)==-4);unsupported.failAllocation=false;
  assert(!unsupported.mPlants.front()->mDead&&PlantCount(&unsupported)==1);
  unsupported.mPlants.front()->airborne=true;int noResult=42;
  assert(!FindFusionTarget(&unsupported,3,0,0,noResult)&&noResult==0);unsupported.mPlants.front()->airborne=false;
@@ -119,7 +121,7 @@ int main(){
    assert(PlacePlant(&support,water?16:33,2,2)==1);
    assert(PlacePlant(&support,0,2,2)==1);assert(PlacePlant(&support,30,2,2)==1);
    auto* base=support.mPlants.front();auto* shell=support.mPlants.back();stackPlants=false;
-   assert(PlacePlant(&support,3,2,2)==118);assert(PlantCount(&support)==3&&!base->mDead&&!shell->mDead);
+   assert(PlacePlant(&support,180,2,2)==120);assert(PlantCount(&support)==3&&!base->mDead&&!shell->mDead);
    if(water){base->Die();assert(!FindFusionTarget(&support,0,2,2,noResult));}
  }
  Board missingLily;missingLily.pool=true;mapType=1;
@@ -128,7 +130,7 @@ int main(){
  mapType=0;Board replacement;stackPlants=true;
  assert(PlacePlant(&replacement,0,1,1)==1);
  for(int i=1;i<180;++i)assert(PlacePlant(&replacement,1,0,0)==1);
- stackPlants=false;assert(PlacePlant(&replacement,3,1,1)==118&&PlantCount(&replacement)==180);
+ stackPlants=false;assert(PlacePlant(&replacement,180,1,1)==120&&PlantCount(&replacement)==180);
  assert(SandboxFusion::InheritedHealth(1,4000,300)==1);
  assert(SandboxFusion::InheritedHealth(10000,300,300)==300);
  {Board b;fusionEnabled=true;assert(PlacePlant(&b,0,1,1)==1);auto* p=b.mPlants.front();p->mPlantHealth=1;

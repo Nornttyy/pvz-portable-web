@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "bundled Chinese sandbox with native-recolour meme powers",
+  "mode": "Chinese adventure and sandbox: three meme powers, native roster only",
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 278024,
-      "sha256": "fd2e2a521d812f0df4682f4325bc82123aa34ba6122d38f5d7111628b9f9ca49"
+      "size": 276749,
+      "sha256": "d6096da99a110b89537e24d002b1c48ab5f2cf73072df5fa934da67695acca91"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7410503,
-      "sha256": "58f5e9401a624ee3fd85b6a044cc6944caaccb053f252288b7c0863a215eaa2e"
+      "size": 7420859,
+      "sha256": "3e96ac85197e1f645d49db52442a8980a739f3728c8f20011b2efcd341e2fc74"
     }
   ]
 }

@@ -26,6 +26,7 @@
 #include "../SeedPacket.h"
 #include "../../LawnApp.h"
 #include "../../Sandbox.h"
+#include "../../MemeAdventure.h"
 #include "../CursorObject.h"
 #include "../../Resources.h"
 #include "../../ConstEnums.h"
@@ -90,7 +91,9 @@ enum SaveChunkTypeV4
 	SAVE4_CHUNK_SEEDBANK = 17,
 	SAVE4_CHUNK_SEEDPACKETS = 18,
 	SAVE4_CHUNK_CHALLENGE = 19,
-	SAVE4_CHUNK_MUSIC = 20
+	SAVE4_CHUNK_MUSIC = 20,
+	SAVE4_CHUNK_MEME_POWERS = 21,
+	SAVE4_CHUNK_MEME_PROJECTILES = 22
 };
 
 static constexpr const uint32_t SAVE4_CHUNK_VERSION = 1U;
@@ -1963,6 +1966,27 @@ static void SyncBoardPortable(PortableSaveContext& theContext, Board* theBoard)
 
 typedef void (*ChunkSyncFn)(PortableSaveContext&, Board*);
 
+// Optional chunk: old saves remain readable; unrelated profile data is untouched.
+static void SyncMemePowersPortable(PortableSaveContext& c,Board* board)
+{
+	auto save=c.mReading?MemeAdventure::Save{}:MemeAdventure::Capture(board);
+	c.SyncInt32(save.power);c.SyncInt32(save.cooldown);
+	int count=static_cast<int>(save.plants.size());c.SyncInt32(count);
+	if(count<0||count>1024){c.mFailed=true;return;}
+	if(c.mReading)save.plants.resize(count);
+	for(auto& plant:save.plants){c.SyncUInt32(plant.key);for(int& field:plant.state)c.SyncInt32(field);}
+	if(c.mReading&&!c.mFailed)MemeAdventure::Load(save);
+}
+static void SyncMemeProjectilesPortable(PortableSaveContext& c,Board* board)
+{
+	auto save=c.mReading?MemeAdventure::Save{}:MemeAdventure::Capture(board);
+	int shots=static_cast<int>(save.shots.size());c.SyncInt32(shots);
+	if(shots<0||shots>4096){c.mFailed=true;return;}
+	if(c.mReading)save.shots.resize(shots);
+	for(auto& shot:save.shots){c.SyncUInt32(shot.key);c.SyncInt32(shot.percent);}
+	if(c.mReading&&!c.mFailed)MemeAdventure::LoadShots(save.shots);
+}
+
 static ChunkSyncFn GetChunkSyncFn(uint32_t theChunkType)
 {
 	switch (theChunkType)
@@ -2007,6 +2031,10 @@ static ChunkSyncFn GetChunkSyncFn(uint32_t theChunkType)
 		return SyncChallengePortable;
 	case SAVE4_CHUNK_MUSIC:
 		return SyncMusicPortable;
+	case SAVE4_CHUNK_MEME_POWERS:
+		return SyncMemePowersPortable;
+	case SAVE4_CHUNK_MEME_PROJECTILES:
+		return SyncMemeProjectilesPortable;
 	default:
 		return nullptr;
 	}
@@ -2289,6 +2317,7 @@ static bool LawnLoadGameV4(Board* theBoard, const std::string& theFilePath)
 		return false;
 
 	FixBoardAfterLoad(theBoard);
+	MemeAdventure::Restore(theBoard);
 	theBoard->mApp->mGameScene = GameScenes::SCENE_PLAYING;
 	return true;
 }
@@ -2758,6 +2787,8 @@ static void SyncBoard(SaveGameContext& theContext, Board* theBoard)
 
 bool LawnLoadGame(Board* theBoard, const std::string& theFilePath)
 {
+	MemeAdventure::Reset();
+	SandboxPlants::Reset();
 	if (LawnLoadGameV4(theBoard, theFilePath))
 	{
 		PvzpLogLn("Loaded save game (v4)");
@@ -2815,6 +2846,8 @@ bool LawnSaveGame(Board* theBoard, const std::string& theFilePath)
 	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_SEEDPACKETS, theBoard)) return false;
 	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_CHALLENGE, theBoard)) return false;
 	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_MUSIC, theBoard)) return false;
+	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_MEME_POWERS, theBoard)) return false;
+	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_MEME_PROJECTILES, theBoard)) return false;
 
 	SaveFileHeaderV4 aHeader{};
 	memcpy(aHeader.mMagic, SAVE_FILE_MAGIC_V4, sizeof(aHeader.mMagic));

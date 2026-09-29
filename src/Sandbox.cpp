@@ -1,5 +1,6 @@
 // Original local sandbox extension. SPDX-License-Identifier: LGPL-3.0-or-later
 #include "Sandbox.h"
+#include "MemeAdventure.h"
 #include "SandboxRules.h"
 #include "SandboxFusion.h"
 #include "SandboxUIRules.h"
@@ -154,7 +155,7 @@ void SandboxStart(int map) {
 }
 
 void SandboxTick(Board* board) {
-    if (!gSandboxEnabled) return;
+    if (!gSandboxEnabled) { MemeAdventure::Tick(board); return; }
     SandboxUITick(board);
     board->mSunMoney = 9999;
     board->mPaused = paused && !stepOnce;
@@ -179,28 +180,21 @@ static void ClearEnemies(Board* board) {
     board->ProcessDeleteQueue();
     SandboxZombies::Reset();
 }
-// Preview and placement share exactly the same target/terrain checks. Never
-// consume a lily pad, flowerpot, pumpkin or an ambiguous stack of main plants.
+// Infuse in place. Prefer an unpowered main plant, then shell, then support.
 static Plant* FindFusionTarget(Board* board,int type,int col,int row,int& result) {
     result=0;
     if(!fusionEnabled||stackPlants||!SandboxRules::ValidCard(type)||!SandboxRules::ValidCell(col,row,mapType==1))return nullptr;
-    SandboxRules::StackSite site;
-    site.water=board->IsPoolSquare(col,row);
-    site.blocked=board->GetGraveStoneAt(col,row)||board->GetCraterAt(col,row)||board->GetScaryPotAt(col,row)||board->IsIceAt(col,row);
     Plant* target=nullptr;
     for(auto* p:board->mPlants){
         if(p->mDead||p->mRow!=row||p->NotOnGround())continue;
-        if(p->mSeedType==SEED_COBCANNON&&p->mPlantCol==col-1)site.blocked=true;
-        if(p->mPlantCol!=col)continue;
-        site.lily|=p->mSeedType==SEED_LILYPAD;
-        site.pot|=p->mSeedType==SEED_FLOWERPOT;
-        if(SandboxFusion::SupportLayer(p->mSeedType))continue;
-        if(target)return nullptr;
-        target=p;
+        if(p->mPlantCol!=col&&!(p->mSeedType==SEED_COBCANNON&&p->mPlantCol==col-1))continue;
+        if(p->mPlantHealth<=0||!SandboxFusion::Result(SandboxPlants::Type(p),type))continue;
+        const auto rank=[](Plant* plant){const int base=plant->mSeedType;return base==35?4:base==30?2:base==16||base==33?1:3;};
+        if(!target||rank(p)>rank(target))target=p;
     }
     if(!target||target->mPlantHealth<=0)return nullptr;
     const int candidate=SandboxFusion::Result(SandboxPlants::Type(target),type);
-    if(!candidate||!SandboxRules::StackTerrainAllows(SandboxPlants::Base(candidate),col,site))return nullptr;
+    if(!candidate)return nullptr;
     result=candidate;
     return target;
 }
@@ -208,7 +202,7 @@ static int PlacePlant(Board* board, int type, int col, int row) {
     if (!SandboxRules::ValidCard(type) || !SandboxRules::ValidCell(col, row, mapType == 1)) return -2;
     int fusedType=0;
     if(auto* target=FindFusionTarget(board,type,col,row,fusedType)){
-        if(type==SandboxMemeRules::Power){
+        if(SandboxMemeRules::IsPower(type)){
             // Imbue the existing instance. Health, damage layers, supports and
             // its native animation attachments remain intact; no heal/replant.
             SandboxPlants::Assign(target,fusedType);board->MarkAllDirty();return fusedType;
@@ -226,7 +220,7 @@ static int PlacePlant(Board* board, int type, int col, int row) {
         board->MarkAllDirty();
         return fusedType;
     }
-    if (type==SandboxMemeRules::Power) return -6; // Powers never become standalone plants.
+    if (SandboxMemeRules::IsPower(type)) return -6; // Powers never become standalone plants.
     if (board->mPlants.mSize >= board->mPlants.mMaxSize - 8) return -3;
     if (PlantCount(board) >= SandboxRules::MaxPlants) return -3;
     const auto seed = static_cast<SeedType>(SandboxPlants::Base(type));

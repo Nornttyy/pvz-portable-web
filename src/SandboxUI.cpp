@@ -38,7 +38,7 @@ namespace {
 enum Tool { PlantTool, ZombieTool, EraseTool, InteractTool };
 int panel=0, plantPage=0, selectedPlant=0, selectedZombie=0, plantSlot=0, catalog=4, catalogPage=0;
 Tool tool=PlantTool;
-std::array<int,6> plants{0,1,3,SandboxMemeRules::Power,5,7};
+std::array<int,6> plants{0,1,3,180,181,182};
 std::vector<int> DirectPlants(){std::vector<int> ids;for(const auto& d:SandboxPlants::Definitions)if(!SandboxMemeRules::IsResult(d.id))ids.push_back(d.id);return ids;}
 bool wasPaused=true, painting=false, dirty=false;
 int lastCell=-1, lastPlantCount=0, messageTicks=0;
@@ -117,7 +117,7 @@ void Portrait(Graphics* g, Box b, int type) {
     g->DrawImage(IMAGE_ALMANAC_ZOMBIEWINDOW2,b.x,b.y,b.w,b.h);
 }
 std::string SelectedName() {
-    if(tool==PlantTool&&selectedPlant==SandboxMemeRules::Power)return "红温之力";
+    if(tool==PlantTool&&SandboxMemeRules::IsPower(selectedPlant))return selectedPlant==180?"红温之力":selectedPlant==181?"内卷之力":"摆烂之力";
     if(tool==EraseTool)return "铲除";
     if(tool==InteractTool)return "操作场地";
     if(tool==PlantTool){const auto* custom=SandboxPlants::Find(selectedPlant);return custom?custom->name:Plant::GetNameString(static_cast<SeedType>(selectedPlant));}
@@ -125,7 +125,7 @@ std::string SelectedName() {
     return std::string(PvzpStringTranslate(std::string("[")+GetZombieDefinition(static_cast<ZombieType>(selectedZombie)).mZombieName+"]"));
 }
 std::string PlantName(int type){
-    if(type==SandboxMemeRules::Power)return "红温之力";
+    if(SandboxMemeRules::IsPower(type))return type==180?"红温之力":type==181?"内卷之力":"摆烂之力";
     const auto* custom=SandboxPlants::Find(type);
     return custom?custom->name:Plant::GetNameString(static_cast<SeedType>(type));
 }
@@ -140,7 +140,7 @@ bool Place(int cell, bool erase=false) {
     }
     else if(result==-3)Say("数量已满，请先清理场地");
     else if(result==-5)Say("这只僵尸不能放在此处");
-    else if(result==-6)Say(Command(0)&64?"力量需要普通豌豆、向日葵或坚果":"请先开启合成");
+    else if(result==-6)Say(Command(0)&64?"请选择可用的普通植物":"请先开启合成");
     else Say("不能放在这里，请检查位置和底座");
     return result>0;
 }
@@ -178,7 +178,7 @@ void SandboxUIReset() {
     SandboxUIDetach();
     panel=0;plantPage=0;catalog=4;catalogPage=0;tool=PlantTool;painting=false;dirty=false;wasPaused=true;
     selectedPlant=0;selectedZombie=0;plantSlot=0;lastCell=-1;lastPlantCount=0;messageTicks=0;
-    plants={0,1,3,SandboxMemeRules::Power,5,7};
+    plants={0,1,3,180,181,182};
     StopPainting();
     PvzpLoadResources("DelayLoad_Almanac");
     SandboxRepairFonts();
@@ -249,9 +249,17 @@ void SandboxDrawUI(Graphics* g) {
                 else hoverName=PvzpStringTranslate(std::string("[")+GetZombieDefinition(static_cast<ZombieType>(id)).mZombieName+"]");
             }
         }
-    }else if(catalog==3||catalog==4){
-        for(int i=0;i<(catalog==4?3:RecipesPerPage);++i){
-            const int index=catalog==4?i+1:catalogPage*RecipesPerPage+i;
+    }else if(catalog==4){
+        for(int i=0;i<3;++i){const auto box=PowerCard(i);SandboxPlants::DrawCard(g,box.x,box.y,180+i);if(tool==PlantTool&&selectedPlant==180+i)Outline(g,box);if(Hover(box))hoverName=PlantName(180+i);}
+        PvzpDrawString(g,"可用植物",132,237,FONT_BRIANNETOD12,Color(244,215,125),DS_ALIGN_CENTER);
+        for(int i=0;i<8;++i){const auto box=PowerBase(i);const int base=SandboxMemeRules::Bases[catalogPage*8+i];SandboxPlants::DrawCard(g,box.x,box.y,base);if(Hover(box))hoverName=PlantName(base);}
+        PvzpDrawString(g,"先种植物，再放力量",132,452,FONT_BRIANNETOD12,Color(244,215,125),DS_ALIGN_CENTER);
+        PvzpDrawString(g,"每株只能获得一种力量",132,477,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
+        Button(g,PrevPage,"<");Button(g,NextPage,">");
+        PvzpDrawString(g,std::format("{}/6",catalogPage+1),132,578,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
+    }else if(catalog==3){
+        for(int i=0;i<RecipesPerPage;++i){
+            const int index=catalogPage*RecipesPerPage+i;
             if(index>=int(SandboxFusion::Recipes.size()))break;
             const auto& recipe=SandboxFusion::Recipes[index];
             const std::array<int,3> types{recipe.first,recipe.second,recipe.result};
@@ -263,13 +271,8 @@ void SandboxDrawUI(Graphics* g) {
             PvzpDrawString(g,"+",80,RecipeCard(i,0).y+41,FONT_DWARVENTODCRAFT18,Color(244,215,125),DS_ALIGN_CENTER);
             PvzpDrawString(g,"=",174,RecipeCard(i,0).y+41,FONT_DWARVENTODCRAFT18,Color(244,215,125),DS_ALIGN_CENTER);
         }
-        if(catalog==3){Button(g,PrevPage,"<");Button(g,NextPage,">");
-         PvzpDrawString(g,std::format("{}/{}",catalogPage+1,(SandboxFusion::Recipes.size()+RecipesPerPage-1)/RecipesPerPage),132,578,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
-        }else{
-         PvzpDrawString(g,"红温之力",132,394,FONT_DWARVENTODCRAFT18,Color(244,160,90),DS_ALIGN_CENTER);
-         PvzpDrawString(g,"先种植物，再放力量",132,428,FONT_BRIANNETOD12,Color(244,215,125),DS_ALIGN_CENTER);
-         PvzpDrawString(g,"每株只能获得一种力量",132,453,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
-        }
+        Button(g,PrevPage,"<");Button(g,NextPage,">");
+        PvzpDrawString(g,std::format("{}/{}",catalogPage+1,(SandboxFusion::Recipes.size()+RecipesPerPage-1)/RecipesPerPage),132,578,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
     }else{
         const auto direct=DirectPlants();const int count=plantPage?int(direct.size()):48;
         for(int i=0;i<25&&i+catalogPage*25<count;++i){
@@ -285,7 +288,6 @@ void SandboxDrawUI(Graphics* g) {
     }
     if(catalog!=2){
         Button(g,NativeFilter,"原版",catalog==1&&!plantPage);
-        Button(g,CustomFilter,"原创",catalog==1&&plantPage);
         Button(g,PowerFilter,"力量",catalog==4);
         Button(g,FusionFilter,"配方",catalog==3);
     }
@@ -363,18 +365,24 @@ bool SandboxMouseDown(int x,int y,int clicks) {
         }else{
             if(PowerFilter.Contains(x,y)){catalog=4;catalogPage=0;return true;}
             if(FusionFilter.Contains(x,y)){catalog=3;catalogPage=0;return true;}
-            if(NativeFilter.Contains(x,y)||CustomFilter.Contains(x,y)){catalog=1;plantPage=CustomFilter.Contains(x,y)?1:0;catalogPage=0;return true;}
-            if(catalog==3||catalog==4){
+            if(NativeFilter.Contains(x,y)){catalog=1;plantPage=0;catalogPage=0;return true;}
+            if(catalog==4){
+                if(PrevPage.Contains(x,y)||NextPage.Contains(x,y)){catalogPage=(catalogPage+(NextPage.Contains(x,y)?1:5))%6;return true;}
+                for(int i=0;i<3;++i)if(PowerCard(i).Contains(x,y)){selectedPlant=180+i;plants[plantSlot]=selectedPlant;tool=PlantTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;}
+                for(int i=0;i<8;++i)if(PowerBase(i).Contains(x,y)){selectedPlant=SandboxMemeRules::Bases[catalogPage*8+i];plants[plantSlot]=selectedPlant;tool=PlantTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;}
+                return true;
+            }
+            if(catalog==3){
                 const int pages=(SandboxFusion::Recipes.size()+RecipesPerPage-1)/RecipesPerPage;
                 if(catalog==3&&(PrevPage.Contains(x,y)||NextPage.Contains(x,y))){
                     catalogPage=(catalogPage+(NextPage.Contains(x,y)?1:pages-1))%pages;return true;
                 }
-                for(int i=0;i<(catalog==4?3:RecipesPerPage);++i){
-                    const int index=catalog==4?i+1:catalogPage*RecipesPerPage+i;
+                for(int i=0;i<RecipesPerPage;++i){
+                    const int index=catalogPage*RecipesPerPage+i;
                     if(index>=int(SandboxFusion::Recipes.size()))break;
                     const auto& recipe=SandboxFusion::Recipes[index];
-                    for(int part=0;part<2;++part)if(RecipeCard(i,part).Contains(x,y)){
-                        selectedPlant=part?recipe.second:recipe.first;plants[plantSlot]=selectedPlant;
+                    for(int part=0;part<3;++part)if(RecipeCard(i,part).Contains(x,y)){
+                        selectedPlant=part==2?recipe.result:part?recipe.second:recipe.first;plants[plantSlot]=selectedPlant;
                         tool=PlantTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;
                     }
                 }
