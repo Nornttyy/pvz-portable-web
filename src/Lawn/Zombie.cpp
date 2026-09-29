@@ -6347,6 +6347,8 @@ void Zombie::Draw(Graphics* g)
 
 bool Zombie::CanTargetPlant(Plant* thePlant, ZombieAttackType theAttackType)
 {
+	// Fake death only fools biting. Vehicles and giant smashes still hit it.
+	if (theAttackType == ZombieAttackType::ATTACKTYPE_CHEW && MemeCharacters::Hiding(thePlant)) return false;
 	if (mApp->IsWallnutBowlingLevel() && theAttackType != ZombieAttackType::ATTACKTYPE_VAULT)
 		return false;
 

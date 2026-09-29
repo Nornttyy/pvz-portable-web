@@ -240,7 +240,7 @@ Board::Board(LawnApp* theApp)
 	}
 }
 
-Board::~Board() { MemeAdventure::Reset(); SandboxPlants::Reset(); SandboxZombies::Reset(); }
+Board::~Board() = default;
 
 void BoardInitForPlayer()
 {

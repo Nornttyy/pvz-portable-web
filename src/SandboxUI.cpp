@@ -38,7 +38,7 @@ namespace {
 enum Tool { PlantTool, ZombieTool, EraseTool, InteractTool };
 int panel=0, plantPage=0, selectedPlant=0, selectedZombie=0, plantSlot=0, catalog=4, catalogPage=0;
 Tool tool=PlantTool;
-std::array<int,6> plants{0,1,3,180,181,182};
+std::array<int,6> plants{0,1,500,501,502,503};
 std::vector<int> DirectPlants(){std::vector<int> ids;for(const auto& d:SandboxPlants::Definitions)if(!SandboxMemeRules::IsResult(d.id))ids.push_back(d.id);return ids;}
 bool wasPaused=true, painting=false, dirty=false;
 int lastCell=-1, lastPlantCount=0, messageTicks=0;
@@ -178,7 +178,7 @@ void SandboxUIReset() {
     SandboxUIDetach();
     panel=0;plantPage=0;catalog=4;catalogPage=0;tool=PlantTool;painting=false;dirty=false;wasPaused=true;
     selectedPlant=0;selectedZombie=0;plantSlot=0;lastCell=-1;lastPlantCount=0;messageTicks=0;
-    plants={0,1,3,180,181,182};
+    plants={0,1,500,501,502,503};
     StopPainting();
     PvzpLoadResources("DelayLoad_Almanac");
     SandboxRepairFonts();
@@ -231,11 +231,11 @@ void SandboxDrawUI(Graphics* g) {
     Button(g,Control(2),"菜单",panel==3);
     Button(g,Control(3),flags&2?"开始":"暂停");
     Button(g,Control(4),std::format("{}x",static_cast<int>(gLawnApp->mUpdateMultiplier)));
-    Button(g,Control(5),flags&64?"合成：开":"合成：关",flags&64);
+    Button(g,Control(5),"操作",tool==InteractTool);
     Button(g,Control(6),flags&32?"连放：开":"连放：关",flags&32);
     Button(g,Control(7),flags&16?"同格：开":"同格：关",flags&16);
 
-    std::string title=catalog==4?"特殊力量":catalog==3?"合成配方":catalog==2?"所有僵尸":plantPage?"原创植物":"所有植物";
+    std::string title=catalog==4?"网梗植物":catalog==2?"所有僵尸":"所有植物";
     std::string hoverName;
     if(catalog==2){
         const int count=int(Zombies.size()+SandboxZombies::Definitions.size());
@@ -250,29 +250,15 @@ void SandboxDrawUI(Graphics* g) {
             }
         }
     }else if(catalog==4){
-        for(int i=0;i<3;++i){const auto box=PowerCard(i);SandboxPlants::DrawCard(g,box.x,box.y,180+i);if(tool==PlantTool&&selectedPlant==180+i)Outline(g,box);if(Hover(box))hoverName=PlantName(180+i);}
-        PvzpDrawString(g,"可用植物",132,237,FONT_BRIANNETOD12,Color(244,215,125),DS_ALIGN_CENTER);
-        for(int i=0;i<8;++i){const auto box=PowerBase(i);const int base=SandboxMemeRules::Bases[catalogPage*8+i];SandboxPlants::DrawCard(g,box.x,box.y,base);if(Hover(box))hoverName=PlantName(base);}
-        PvzpDrawString(g,"先种植物，再放力量",132,452,FONT_BRIANNETOD12,Color(244,215,125),DS_ALIGN_CENTER);
-        PvzpDrawString(g,"每株只能获得一种力量",132,477,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
-        Button(g,PrevPage,"<");Button(g,NextPage,">");
-        PvzpDrawString(g,std::format("{}/6",catalogPage+1),132,578,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
-    }else if(catalog==3){
-        for(int i=0;i<RecipesPerPage;++i){
-            const int index=catalogPage*RecipesPerPage+i;
-            if(index>=int(SandboxFusion::Recipes.size()))break;
-            const auto& recipe=SandboxFusion::Recipes[index];
-            const std::array<int,3> types{recipe.first,recipe.second,recipe.result};
-            for(int part=0;part<3;++part){
-                const auto b=RecipeCard(i,part);SandboxPlants::DrawCard(g,b.x,b.y,types[part]);
-                if(part<2&&tool==PlantTool&&selectedPlant==types[part])Outline(g,b);
-                if(Hover(b))hoverName=PlantName(types[part]);
-            }
-            PvzpDrawString(g,"+",80,RecipeCard(i,0).y+41,FONT_DWARVENTODCRAFT18,Color(244,215,125),DS_ALIGN_CENTER);
-            PvzpDrawString(g,"=",174,RecipeCard(i,0).y+41,FONT_DWARVENTODCRAFT18,Color(244,215,125),DS_ALIGN_CENTER);
+        const char* tips[]{"过热自伤，及时点击降温","点上半向上，下半向下","定时引来邻路步行僵尸","装死放行，再向后反击"};
+        for(int i=0;i<4;++i){
+            const auto box=Character(i);const auto& d=MemeCharacters::Definitions[i];
+            SandboxPlants::DrawCard(g,box.x,box.y,d.id);
+            if(tool==PlantTool&&selectedPlant==d.id)Outline(g,{box.x,box.y,50,70});
+            PvzpDrawString(g,d.name,158,box.y+24,FONT_BRIANNETOD12,Color(244,215,125),DS_ALIGN_CENTER);
+            PvzpDrawString(g,tips[i],158,box.y+49,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
         }
-        Button(g,PrevPage,"<");Button(g,NextPage,">");
-        PvzpDrawString(g,std::format("{}/{}",catalogPage+1,(SandboxFusion::Recipes.size()+RecipesPerPage-1)/RecipesPerPage),132,578,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
+        PvzpDrawString(g,"切到「操作」后点击植物",132,579,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
     }else{
         const auto direct=DirectPlants();const int count=plantPage?int(direct.size()):48;
         for(int i=0;i<25&&i+catalogPage*25<count;++i){
@@ -288,8 +274,8 @@ void SandboxDrawUI(Graphics* g) {
     }
     if(catalog!=2){
         Button(g,NativeFilter,"原版",catalog==1&&!plantPage);
-        Button(g,PowerFilter,"力量",catalog==4);
-        Button(g,FusionFilter,"配方",catalog==3);
+        Button(g,PowerFilter,"网梗",catalog==4);
+        Button(g,FusionFilter,"操作",tool==InteractTool);
     }
     PvzpDrawString(g,title,132,107,FONT_DWARVENTODCRAFT18,Color(92,230,40),DS_ALIGN_CENTER);
     if(!hoverName.empty())PvzpDrawString(g,hoverName,132,catalog==2?578:512,FONT_BRIANNETOD12,Color(244,215,125),DS_ALIGN_CENTER);
@@ -344,7 +330,7 @@ bool SandboxMouseDown(int x,int y,int clicks) {
         else if(i==2)OpenPanel(3);
         else if(i==3)Command(4,flags&2?0:1);
         else if(i==4){int speed=static_cast<int>(gLawnApp->mUpdateMultiplier);Command(5,speed==4?1:speed*2);}
-        else if(i==5){Command(21,flags&64?0:1);dirty=true;}
+        else if(i==5){tool=InteractTool;}
         else if(i==6){Command(20,flags&32?0:1);if(!(flags&32))Say("按住连续放置，拖动换位置，松手停止");}
         else {Command(19,flags&16?0:1);dirty=true;if(!(flags&16))Say("同一格可种多株，铲子每次移除一株");}
         return true;
@@ -364,28 +350,10 @@ bool SandboxMouseDown(int x,int y,int clicks) {
             }
         }else{
             if(PowerFilter.Contains(x,y)){catalog=4;catalogPage=0;return true;}
-            if(FusionFilter.Contains(x,y)){catalog=3;catalogPage=0;return true;}
+            if(FusionFilter.Contains(x,y)){tool=InteractTool;return true;}
             if(NativeFilter.Contains(x,y)){catalog=1;plantPage=0;catalogPage=0;return true;}
             if(catalog==4){
-                if(PrevPage.Contains(x,y)||NextPage.Contains(x,y)){catalogPage=(catalogPage+(NextPage.Contains(x,y)?1:5))%6;return true;}
-                for(int i=0;i<3;++i)if(PowerCard(i).Contains(x,y)){selectedPlant=180+i;plants[plantSlot]=selectedPlant;tool=PlantTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;}
-                for(int i=0;i<8;++i)if(PowerBase(i).Contains(x,y)){selectedPlant=SandboxMemeRules::Bases[catalogPage*8+i];plants[plantSlot]=selectedPlant;tool=PlantTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;}
-                return true;
-            }
-            if(catalog==3){
-                const int pages=(SandboxFusion::Recipes.size()+RecipesPerPage-1)/RecipesPerPage;
-                if(catalog==3&&(PrevPage.Contains(x,y)||NextPage.Contains(x,y))){
-                    catalogPage=(catalogPage+(NextPage.Contains(x,y)?1:pages-1))%pages;return true;
-                }
-                for(int i=0;i<RecipesPerPage;++i){
-                    const int index=catalogPage*RecipesPerPage+i;
-                    if(index>=int(SandboxFusion::Recipes.size()))break;
-                    const auto& recipe=SandboxFusion::Recipes[index];
-                    for(int part=0;part<3;++part)if(RecipeCard(i,part).Contains(x,y)){
-                        selectedPlant=part==2?recipe.result:part?recipe.second:recipe.first;plants[plantSlot]=selectedPlant;
-                        tool=PlantTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;
-                    }
-                }
+                for(int i=0;i<4;++i)if(Character(i).Contains(x,y)){selectedPlant=500+i;plants[plantSlot]=selectedPlant;tool=PlantTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;}
                 return true;
             }
             if(!plantPage&&(PrevPage.Contains(x,y)||NextPage.Contains(x,y))){catalogPage=1-catalogPage;return true;}
@@ -398,7 +366,7 @@ bool SandboxMouseDown(int x,int y,int clicks) {
         return true;
     }
     if(y<80)return true;
-    if(tool==InteractTool)return false;
+    if(tool==InteractTool)return MemeCharacters::Click(gLawnApp->mBoard,x-WorldOffset,y);
     StopPainting();lastCell=Cell(x-WorldOffset,y,bool(flags&4));
     if(Place(lastCell)){
         painting=tool==PlantTool||tool==EraseTool;

@@ -25,6 +25,24 @@ struct World:Board {
 };
 int main(){
  using namespace SandboxMemeRules;
+ // Four playable characters have independent, observable mechanics.
+ {World w;auto* p=w.add(500);auto* z=w.enemy(180);w.step(350);assert(MemeCharacters::Data(p,1)>=300);
+  const float before=z->mPosX;assert(MemeCharacters::Activate(p));assert(z->mPosX>before&&MemeCharacters::Data(p,1)==0);
+  assert(!MemeCharacters::Activate(p));}
+ {World w;auto* p=w.add(500);w.enemy();w.step(900);assert(MemeCharacters::Data(p,0)==2&&p->mPlantHealth==180);
+  const auto count=w.mProjectiles.mSize;w.step(100);assert(w.mProjectiles.mSize==count&&!MemeCharacters::Activate(p));}
+ {World w;auto* p=w.add(501);auto* z=w.enemy(160);assert(MemeCharacters::Activate(p,-1));assert(z->mRow==1&&MemeCharacters::Data(p,2)==600);
+  auto* next=w.enemy(160);MemeCharacters::Activate(p,1);assert(next->mRow==2);w.step(600);MemeCharacters::Activate(p,1);assert(next->mRow==3);}
+ {World w;w.pool=true;auto* p=w.add(501,1);auto* z=w.enemy(160,1);MemeCharacters::Activate(p,1);assert(z->mRow==1);
+  auto* heavy=w.enemy(150,1,ZOMBIE_GARGANTUAR);MemeCharacters::Activate(p,-1);assert(z->mRow==0&&heavy->mRow==1);}
+ {World w;auto* p=w.add(502);auto* z=w.enemy(180,1),*heavy=w.enemy(150,3,ZOMBIE_GARGANTUAR);w.step(180);assert(z->mRow==2&&heavy->mRow==3);assert(w.mProjectiles.mSize==0);}
+ {World w;auto* p=w.add(503);auto* z=w.enemy(p->mX+44);w.step();assert(MemeCharacters::Hiding(p));
+  for(int i=0;i<1110;++i){z->mPosX-=0.1f;w.step();}assert(!MemeCharacters::Hiding(p)&&MemeCharacters::Data(p,0)==2);
+  w.step(100);assert(w.mProjectiles.mSize==3&&w.mCoins.mSize==0);
+  for(auto* shot:w.mProjectiles)assert(shot->mMotionType==MOTION_BACKWARDS&&SandboxPlants::ShotDamage(shot,20)==60);}
+ for(int id:{500,501,502,503}){World w;auto* p=w.add(id);w.step(100);auto state=SandboxPlants::SavePower(p);
+  w.mPaused=true;w.step(1000);assert(SandboxPlants::SavePower(p)==state);SandboxPlants::Forget(p);assert(!SandboxPlants::IsCustom(p));
+  assert(SandboxPlants::RestorePower(p,state)&&SandboxPlants::SavePower(p)==state);state[9]=0;assert(!SandboxPlants::RestorePower(p,state));}
  static_assert(MemeAdventureRules::Cooldown==300);
  for(int power=180;power<=182;++power)for(int base:Bases){const int id=Result(base,power);assert(IsResult(id)&&SandboxPlants::Find(id)&&BaseOf(id)==base&&PowerOf(id)==power);
   assert(!MemeAdventureRules::Unlocked(1,false,power,base));assert(MemeAdventureRules::Unlocked(50,false,power,base));assert(MemeAdventureRules::Unlocked(1,true,power,base));

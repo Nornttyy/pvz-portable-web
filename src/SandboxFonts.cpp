@@ -7,6 +7,28 @@
 #include "graphics/ImageFont.h"
 using namespace Sexy;
 namespace {
+// Compose missing characters using the same atlas, strokes and advance.
+// Fractions describe source cells; each fragment retains its native placement.
+struct Fragment {char32_t source;float x,y,w,h;};
+void Supplement(_Font* source,char32_t target,const char* name,std::initializer_list<Fragment> parts){
+ auto* font=dynamic_cast<ImageFont*>(source);if(!font||!font->mFontData)return;
+ auto* data=font->mFontData;const std::string key=std::string("MEMEGLYPH")+name;
+ if(data->mFontLayerMap.contains(key+"0"))return;
+ for(auto& layer:data->mFontLayerList){auto found=layer.mCharDataMap.find(target);if(found!=layer.mCharDataMap.end()&&found->second.mImageRect.mWidth>0)return;}
+ FontLayer* main=nullptr;
+ for(auto& layer:data->mFontLayerList){bool complete=true;for(const auto& p:parts){auto it=layer.mCharDataMap.find(p.source);if(it==layer.mCharDataMap.end()||it->second.mImageRect.mWidth<2)complete=false;}if(complete){main=&layer;break;}}
+ if(!main)return;
+ int index=0;
+ for(const auto& part:parts){
+  auto glyph=main->mCharDataMap.at(part.source);const int width=glyph.mImageRect.mWidth,height=glyph.mImageRect.mHeight;
+  const int x=int(width*part.x+0.5f),y=int(height*part.y+0.5f);
+  glyph.mImageRect.mX+=x;glyph.mImageRect.mY+=y;
+  glyph.mImageRect.mWidth=int(width*(part.x+part.w)+0.5f)-x;glyph.mImageRect.mHeight=int(height*(part.y+part.h)+0.5f)-y;
+  glyph.mOffset.mX+=x;glyph.mOffset.mY+=y;
+  data->mFontLayerList.emplace_back(*main);auto& layer=data->mFontLayerList.back();layer.mLayerName=key+std::to_string(index++);layer.mCharDataMap.clear();layer.mCharDataMap.emplace(target,glyph);data->mFontLayerMap.emplace(layer.mLayerName,&layer);
+ }
+ font->mActiveListValid=false;font->Prepare();
+}
 void Repair(_Font* source) {
     auto* font=dynamic_cast<ImageFont*>(source);
     if(!font||!font->mFontData)return;
@@ -42,5 +64,10 @@ void Repair(_Font* source) {
 }
 }
 void SandboxRepairFonts(){
-    for(auto* font:{FONT_BRIANNETOD12,FONT_DWARVENTODCRAFT18,FONT_DWARVENTODCRAFT24})Repair(font);
+    for(auto* font:{FONT_BRIANNETOD12,FONT_DWARVENTODCRAFT18,FONT_DWARVENTODCRAFT24,FONT_DWARVENTODCRAFT18GREENINSET,FONT_DWARVENTODCRAFT18BRIGHTGREENINSET}){
+        Repair(font);
+        Supplement(font,U'梗',"GENG",{{U'样',0,0,0.46f,1},{U'硬',0.46f,0,0.54f,1}});
+        Supplement(font,U'锅',"GUO",{{U'钢',0,0,0.46f,1},{U'蜗',0.46f,0,0.54f,1}});
+        Supplement(font,U'甩',"SHUAI",{{U'用',0,0,1,0.55f},{U'用',0,0.55f,0.46f,0.45f},{U'电',0.46f,0.55f,0.54f,0.45f}});
+    }
 }

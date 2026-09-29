@@ -16,8 +16,8 @@ for(const name of Object.keys(zip.files))if(name.startsWith('images/sandbox/'))z
 const bytes=await zip.generateAsync({type:'nodebuffer',compression:'DEFLATE',compressionOptions:{level:6},platform:'UNIX'});
 m.files=kept;m.totalFiles=kept.length;m.totalBytes=kept.reduce((n,f)=>n+f.size,0);
 m.bundle={url:`resources/game-${hash(bytes).slice(0,12)}.zip`,size:bytes.length,sha256:hash(bytes)};
-m.originalPlants={files:[],source:'Native per-instance recolouring only; previous original plants and zombies retired.'};
-m.sandboxExpansion={powers:3,compatibleNativePlants:48,powerResults:144,totalCustomZombies:0,parts:0};
+m.originalPlants={files:[],source:'Four fixed characters use native rigs and effects with independent behavior; infusion retired.'};
+m.sandboxExpansion={powers:0,fixedCharacters:4,compatibleNativePlants:0,powerResults:0,totalCustomZombies:0,parts:0};
 await writeFile(new URL('site/'+m.bundle.url,root),bytes);
 await writeFile(manifestPath,JSON.stringify(m,null,2)+'\n');
 console.log(new URL('site/'+m.bundle.url,root).pathname);

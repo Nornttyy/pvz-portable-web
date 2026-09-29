@@ -25,7 +25,7 @@
   ],
   "originalPlants": {
     "files": [],
-    "source": "Native per-instance recolouring only; previous original plants and zombies retired."
+    "source": "Four fixed characters use native rigs and effects with independent behavior; infusion retired."
   },
   "localization": {
     "locale": "zh-CN",
@@ -14715,9 +14715,10 @@
   ],
   "delivery": "bundled",
   "sandboxExpansion": {
-    "powers": 3,
-    "compatibleNativePlants": 48,
-    "powerResults": 144,
+    "powers": 0,
+    "fixedCharacters": 4,
+    "compatibleNativePlants": 0,
+    "powerResults": 0,
     "totalCustomZombies": 0,
     "parts": 0
   }

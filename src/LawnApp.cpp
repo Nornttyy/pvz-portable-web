@@ -25,6 +25,9 @@
 #include <format>
 #include "LawnApp.h"
 #include "Sandbox.h"
+#include "MemeAdventure.h"
+#include "SandboxPlants.h"
+#include "SandboxZombies.h"
 #include "Resources.h"
 #include "Lawn/LawnCommon.h"
 #include "Lawn/Board.h"
@@ -269,6 +272,10 @@ void LawnApp::KillBoard()
 		}
 
 		mBoard->DisposeBoard();
+		// SafeDeleteWidget is deferred: reset now, before another board can load.
+		MemeAdventure::Reset();
+		SandboxPlants::Reset();
+		SandboxZombies::Reset();
 		mWidgetManager->RemoveWidget(mBoard);
 		SafeDeleteWidget(mBoard);
 		mBoard = nullptr;

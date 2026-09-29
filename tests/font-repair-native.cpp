@@ -3,7 +3,7 @@
 #include "../src/SandboxFontRules.h"
 #include <cassert>
 #include <iostream>
-namespace Sexy {_Font* FONT_BRIANNETOD12=nullptr;_Font* FONT_DWARVENTODCRAFT18=nullptr;_Font* FONT_DWARVENTODCRAFT24=nullptr;}
+namespace Sexy {_Font* FONT_BRIANNETOD12=nullptr;_Font* FONT_DWARVENTODCRAFT18=nullptr;_Font* FONT_DWARVENTODCRAFT24=nullptr;_Font* FONT_DWARVENTODCRAFT18GREENINSET=nullptr;_Font* FONT_DWARVENTODCRAFT18BRIGHTGREENINSET=nullptr;}
 using namespace Sexy;
 void check(int cell,int advance,int offset,int split,bool measured){
     FontData data;data.mFontLayerList.emplace_back();
@@ -39,5 +39,11 @@ int main(){
     ImageFont font;font.mFontData=&native;FONT_DWARVENTODCRAFT24=&font;
     SandboxRepairFonts();assert(native.mFontLayerList.size()==1&&font.prepared==0);
     FONT_DWARVENTODCRAFT24=nullptr;SandboxRepairFonts();
+    FontData added;added.mFontLayerList.emplace_back();auto& original=added.mFontLayerList.back();
+    for(char32_t c:U"样硬钢蜗用电")original.mCharDataMap[c]={{0,0,24,24},{-5,-4},14};
+    ImageFont fixed;fixed.mFontData=&added;FONT_BRIANNETOD12=&fixed;SandboxRepairFonts();
+    assert(added.mFontLayerList.size()==8&&fixed.prepared==3);
+    for(char32_t c:U"梗锅甩"){if(!c)continue;int found=0;for(const auto& l:added.mFontLayerList)if(l.mCharDataMap.contains(c)){const auto& g=l.mCharDataMap.at(c);assert(g.mWidth==14&&g.mImageRect.mWidth>0&&g.mImageRect.mHeight>0);++found;}assert(found>=2);}
+    SandboxRepairFonts();assert(added.mFontLayerList.size()==8&&fixed.prepared==3);FONT_BRIANNETOD12=nullptr;
     std::cout<<"Three font sizes, prior measurement, original glyph preservation and idempotence passed.\n";
 }

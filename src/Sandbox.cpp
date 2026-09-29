@@ -31,7 +31,7 @@
 bool gSandboxEnabled = false;
 static bool paused = true, stepOnce = false, awake = true;
 static bool stackPlants = false, continuousZombies = false;
-static bool fusionEnabled = true;
+static bool fusionEnabled = false;
 static int mapType = 0, escaped = 0;
 static int sessionRevision = 0;
 static std::unique_ptr<PlayerInfo> sandboxProfile;
@@ -69,7 +69,7 @@ bool SandboxEnter() {
     awake = true;
     stackPlants = false;
     continuousZombies = false;
-    fusionEnabled = true;
+    fusionEnabled = false;
     CanvasSize(SandboxUIRules::CanvasWidth);
     SandboxStart(0);
     return true;
@@ -323,10 +323,19 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
     case 18: return sessionRevision;
     case 19: stackPlants = type != 0; if(stackPlants)fusionEnabled=false; return 1;
     case 20: continuousZombies = type != 0; return 1;
-    case 21: fusionEnabled = type != 0; if(fusionEnabled)stackPlants=false; return 1;
+    case 21: fusionEnabled = false; return 1; // Retired layout flag, accepted for compatibility only.
     case 22: { int result=0; FindFusionTarget(board,type,col,row,result); return result; }
+    case 23:
+        for(auto* p:board->mPlants)if(!p->mDead&&p->mPlantCol==col&&p->mRow==row&&MemeCharacters::Is(p))return MemeCharacters::Activate(p,type)?1:0;
+        return 0;
     default: return -2;
     }
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_zombie_data(int index,int field) {
+    auto* board=ActiveBoard();if(!board||index<0||field<0||field>5)return -1;
+    for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard()){if(index--==0)return field==0?int(z->mZombieType):field==1?z->mRow:field==2?int(z->mPosX):field==3?int(z->mPosY):field==4?z->mBodyHealth:z->mHelmHealth;}
+    return -1;
 }
 
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_plant_data(int index, int field) {

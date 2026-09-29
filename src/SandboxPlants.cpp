@@ -104,27 +104,30 @@ Sexy::MemoryImage* Card(int id){
  return cached.get();
 }
 }
-void Reset(){states.clear();shots.clear();damageShots.clear();}
-void Forget(Plant* p){states.erase(p);}
+void Reset(){states.clear();shots.clear();damageShots.clear();MemeCharacters::Reset();}
+void Forget(Plant* p){states.erase(p);MemeCharacters::Forget(p);}
 void ForgetShot(Projectile* p){shots.erase(p);damageShots.erase(p);}
-bool IsCustom(const Plant* p){return states.contains(p);}
-int Type(const Plant* p){auto it=states.find(p);return it==states.end()?int(p->mSeedType):it->second.id;}
+bool IsCustom(const Plant* p){return states.contains(p)||MemeCharacters::Is(p);}
+int Type(const Plant* p){if(MemeCharacters::Is(p))return MemeCharacters::Type(p);auto it=states.find(p);return it==states.end()?int(p->mSeedType):it->second.id;}
 int GrowthStage(const Plant* p){auto it=states.find(p);return it==states.end()?0:it->second.heat.heat/250;}
-int HeatData(const Plant* p,int field){auto it=states.find(p);if(it==states.end())return -1;const auto& s=it->second.heat;return field==0?s.phase:field==1?s.heat:s.timer;}
+int HeatData(const Plant* p,int field){if(MemeCharacters::Is(p))return MemeCharacters::Data(p,field);auto it=states.find(p);if(it==states.end())return -1;const auto& s=it->second.heat;return field==0?s.phase:field==1?s.heat:s.timer;}
 bool KeepsNativeBlink(const Plant* p){return IsCustom(p);}
 int EffectiveBase(const Plant* p){return int(p->mSeedType)==48?int(p->mImitaterType):int(p->mSeedType);}
 int Power(const Plant* p){return SandboxMemeRules::PowerOf(Type(p));}
 void Assign(Plant* p,int id){
+ if(MemeCharacters::Is(id)){MemeCharacters::Assign(p,id);return;}
  if(!Find(id)||Base(id)!=EffectiveBase(p))return;auto& s=states[p];s={};s.id=id;s.health=p->mPlantHealth;s.heat=SandboxMemeRules::Initial(id);
  if(SandboxMemeRules::LegacyBase(Base(id))&&int(p->mSeedType)!=48){p->mLaunchCounter=9999;p->mShootingCounter=0;}
  else if(Power(p)==182&&p->mLaunchRate>0)p->mLaunchCounter=std::max(p->mLaunchCounter,p->mLaunchRate*2);
 }
 PowerSave SavePower(const Plant* p){
+ if(MemeCharacters::Is(p))return MemeCharacters::Save(p);
  auto it=states.find(p);if(it==states.end())return {};
  const auto& s=it->second;const auto& h=s.heat;
  return {s.id,s.health,h.phase,h.heat,h.timer,h.delay,h.age,h.pulse,s.remaining,s.spacing};
 }
 bool RestorePower(Plant* p,const PowerSave& a){
+ if(MemeCharacters::Is(a[0]))return MemeCharacters::Restore(p,a);
  if(!Find(a[0])||Base(a[0])!=EffectiveBase(p)||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>2||a[3]<0||a[3]>1000||a[4]<0||a[4]>10000||a[5]<0||a[5]>10000||a[6]<0||a[6]>=1000000||a[7]<0||a[7]>32||a[8]<0||a[8]>12||a[9]<0||a[9]>8)return false;
  auto& s=states[p];s={};s.id=a[0];s.health=a[1];s.empowered=0;
  s.heat={a[2],a[3],a[4],a[5],a[6],a[7]};s.remaining=a[8];s.spacing=a[9];
@@ -191,6 +194,7 @@ void OneShot(Plant* p,Zombie* exclude){
  }
 }
 void NativeTint(const Plant* p,Sexy::Color& color){
+ if(MemeCharacters::Is(p)){MemeCharacters::Tint(p,color);return;}
  auto it=states.find(p);if(it==states.end()||SandboxMemeRules::LegacyBase(int(p->mSeedType)))return;
  const int heat=it->second.heat.heat,power=Power(p),amount=20+heat/20;
  if(power==180){color.mGreen=color.mGreen*(255-amount)/255;color.mBlue=color.mBlue*(245-amount)/255;}
@@ -198,6 +202,7 @@ void NativeTint(const Plant* p,Sexy::Color& color){
  else {color.mRed=color.mRed*205/255;color.mGreen=color.mGreen*230/255;}
 }
 void AdjustScale(const Plant* p,float& x,float& y,float& sx,float& sy){
+ if(MemeCharacters::Is(p)){MemeCharacters::Scale(p,x,y,sx,sy);return;}
  auto it=states.find(p);if(it==states.end()||p->mSquished||!SandboxMemeRules::LegacyBase(Base(it->second.id))||int(p->mSeedType)==48)return;const auto& h=it->second.heat;
  const float swell=h.phase==SandboxMemeRules::Recovering?std::sin(h.age*0.09f)*0.025f:h.heat/1000.0f*0.035f+std::sin(h.age*0.35f)*(h.phase==SandboxMemeRules::Bursting?0.012f:0.0f);
  x-=40*sx*swell;y+=65*sy*swell;sx*=1+swell;sy*=1-swell;
@@ -209,6 +214,7 @@ bool UsesCustomShotArt(const Projectile*){return false;}
 int ShotRadius(const Projectile*){return 12;}
 int NextShot(Plant*){return 0;}
 void OnFired(Plant* p,Projectile* shot,Zombie*){
+ if(MemeCharacters::Is(p)){MemeCharacters::OnFired(p,shot);return;}
  if(!IsCustom(p))return;
  if(!SandboxMemeRules::LegacyBase(EffectiveBase(p))){const int percent=NativeDamage(p,100);if(percent!=100)damageShots[shot]=percent;return;}
  shots.insert(shot);
@@ -228,6 +234,7 @@ void UpdateShot(Projectile*){}
 bool Impact(Projectile*,Zombie*){return false;} // Native damage, slow, fire and splats.
 void Tick(Board* b){
  if(b->mPaused)return;
+ MemeCharacters::Tick(b);
  using namespace SandboxMemeRules;
  for(auto* p:b->mPlants){
   if(p->mDead){Forget(p);continue;}auto it=states.find(p);if(it==states.end())continue;auto& s=it->second;
@@ -276,6 +283,7 @@ void Tick(Board* b){
 }
 void DrawEffects(Sexy::Graphics* graphics,Board* b,int row){
  Sexy::Graphics clipped(*graphics);clipped.ClipRect(0,82,800,518);auto* g=&clipped;
+ MemeCharacters::Effects(g,b,row);
  for(const auto& [p,s]:states)if(!p->mDead&&!p->mIsAsleep&&!p->mSquished&&p->mRow==row){
   const auto& h=s.heat;
   if(s.empowered>0){const int age=32-s.empowered;for(int side:{-1,1})NativePuff(g,p->mX+40+side*(18+age*0.6f),p->mY+48-age*0.8f,12+age*0.4f,age,s.empowered*4);}
@@ -289,6 +297,7 @@ void DrawEffects(Sexy::Graphics* graphics,Board* b,int row){
 }
 bool DrawShot(Sexy::Graphics*,const Projectile*){return false;}
 void DrawCard(Sexy::Graphics* g,int x,int y,int id){
+ if(MemeCharacters::Is(id)){MemeCharacters::Card(g,x,y,id);return;}
  if(SandboxMemeRules::IsPower(id)){
   DrawSeedPacket(g,x,y,static_cast<SeedType>(id==180?20:id==181?35:9),SEED_NONE,0,255,false,false);
   Sexy::Graphics label(*g);label.SetClipRect(x+3,y+53,44,15);

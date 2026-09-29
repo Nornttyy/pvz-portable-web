@@ -19,7 +19,7 @@ test('production placement function and repeat state machine pass native tests',
  await run('c++',['-std=c++20','-Isrc','-I'+dir,'tests/sandbox-placement-native.cpp','-o',join(dir,'placement')],{cwd:root});
  const result=await run(join(dir,'placement'));
  assert.match(result.stdout,/Production placement.*passed/);
- assert.match(result.stdout,/Production fusion: ordered recipes.*passed/);
+ assert.match(result.stdout,/Fixed characters:.*passed/);
 });
 test('stacked formations round-trip duplicates, mixed units, shells and two-cell cannons',()=>{
  for(const plants of [[plant(),plant()],[plant(),plant(126),plant(30),plant(30)],[plant(47),plant(0,1)]]){
@@ -66,7 +66,7 @@ test('storage bridge restores stacking before planting and detects stacks even a
  const noFusion=calls.findIndex(([cmd,type])=>cmd===21&&type===0);assert.ok(noFusion>=0&&noFusion<place);
 });
 test('fusion setting is optional, validated and retained without mutating legacy formations',()=>{
- const old={schema:1,map:0,plants:[plant(134)]};assert.deepEqual(validateLayout(old),old);
+ const old={schema:1,map:0,plants:[plant(500)]};assert.deepEqual(validateLayout(old),old);
  for(const fusion of [true,false])assert.equal(validateLayout({...old,fusion}).fusion,fusion);
  for(const fusion of ['yes',1,null])assert.throws(()=>validateLayout({...old,fusion}));
  assert.throws(()=>validateLayout({...old,stacked:true,fusion:true}));

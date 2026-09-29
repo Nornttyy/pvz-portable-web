@@ -1013,6 +1013,7 @@ bool Plant::MakesSun()
 
 void Plant::UpdateProductionPlant()
 {
+	if (MemeCharacters::Is(this)) return;
 	if (!IsInPlay() || mApp->IsIZombieLevel() || mApp->mGameMode == GameMode::GAMEMODE_UPSELL || mApp->mGameMode == GameMode::GAMEMODE_INTRO)
 		return;
 

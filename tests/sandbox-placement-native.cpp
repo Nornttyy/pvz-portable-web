@@ -68,8 +68,8 @@ int main(){
  Board b;
  assert(PlacePlant(&b,0,2,2)==1);assert(PlacePlant(&b,0,2,2)==-4);
  stackPlants=true;
- assert(PlacePlant(&b,0,2,2)==1);assert(PlacePlant(&b,126,2,2)==1);
- assert(PlantCount(&b)==3&&b.mPlants.back()->id==126); // upgrade leaves both originals alive
+ assert(PlacePlant(&b,0,2,2)==1);assert(PlacePlant(&b,500,2,2)==1);
+ assert(PlantCount(&b)==3&&b.mPlants.back()->id==500);
  stackPlants=false;assert(PlacePlant(&b,7,2,2)==-4);assert(PlantCount(&b)==3);
  Board normal;assert(PlacePlant(&normal,7,0,0)==1);assert(PlacePlant(&normal,40,0,0)==1);
  assert(PlantCount(&normal)==1&&normal.mPlants.front()->mDead);
@@ -88,61 +88,16 @@ int main(){
  assert(PlacePlant(&cap,0,0,0)==-3);assert(PlantCount(&cap)==180);
  Board slots;slots.mPlants.mSize=248;assert(PlacePlant(&slots,0,0,0)==-3);
  assert(PlacePlant(&b,999,0,0)==-2);assert(PlacePlant(&b,0,-1,0)==-2);
- // Real production fusion lookup/placement, all new recipes in both orders.
- mapType=0;stackPlants=false;fusionEnabled=true;
- for(const auto& recipe:SandboxFusion::Recipes)for(bool reversed:{false,true}){
-   Board fused;const int a=reversed?recipe.second:recipe.first,b=reversed?recipe.first:recipe.second;
-   if(SandboxMemeRules::IsPower(a)){assert(PlacePlant(&fused,a,1,1)==-6&&PlantCount(&fused)==0);continue;}
-   assert(SandboxPlants::Find(recipe.result));
-   // Existing native plants already passed their native terrain/target checks.
-   auto* fixture=fused.AddPlant(1,1,static_cast<SeedType>(a),SEED_NONE);SandboxPlants::Assign(fixture,a);
-   auto* before=fused.mPlants.front();before->mPlantHealth=before->mPlantMaxHealth/2;
-   const int marks=fused.marks;int result=0;
-   assert(FindFusionTarget(&fused,b,1,1,result)==before&&result==recipe.result);
-   assert(PlantCount(&fused)==1&&fused.marks==marks&&!before->mDead); // preview is read-only
-   assert(PlacePlant(&fused,b,1,1)==recipe.result);
-   assert(before->mDead==(!SandboxMemeRules::IsPower(b))&&PlantCount(&fused)==1&&fused.mPlants.back()->id==recipe.result);
-   assert(fused.mPlants.back()->mPlantHealth==fused.mPlants.back()->mPlantMaxHealth/2);
-   assert(PlacePlant(&fused,b,1,1)==(SandboxMemeRules::IsPower(b)?-6:-4)); // no recursive/base-type matching
+ // Fixed seed cards plant directly, cannot overwrite an existing plant or fuse.
+ mapType=0;stackPlants=false;fusionEnabled=false;
+ for(int id:{500,501,502,503}){
+   Board world;assert(PlacePlant(&world,id,1,1)==1);
+   assert(world.mPlants.back()->id==id&&int(world.mPlants.back()->mSeedType)==SandboxPlants::Base(id));
+   world.mPlants.back()->mPlantHealth=1;
+   assert(PlacePlant(&world,id,1,1)==-4&&world.mPlants.back()->mPlantHealth==1);
  }
- Board unsupported;assert(PlacePlant(&unsupported,0,0,0)==1);
- assert(PlacePlant(&unsupported,1,0,0)==-4&&PlantCount(&unsupported)==1);
- unsupported.blocked=true;assert(PlacePlant(&unsupported,3,0,0)==-4);unsupported.blocked=false;
- unsupported.failAllocation=true;assert(PlacePlant(&unsupported,3,0,0)==-4);unsupported.failAllocation=false;
- assert(!unsupported.mPlants.front()->mDead&&PlantCount(&unsupported)==1);
- unsupported.mPlants.front()->airborne=true;int noResult=42;
- assert(!FindFusionTarget(&unsupported,3,0,0,noResult)&&noResult==0);unsupported.mPlants.front()->airborne=false;
- fusionEnabled=false;assert(PlacePlant(&unsupported,3,0,0)==-4);
- fusionEnabled=true;stackPlants=true;assert(PlacePlant(&unsupported,3,0,0)==1);
- stackPlants=false;assert(PlacePlant(&unsupported,18,0,0)==-4&&PlantCount(&unsupported)==2); // ambiguous old stack
- // Support layers survive; water still requires its original lily pad.
- for(bool water:{false,true}){
-   Board support;support.pool=water;mapType=water?1:0;stackPlants=true;
-   assert(PlacePlant(&support,water?16:33,2,2)==1);
-   assert(PlacePlant(&support,0,2,2)==1);assert(PlacePlant(&support,30,2,2)==1);
-   auto* base=support.mPlants.front();auto* shell=support.mPlants.back();stackPlants=false;
-   assert(PlacePlant(&support,180,2,2)==120);assert(PlantCount(&support)==3&&!base->mDead&&!shell->mDead);
-   if(water){base->Die();assert(!FindFusionTarget(&support,0,2,2,noResult));}
- }
- Board missingLily;missingLily.pool=true;mapType=1;
- auto* floating=missingLily.AddPlant(2,2,SEED_PEASHOOTER,SEED_NONE);SandboxPlants::Assign(floating,0);
- assert(!FindFusionTarget(&missingLily,3,2,2,noResult)&&!floating->mDead);
- mapType=0;Board replacement;stackPlants=true;
- assert(PlacePlant(&replacement,0,1,1)==1);
- for(int i=1;i<180;++i)assert(PlacePlant(&replacement,1,0,0)==1);
- stackPlants=false;assert(PlacePlant(&replacement,180,1,1)==120&&PlantCount(&replacement)==180);
- assert(SandboxFusion::InheritedHealth(1,4000,300)==1);
- assert(SandboxFusion::InheritedHealth(10000,300,300)==300);
- {Board b;fusionEnabled=true;assert(PlacePlant(&b,0,1,1)==1);auto* p=b.mPlants.front();p->mPlantHealth=1;
-  b.mPlants.mSize=b.mPlants.mMaxSize-8;assert(PlacePlant(&b,180,1,1)==120);assert(p->mPlantHealth==1&&!p->mDead&&b.owned.size()==1);}
- {Board b;assert(PlacePlant(&b,1,1,1)==1);fusionEnabled=false;assert(PlacePlant(&b,180,1,1)==-6);
-  fusionEnabled=true;stackPlants=true;assert(PlacePlant(&b,180,1,1)==-6);stackPlants=false;
-  assert(b.mPlants.front()->id==1&&!b.mPlants.front()->mDead);}
- for(size_t i=0;i<SandboxFusion::Recipes.size();++i)for(size_t j=0;j<i;++j){
-   const auto& a=SandboxFusion::Recipes[i];const auto& b=SandboxFusion::Recipes[j];
-   assert(SandboxFusion::Result(a.first,a.second)==a.result);
-   assert(a.result!=b.result);
- }
- std::cout<<"Production fusion: ordered recipes, health, layers, capacity and rollback passed\n";
+ for(int id:{120,143,180,181,182,302,443}){Board world;assert(PlacePlant(&world,id,1,1)==-2);assert(PlantCount(&world)==0);}
+ {Board world;assert(PlacePlant(&world,0,1,1)==1);assert(PlacePlant(&world,500,1,1)==-4);assert(PlantCount(&world)==1);}
+ std::cout<<"Fixed characters: direct placement, native bases and retired recipe rejection passed\n";
  std::cout<<"Production placement, stack terrain, capacity and continuous input passed\n";
 }

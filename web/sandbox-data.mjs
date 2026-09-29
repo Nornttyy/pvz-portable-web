@@ -5,7 +5,7 @@ const groups = {
   support:[1,9,11,22,25,31,33,35,38], water:[16,19,24,43], upgrade:[40,41,42,43,44,45,46,47],
 };
 const notes = {11:'需要墓碑',16:'水上底座',19:'仅限水路',24:'仅限水路',30:'可套在植物外',35:'需要睡眠蘑菇',43:'放在泳池',47:'占两格 · 操作后发射'};
-export const ORIGINAL_PLANTS = [
+export const RETIRED_PLANTS = [
   [120,0,"红温豌豆","持续攻击升温 · 红温连发 · 喘气停火"],
   [121,1,"红温向日葵","生产升温 · 集中产出 · 休息恢复"],
   [122,3,"红温坚果","受伤升温 · 爆发推退 · 冷静后再发动"],
@@ -151,7 +151,13 @@ export const ORIGINAL_PLANTS = [
   [442,46,"摆烂地刺王","延长攻击间隔 · 蓄力重击"],
   [443,47,"摆烂玉米加农炮","慢速装填 · 扩大炮击范围"],
 ].map(([id,base,name,note])=>({id,base,name,note}));
-export const nativeBase = id => ORIGINAL_PLANTS.find(p=>p.id===id)?.base ?? id;
+export const ORIGINAL_PLANTS = [
+  [500,0,'红温豌豆','点击降温 · 过热会自伤'],
+  [501,3,'甩锅坚果','点上半向上 · 下半向下'],
+  [502,8,'显眼包蘑菇','吸引邻路普通步行僵尸'],
+  [503,1,'已读不回花','装死放行 · 回身三连击'],
+].map(([id,base,name,note])=>({id,base,name,note}));
+export const nativeBase = id => ORIGINAL_PLANTS.find(p=>p.id===id)?.base ?? RETIRED_PLANTS.find(p=>p.id===id)?.base ?? id;
 export const PLANTS = [...plantNames.map((name,id) => ({id,name,note:notes[id] ?? '免费 · 无冷却'})),...ORIGINAL_PLANTS];
 const validPlant = id => (id>=0&&id<48)||ORIGINAL_PLANTS.some(p=>p.id===id);
 export const ORIGINAL_ZOMBIES = [];
@@ -193,6 +199,7 @@ export function validateLayout(value) {
     // Retired originals safely become their native base in old formations.
     const retired=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
     if(Number.isInteger(p?.type)&&p.type>=100&&p.type<120)p={...p,type:retired[p.type-100]};
+    if(RETIRED_PLANTS.some(old=>old.id===p?.type))p={...p,type:nativeBase(p.type)};
     if (!p || ![p.type,p.col,p.row].every(Number.isInteger) || !validPlant(p.type) || p.col<0 || p.col>=9 || p.row<0 || p.row >= (value.map===1?6:5)) throw Error('阵型中有无效的植物或位置');
     const key = `${p.type}:${p.col}:${p.row}`;
     if (!stacked&&seen.has(key)) throw Error('阵型中有重复植物');

@@ -7,17 +7,17 @@ import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
-import {ORIGINAL_PLANTS,ORIGINAL_ZOMBIES,ZOMBIES,validateLayout} from '../web/sandbox-data.mjs';
+import {ORIGINAL_PLANTS,RETIRED_PLANTS,ORIGINAL_ZOMBIES,ZOMBIES,validateLayout} from '../web/sandbox-data.mjs';
 const run=promisify(execFile),root=fileURLToPath(new URL('../',import.meta.url));
 const read=name=>readFile(join(root,name));
 test('meme powers exercise real production combat and preserve native pixel shading',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'pvz-meme-combat-')),binary=join(dir,'combat');
- for(const f of ['SandboxPlants.cpp','SandboxZombies.cpp'])await copyFile(join(root,'src',f),join(dir,f));
- await run(process.env.CXX||'c++',['-std=c++20','-Itests/combat-stubs','-Isrc',join(dir,'SandboxPlants.cpp'),join(dir,'SandboxZombies.cpp'),'tests/meme-combat.cpp','-o',binary],{cwd:root});
+ for(const f of ['SandboxPlants.cpp','SandboxZombies.cpp','MemeCharacters.cpp'])await copyFile(join(root,'src',f),join(dir,f));
+ await run(process.env.CXX||'c++',['-std=c++20','-Itests/combat-stubs','-Isrc',join(dir,'SandboxPlants.cpp'),join(dir,'SandboxZombies.cpp'),join(dir,'MemeCharacters.cpp'),'tests/meme-combat.cpp','-o',binary],{cwd:root});
  assert.match((await run(binary)).stdout,/Meme powers:.*passed/);
 });
 test('power token is not a plant or a save entry; only results round-trip',()=>{
- for(const type of [120,121,122])assert.equal(validateLayout({schema:1,map:0,plants:[{type,col:0,row:0}]}).plants[0].type,type);
+ for(const type of [500,501,502,503])assert.equal(validateLayout({schema:1,map:0,plants:[{type,col:0,row:0}]}).plants[0].type,type);
  assert.throws(()=>validateLayout({schema:1,map:0,plants:[{type:180,col:0,row:0}]}));
 });
 test('persistent native sidebar fits both rosters and keeps the lawn in original units',async()=>{
@@ -28,8 +28,8 @@ test('persistent native sidebar fits both rosters and keeps the lawn in original
 });
 test('actual projectile/effect draw code preserves bone and world coordinate contracts',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'pvz-visual-contracts-')),binary=join(dir,'visual');
- for(const f of ['SandboxPlants.cpp','SandboxZombies.cpp','SandboxArt.cpp'])await copyFile(join(root,'src',f),join(dir,f));
- await run(process.env.CXX||'c++',['-std=c++20','-Itests/combat-stubs','-Isrc',...['SandboxPlants.cpp','SandboxZombies.cpp','SandboxArt.cpp'].map(f=>join(dir,f)),'tests/visual-coordinates.cpp','-o',binary],{cwd:root});
+ for(const f of ['SandboxPlants.cpp','SandboxZombies.cpp','SandboxArt.cpp','MemeCharacters.cpp'])await copyFile(join(root,'src',f),join(dir,f));
+ await run(process.env.CXX||'c++',['-std=c++20','-Itests/combat-stubs','-Isrc',...['SandboxPlants.cpp','SandboxZombies.cpp','SandboxArt.cpp','MemeCharacters.cpp'].map(f=>join(dir,f)),'tests/visual-coordinates.cpp','-o',binary],{cwd:root});
  assert.match((await run(binary)).stdout,/Visual coordinate contracts passed/);
 });
 test('native projectile integration retains splats, centered scaling and fire attachments',async()=>{
@@ -45,15 +45,15 @@ test('native projectile integration retains splats, centered scaling and fire at
  const plant=source.slice(source.indexOf('void Plant::Fire('),source.indexOf('Zombie* Plant::FindTargetZombie('));
  assert.ok(plant.indexOf('aProjectile->ConvertToFireball(mPlantCol)')>plant.indexOf('SandboxPlants::OnFired(this,aProjectile,theTargetZombie)'),'fire attaches only after muzzle correction');
 });
-test('three powers cover every native plant; old originals migrate without being playable',async()=>{
- assert.equal(ORIGINAL_PLANTS.length,144);assert.equal(new Set(ORIGINAL_PLANTS.map(p=>p.id)).size,144);assert.deepEqual(ORIGINAL_ZOMBIES,[]);assert.equal(ZOMBIES.length,23);
+test('four fixed characters replace infusion; old results migrate without losing plants',async()=>{
+ assert.equal(ORIGINAL_PLANTS.length,4);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,502,503]);assert.deepEqual(ORIGINAL_ZOMBIES,[]);assert.equal(ZOMBIES.length,23);
  const bases=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
  for(let id=100;id<120;++id)assert.equal(validateLayout({schema:1,map:0,plants:[{type:id,col:0,row:0}]}).plants[0].type,bases[id-100]);
- for(const p of ORIGINAL_PLANTS){
+ for(const p of RETIRED_PLANTS){
   if(p.base===11){assert.throws(()=>validateLayout({schema:1,map:0,plants:[{type:p.id,col:0,row:0}]}));continue;}
   const water=[16,19,24,43].includes(p.base),plants=[{type:p.id,col:0,row:water?2:0}];
   if(p.base===35)plants.push({type:8,col:0,row:0});
-  assert.ok(validateLayout({schema:1,map:water?1:0,plants}).plants.some(n=>n.type===p.id));
+  assert.ok(validateLayout({schema:1,map:water?1:0,plants}).plants.some(n=>n.type===p.base));
  }
  for(const id of [144,180,181,182,200,211])assert.throws(()=>validateLayout({schema:1,map:0,plants:[{type:id,col:0,row:0}]}));
  const m=JSON.parse(await read('site/resource-manifest.json'));assert.equal(m.totalFiles,2912);assert.equal(m.files.filter(f=>f.path.startsWith('images/sandbox/')).length,0);
@@ -62,10 +62,11 @@ test('three powers cover every native plant; old originals migrate without being
 });
 test('adventure wires independent slot, optional save chunk and actual combat ticks',async()=>{
  const adventure=(await read('src/MemeAdventure.cpp')).toString(),save=(await read('src/Lawn/System/SaveGame.cpp')).toString();
- assert.match(adventure,/TakeSunMoney\(Cost\(power\)\)/);assert.match(adventure,/cooldown=Cooldown/);assert.match(adventure,/SandboxPlants::Tick\(b\)/);
+ assert.match(adventure,/TakeSunMoney\(d->cost\)/);assert.match(adventure,/cooldown=Cooldown/);assert.match(adventure,/SandboxPlants::Tick\(b\)/);
  assert.match(save,/SAVE4_CHUNK_MEME_POWERS = 21/);assert.match(save,/MemeAdventure::Restore\(theBoard\)/);
  assert.match(save,/SAVE4_CHUNK_MEME_PROJECTILES = 22/);assert.match(save,/MemeAdventure::LoadShots\(save.shots\)/);
- assert.match(adventure,/CURSOR_TYPE_PLANT_FROM_BANK/);assert.match(adventure,/void OnPlanted\(Plant\* p\)/);
+ assert.match(adventure,/CURSOR_TYPE_NORMAL/);assert.match(adventure,/void OnPlanted\(Plant\*\)\{\}/);
+ assert.match(adventure,/GetPlantDefinition\(p->mSeedType\).mLaunchRate/);
  const board=(await read('src/Lawn/Board.cpp')).toString();assert.match(board,/MemeAdventure::OnPlanted\(aPlant\)/);
  const plants=(await read('src/Lawn/Plant.cpp')).toString();
  const special=plants.slice(plants.indexOf('void Plant::DoSpecial()'),plants.indexOf('void Plant::ImitaterMorph()'));
@@ -76,4 +77,10 @@ test('adventure wires independent slot, optional save chunk and actual combat ti
  assert.match(plants,/const int inheritedPower=SandboxPlants::Power\(this\);/);
  assert.match(save,/MemeAdventure::Reset\(\)/);assert.match(save,/count>1024/);
  assert.doesNotMatch(adventure,/mNumPackets\s*=|mSunMoney\s*=|mLevel\s*=/);
+});
+test('deferred disposal cannot reset a newly loaded board',async()=>{
+ const board=(await read('src/Lawn/Board.cpp')).toString(),app=(await read('src/LawnApp.cpp')).toString();
+ assert.match(board,/Board::~Board\(\) = default;/);
+ const kill=app.slice(app.indexOf('void LawnApp::KillBoard()'),app.indexOf('bool LawnApp::CanPauseNow()'));
+ for(const state of ['MemeAdventure','SandboxPlants','SandboxZombies'])assert.ok(kill.indexOf(state+'::Reset()')<kill.indexOf('SafeDeleteWidget(mBoard)'));
 });

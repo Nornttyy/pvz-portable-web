@@ -10,6 +10,7 @@
 enum SeedType {SEED_PEASHOOTER=0,SEED_NONE=-1};
 enum ZombieType {ZOMBIE_NORMAL=0,ZOMBIE_IMP=24,ZOMBIE_GARGANTUAR=23,ZOMBIE_REDEYE_GARGANTUAR=32,ZOMBIE_ZAMBONI=12};
 enum ZombieID : unsigned { ZOMBIEID_NULL=0 };
+constexpr int PHASE_ZOMBIE_NORMAL=0,HEIGHT_ZOMBIE_NORMAL=0;
 enum ReanimationType {REANIM_ZOMBIE,REANIM_FLAG};
 enum ProjectileType {PROJECTILE_PEA,PROJECTILE_SNOWPEA,PROJECTILE_FIREBALL,PROJECTILE_ZOMBIE_PEA};
 enum ProjectileMotion {MOTION_STRAIGHT,MOTION_STAR,MOTION_HOMING,MOTION_THREEPEATER,MOTION_BACKWARDS};
@@ -61,6 +62,9 @@ public:
  Board* mBoard=nullptr;ZombieType mZombieType=ZOMBIE_NORMAL;ZombieID id=ZOMBIEID_NULL;
  float mPosX=0,mPosY=0,mScaleZombie=1;int mX=0,mY=0,mRow=0,mBodyReanimID=0,mBodyHealth=1000,mBodyMaxHealth=1000,mHelmHealth=0,mHelmMaxHealth=0;
  bool mDead=false,mMindControlled=false,mHasHead=true,mHasArm=true,mIsEating=false;int chill=0,mIceTrapCounter=0,mButteredCounter=0,mRenderOrder=0;
+ int mZombiePhase=0,mZombieHeight=0;bool mInPool=false;
+ void SetRow(int row){mRow=row;}
+ bool IsOnBoard(){return true;}
  void StartWalkAnim(int){}
  int mSpecialHeadReanimID=0;
  bool IsDeadOrDying(){return mDead||mBodyHealth<=0;};bool EffectedByDamage(unsigned){return !IsDeadOrDying();}
@@ -78,6 +82,7 @@ public:
  int mRenderOrder=0,mEatenFlashCountdown=0;
  bool mDead=false,mIsAsleep=false,mSquished=false,airborne=false;
  bool NotOnGround(){return airborne;}
+ void SetSleeping(bool value){mIsAsleep=value;}void Die(){mDead=true;}
  int GetDamageRangeFlags(PlantWeapon){return 0;};Zombie* FindTargetZombie(int row,PlantWeapon);
  void Fire(Zombie*,int row,PlantWeapon);
 };
@@ -111,6 +116,7 @@ public:
  void AddCoin(int,int,int,int){++mCoins.mSize;}
  std::vector<std::unique_ptr<Plant>> ownedPlants;std::vector<std::unique_ptr<Zombie>> ownedZombies;std::vector<std::unique_ptr<Projectile>> ownedShots;
  bool StageHasPool(){return pool;}
+ bool RowCanHaveZombies(int row){return row>=0&&row<(pool?6:5);}
  ZombieID ZombieGetID(Zombie* z){return z?z->id:ZOMBIEID_NULL;}
  Zombie* ZombieTryToGet(ZombieID id){for(auto* z:mZombies)if(z->id==id)return z;return nullptr;}
  Zombie* AddZombieInRow(ZombieType type,int row,int){
@@ -129,6 +135,7 @@ inline PlantDefinition GetPlantDefinition(SeedType type){return {REANIM_ZOMBIE,i
 inline void DrawSeedPacket(Sexy::Graphics*,int,int,SeedType,SeedType,int,int,bool,bool){}
 inline void PvzpDrawImageCelScaledF(Sexy::Graphics*,Sexy::Image*,int,int,int,int,int,int){}
 inline void PvzpDrawString(Sexy::Graphics*,const char*,int,int,int,Sexy::Color,int){}
+inline void PvzpDrawString(Sexy::Graphics*,const std::string&,int,int,int,Sexy::Color,int){}
 struct Blit{std::string path;Sexy::SexyTransform2D matrix;int alpha;};
 inline std::vector<Blit> testBlits;
 inline void PvzpBltMatrix(Sexy::Graphics*,Sexy::Image* im,const Sexy::SexyTransform2D& mat,Sexy::Rect,Sexy::Color color,int,Sexy::Rect){testBlits.push_back({im->path,mat,color.mAlpha});}
