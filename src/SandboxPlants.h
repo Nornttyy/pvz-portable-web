@@ -4,11 +4,12 @@ class Plant;
 class Board;
 class Projectile;
 class Zombie;
+class Reanimation;
 namespace Sexy { class Graphics; }
 namespace SandboxPlants {
 enum class Element { Fire, Ice, Alternating, Native };
 struct Definition { int id, base; Element element; const char* name; const char* note; const char* art=nullptr; int rate=0,damage=20; float scale=1.0f; };
-inline constexpr std::array<Definition,19> Definitions{{
+inline constexpr std::array<Definition,22> Definitions{{
     {100,0,Element::Fire,"火焰豌豆","火球攻击 · 小范围伤害"},
     {101,7,Element::Ice,"双发寒冰","连续两发 · 寒冰减速"},
     {102,7,Element::Fire,"双发火焰","连续两发 · 火球攻击"},
@@ -28,6 +29,9 @@ inline constexpr std::array<Definition,19> Definitions{{
     {117,0,Element::Native,"腐化豌豆","命中后持续伤害 · 再次命中刷新","acid-pea",180,12},
     {118,3,Element::Native,"坚果豌豆","豌豆与坚果合成 · 厚壳防守 · 普通豌豆弹","native-walnut",200,20},
     {119,0,Element::Native,"储种花","直接种植 · 储存三粒种子 · 遇敌连续发射","dandelion",160,24},
+    {120,0,Element::Native,"红温豌豆","持续攻击升温 · 红温连发 · 喘气停火","native-heat"},
+    {121,1,Element::Native,"红温向日葵","生产升温 · 集中产出 · 休息恢复","native-heat"},
+    {122,3,Element::Native,"红温坚果","受伤升温 · 爆发推退 · 冷静后再发动","native-heat"},
 }};
 constexpr const Definition* Find(int id) {
     for(const auto& d:Definitions)if(d.id==id)return &d;
@@ -43,6 +47,9 @@ void Forget(Plant* plant);
 void Assign(Plant* plant,int id);
 int Type(const Plant* plant);
 int GrowthStage(const Plant* plant);
+// Read-only state for native tooltips and real-engine QA: phase, heat, timer.
+int HeatData(const Plant* plant,int field);
+bool KeepsNativeBlink(const Plant* plant);
 bool IsCustom(const Plant* plant);
 // 0 = native shot, 1 = ice, 2 = fire. Called once for each emitted pea.
 int NextShot(Plant* plant);

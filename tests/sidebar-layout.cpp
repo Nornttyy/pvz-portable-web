@@ -15,9 +15,9 @@ int main(){
    for(int j=0;j<6;++j)assert(!overlaps(b,Hotbar(j)));
  }
  for(int i=0;i<6;++i)assert(!overlaps(Hotbar(i),Shovel));
- for(auto a:{NativeFilter,CustomFilter,FusionFilter}){
+ for(auto a:{NativeFilter,CustomFilter,PowerFilter,FusionFilter}){
   assert(a.x>=0&&a.x+a.w<=SidebarWidth&&a.y+a.h<PrevPage.y);
-  for(auto b:{NativeFilter,CustomFilter,FusionFilter})if(a.x!=b.x)assert(!overlaps(a,b));
+  for(auto b:{NativeFilter,CustomFilter,PowerFilter,FusionFilter})if(a.x!=b.x)assert(!overlaps(a,b));
  }
  for(int row=0;row<RecipesPerPage;++row)for(int part=0;part<3;++part){
   const auto a=RecipeCard(row,part);assert(a.x>=0&&a.x+a.w<SidebarWidth&&a.y>=118&&a.y+a.h<NativeFilter.y);

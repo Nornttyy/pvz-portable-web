@@ -183,7 +183,7 @@ static void ClearEnemies(Board* board) {
 // consume a lily pad, flowerpot, pumpkin or an ambiguous stack of main plants.
 static Plant* FindFusionTarget(Board* board,int type,int col,int row,int& result) {
     result=0;
-    if(!fusionEnabled||stackPlants||!SandboxRules::ValidPlant(type)||!SandboxRules::ValidCell(col,row,mapType==1))return nullptr;
+    if(!fusionEnabled||stackPlants||!SandboxRules::ValidCard(type)||!SandboxRules::ValidCell(col,row,mapType==1))return nullptr;
     SandboxRules::StackSite site;
     site.water=board->IsPoolSquare(col,row);
     site.blocked=board->GetGraveStoneAt(col,row)||board->GetCraterAt(col,row)||board->GetScaryPotAt(col,row)||board->IsIceAt(col,row);
@@ -205,10 +205,15 @@ static Plant* FindFusionTarget(Board* board,int type,int col,int row,int& result
     return target;
 }
 static int PlacePlant(Board* board, int type, int col, int row) {
-    if (!SandboxRules::ValidPlant(type) || !SandboxRules::ValidCell(col, row, mapType == 1)) return -2;
-    if (board->mPlants.mSize >= board->mPlants.mMaxSize - 8) return -3;
+    if (!SandboxRules::ValidCard(type) || !SandboxRules::ValidCell(col, row, mapType == 1)) return -2;
     int fusedType=0;
     if(auto* target=FindFusionTarget(board,type,col,row,fusedType)){
+        if(type==SandboxMemeRules::Power){
+            // Imbue the existing instance. Health, damage layers, supports and
+            // its native animation attachments remain intact; no heal/replant.
+            SandboxPlants::Assign(target,fusedType);board->MarkAllDirty();return fusedType;
+        }
+        if (board->mPlants.mSize >= board->mPlants.mMaxSize - 8) return -3;
         const auto resultSeed=static_cast<SeedType>(SandboxPlants::Base(fusedType));
         Plant::PreloadPlantResources(resultSeed);
         // Allocate before consuming anything; a failed placement must be harmless.
@@ -221,6 +226,8 @@ static int PlacePlant(Board* board, int type, int col, int row) {
         board->MarkAllDirty();
         return fusedType;
     }
+    if (type==SandboxMemeRules::Power) return -6; // Powers never become standalone plants.
+    if (board->mPlants.mSize >= board->mPlants.mMaxSize - 8) return -3;
     if (PlantCount(board) >= SandboxRules::MaxPlants) return -3;
     const auto seed = static_cast<SeedType>(SandboxPlants::Base(type));
     if (seed == SEED_COBCANNON && col >= 8) return -4;
@@ -330,10 +337,14 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
 
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_plant_data(int index, int field) {
     auto* board = ActiveBoard();
-    if (!board || index < 0 || index >= SandboxRules::MaxPlants || field < 0 || field > 2) return -1;
+    if (!board || index < 0 || index >= SandboxRules::MaxPlants || field < 0 || field > 6) return -1;
     for (auto* plant : board->mPlants) {
         if (plant->mDead) continue;
-        if (index-- == 0) return field == 0 ? SandboxPlants::Type(plant) : field == 1 ? plant->mPlantCol : plant->mRow;
+        if (index-- == 0) {
+            if(field==3)return plant->mPlantHealth;
+            if(field>=4)return SandboxPlants::HeatData(plant,field-4);
+            return field == 0 ? SandboxPlants::Type(plant) : field == 1 ? plant->mPlantCol : plant->mRow;
+        }
     }
     return -1;
 }

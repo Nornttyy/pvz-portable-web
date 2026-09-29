@@ -53,8 +53,8 @@ test('published sandbox engine matches the recorded build and really initializes
   assert.equal(Module._pvz_sandbox_plant_data(0, 0), -1);
 });
 
-test('sandbox source and all nineteen active custom plant IDs are included', async () => {
-  assert.deepEqual(ORIGINAL_PLANTS.map(p => p.id), Array.from({length:20},(_,i)=>100+i).filter(id=>id!==109));
+test('sandbox source includes existing plants and three meme-power results', async () => {
+  assert.deepEqual(ORIGINAL_PLANTS.map(p => p.id), Array.from({length:23},(_,i)=>100+i).filter(id=>id!==109));
   const layout = {schema: 1, map: 0, plants: [{type: 100, col: 2, row: 2}]};
   assert.deepEqual(validateLayout(layout), layout);
   for (const file of ['Sandbox.cpp', 'SandboxUI.cpp', 'SandboxPlants.cpp', 'SandboxButton.cpp']) assert.ok((await read('src/' + file)).length > 1000);

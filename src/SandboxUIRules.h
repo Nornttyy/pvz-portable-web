@@ -35,7 +35,7 @@ struct RepeatPlacement {
 inline constexpr Box Shovel{447,4,86,74};
 constexpr Box SidebarZombie(int i) { return {8+(i%5)*50,118+(i/5)*62,46,58}; }
 constexpr Box SidebarPlant(int i) { return {5+(i%5)*51,118+(i/5)*78,50,70}; }
-inline constexpr Box NativeFilter{7,520,80,30},CustomFilter{92,520,80,30},FusionFilter{177,520,80,30};
+inline constexpr Box NativeFilter{5,520,60,30},CustomFilter{70,520,60,30},PowerFilter{135,520,60,30},FusionFilter{200,520,60,30};
 inline constexpr int RecipesPerPage=5;
 constexpr Box RecipeCard(int row,int part){return {8+part*94,118+row*78,50,70};}
 inline constexpr Box PrevPage{7,557,70,30},NextPage{187,557,70,30};

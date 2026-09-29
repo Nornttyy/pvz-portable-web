@@ -12,6 +12,17 @@
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
+ // Runtime palettes retain native dimensions/alpha, are cached, and never
+ // mutate base pixels or the persistent damage override used by AnimateNuts.
+ {auto* source=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::NativeImage("Wallnut_cracked1.png"));
+  source->GetBits()[0]=0x80b88742;auto* heated=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::WarmNative("Wallnut_cracked1.png",2));
+  assert(source!=heated&&source->GetBits()[0]==0x80b88742&&(heated->GetBits()[0]>>24)==0x80);
+  assert(heated==SandboxArt::WarmNative("Wallnut_cracked1.png",2)&&heated->mWidth==source->mWidth&&heated->mHeight==source->mHeight);
+  Board w;auto* p=w.plant(1,1);p->mPlantMaxHealth=4000;p->mPlantHealth=2000;SandboxPlants::Assign(p,122);
+  Reanimation body;Track tracks[]={{"anim_face"}};TrackInstance instances[1];body.def.mTracks={1,tracks};body.mTrackInstances=instances;
+  instances[0].mImageOverride=source;app.reanims[80]=&body;p->mBodyReanimID=80;Sexy::Graphics g(nullptr);drawnOverrides.clear();
+  assert(SandboxPlants::DrawBody(&g,p,0,0));assert(drawnOverrides.back()==heated);assert(instances[0].mImageOverride==source);
+  assert(SandboxPlants::KeepsNativeBlink(p));SandboxPlants::Reset();app.reanims.clear();}
  // Native walnut pixels and damage frames are unchanged. The attached original
  // pea mouth and bullet birth use the same native bone transform.
  {Board w;Sexy::Graphics rig(nullptr);rig.mTransX=200;rig.mTransY=300;

@@ -2892,7 +2892,7 @@ bool Plant::NotOnGround()
 
 Reanimation* Plant::AttachBlinkAnim(Reanimation* theReanimBody)
 {
-    if (SandboxPlants::IsCustom(this) && SandboxPlants::Type(this)!=118) return nullptr; // Native walnut fusion keeps its original blink attachment.
+    if (SandboxPlants::IsCustom(this) && !SandboxPlants::KeepsNativeBlink(this)) return nullptr; // Native-part plants keep their original blink attachment.
 	const PlantDefinition& aPlantDef = GetPlantDefinition(mSeedType);
 	LawnApp* aApp = (LawnApp*)gSexyAppBase;
 	Reanimation* aAnimToAttach = theReanimBody;

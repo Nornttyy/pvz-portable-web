@@ -15,6 +15,7 @@ enum ProjectileType {PROJECTILE_PEA,PROJECTILE_SNOWPEA,PROJECTILE_FIREBALL,PROJE
 enum ProjectileMotion {MOTION_STRAIGHT,MOTION_STAR,MOTION_HOMING,MOTION_THREEPEATER,MOTION_BACKWARDS};
 constexpr int REANIM_PLAY_ONCE_AND_HOLD=0;
 constexpr int FOLEY_THROW=0;
+constexpr int FOLEY_SPAWN_SUN=1,COIN_SUN=0,COIN_MOTION_FROM_PLANT=0;
 enum PlantWeapon {WEAPON_PRIMARY};
 enum PlantSubClass {SUBCLASS_NORMAL,SUBCLASS_SHOOTER};
 constexpr int RENDER_GROUP_HIDDEN=-1,DS_ALIGN_CENTER=0;
@@ -23,7 +24,7 @@ struct Color{int mAlpha;Color(int=0,int=0,int=0,int a=255):mAlpha(a){}};
 struct SexyTransform2D{float m00=1,m01=0,m02=0,m10=0,m11=1,m12=0;void LoadIdentity(){*this={};}};
 struct Rect{int mX,mY,mWidth,mHeight;Rect(int x=0,int y=0,int w=0,int h=0):mX(x),mY(y),mWidth(w),mHeight(h){}};
 struct Image{int mWidth=80,mHeight=80;std::string path;virtual~Image()=default;};
-struct MemoryImage:Image{std::vector<uint32_t> bits=std::vector<uint32_t>(6400,0xffffffff);uint32_t* GetBits(){return bits.data();}};
+struct MemoryImage:Image{std::vector<uint32_t> bits=std::vector<uint32_t>(6400,0xffffffff);uint32_t* GetBits(){return bits.data();}void Create(int w,int h){mWidth=w;mHeight=h;bits.resize(w*h);}void BitsChanged(){}};
 struct GLImage:MemoryImage{};
 struct Graphics{
  float mTransX=0,mTransY=0;Rect mClipRect;int mDrawMode=0;
@@ -38,13 +39,15 @@ struct Track{const char* mName="";};
 struct TrackGroup{int count=0;Track* tracks=nullptr;};
 struct Definition{TrackGroup mTracks;};
 struct TrackInstance{Sexy::Image* mImageOverride=nullptr;int mRenderGroup=0;};
+using ReanimatorTrackInstance=TrackInstance;
+inline std::vector<Sexy::Image*> drawnOverrides;
 struct ReanimatorTransform{float mFrame=0,mAlpha=1;};
 struct Reanimation{
  Definition def;Definition* mDefinition=&def;TrackInstance* mTrackInstances=nullptr;float mAnimTime=0;
  std::string track;Sexy::SexyTransform2D matrix;ReanimatorTransform pose;
  void ReanimationInitializeType(int,int,ReanimationType){};bool TrackExists(const char* name){return track==name;}
  void PlayReanim(const char*,int,int,float){}
- void SetFramesForLayer(const char*){};void Draw(Sexy::Graphics*){};void SetImageOverride(const char* name,Sexy::Image* image){for(int i=0;i<def.mTracks.count;++i)if(std::string(def.mTracks.tracks[i].mName)==name)mTrackInstances[i].mImageOverride=image;};Reanimation* FindSubReanim(ReanimationType){return nullptr;}
+ void SetFramesForLayer(const char*){};void Draw(Sexy::Graphics*){for(int i=0;i<def.mTracks.count;++i)drawnOverrides.push_back(mTrackInstances[i].mImageOverride);};void SetImageOverride(const char* name,Sexy::Image* image){for(int i=0;i<def.mTracks.count;++i)if(std::string(def.mTracks.tracks[i].mName)==name)mTrackInstances[i].mImageOverride=image;};Reanimation* FindSubReanim(ReanimationType){return nullptr;}
  int mFrameBasePose=0;Sexy::SexyTransform2D mOverlayMatrix;int FindTrackIndex(const char*){return 0;}void GetAttachmentOverlayMatrix(int,Sexy::SexyTransform2D&){};
  void GetTrackMatrix(int,Sexy::SexyTransform2D& out){out=matrix;}void GetCurrentTransform(int,ReanimatorTransform* out){*out=pose;}
 };
@@ -69,7 +72,7 @@ class Plant{
 public:
  Board* mBoard=nullptr;SeedType mSeedType=SEED_PEASHOOTER;
  int mX=0,mY=0,mRow=0,mPlantCol=0,mPlantHealth=300,mPlantMaxHealth=300,mLaunchRate=150,mLaunchCounter=100,mBlinkCountdown=0,mShootingCounter=0;
- int mBodyReanimID=0,mHeadReanimID=0,mHeadReanimID2=0,mHeadReanimID3=0;
+ int mBodyReanimID=0,mHeadReanimID=0,mHeadReanimID2=0,mHeadReanimID3=0,mBlinkReanimID=0;
  int mRenderOrder=0,mEatenFlashCountdown=0;
  bool mDead=false,mIsAsleep=false,mSquished=false,airborne=false;
  bool NotOnGround(){return airborne;}
@@ -98,6 +101,8 @@ class Board{
 public:
  bool mPaused=false,pool=false;int mMainCounter=0;
  Array<Plant> mPlants;Array<Zombie> mZombies;Array<Projectile> mProjectiles;
+ struct {int mSize=0,mMaxSize=256;} mCoins;
+ void AddCoin(int,int,int,int){++mCoins.mSize;}
  std::vector<std::unique_ptr<Plant>> ownedPlants;std::vector<std::unique_ptr<Zombie>> ownedZombies;std::vector<std::unique_ptr<Projectile>> ownedShots;
  bool StageHasPool(){return pool;}
  ZombieID ZombieGetID(Zombie* z){return z?z->id:ZOMBIEID_NULL;}

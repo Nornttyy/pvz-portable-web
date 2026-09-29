@@ -27,6 +27,7 @@
 #include <format>
 #include <memory>
 #include <chrono>
+#include <vector>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -35,9 +36,10 @@ using namespace Sexy;
 using namespace SandboxUIRules;
 namespace {
 enum Tool { PlantTool, ZombieTool, EraseTool, InteractTool };
-int panel=0, plantPage=0, selectedPlant=0, selectedZombie=0, plantSlot=0, catalog=2, catalogPage=0;
+int panel=0, plantPage=0, selectedPlant=0, selectedZombie=0, plantSlot=0, catalog=4, catalogPage=0;
 Tool tool=PlantTool;
-std::array<int,6> plants{0,1,2,3,5,7};
+std::array<int,6> plants{0,1,3,SandboxMemeRules::Power,5,7};
+std::vector<int> DirectPlants(){std::vector<int> ids;for(const auto& d:SandboxPlants::Definitions)if(!SandboxMemeRules::IsResult(d.id))ids.push_back(d.id);return ids;}
 bool wasPaused=true, painting=false, dirty=false;
 int lastCell=-1, lastPlantCount=0, messageTicks=0;
 std::string message;
@@ -115,6 +117,7 @@ void Portrait(Graphics* g, Box b, int type) {
     g->DrawImage(IMAGE_ALMANAC_ZOMBIEWINDOW2,b.x,b.y,b.w,b.h);
 }
 std::string SelectedName() {
+    if(tool==PlantTool&&selectedPlant==SandboxMemeRules::Power)return "红温之力";
     if(tool==EraseTool)return "铲除";
     if(tool==InteractTool)return "操作场地";
     if(tool==PlantTool){const auto* custom=SandboxPlants::Find(selectedPlant);return custom?custom->name:Plant::GetNameString(static_cast<SeedType>(selectedPlant));}
@@ -122,6 +125,7 @@ std::string SelectedName() {
     return std::string(PvzpStringTranslate(std::string("[")+GetZombieDefinition(static_cast<ZombieType>(selectedZombie)).mZombieName+"]"));
 }
 std::string PlantName(int type){
+    if(type==SandboxMemeRules::Power)return "红温之力";
     const auto* custom=SandboxPlants::Find(type);
     return custom?custom->name:Plant::GetNameString(static_cast<SeedType>(type));
 }
@@ -136,6 +140,7 @@ bool Place(int cell, bool erase=false) {
     }
     else if(result==-3)Say("数量已满，请先清理场地");
     else if(result==-5)Say("这只僵尸不能放在此处");
+    else if(result==-6)Say(Command(0)&64?"力量需要普通豌豆、向日葵或坚果":"请先开启合成");
     else Say("不能放在这里，请检查位置和底座");
     return result>0;
 }
@@ -171,9 +176,9 @@ void Action(int index) {
 
 void SandboxUIReset() {
     SandboxUIDetach();
-    panel=0;plantPage=0;catalog=2;catalogPage=0;tool=PlantTool;painting=false;dirty=false;wasPaused=true;
+    panel=0;plantPage=0;catalog=4;catalogPage=0;tool=PlantTool;painting=false;dirty=false;wasPaused=true;
     selectedPlant=0;selectedZombie=0;plantSlot=0;lastCell=-1;lastPlantCount=0;messageTicks=0;
-    plants={0,1,2,3,5,7};
+    plants={0,1,3,SandboxMemeRules::Power,5,7};
     StopPainting();
     PvzpLoadResources("DelayLoad_Almanac");
     SandboxRepairFonts();
@@ -230,7 +235,7 @@ void SandboxDrawUI(Graphics* g) {
     Button(g,Control(6),flags&32?"连放：开":"连放：关",flags&32);
     Button(g,Control(7),flags&16?"同格：开":"同格：关",flags&16);
 
-    std::string title=catalog==3?"合成配方":catalog==2?"所有僵尸":plantPage?"原创植物":"所有植物";
+    std::string title=catalog==4?"特殊力量":catalog==3?"合成配方":catalog==2?"所有僵尸":plantPage?"原创植物":"所有植物";
     std::string hoverName;
     if(catalog==2){
         const int count=int(Zombies.size()+SandboxZombies::Definitions.size());
@@ -244,9 +249,9 @@ void SandboxDrawUI(Graphics* g) {
                 else hoverName=PvzpStringTranslate(std::string("[")+GetZombieDefinition(static_cast<ZombieType>(id)).mZombieName+"]");
             }
         }
-    }else if(catalog==3){
-        for(int i=0;i<RecipesPerPage;++i){
-            const int index=catalogPage*RecipesPerPage+i;
+    }else if(catalog==3||catalog==4){
+        for(int i=0;i<(catalog==4?3:RecipesPerPage);++i){
+            const int index=catalog==4?i+1:catalogPage*RecipesPerPage+i;
             if(index>=int(SandboxFusion::Recipes.size()))break;
             const auto& recipe=SandboxFusion::Recipes[index];
             const std::array<int,3> types{recipe.first,recipe.second,recipe.result};
@@ -258,12 +263,17 @@ void SandboxDrawUI(Graphics* g) {
             PvzpDrawString(g,"+",80,RecipeCard(i,0).y+41,FONT_DWARVENTODCRAFT18,Color(244,215,125),DS_ALIGN_CENTER);
             PvzpDrawString(g,"=",174,RecipeCard(i,0).y+41,FONT_DWARVENTODCRAFT18,Color(244,215,125),DS_ALIGN_CENTER);
         }
-        Button(g,PrevPage,"<");Button(g,NextPage,">");
-        PvzpDrawString(g,std::format("{}/{}",catalogPage+1,(SandboxFusion::Recipes.size()+RecipesPerPage-1)/RecipesPerPage),132,578,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
+        if(catalog==3){Button(g,PrevPage,"<");Button(g,NextPage,">");
+         PvzpDrawString(g,std::format("{}/{}",catalogPage+1,(SandboxFusion::Recipes.size()+RecipesPerPage-1)/RecipesPerPage),132,578,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
+        }else{
+         PvzpDrawString(g,"红温之力",132,394,FONT_DWARVENTODCRAFT18,Color(244,160,90),DS_ALIGN_CENTER);
+         PvzpDrawString(g,"先种植物，再放力量",132,428,FONT_BRIANNETOD12,Color(244,215,125),DS_ALIGN_CENTER);
+         PvzpDrawString(g,"每株只能获得一种力量",132,453,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
+        }
     }else{
-        const int count=plantPage?int(SandboxPlants::Definitions.size()):48;
+        const auto direct=DirectPlants();const int count=plantPage?int(direct.size()):48;
         for(int i=0;i<25&&i+catalogPage*25<count;++i){
-            const int id=plantPage?SandboxPlants::Definitions[i].id:i+catalogPage*25;
+            const int id=plantPage?direct[i+catalogPage*25]:i+catalogPage*25;
             const auto b=SidebarPlant(i);SandboxPlants::DrawCard(g,b.x,b.y,id);
             if(tool==PlantTool&&selectedPlant==id)Outline(g,b);
             if(Hover(b)){Outline(g,b);const auto* d=SandboxPlants::Find(id);hoverName=d?d->name:Plant::GetNameString(static_cast<SeedType>(id));}
@@ -276,6 +286,7 @@ void SandboxDrawUI(Graphics* g) {
     if(catalog!=2){
         Button(g,NativeFilter,"原版",catalog==1&&!plantPage);
         Button(g,CustomFilter,"原创",catalog==1&&plantPage);
+        Button(g,PowerFilter,"力量",catalog==4);
         Button(g,FusionFilter,"配方",catalog==3);
     }
     PvzpDrawString(g,title,132,107,FONT_DWARVENTODCRAFT18,Color(92,230,40),DS_ALIGN_CENTER);
@@ -350,15 +361,16 @@ bool SandboxMouseDown(int x,int y,int clicks) {
                 tool=ZombieTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;
             }
         }else{
+            if(PowerFilter.Contains(x,y)){catalog=4;catalogPage=0;return true;}
             if(FusionFilter.Contains(x,y)){catalog=3;catalogPage=0;return true;}
             if(NativeFilter.Contains(x,y)||CustomFilter.Contains(x,y)){catalog=1;plantPage=CustomFilter.Contains(x,y)?1:0;catalogPage=0;return true;}
-            if(catalog==3){
+            if(catalog==3||catalog==4){
                 const int pages=(SandboxFusion::Recipes.size()+RecipesPerPage-1)/RecipesPerPage;
-                if(PrevPage.Contains(x,y)||NextPage.Contains(x,y)){
+                if(catalog==3&&(PrevPage.Contains(x,y)||NextPage.Contains(x,y))){
                     catalogPage=(catalogPage+(NextPage.Contains(x,y)?1:pages-1))%pages;return true;
                 }
-                for(int i=0;i<RecipesPerPage;++i){
-                    const int index=catalogPage*RecipesPerPage+i;
+                for(int i=0;i<(catalog==4?3:RecipesPerPage);++i){
+                    const int index=catalog==4?i+1:catalogPage*RecipesPerPage+i;
                     if(index>=int(SandboxFusion::Recipes.size()))break;
                     const auto& recipe=SandboxFusion::Recipes[index];
                     for(int part=0;part<2;++part)if(RecipeCard(i,part).Contains(x,y)){
@@ -369,9 +381,9 @@ bool SandboxMouseDown(int x,int y,int clicks) {
                 return true;
             }
             if(!plantPage&&(PrevPage.Contains(x,y)||NextPage.Contains(x,y))){catalogPage=1-catalogPage;return true;}
-            const int count=plantPage?int(SandboxPlants::Definitions.size()):48;
+            const auto direct=DirectPlants();const int count=plantPage?int(direct.size()):48;
             for(int i=0;i<25&&i+catalogPage*25<count;++i)if(SidebarPlant(i).Contains(x,y)){
-                selectedPlant=plantPage?SandboxPlants::Definitions[i].id:i+catalogPage*25;plants[plantSlot]=selectedPlant;
+                selectedPlant=plantPage?direct[i+catalogPage*25]:i+catalogPage*25;plants[plantSlot]=selectedPlant;
                 tool=PlantTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;
             }
         }

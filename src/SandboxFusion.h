@@ -1,12 +1,13 @@
 #pragma once
 #include <algorithm>
 #include <array>
-// Two native ingredients, one newly drawn result. No recursive chains
+#include "SandboxMemeRules.h"
+// Native ingredients or one meme power. No recursive chains
 // or implicit Base() matching: a fused plant is never silently treated as a pea.
 namespace SandboxFusion {
 struct Recipe { int first,second,result; };
-inline constexpr std::array<Recipe,1> Recipes{{
- {0,3,118}
+inline constexpr std::array<Recipe,4> Recipes{{
+ {0,3,118},{0,180,120},{1,180,121},{3,180,122}
 }};
 constexpr int Result(int first,int second) {
  for(const auto& recipe:Recipes)

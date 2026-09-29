@@ -10,6 +10,16 @@ import {createHash} from 'node:crypto';
 import {ORIGINAL_PLANTS,ORIGINAL_ZOMBIES,ZOMBIES,validateLayout} from '../web/sandbox-data.mjs';
 const run=promisify(execFile),root=fileURLToPath(new URL('../',import.meta.url));
 const read=name=>readFile(join(root,name));
+test('meme powers exercise real production combat and preserve native pixel shading',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'pvz-meme-combat-')),binary=join(dir,'combat');
+ for(const f of ['SandboxPlants.cpp','SandboxZombies.cpp'])await copyFile(join(root,'src',f),join(dir,f));
+ await run(process.env.CXX||'c++',['-std=c++20','-Itests/combat-stubs','-Isrc',join(dir,'SandboxPlants.cpp'),join(dir,'SandboxZombies.cpp'),'tests/meme-combat.cpp','-o',binary],{cwd:root});
+ assert.match((await run(binary)).stdout,/Meme powers:.*passed/);
+});
+test('power token is not a plant or a save entry; only results round-trip',()=>{
+ for(const type of [120,121,122])assert.equal(validateLayout({schema:1,map:0,plants:[{type,col:0,row:0}]}).plants[0].type,type);
+ assert.throws(()=>validateLayout({schema:1,map:0,plants:[{type:180,col:0,row:0}]}));
+});
 test('actual production combat modules pass 36 native simulation scenarios',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'pvz-expansion-combat-')),binary=join(dir,'combat');
  // Copy source unmodified only to let the compiler resolve state doubles before engine headers.
@@ -17,14 +27,14 @@ test('actual production combat modules pass 36 native simulation scenarios',asyn
  await run(process.env.CXX||'c++',['-std=c++20','-Itests/combat-stubs','-Isrc',join(dir,'SandboxPlants.cpp'),join(dir,'SandboxZombies.cpp'),'tests/expansion-combat.cpp','-o',binary],{cwd:root});
  const result=await run(binary);assert.match(result.stdout,/36 production combat scenarios passed/);
 });
-test('19 active custom plants and 12 zombies agree in native and web catalogs',async()=>{
- assert.deepEqual(ORIGINAL_PLANTS.map(x=>x.id),Array.from({length:20},(_,i)=>100+i).filter(id=>id!==109));
+test('22 custom plants including three power results agree in native and web catalogs',async()=>{
+ assert.deepEqual(ORIGINAL_PLANTS.map(x=>x.id),Array.from({length:23},(_,i)=>100+i).filter(id=>id!==109));
  assert.deepEqual(ORIGINAL_ZOMBIES.map(x=>x.id),Array.from({length:12},(_,i)=>200+i));assert.equal(ZOMBIES.length,35);
  for(const [defs,file]of [[ORIGINAL_PLANTS,'SandboxPlants.h'],[ORIGINAL_ZOMBIES,'SandboxZombies.h']]){
   const source=(await read('src/'+file)).toString();for(const d of defs){assert.ok(source.includes(d.name));assert.ok(source.includes(d.note));}
  }
  for(const p of ORIGINAL_PLANTS)assert.equal(validateLayout({schema:1,map:0,plants:[{type:p.id,col:0,row:0}]}).plants[0].type,p.id);
- assert.throws(()=>validateLayout({schema:1,map:0,plants:[{type:120,col:0,row:0}]}));
+ for(const type of [123,180])assert.throws(()=>validateLayout({schema:1,map:0,plants:[{type,col:0,row:0}]}));
  assert.doesNotThrow(()=>validateLayout({schema:1,map:0,plants:[{type:111,col:0,row:0},{type:35,col:0,row:0}]}));
  assert.equal(validateLayout({schema:1,map:0,plants:[{type:109,col:0,row:0}]}).plants[0].type,3);
 });
@@ -44,7 +54,7 @@ test('native fusion excludes rejected redraw; independent draft ships nine RGBA 
  assert.ok(!fusion.includes(',119}'),'independent plant is not locked behind a fusion recipe');
  const render=(await read('src/SandboxPlants.cpp')).toString();assert.ok(render.includes('NutMouthMatrix'));assert.ok(render.includes('anim->Draw(g)'));
  assert.ok(render.includes('PeaShooter_mouth.png'));assert.ok(!render.includes('"walnut-pea"'));
- assert.match((await read('src/Lawn/Plant.cpp')).toString(),/SandboxPlants::Type\(this\)!=118/);
+ assert.match((await read('src/Lawn/Plant.cpp')).toString(),/SandboxPlants::KeepsNativeBlink\(this\)/);
 });
 test('persistent native sidebar fits both rosters and keeps the lawn in original units',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'pvz-sidebar-')),binary=join(dir,'sidebar');

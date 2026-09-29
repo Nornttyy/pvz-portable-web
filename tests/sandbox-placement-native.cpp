@@ -92,15 +92,16 @@ int main(){
  mapType=0;stackPlants=false;fusionEnabled=true;
  for(const auto& recipe:SandboxFusion::Recipes)for(bool reversed:{false,true}){
    Board fused;const int a=reversed?recipe.second:recipe.first,b=reversed?recipe.first:recipe.second;
+   if(a==SandboxMemeRules::Power){assert(PlacePlant(&fused,a,1,1)==-6&&PlantCount(&fused)==0);continue;}
    assert(SandboxPlants::Find(recipe.result));assert(PlacePlant(&fused,a,1,1)==1);
    auto* before=fused.mPlants.front();before->mPlantHealth=before->mPlantMaxHealth/2;
    const int marks=fused.marks;int result=0;
    assert(FindFusionTarget(&fused,b,1,1,result)==before&&result==recipe.result);
    assert(PlantCount(&fused)==1&&fused.marks==marks&&!before->mDead); // preview is read-only
    assert(PlacePlant(&fused,b,1,1)==recipe.result);
-   assert(before->mDead&&PlantCount(&fused)==1&&fused.mPlants.back()->id==recipe.result);
+   assert(before->mDead==(b!=SandboxMemeRules::Power)&&PlantCount(&fused)==1&&fused.mPlants.back()->id==recipe.result);
    assert(fused.mPlants.back()->mPlantHealth==fused.mPlants.back()->mPlantMaxHealth/2);
-   assert(PlacePlant(&fused,b,1,1)==-4); // no accidental recursive/base-type matching
+   assert(PlacePlant(&fused,b,1,1)==(b==SandboxMemeRules::Power?-6:-4)); // no recursive/base-type matching
  }
  Board unsupported;assert(PlacePlant(&unsupported,0,0,0)==1);
  assert(PlacePlant(&unsupported,1,0,0)==-4&&PlantCount(&unsupported)==1);
@@ -130,6 +131,11 @@ int main(){
  stackPlants=false;assert(PlacePlant(&replacement,3,1,1)==118&&PlantCount(&replacement)==180);
  assert(SandboxFusion::InheritedHealth(1,4000,300)==1);
  assert(SandboxFusion::InheritedHealth(10000,300,300)==300);
+ {Board b;fusionEnabled=true;assert(PlacePlant(&b,0,1,1)==1);auto* p=b.mPlants.front();p->mPlantHealth=1;
+  b.mPlants.mSize=b.mPlants.mMaxSize-8;assert(PlacePlant(&b,180,1,1)==120);assert(p->mPlantHealth==1&&!p->mDead&&b.owned.size()==1);}
+ {Board b;assert(PlacePlant(&b,1,1,1)==1);fusionEnabled=false;assert(PlacePlant(&b,180,1,1)==-6);
+  fusionEnabled=true;stackPlants=true;assert(PlacePlant(&b,180,1,1)==-6);stackPlants=false;
+  assert(b.mPlants.front()->id==1&&!b.mPlants.front()->mDead);}
  for(size_t i=0;i<SandboxFusion::Recipes.size();++i)for(size_t j=0;j<i;++j){
    const auto& a=SandboxFusion::Recipes[i];const auto& b=SandboxFusion::Recipes[j];
    assert(SandboxFusion::Result(a.first,a.second)==a.result);

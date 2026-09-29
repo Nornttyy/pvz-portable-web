@@ -13,6 +13,7 @@ LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 namespace SandboxArt {
 Sexy::Image* Image(const char*,const char*){return nullptr;}void DrawFit(Sexy::Graphics*,Sexy::MemoryImage*,int,int,int,int,float){}
 Sexy::Image* NativeImage(const char*){return nullptr;}
+Sexy::Image* WarmNative(const char*,int){return nullptr;}
 void Sprite(Sexy::Graphics*,const char*,float,float,float,float,float,int){}
 void Link(Sexy::Graphics*,float,float,float,float,int,int){}
 bool TrackPoint(Reanimation*,const char*,float,float,float,float,float&,float&){return false;}
@@ -26,8 +27,8 @@ struct World:Board{
 };
 int main(){
  for(bool slow:{false,true}){int counter=150,at25=0,at50=0,tick=0;while(counter>0){if(slow&&tick%3==0&&SandboxCombatRules::CanSlow(counter))++counter;else if(!slow&&tick%2==0&&SandboxCombatRules::CanHaste(counter))--counter;--counter;if(counter==25)++at25;if(counter==50)++at50;++tick;}assert(at25==1&&at50==1);}
- assert(SandboxPlants::Definitions.size()==19);assert(SandboxZombies::Definitions.size()==12);
- for(int i=108;i<120;++i)assert(SandboxRules::ValidPlant(i)==(i!=109));assert(!SandboxRules::ValidPlant(120));
+ assert(SandboxPlants::Definitions.size()==22);assert(SandboxZombies::Definitions.size()==12);
+ for(int i=108;i<123;++i)assert(SandboxRules::ValidPlant(i)==(i!=109));assert(!SandboxRules::ValidPlant(123));assert(!SandboxRules::ValidPlant(180)&&SandboxRules::ValidCard(180));
  for(int i=200;i<212;++i)assert(SandboxRules::ValidZombie(i));assert(!SandboxRules::ValidZombie(212));
  for(int i=0;i<18;++i){auto b=SandboxUIRules::SidebarPlant(i);assert(b.x>=0&&b.x+b.w<=SandboxUIRules::SidebarWidth&&b.y+b.h<520);}
  {World w;auto* p=w.add(107);assert(SandboxPlants::NextShot(p)==1);assert(SandboxPlants::NextShot(p)==2);assert(SandboxPlants::NextShot(p)==1);}

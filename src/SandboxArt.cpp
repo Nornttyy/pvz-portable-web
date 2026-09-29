@@ -1,5 +1,6 @@
 // Per-instance atlas parts; original image definitions remain untouched.
 #include "SandboxArt.h"
+#include "SandboxMemeRules.h"
 #include "LawnApp.h"
 #include "graphics/GLImage.h"
 #include "graphics/Graphics.h"
@@ -15,6 +16,16 @@ Sexy::Image* NativeImage(const char* file){
  static std::map<std::string,std::unique_ptr<Sexy::GLImage>> cache;
  const auto path=std::string("reanim/")+file;
  auto& image=cache[path];if(!image)image.reset(gLawnApp->GetImage(path));return image.get();
+}
+Sexy::Image* WarmNative(const char* file,int level){
+ level=std::clamp(level,0,24);if(!level)return NativeImage(file);
+ static std::map<std::pair<std::string,int>,std::unique_ptr<Sexy::MemoryImage>> cache;
+ auto& image=cache[{file,level}];if(image)return image.get();
+ auto* source=dynamic_cast<Sexy::MemoryImage*>(NativeImage(file));if(!source)return nullptr;
+ image=std::make_unique<Sexy::MemoryImage>();image->Create(source->mWidth,source->mHeight);
+ auto* out=image->GetBits();const auto* in=source->GetBits();
+ for(int i=0;i<source->mWidth*source->mHeight;++i)out[i]=SandboxMemeRules::WarmPixel(in[i],level);
+ image->BitsChanged();return image.get();
 }
 Sexy::Image* Image(const char* family,const char* part){
  static std::map<std::string,std::unique_ptr<Sexy::GLImage>> cache;

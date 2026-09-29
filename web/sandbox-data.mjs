@@ -17,6 +17,9 @@ export const ORIGINAL_PLANTS = [
   [116,0,'追击豌豆','子弹转向 · 自动追击敌人'],[117,0,'腐化豌豆','命中后持续伤害 · 再次命中刷新'],
   [118,3,'坚果豌豆','豌豆与坚果合成 · 厚壳防守 · 普通豌豆弹'],
   [119,0,'储种花','直接种植 · 储存三粒种子 · 遇敌连续发射'],
+  [120,0,'红温豌豆','持续攻击升温 · 红温连发 · 喘气停火'],
+  [121,1,'红温向日葵','生产升温 · 集中产出 · 休息恢复'],
+  [122,3,'红温坚果','受伤升温 · 爆发推退 · 冷静后再发动'],
 ].map(([id,base,name,note])=>({id,base,name,note}));
 export const PLANTS = [...plantNames.map((name,id) => ({id,name,note:notes[id] ?? '免费 · 无冷却'})),...ORIGINAL_PLANTS];
 const validPlant = id => (id>=0&&id<48)||ORIGINAL_PLANTS.some(p=>p.id===id);
