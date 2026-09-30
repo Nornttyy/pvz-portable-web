@@ -13,7 +13,7 @@ index c263ab4..e613ef3 100644
  enum ScaryPotType : int32_t
  {
 diff --git a/src/Lawn/Board.cpp b/src/Lawn/Board.cpp
-index 665fcca..2ba9edc 100644
+index 665fcca..04d9036 100644
 --- a/src/Lawn/Board.cpp
 +++ b/src/Lawn/Board.cpp
 @@ -25,6 +25,11 @@
@@ -28,15 +28,17 @@ index 665fcca..2ba9edc 100644
  #include "LawnCommon.h"
  #include "System/Music.h"
  #include "System/SaveGame.h"
-@@ -250,6 +255,7 @@ void Board::DisposeBoard()
+@@ -250,6 +255,9 @@ void Board::DisposeBoard()
  		mChallenge->TreeOfWisdomLeave();
  
  	mApp->mSoundSystem->StopFoley(FoleyType::FOLEY_RAIN);
 +	mApp->mSoundSystem->StopFoley(FoleyType::FOLEY_RAGE_RELEASE);
++	for (int i = FOLEY_MEME_HICCUP; i <= FOLEY_MEME_SQUEAK; ++i)
++		mApp->mSoundSystem->StopFoley(static_cast<FoleyType>(i));
  	mApp->mZenGarden->mBoard = nullptr;
  	mApp->CrazyDaveDie();
  	mApp->mEffectSystem->EffectSystemFreeAll();
-@@ -315,6 +321,7 @@ int Board::CountUntriggerLawnMowers()
+@@ -315,6 +323,7 @@ int Board::CountUntriggerLawnMowers()
  
  void Board::TryToSaveGame()
  {
@@ -44,7 +46,7 @@ index 665fcca..2ba9edc 100644
  	std::string aFileName = GetSavedGameName(mApp->mGameMode, mApp->mPlayerInfo->mId);
  
  	if (NeedSaveGame())
-@@ -346,6 +353,7 @@ bool Board::NeedSaveGame()
+@@ -346,6 +355,7 @@ bool Board::NeedSaveGame()
  
  void Board::SaveGame(const std::string& theFileName)
  {
@@ -52,7 +54,7 @@ index 665fcca..2ba9edc 100644
  	LawnSaveGame(this, theFileName);
  }
  
-@@ -2021,6 +2029,7 @@ Plant* Board::NewPlant(int theGridX, int theGridY, SeedType theSeedType, SeedTyp
+@@ -2021,6 +2031,7 @@ Plant* Board::NewPlant(int theGridX, int theGridY, SeedType theSeedType, SeedTyp
  	Plant* aPlant = mPlants.DataArrayAlloc();
  	aPlant->mIsOnBoard = true;
  	aPlant->PlantInitialize(theGridX, theGridY, theSeedType, theImitaterType);
@@ -60,7 +62,7 @@ index 665fcca..2ba9edc 100644
  	return aPlant;
  }
  
-@@ -2184,22 +2193,22 @@ void Board::GetPlantsOnLawn(int theGridX, int theGridY, PlantsOnLawn* thePlantOn
+@@ -2184,22 +2195,22 @@ void Board::GetPlantsOnLawn(int theGridX, int theGridY, PlantsOnLawn* thePlantOn
  
  		if (Plant::IsFlying(aSeedType))
  		{
@@ -87,7 +89,7 @@ index 665fcca..2ba9edc 100644
  			thePlantOnLawn->mNormalPlant = aPlant;
  		}
  	}
-@@ -3004,12 +3013,34 @@ void Board::MouseMove(int x, int y)
+@@ -3004,12 +3015,34 @@ void Board::MouseMove(int x, int y)
  {
  	Widget::MouseMove(x, y);
  	mChallenge->MouseMove(x, y);
@@ -122,7 +124,7 @@ index 665fcca..2ba9edc 100644
  }
  
  Zombie* Board::ZombieHitTest(int theMouseX, int theMouseY)
-@@ -4362,6 +4393,8 @@ void Board::PickUpTool(GameObjectType theObjectType)
+@@ -4362,6 +4395,8 @@ void Board::PickUpTool(GameObjectType theObjectType)
  
  void Board::MouseDown(int x, int y, int theClickCount)
  {
@@ -131,7 +133,7 @@ index 665fcca..2ba9edc 100644
  	UpdateMousePosition();
  	Widget::MouseDown(x, y, theClickCount);
  	mIgnoreMouseUp = !CanInteractWithBoardButtons();
-@@ -4580,6 +4613,7 @@ bool Board::CanInteractWithBoardButtons()
+@@ -4580,6 +4615,7 @@ bool Board::CanInteractWithBoardButtons()
  
  void Board::MouseUp(int x, int y, int theClickCount)
  {
@@ -139,7 +141,7 @@ index 665fcca..2ba9edc 100644
  	Widget::MouseUp(x, y, theClickCount);
  	if (mIgnoreMouseUp)
  	{
-@@ -5048,6 +5082,7 @@ void Board::PuzzleSaveStreak()
+@@ -5048,6 +5084,7 @@ void Board::PuzzleSaveStreak()
  
  void Board::ZombiesWon(Zombie* theZombie)
  {
@@ -147,7 +149,7 @@ index 665fcca..2ba9edc 100644
  	if (mApp->mGameScene == GameScenes::SCENE_ZOMBIES_WON)
  		return;
  
-@@ -5176,6 +5211,7 @@ bool Board::HasLevelAwardDropped()
+@@ -5176,6 +5213,7 @@ bool Board::HasLevelAwardDropped()
  
  void Board::UpdateSunSpawning()
  {
@@ -155,7 +157,7 @@ index 665fcca..2ba9edc 100644
  	if (StageIsNight() ||
  		HasLevelAwardDropped() ||
  		mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_RAINING_SEEDS ||
-@@ -5234,6 +5270,7 @@ void Board::NextWaveComing()
+@@ -5234,6 +5272,7 @@ void Board::NextWaveComing()
  
  void Board::UpdateZombieSpawning()
  {
@@ -163,7 +165,7 @@ index 665fcca..2ba9edc 100644
  	if (mApp->mGameMode == GameMode::GAMEMODE_UPSELL || mApp->mGameMode == GameMode::GAMEMODE_INTRO)
  		return;
  
-@@ -5418,6 +5455,7 @@ void Board::UpdateIce()
+@@ -5418,6 +5457,7 @@ void Board::UpdateIce()
  
  void Board::UpdateProgressMeter()
  {
@@ -171,7 +173,7 @@ index 665fcca..2ba9edc 100644
  	if (mApp->IsFinalBossLevel())
  	{
  		Zombie* aBoss = GetBossZombie();
-@@ -5692,6 +5730,7 @@ void Board::UpdateGame()
+@@ -5692,6 +5732,7 @@ void Board::UpdateGame()
  
  void Board::Update()
  {
@@ -179,7 +181,7 @@ index 665fcca..2ba9edc 100644
  	PvzpHesitationBracket aHesitation("Board::Update");
  
  	Widget::Update();
-@@ -5746,7 +5785,7 @@ void Board::Update()
+@@ -5746,7 +5787,7 @@ void Board::Update()
  		mShakeCounter--;
  		if (mShakeCounter == 0)
  		{
@@ -188,7 +190,7 @@ index 665fcca..2ba9edc 100644
  			mY = 0;
  		}
  		else
-@@ -5755,7 +5794,7 @@ void Board::Update()
+@@ -5755,7 +5796,7 @@ void Board::Update()
  			{
  				mShakeAmountX = -mShakeAmountX;
  			}
@@ -197,7 +199,7 @@ index 665fcca..2ba9edc 100644
  			mY = PvzpAnimateCurve(12, 0, mShakeCounter, 0, mShakeAmountY, PvzpCurves::CURVE_BOUNCE);
  		}
  	}
-@@ -6282,6 +6321,13 @@ void Board::DrawGameObjects(Graphics* g)
+@@ -6282,6 +6323,13 @@ void Board::DrawGameObjects(Graphics* g)
  	}
  	AddGameObjectRenderItemCursorPreview(aRenderList, aRenderItemCount, RenderObjectType::RENDER_ITEM_CURSOR_PREVIEW, mCursorPreview.get());
  
@@ -211,7 +213,7 @@ index 665fcca..2ba9edc 100644
  	std::sort(aRenderList, aRenderList + aRenderItemCount, RenderItemSortFunc);
  
  	for (int i = 0; i < aRenderItemCount; i++)
-@@ -6289,6 +6335,10 @@ void Board::DrawGameObjects(Graphics* g)
+@@ -6289,6 +6337,10 @@ void Board::DrawGameObjects(Graphics* g)
  		RenderItem& aRenderItem = aRenderList[i];
  		switch (aRenderItem.mRenderObjectType)
  		{
@@ -222,7 +224,7 @@ index 665fcca..2ba9edc 100644
  		case RenderObjectType::RENDER_ITEM_PLANT:
  		{
  			Plant* aPlant = aRenderItem.mPlant;
-@@ -7175,7 +7225,7 @@ void Board::DrawUIBottom(Graphics* g)
+@@ -7175,7 +7227,7 @@ void Board::DrawUIBottom(Graphics* g)
  
  	if (mApp->mGameScene != GameScenes::SCENE_ZOMBIES_WON)
  	{
@@ -231,7 +233,7 @@ index 665fcca..2ba9edc 100644
  		{
  			mSeedBank->Draw(g);
  			mSeedBank->EndDraw(g);
-@@ -7372,6 +7422,7 @@ bool Board::IsScaryPotterDaveTalking()
+@@ -7372,6 +7424,7 @@ bool Board::IsScaryPotterDaveTalking()
  
  void Board::DrawUITop(Graphics* g)
  {
@@ -239,7 +241,7 @@ index 665fcca..2ba9edc 100644
  	if (StageHasFog())
  	{
  		DrawTopRightUI(g);
-@@ -7431,6 +7482,7 @@ void Board::DrawUITop(Graphics* g)
+@@ -7431,6 +7484,7 @@ void Board::DrawUITop(Graphics* g)
  	}
  
  	mToolTip->Draw(g);
@@ -247,7 +249,7 @@ index 665fcca..2ba9edc 100644
  	DrawDebugText(g);
  	DrawDebugObjectRects(g);
  }
-@@ -7627,6 +7679,8 @@ void Board::DoTypingCheck(KeyCode theKey)
+@@ -7627,6 +7681,8 @@ void Board::DoTypingCheck(KeyCode theKey)
  
  void Board::KeyDown(KeyCode theKey)
  {
@@ -308,7 +310,7 @@ index cdec611..8979b9e 100644
  
  int Coin::GetSunValue()
 diff --git a/src/Lawn/Plant.cpp b/src/Lawn/Plant.cpp
-index c934659..9d2c1bd 100644
+index c934659..f6a2221 100644
 --- a/src/Lawn/Plant.cpp
 +++ b/src/Lawn/Plant.cpp
 @@ -30,6 +30,9 @@
@@ -662,7 +664,7 @@ index c934659..9d2c1bd 100644
  
  	mState = PlantState::STATE_COBCANNON_FIRING;
  	mShootingCounter = 206;
-@@ -4475,6 +4527,7 @@ void Plant::CobCannonFire(int theTargetX, int theTargetY)
+@@ -4475,10 +4527,13 @@ void Plant::CobCannonFire(int theTargetX, int theTargetY)
  
  void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon)
  {
@@ -670,7 +672,13 @@ index c934659..9d2c1bd 100644
  	if (mSeedType == SeedType::SEED_FUMESHROOM)
  	{
  		DoRowAreaDamage(20, 2U);
-@@ -4675,6 +4728,8 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
+ 		mApp->PlayFoley(FoleyType::FOLEY_FUME);
++		if (MemeCharacters::Type(this) == 514)
++			mApp->PlayMemeCue(0, MemeCharacters::Data(this, 4) == 1 ? 5.0f : -6.0f);
+ 		return;
+ 	}
+ 	if (mSeedType == SeedType::SEED_GLOOMSHROOM)
+@@ -4675,6 +4730,8 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
  		mApp->AddPvzpParticle(aOriginX + 27, aOriginY + 13, aRenderPosition, ParticleEffect::PARTICLE_PUFFSHROOM_MUZZLE);
  	}
  
@@ -679,7 +687,7 @@ index c934659..9d2c1bd 100644
  	Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder - 1, theRow, aProjectileType);
  	aProjectile->mDamageRangeFlags = GetDamageRangeFlags(thePlantWeapon);
  
-@@ -4765,6 +4820,10 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
+@@ -4765,6 +4822,10 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
  		aProjectile->mCobTargetX = mTargetX - 40;
  		aProjectile->mCobTargetRow = mBoard->PixelToGridYKeepOnBoard(mTargetX, mTargetY);
  	}
@@ -690,7 +698,7 @@ index c934659..9d2c1bd 100644
  }
  
  Zombie* Plant::FindTargetZombie(int theRow, PlantWeapon thePlantWeapon)
-@@ -4930,6 +4989,7 @@ int Plant::DistanceToClosestZombie()
+@@ -4930,6 +4991,7 @@ int Plant::DistanceToClosestZombie()
  
  void Plant::Die()
  {
@@ -698,7 +706,7 @@ index c934659..9d2c1bd 100644
  	if (IsOnBoard() && mSeedType == SeedType::SEED_TANGLEKELP)
  	{
  		Zombie* aZombie = mBoard->ZombieTryToGet(mTargetZombieID);
-@@ -4973,6 +5033,7 @@ const PlantDefinition& GetPlantDefinition(SeedType theSeedType)
+@@ -4973,6 +5035,7 @@ const PlantDefinition& GetPlantDefinition(SeedType theSeedType)
  
  int Plant::GetCost(SeedType theSeedType, SeedType theImitaterType)
  {
@@ -706,7 +714,7 @@ index c934659..9d2c1bd 100644
  	if (gLawnApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED || gLawnApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED_TWIST)
  	{
  		if (theSeedType == SeedType::SEED_REPEATER)
-@@ -5036,6 +5097,7 @@ int Plant::GetCost(SeedType theSeedType, SeedType theImitaterType)
+@@ -5036,6 +5099,7 @@ int Plant::GetCost(SeedType theSeedType, SeedType theImitaterType)
  
  std::string Plant::GetNameString(SeedType theSeedType, SeedType theImitaterType)
  {
@@ -714,7 +722,7 @@ index c934659..9d2c1bd 100644
  	const PlantDefinition& aPlantDef = GetPlantDefinition(theSeedType);
  	std::string aName = std::format("[{}]", aPlantDef.mPlantName);
  	std::string aTranslatedName(PvzpStringTranslate(aName));
-@@ -5053,6 +5115,7 @@ std::string Plant::GetNameString(SeedType theSeedType, SeedType theImitaterType)
+@@ -5053,6 +5117,7 @@ std::string Plant::GetNameString(SeedType theSeedType, SeedType theImitaterType)
  
  std::string Plant::GetToolTip(SeedType theSeedType)
  {
@@ -722,7 +730,7 @@ index c934659..9d2c1bd 100644
  	const PlantDefinition& aPlantDef = GetPlantDefinition(theSeedType);
  	std::string aToolTip = std::format("[{}_TOOLTIP]", aPlantDef.mPlantName);
  	return std::string(PvzpStringTranslate(aToolTip));
-@@ -5060,6 +5123,7 @@ std::string Plant::GetToolTip(SeedType theSeedType)
+@@ -5060,6 +5125,7 @@ std::string Plant::GetToolTip(SeedType theSeedType)
  
  int Plant::GetRefreshTime(SeedType theSeedType, SeedType theImitaterType)
  {
@@ -730,7 +738,7 @@ index c934659..9d2c1bd 100644
  	if (Challenge::IsZombieSeedType(theSeedType))
  	{
  		return 0;
-@@ -5079,6 +5143,7 @@ int Plant::GetRefreshTime(SeedType theSeedType, SeedType theImitaterType)
+@@ -5079,6 +5145,7 @@ int Plant::GetRefreshTime(SeedType theSeedType, SeedType theImitaterType)
  
  bool Plant::IsNocturnal(SeedType theSeedtype)
  {
@@ -1621,7 +1629,7 @@ index c140a3d..ed44b0d 100644
  	StopZombieSound();
  }
 diff --git a/src/LawnApp.cpp b/src/LawnApp.cpp
-index d360a2f..1439193 100644
+index d360a2f..d4c3284 100644
 --- a/src/LawnApp.cpp
 +++ b/src/LawnApp.cpp
 @@ -24,6 +24,10 @@
@@ -1672,7 +1680,7 @@ index d360a2f..1439193 100644
  	if (mBoard == nullptr || !mBoard->mLevelComplete)
  		return;
  
-@@ -1967,6 +1976,15 @@ void LawnApp::PlayFoleyPitch(FoleyType theFoleyType, float thePitch)
+@@ -1967,6 +1976,24 @@ void LawnApp::PlayFoleyPitch(FoleyType theFoleyType, float thePitch)
  	}
  }
  
@@ -1685,10 +1693,19 @@ index d360a2f..1439193 100644
 +	mSoundSystem->PlayFoleyPitch(FOLEY_RAGE_RELEASE, 7.0f);
 +}
 +
++void LawnApp::PlayMemeCue(int cue, float pitch)
++{
++	if (cue < 0 || cue > 3 || mMuteSoundsForCutscene || !mSoundSystem) return;
++	// Shared gag budget: at most one short vocal/boing, never a wall of voices.
++	for (int i = FOLEY_MEME_HICCUP; i <= FOLEY_MEME_SQUEAK; ++i)
++		if (mSoundSystem->IsFoleyPlaying(static_cast<FoleyType>(i))) return;
++	mSoundSystem->PlayFoleyPitch(static_cast<FoleyType>(FOLEY_MEME_HICCUP + cue), std::clamp(pitch, -8.0f, 8.0f));
++}
++
  std::string LawnApp::GetStageString(int theLevel)
  {
  	int aArea = std::clamp((theLevel - 1) / LEVELS_PER_AREA + 1, 1, ADVENTURE_AREAS + 1);
-@@ -2267,6 +2285,8 @@ int LawnApp::GetSeedsAvailable()
+@@ -2267,6 +2294,8 @@ int LawnApp::GetSeedsAvailable()
  
  bool LawnApp::HasSeedType(SeedType theSeedType)
  {
@@ -1698,49 +1715,60 @@ index d360a2f..1439193 100644
  		return false;
  
 diff --git a/src/LawnApp.h b/src/LawnApp.h
-index 80ba516..8252ae4 100644
+index 80ba516..3910d90 100644
 --- a/src/LawnApp.h
 +++ b/src/LawnApp.h
-@@ -231,6 +231,7 @@ public:
+@@ -231,6 +231,8 @@ public:
  	void							ToggleFastMo();
  	void							PlayFoley(FoleyType theFoleyType);
  	void							PlayFoleyPitch(FoleyType theFoleyType, float thePitch);
 +	void							PlayRageRelease();
++	void                            PlayMemeCue(int cue, float pitch = 0.0f);
  	void							PlaySample(intptr_t theSoundNum) override;
  	void							FastLoad(GameMode theGameMode);
  	static std::string				GetStageString(int theLevel);
 diff --git a/src/PvzpLib/PvzpFoley.cpp b/src/PvzpLib/PvzpFoley.cpp
-index 89f0a43..d190283 100644
+index 89f0a43..e41ba09 100644
 --- a/src/PvzpLib/PvzpFoley.cpp
 +++ b/src/PvzpLib/PvzpFoley.cpp
-@@ -131,7 +131,8 @@ constinit const FoleyParams gLawnFoleyParamArray[FoleyType::NUM_FOLEY] = {
+@@ -131,7 +131,12 @@ constinit const FoleyParams gLawnFoleyParamArray[FoleyType::NUM_FOLEY] = {
  	{ .mFoleyType = FoleyType::FOLEY_DANCER, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_DANCER}, .mFoleyFlags = 6U },
  	{ .mFoleyType = FoleyType::FOLEY_FINAL_FANFARE, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_FINALFANFARE}, .mFoleyFlags = 0U },
  	{ .mFoleyType = FoleyType::FOLEY_CRAZY_DAVE_SCREAM, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVESCREAM}, .mFoleyFlags = 0U },
 -	{ .mFoleyType = FoleyType::FOLEY_CRAZY_DAVE_SCREAM_2, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVESCREAM2}, .mFoleyFlags = 0U }
 +	{ .mFoleyType = FoleyType::FOLEY_CRAZY_DAVE_SCREAM_2, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVESCREAM2}, .mFoleyFlags = 0U },
-+	{ .mFoleyType = FoleyType::FOLEY_RAGE_RELEASE, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVECRAZY}, .mFoleyFlags = 0U }
++	{ .mFoleyType = FoleyType::FOLEY_RAGE_RELEASE, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVECRAZY}, .mFoleyFlags = 0U },
++	{ .mFoleyType = FoleyType::FOLEY_MEME_HICCUP, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_GULP}, .mFoleyFlags = 0U },
++	{ .mFoleyType = FoleyType::FOLEY_MEME_ARGUMENT, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVESHORT1}, .mFoleyFlags = 0U },
++	{ .mFoleyType = FoleyType::FOLEY_MEME_BOING, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_BOING}, .mFoleyFlags = 0U },
++	{ .mFoleyType = FoleyType::FOLEY_MEME_SQUEAK, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_IMP}, .mFoleyFlags = 0U }
  };
  
  FoleyInstance::FoleyInstance()
-@@ -292,6 +293,8 @@ void PvzpFoley::PlayFoleyPitch(FoleyType theFoleyType, float thePitch)
+@@ -292,6 +297,10 @@ void PvzpFoley::PlayFoleyPitch(FoleyType theFoleyType, float thePitch)
  	aFoleyData->mLastVariationPlayed = aVariation;
  	if (thePitch != 0.0f)
  		aSoundInstance->AdjustPitch(thePitch);
 +	if (theFoleyType == FOLEY_RAGE_RELEASE)
 +		aSoundInstance->SetVolume(0.60); // Still multiplied by the native SFX volume.
++	if (theFoleyType >= FOLEY_MEME_HICCUP && theFoleyType <= FOLEY_MEME_SQUEAK)
++		aSoundInstance->SetVolume(0.42);
  	if (TestBit(aFoleyParams->mFoleyFlags, FoleyFlags::FOLEYFLAGS_USES_MUSIC_VOLUME))
  		ApplyMusicVolume(aFoleyInstance);
  	bool aIsLooping = TestBit(aFoleyParams->mFoleyFlags, FoleyFlags::FOLEYFLAGS_LOOP);
 diff --git a/src/PvzpLib/PvzpFoley.h b/src/PvzpLib/PvzpFoley.h
-index 9fd6d07..3ef1d0e 100644
+index 9fd6d07..93c0102 100644
 --- a/src/PvzpLib/PvzpFoley.h
 +++ b/src/PvzpLib/PvzpFoley.h
-@@ -147,6 +147,7 @@ enum FoleyType : int32_t
+@@ -147,6 +147,11 @@ enum FoleyType : int32_t
  	FOLEY_FINAL_FANFARE,
  	FOLEY_CRAZY_DAVE_SCREAM,
  	FOLEY_CRAZY_DAVE_SCREAM_2,
 +	FOLEY_RAGE_RELEASE,
++	FOLEY_MEME_HICCUP,
++	FOLEY_MEME_ARGUMENT,
++	FOLEY_MEME_BOING,
++	FOLEY_MEME_SQUEAK,
  	NUM_FOLEY
  };
  

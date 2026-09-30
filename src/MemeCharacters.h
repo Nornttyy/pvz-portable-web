@@ -5,7 +5,7 @@ namespace Sexy {class Graphics;class Color;}
 namespace MemeCharacters {
 inline constexpr int ShowoffLifetime=60*100; // Native simulation ticks, not wall-clock time.
 struct Definition {int id,base,cost,unlock;const char* name;const char* shortName;const char* hint;const char* key;const char* description;};
-inline constexpr std::array<Definition,14> Definitions{{
+inline constexpr std::array<Definition,17> Definitions{{
  {500,0,100,1,"红温豌豆","红温","满300怒气自动乱射80发","PEASHOOTER","普通攻击只有10%命中判定，其余豌豆飞行中反复上下飘，每次摆幅随机，不击退僵尸。每发增加20怒气，逐渐变红；满300自动乱射80发，不能手动释放。射完恢复绿色，不消耗生命。"},
  {501,3,50,4,"反咬坚果","反咬","被啃后反击 · 冷却3秒","WALL_NUT","被啃后反击面前的僵尸，造成80伤害。每3秒一次，不击退僵尸。"},
  {502,8,0,11,"显眼包蘑菇","显眼包","吸引邻路僵尸 · 存活60秒","PUFF_SHROOM","种下60秒后消失。近距离喷射孢子，每五秒吸引一只邻路普通步行僵尸。白天也能工作。不能吸引巨人和冰车。"},
@@ -19,7 +19,10 @@ inline constexpr std::array<Definition,14> Definitions{{
  {510,32,100,41,"甩锅卷心菜","甩锅","跳过前排 · 专挑最后一个","CABBAGE_PULT","把卷心菜甩给本路最后面的僵尸，越过前排。后排消失后重新选目标，保留原版抛物线、伤害和攻击间隔。"},
  {511,29,150,37,"蹦迪杨桃","蹦迪","每轮转方向 · 五向星弹","STARFRUIT","附近有敌人就射出五颗星星，每轮把发射方向转动一格。星星沿直线飞行，可以打到其他路，不追踪。"},
  {512,34,150,43,"爆米花玉米","爆米花","第三发黄油 · 定住后追打","KERNEL_PULT","前两轮投玉米，第三轮必投黄油。黄油落地后，如果本路还有被黄油定住的僵尸，就补射五粒玉米；没有目标则取消补射。"},
- {513,13,50,17,"嘴硬胆小菇","嘴硬","躲着攒话 · 安全后连喷","SCAREDY_SHROOM","平时照常远射，害怕时仍会缩起来。每躲一秒攒一发，最多六发，站起来后连续喷出。白天需要咖啡豆唤醒。"}
+ {513,13,50,17,"嘴硬胆小菇","嘴硬","躲着攒话 · 安全后连喷","SCAREDY_SHROOM","平时照常远射，害怕时仍会缩起来。每躲一秒攒一发，最多六发，站起来后连续喷出。白天需要咖啡豆唤醒。"},
+ {514,10,75,13,"打嗝大喷菇","打嗝","憋三秒 · 连打三个嗝","FUME_SHROOM","遇敌憋气三秒，随后连喷三口穿透烟雾，每口20伤害。没有目标时保留憋气进度；白天仍需唤醒。"},
+ {515,28,150,35,"左右互搏裂荚","互搏","两个头吵架 · 左右轮流喷","SPLIT_PEA","本路任一侧有敌人就开始互喷：左右交替六发，每侧三发，随后休息2.5秒。使用普通豌豆，不推退敌人。"},
+ {516,21,125,27,"烫脚地刺","烫脚","踩上来 · 烫得跳脚","SPIKEWEED","保留地刺攻击。每两秒把踩在上面的普通步行僵尸烫起一个小跳，额外造成20伤害，不横向推退。不能弹起巨人、车辆或水里的僵尸。"}
 }};
 constexpr const Definition* Find(int id){for(const auto& d:Definitions)if(d.id==id)return &d;return nullptr;}
 constexpr bool Is(int id){return Find(id)!=nullptr;}

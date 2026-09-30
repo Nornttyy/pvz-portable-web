@@ -4532,6 +4532,8 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
 	{
 		DoRowAreaDamage(20, 2U);
 		mApp->PlayFoley(FoleyType::FOLEY_FUME);
+		if (MemeCharacters::Type(this) == 514)
+			mApp->PlayMemeCue(0, MemeCharacters::Data(this, 4) == 1 ? 5.0f : -6.0f);
 		return;
 	}
 	if (mSeedType == SeedType::SEED_GLOOMSHROOM)

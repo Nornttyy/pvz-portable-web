@@ -16,6 +16,16 @@ test('meme powers exercise real production combat and preserve native pixel shad
  await run(process.env.CXX||'c++',['-std=c++20','-Itests/combat-stubs','-Isrc',join(dir,'SandboxPlants.cpp'),join(dir,'SandboxZombies.cpp'),join(dir,'MemeCharacters.cpp'),'tests/meme-combat.cpp','-o',binary],{cwd:root});
  assert.match((await run(binary)).stdout,/Meme powers:.*passed/);
 });
+test('gag roster shares native adventure identities and isolated non-looping audio',async()=>{
+ for(const [id,base] of [[514,10],[515,28],[516,21]])assert.equal(ORIGINAL_PLANTS.find(p=>p.id===id).base,base);
+ assert.equal(ZOMBIES.find(z=>z.id===24).name,'倒车小鬼');assert.equal(ZOMBIES.find(z=>z.id===21).name,'插队梯子');
+ const app=(await read('src/LawnApp.cpp')).toString(),foley=(await read('src/PvzpLib/PvzpFoley.cpp')).toString(),board=(await read('src/Lawn/Board.cpp')).toString();
+ const body=app.slice(app.indexOf('void LawnApp::PlayMemeCue'),app.indexOf('std::string LawnApp::GetStageString'));
+ assert.match(body,/mMuteSoundsForCutscene/);assert.match(body,/IsFoleyPlaying/);assert.match(body,/std::clamp\(pitch, -8\.0f, 8\.0f\)/);
+ for(const name of ['HICCUP','ARGUMENT','BOING','SQUEAK'])assert.match(foley,new RegExp('FOLEY_MEME_'+name+'.*mFoleyFlags = 0U'));
+ assert.match(foley,/SetVolume\(0\.42\)/);assert.match(board,/FOLEY_MEME_HICCUP; i <= FOLEY_MEME_SQUEAK;[\s\S]*?StopFoley/);
+ const plant=(await read('src/Lawn/Plant.cpp')).toString();assert.match(plant,/Type\(this\) == 514[\s\S]*?PlayMemeCue\(0/);
+});
 test('power token is not a plant or a save entry; only results round-trip',()=>{
  for(const {id:type} of ORIGINAL_PLANTS)assert.equal(validateLayout({schema:1,map:0,plants:[{type,col:0,row:0}]}).plants[0].type,type);
  assert.throws(()=>validateLayout({schema:1,map:0,plants:[{type:180,col:0,row:0}]}));
@@ -58,8 +68,8 @@ test('native projectile integration retains splats, centered scaling and fire at
  const plant=source.slice(source.indexOf('void Plant::Fire('),source.indexOf('Zombie* Plant::FindTargetZombie('));
  assert.ok(plant.indexOf('aProjectile->ConvertToFireball(mPlantCol)')>plant.indexOf('SandboxPlants::OnFired(this,aProjectile,theTargetZombie)'),'fire attaches only after muzzle correction');
 });
-test('fourteen mechanic characters replace infusion; old results migrate without losing plants',async()=>{
- assert.equal(ORIGINAL_PLANTS.length,14);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),Array.from({length:14},(_,i)=>500+i));assert.deepEqual(ORIGINAL_ZOMBIES,[]);assert.equal(ZOMBIES.length,23);
+test('seventeen mechanic characters replace infusion; old results migrate without losing plants',async()=>{
+ assert.equal(ORIGINAL_PLANTS.length,17);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),Array.from({length:17},(_,i)=>500+i));assert.deepEqual(ORIGINAL_ZOMBIES,[]);assert.equal(ZOMBIES.length,23);
  const bases=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
  for(let id=100;id<120;++id)assert.equal(validateLayout({schema:1,map:0,plants:[{type:id,col:0,row:0}]}).plants[0].type,bases[id-100]);
  for(const p of RETIRED_PLANTS){

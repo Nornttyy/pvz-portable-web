@@ -10,7 +10,7 @@ namespace Sexy { class Graphics; class Color; }
 namespace SandboxPlants {
 enum class Element { Fire, Ice, Alternating, Native };
 struct Definition { int id, base; Element element; const char* name; const char* note; const char* art=nullptr; int rate=0,damage=20; float scale=1.0f; };
-inline constexpr std::array<Definition,158> Definitions{{
+inline constexpr std::array<Definition,161> Definitions{{
     {500,0,Element::Native,"红温豌豆","满300怒气自动乱射80发"},
     {501,3,Element::Native,"反咬坚果","被啃后反击 · 冷却3秒"},
     {502,8,Element::Native,"显眼包蘑菇","吸引邻路僵尸 · 存活60秒"},
@@ -25,6 +25,9 @@ inline constexpr std::array<Definition,158> Definitions{{
     {511,29,Element::Native,"蹦迪杨桃","每轮转方向 · 五向星弹"},
     {512,34,Element::Native,"爆米花玉米","第三发黄油 · 定住后追打"},
     {513,13,Element::Native,"嘴硬胆小菇","躲着攒话 · 安全后连喷"},
+    {514,10,Element::Native,"打嗝大喷菇","憋三秒 · 连打三个嗝"},
+    {515,28,Element::Native,"左右互搏裂荚","两个头吵架 · 左右轮流喷"},
+    {516,21,Element::Native,"烫脚地刺","踩上来 · 烫得跳脚"},
     {120,0,Element::Native,"红温豌豆","持续攻击升温 · 红温连发 · 喘气停火","native-power"},
     {121,1,Element::Native,"红温向日葵","生产升温 · 集中产出 · 休息恢复","native-power"},
     {122,3,Element::Native,"红温坚果","受伤升温 · 爆发推退 · 冷静后再发动","native-power"},

@@ -256,6 +256,8 @@ void Board::DisposeBoard()
 
 	mApp->mSoundSystem->StopFoley(FoleyType::FOLEY_RAIN);
 	mApp->mSoundSystem->StopFoley(FoleyType::FOLEY_RAGE_RELEASE);
+	for (int i = FOLEY_MEME_HICCUP; i <= FOLEY_MEME_SQUEAK; ++i)
+		mApp->mSoundSystem->StopFoley(static_cast<FoleyType>(i));
 	mApp->mZenGarden->mBoard = nullptr;
 	mApp->CrazyDaveDie();
 	mApp->mEffectSystem->EffectSystemFreeAll();

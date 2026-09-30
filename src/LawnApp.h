@@ -232,6 +232,7 @@ public:
 	void							PlayFoley(FoleyType theFoleyType);
 	void							PlayFoleyPitch(FoleyType theFoleyType, float thePitch);
 	void							PlayRageRelease();
+	void                            PlayMemeCue(int cue, float pitch = 0.0f);
 	void							PlaySample(intptr_t theSoundNum) override;
 	void							FastLoad(GameMode theGameMode);
 	static std::string				GetStageString(int theLevel);

@@ -4,6 +4,7 @@
 #include "LawnApp.h"
 #include "Lawn/Zombie.h"
 #include "Lawn/Board.h"
+#include "Lawn/Plant.h"
 #include "PvzpLib/Reanimator.h"
 #include <algorithm>
 #include <cmath>
@@ -14,7 +15,7 @@ namespace {
 bool Enabled(){return gSandboxEnabled||(gLawnApp&&gLawnApp->IsAdventureMode());}
 bool Walker(Zombie* z){return z&&z->IsOnBoard()&&!z->mDead&&!z->IsDeadOrDying()&&z->mHasHead&&!z->mMindControlled&&z->mZombiePhase==PHASE_ZOMBIE_NORMAL&&z->mZombieHeight==HEIGHT_ZOMBIE_NORMAL&&!z->mInPool;}
 }
-bool IsRetreating(Zombie*){return false;}
+bool IsRetreating(Zombie* z){return Enabled()&&Walker(z)&&int(z->mZombieType)==24&&z->mZombieAge%600>=400&&z->mZombieAge%600<500&&z->mPosX<760;}
 // The normal cone's native phase counter is serialized with the zombie. Only
 // a real armor break starts this one-time gag; hits never push or restart it.
 bool IsFeigning(Zombie* z){return Enabled()&&Walker(z)&&int(z->mZombieType)==2&&z->mHelmHealth==0&&z->mPhaseCounter>0&&z->mPhaseCounter<=300;}
@@ -30,7 +31,11 @@ void ArmorBroken(Zombie* z){
 void AdjustPose(Zombie* z,Reanimation* body){
  if(!body||!Enabled())return;
  float angle=0;
- if(IsFeigning(z)){
+ if(IsRetreating(z)){
+  angle=0.24f*std::sin((z->mZombieAge%600-400)*3.14159265f/100);
+ }else if(int(z->mZombieType)==21&&z->mZombiePhase==PHASE_LADDER_CARRYING&&z->mPhaseCounter>0&&z->mPhaseCounter<=35){
+  angle=0.18f*std::sin(z->mPhaseCounter*3.14159265f/35);
+ }else if(IsFeigning(z)){
   const float t=z->mPhaseCounter>275?(300-z->mPhaseCounter)/25.0f:z->mPhaseCounter<40?z->mPhaseCounter/40.0f:1.0f;
   angle=-1.36f*t*t*(3-2*t);
  }else if(IsResting(z)){
@@ -62,6 +67,17 @@ void Tick(Board* b){
  struct Delivery{float x;int row,wave;};std::vector<Delivery> pending;
  for(auto* z:b->mZombies){
   if(IsResting(z))z->StopEating();
+  if(IsRetreating(z)){
+   z->StopEating();if(z->mZombieAge%600==400&&!z->mIceTrapCounter&&!z->mButteredCounter)gLawnApp->PlayMemeCue(3,6);
+  }
+  // Use saved native age/phase fields. A ladder changes lanes only before
+  // placing it, only on land, and only toward a genuinely less crowded lane.
+  if(!z->mDead&&z->IsOnBoard()&&!z->IsDeadOrDying()&&z->mHasHead&&!z->mMindControlled&&int(z->mZombieType)==21&&z->mShieldHealth>0&&z->mZombiePhase==PHASE_LADDER_CARRYING&&z->mZombieHeight==HEIGHT_ZOMBIE_NORMAL&&!z->mInPool&&!z->mIsEating&&!z->mIceTrapCounter&&!z->mButteredCounter&&z->mZombieAge>0&&z->mZombieAge%600==0&&z->mPosX>100&&z->mPosX<800){
+   auto crowd=[&](int row){int n=0;for(auto* p:b->mPlants)if(!p->mDead&&!p->mSquished&&p->mRow==row&&int(p->mSeedType)!=16&&int(p->mSeedType)!=33&&int(p->mSeedType)!=21&&int(p->mSeedType)!=46&&p->mX<z->mPosX+60&&p->mX>z->mPosX-180)++n;return n;};
+   int best=z->mRow,count=crowd(best);
+   for(int row:{z->mRow-1,z->mRow+1})if(row>=0&&row<(b->StageHasPool()?6:5)&&b->RowCanHaveZombies(row)&&!(b->StageHasPool()&&(row==2||row==3||z->mRow==2||z->mRow==3))){const int n=crowd(row);if(n<count){count=n;best=row;}}
+   if(best!=z->mRow){z->StopEating();z->SetRow(best);z->mPhaseCounter=35;gLawnApp->PlayMemeCue(2,-5);}
+  }
   // Age is a native saved field: a single delivery, not a timer reset on load.
   if(!z->mDead&&z->IsOnBoard()&&!z->IsDeadOrDying()&&z->mHasHead&&!z->mMindControlled&&int(z->mZombieType)==16&&z->IsFlying()&&z->mZombieAge==600&&z->mPosX>100&&z->mPosX<740&&!(b->StageHasPool()&&(z->mRow==2||z->mRow==3)))pending.push_back({z->mPosX+25,z->mRow,z->mFromWave});
  }
@@ -74,6 +90,7 @@ void Tick(Board* b){
 void DrawPortrait(Sexy::Graphics*,int,int,int,int,int){}
 float Speed(Zombie* z){
  if(!Enabled()||!Walker(z))return 1.0f;
+ if(IsRetreating(z))return -1.4f;
  if(IsFeigning(z)||IsResting(z))return 0.0f;
  const int type=int(z->mZombieType);
  if(type==7&&z->mZombieAge%800<200)return 1.8f;

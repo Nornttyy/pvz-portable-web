@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Showoff shroom expires after 60 simulation seconds in sandbox and adventure; pause and save/resume retain remaining lifetime; supports and native puff-shrooms are unaffected. Automatic 300-rage/80-pea burst and ordinary-size 50-value plant suns retained. Fourteen mechanic plants and seven zombie replacements; integrated native seed chooser",
+  "mode": "Seventeen mechanic plants and nine native zombie replacements: hiccup fume-shroom, alternating split-pea, hotfoot spikeweed, reversing imp and lane-cutting ladder. Four isolated pitch-shifted gag sounds share a single-voice budget. Native animations, particles, adventure unlocks and saves retained. Showoff 60-second lifetime, automatic 300-rage/80-pea burst and ordinary-size 50-value suns unchanged",
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 277207,
-      "sha256": "622c35f6bdbccad955a7e4b7f54cc4c8d32d8f156f096cab014b73ec9672ece1"
+      "size": 277298,
+      "sha256": "0a707be127b48f3d25a7fb1303ea5580130bc57a9db03b51fd1b5056d09ba38f"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7466683,
-      "sha256": "45e6924cdaef022fb22c9e9f16e859e24670cffbfb1ef52d8bc3d93e0a349f79"
+      "size": 7475469,
+      "sha256": "83c03ef10fb57e28a38a5d38830f8a61a8aab46a3ffe6a4bc62f766e32ddf27b"
     }
   ]
 }

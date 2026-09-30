@@ -13,6 +13,7 @@ enum ZombieID : unsigned { ZOMBIEID_NULL=0 };
 constexpr int PHASE_ZOMBIE_NORMAL=0,HEIGHT_ZOMBIE_NORMAL=0,HEIGHT_FALLING=1;
 constexpr int STATE_READY=1,STATE_CHOMPER_DIGESTING=13,STATE_SCAREDYSHROOM_SCARED=21,STATE_CACTUS_LOW=30,STATE_CACTUS_HIGH=32;
 constexpr int PHASE_NEWSPAPER_MAD=2,PHASE_NEWSPAPER_READING=3,SHIELDTYPE_NEWSPAPER=1;
+constexpr int PHASE_LADDER_CARRYING=4,PHASE_LADDER_PLACING=5;
 enum ReanimationType {REANIM_ZOMBIE,REANIM_FLAG};
 enum ProjectileType {PROJECTILE_PEA,PROJECTILE_SNOWPEA,PROJECTILE_FIREBALL,PROJECTILE_ZOMBIE_PEA,PROJECTILE_SPIKE,PROJECTILE_BUTTER,PROJECTILE_KERNEL,PROJECTILE_CABBAGE,PROJECTILE_STAR,PROJECTILE_PUFF};
 enum ProjectileMotion {MOTION_STRAIGHT,MOTION_STAR,MOTION_HOMING,MOTION_THREEPEATER,MOTION_BACKWARDS};
@@ -61,7 +62,7 @@ struct Reanimation{
  void GetTrackMatrix(int,Sexy::SexyTransform2D& out){out=matrix;}void GetCurrentTransform(int,ReanimatorTransform* out){*out=pose;}
 };
 struct ReanimatorCache{std::unique_ptr<Sexy::MemoryImage> MakeBlankMemoryImage(int,int){return std::make_unique<Sexy::MemoryImage>();}};
-struct LawnApp{int rageReleaseRequests=0;void PlayRageRelease(){++rageReleaseRequests;}bool adventure=true;bool IsAdventureMode(){return adventure;}ReanimatorCache cache;ReanimatorCache* mReanimatorCache=&cache;std::map<int,Reanimation*> reanims;Reanimation* ReanimationTryToGet(int id){return reanims.contains(id)?reanims.at(id):nullptr;}Sexy::GLImage* GetImage(std::string file){auto* im=new Sexy::GLImage;im->path=file;return im;}void PlayFoley(int){}};
+struct LawnApp{std::vector<std::pair<int,float>> memeCues;void PlayMemeCue(int cue,float pitch=0){memeCues.push_back({cue,pitch});}int rageReleaseRequests=0;void PlayRageRelease(){++rageReleaseRequests;}bool adventure=true;bool IsAdventureMode(){return adventure;}ReanimatorCache cache;ReanimatorCache* mReanimatorCache=&cache;std::map<int,Reanimation*> reanims;Reanimation* ReanimationTryToGet(int id){return reanims.contains(id)?reanims.at(id):nullptr;}Sexy::GLImage* GetImage(std::string file){auto* im=new Sexy::GLImage;im->path=file;return im;}void PlayFoley(int){}};
 extern LawnApp* gLawnApp;
 class Board;
 class Zombie{
@@ -97,6 +98,7 @@ public:
  void SetSleeping(bool value){mIsAsleep=value;}void Die(){mDead=true;}
  int GetDamageRangeFlags(PlantWeapon){return 0;};Zombie* FindTargetZombie(int row,PlantWeapon);
  void Fire(Zombie*,int row,PlantWeapon);
+ bool FindTargetAndFire(int row,PlantWeapon);
 };
 class Projectile;
 namespace SandboxPlants {void ForgetShot(Projectile*);void OnFired(Plant*,Projectile*,Zombie*);}
@@ -139,11 +141,13 @@ public:
  }
  Plant* plant(int col,int row){auto p=std::make_unique<Plant>();auto* a=p.get();a->mBoard=this;a->mPlantCol=col;a->mRow=row;a->mX=col*80;a->mY=row*100;ownedPlants.push_back(std::move(p));mPlants.add(a);return a;}
 };
-inline Zombie* Plant::FindTargetZombie(int row,PlantWeapon){for(auto* z:mBoard->mZombies)if(!z->IsDeadOrDying()&&z->mRow==row&&!z->mMindControlled&&z->mPosX>=mX)return z;return nullptr;}
+inline Zombie* Plant::FindTargetZombie(int row,PlantWeapon weapon){for(auto* z:mBoard->mZombies)if(!z->IsDeadOrDying()&&z->mRow==row&&!z->mMindControlled&&(int(mSeedType)==28&&weapon==WEAPON_SECONDARY?z->mPosX<mX:z->mPosX>=mX)&&(int(mSeedType)!=10||z->mPosX<mX+400))return z;return nullptr;}
 inline void Plant::Fire(Zombie* target,int row,PlantWeapon weapon){
+ if(int(mSeedType)==10){for(auto* z:mBoard->mZombies)if(!z->IsDeadOrDying()&&!z->mMindControlled&&z->mRow==row&&z->mPosX>=mX&&z->mPosX<mX+400)z->TakeDamage(20,2);return;}
  const int base=int(mSeedType);const auto type=base==5?PROJECTILE_SNOWPEA:base==26?PROJECTILE_SPIKE:base==34?(weapon==WEAPON_SECONDARY?PROJECTILE_BUTTER:PROJECTILE_KERNEL):base==32?PROJECTILE_CABBAGE:base==13?PROJECTILE_PUFF:PROJECTILE_PEA;
- auto* s=mBoard->AddProjectile(mX+60,mY+25,mRenderOrder,row,type);SandboxPlants::OnFired(this,s,target);
+ auto* s=mBoard->AddProjectile(mX+60,mY+25,mRenderOrder,row,type);if(base==28&&weapon==WEAPON_SECONDARY)s->mMotionType=MOTION_BACKWARDS;SandboxPlants::OnFired(this,s,target);
 }
+inline bool Plant::FindTargetAndFire(int row,PlantWeapon weapon){auto* target=FindTargetZombie(row,weapon);if(!target)return false;Fire(target,row,weapon);return true;}
 inline float PlantDrawHeightOffset(Board*,Plant* p,SeedType,int,int){return p?p->drawHeightOffset:0;}
 struct PlantDefinition{ReanimationType mReanimationType=REANIM_ZOMBIE;PlantSubClass mSubClass=SUBCLASS_SHOOTER;int mLaunchRate=150;};
 inline PlantDefinition GetPlantDefinition(SeedType type){return {REANIM_ZOMBIE,int(type)==1||int(type)==3?SUBCLASS_NORMAL:SUBCLASS_SHOOTER};}

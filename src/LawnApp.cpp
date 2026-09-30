@@ -1985,6 +1985,15 @@ void LawnApp::PlayRageRelease()
 	mSoundSystem->PlayFoleyPitch(FOLEY_RAGE_RELEASE, 7.0f);
 }
 
+void LawnApp::PlayMemeCue(int cue, float pitch)
+{
+	if (cue < 0 || cue > 3 || mMuteSoundsForCutscene || !mSoundSystem) return;
+	// Shared gag budget: at most one short vocal/boing, never a wall of voices.
+	for (int i = FOLEY_MEME_HICCUP; i <= FOLEY_MEME_SQUEAK; ++i)
+		if (mSoundSystem->IsFoleyPlaying(static_cast<FoleyType>(i))) return;
+	mSoundSystem->PlayFoleyPitch(static_cast<FoleyType>(FOLEY_MEME_HICCUP + cue), std::clamp(pitch, -8.0f, 8.0f));
+}
+
 std::string LawnApp::GetStageString(int theLevel)
 {
 	int aArea = std::clamp((theLevel - 1) / LEVELS_PER_AREA + 1, 1, ADVENTURE_AREAS + 1);

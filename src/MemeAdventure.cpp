@@ -54,6 +54,10 @@ void Draw(Board* b,Sexy::Graphics*){
 }
 std::string_view Translate(std::string_view key,std::string_view original){
  if(gSandboxEnabled||RosterEnabled()){
+  if(key=="IMP")return "倒车小鬼";
+  if(key=="IMP_DESCRIPTION")return "每六秒有一秒突然倒着走，倒车时不啃植物。巨人扔出的小鬼落地后也会倒车，不改变原来的血量。";
+  if(key=="LADDER_ZOMBIE")return "插队梯子";
+  if(key=="LADDER_ZOMBIE_DESCRIPTION")return "扛着梯子时，每六秒看一眼前路；遇到植物阻挡，就插进植物更少的邻路。不会跨进泳池，放梯子时不插队。";
   if(key=="FLAG_ZOMBIE")return "催更旗手";
   if(key=="FLAG_ZOMBIE_DESCRIPTION")return "挥旗催着同伴赶路，让附近一格、横向两格内的普通步行僵尸移速提高50%。多面旗帜不会叠加。";
   if(key=="CONEHEAD_ZOMBIE")return "碰瓷路障";

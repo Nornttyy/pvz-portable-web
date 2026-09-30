@@ -369,6 +369,18 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_projectile_data(int index,int field) {
     }return -1;
 }
 
+// Read-only audio diagnostics: active cue, voice count and relative volume.
+extern "C" EMSCRIPTEN_KEEPALIVE int pvz_meme_audio_data(int field) {
+    if(!gLawnApp||!gLawnApp->mSoundSystem)return -1;
+    int count=0,cue=-1,volume=0;
+    for(int i=FOLEY_MEME_HICCUP;i<=FOLEY_MEME_SQUEAK;++i)
+        for(const auto& voice:gLawnApp->mSoundSystem->mFoleyTypeData[i].mFoleyInstances)
+            if(voice.mInstance&&voice.mRefCount&&!voice.mPaused&&voice.mInstance->IsPlaying()){
+                ++count;cue=i-FOLEY_MEME_HICCUP;volume=int(voice.mInstance->GetVolume()*1000);
+            }
+    return field==0?cue:field==1?count:field==2?volume:-1;
+}
+
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_plant_data(int index, int field) {
     auto* board = ActiveBoard();
     if (!board || index < 0 || index >= SandboxRules::MaxPlants || field < 0 || field > 10) return -1;

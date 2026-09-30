@@ -24,7 +24,7 @@ namespace {
 struct State {int id=0,health=0,phase=0,heat=0,timer=0,delay=50,age=0,pulse=0,remaining=0,direction=1;};
 std::map<const Plant*,State> states;
 std::map<const Projectile*,int> shotStyles; // 1..8 legacy wobble; 9 burst; 10 hit; 11..18 legacy miss; 19 retreat ice; 20 legacy straight miss; 32..287 floating seeds.
-bool NativeSequence(int id){return id>=508&&id<=513;}
+bool NativeSequence(int id){return (id>=508&&id<=513)||id==516;}
 void Burst(State& s){
  s.phase=1;s.heat=0;s.remaining=MemeShooterRules::BurstCount;s.delay=0;s.timer=0;s.pulse=30;
  gLawnApp->PlayRageRelease(); // Once per release, never once per pea or save restore.
@@ -59,16 +59,18 @@ void Forget(Plant* p){states.erase(p);}
 void Assign(Plant* p,int id){const auto* d=Find(id);if(!d||int(p->mSeedType)!=d->base)return;
  State s;s.id=id;s.health=p->mPlantHealth;s.timer=id==502?180:0;if(id==500)s.direction=2;states[p]=s;
  if(id==507)states[p].remaining=3;
- if(!NativeSequence(id)){p->mLaunchCounter=id==503?std::clamp(p->mLaunchCounter,300,2500):9999;p->mShootingCounter=0;}
+ if(!NativeSequence(id)){p->mLaunchCounter=id==503?std::clamp(p->mLaunchCounter,300,2500):9999;if(id!=514)p->mShootingCounter=0;}
  if(id==502)p->SetSleeping(false); // Keep the native short-range shot and add a daytime lure.
 }
 std::array<int,10> Save(const Plant* p){auto it=states.find(p);if(it==states.end())return {};const auto& s=it->second;return {s.id,s.health,s.phase,s.heat,s.timer,s.delay,s.age,s.pulse,s.remaining,s.direction};}
 bool Restore(Plant* p,const std::array<int,10>& a){
  const bool shooter=a[0]==500,newShooter=shooter&&a[9]==2;
- const auto* d=Find(a[0]);if(!d||int(p->mSeedType)!=d->base||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>(newShooter?1:2)||a[3]<0||a[3]>(newShooter?300:1000)||a[4]<0||a[4]>2000||a[5]<0||a[5]>2000||a[6]<0||a[6]>=1000000||a[7]<0||a[7]>50||a[8]<0||a[8]>(newShooter?150:(a[0]==506||NativeSequence(a[0]))?6:3)||(!newShooter&&a[9]!=1&&a[9]!=-1))return false;
+ const auto* d=Find(a[0]);if(!d||int(p->mSeedType)!=d->base||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>(newShooter?1:2)||a[3]<0||a[3]>(newShooter?300:1000)||a[4]<0||a[4]>2000||a[5]<0||a[5]>2000||a[6]<0||a[6]>=1000000||a[7]<0||a[7]>50||a[8]<0||a[8]>(newShooter?150:(a[0]==506||a[0]==515||NativeSequence(a[0]))?6:3)||(!newShooter&&a[9]!=1&&a[9]!=-1))return false;
  if((a[0]==508||a[0]==512)&&a[8]>5)return false;
  if(a[0]==511&&(a[3]>7||a[8]>4))return false;
  if(a[0]==512&&a[3]>2)return false;
+ if(a[0]==514&&(a[3]>300||a[2]>1))return false;
+ if(a[0]==515&&a[2]>1)return false;
  if(newShooter&&((a[2]==1&&(a[8]==0||a[3]!=0))||(a[2]==0&&a[8]!=0)))return false;
  if(a[0]==507&&a[8]<1)return false;
  State s{a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9]};
@@ -77,7 +79,7 @@ bool Restore(Plant* p,const std::array<int,10>& a){
  if(shooter&&!newShooter){s.phase=0;s.heat=a[2]==0?a[3]*300/1000:0;s.timer=0;s.delay=std::min(a[5],150);s.remaining=0;s.pulse=0;s.direction=2;}
  if(shooter)s.heat=std::min(s.heat,MemeShooterRules::MaxRage); // Keep old 300-rage saves readable.
  if(shooter)s.remaining=std::min(s.remaining,MemeShooterRules::BurstCount); // Read old 150-pea saves without adding shots.
- states[p]=s;if(!NativeSequence(a[0])){p->mLaunchCounter=a[0]==503?std::clamp(p->mLaunchCounter,0,2500):9999;p->mShootingCounter=0;}return true;
+ states[p]=s;if(!NativeSequence(a[0])){p->mLaunchCounter=a[0]==503?std::clamp(p->mLaunchCounter,0,2500):9999;if(a[0]!=514)p->mShootingCounter=0;}return true;
 }
 int Data(const Plant* p,int field){const auto it=states.find(p);if(it==states.end())return -1;const auto& s=it->second;if(field==5)return s.id==502?std::max(0,ShowoffLifetime-s.age):-1;return field==0?s.phase:field==1?s.heat:field==2?s.timer:field==3?s.direction:s.remaining;}
 // Keep legacy input/ABI callers harmless; rage is automatic only.
@@ -107,7 +109,7 @@ void Tick(Board* b){
   // not refill this lifetime; pause freezes it and sandbox speed advances it.
   // Expire even without targets or while asleep, without harming supports.
   if(s.id==502&&++s.age>=ShowoffLifetime){Forget(p);p->Die();continue;}
-  if(!NativeSequence(s.id)){if(s.id!=503)p->mLaunchCounter=9999;p->mShootingCounter=0;}
+  if(!NativeSequence(s.id)){if(s.id!=503)p->mLaunchCounter=9999;if(s.id!=514)p->mShootingCounter=0;}
   if(p->mIsAsleep||p->mSquished||p->NotOnGround()||p->mPlantHealth<=0)continue;
   if(s.id!=502)s.age=(s.age+1)%1000000;if(s.pulse)--s.pulse;if(s.delay)--s.delay;if(s.timer)--s.timer;
   if(s.id==500){
@@ -187,6 +189,35 @@ void Tick(Board* b){
    if(s.remaining&&!s.delay&&b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8){
     Shoot(p,nullptr);--s.remaining;s.delay=30;s.pulse=20;
    }
+  }else if(s.id==514){
+   auto* target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY);
+   if(!s.phase&&target&&++s.heat>=300){s.phase=1;s.remaining=3;s.delay=0;}
+   if(s.phase&&s.remaining&&!s.delay&&target&&p->FindTargetAndFire(p->mRow,WEAPON_PRIMARY)){
+    --s.remaining;s.delay=65;s.pulse=40;
+   }
+   if(s.phase&&!s.remaining&&!p->mShootingCounter){s.phase=0;s.heat=0;}
+  }else if(s.id==515){
+   if(!s.phase&&!s.delay){
+    const bool front=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY)!=nullptr;
+    if(front||p->FindTargetZombie(p->mRow,WEAPON_SECONDARY)){s.phase=1;s.remaining=6;s.direction=front?1:-1;}
+   }
+   if(s.phase&&!s.delay&&b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8){
+    const auto weapon=s.direction<0?WEAPON_SECONDARY:WEAPON_PRIMARY;
+    p->Fire(nullptr,p->mRow,weapon);
+    auto* head=gLawnApp->ReanimationTryToGet(s.direction<0?p->mHeadReanimID2:p->mHeadReanimID);
+    const char* layer=s.direction<0?"anim_splitpea_shooting":"anim_shooting";
+    if(head&&head->TrackExists(layer))head->PlayReanim(layer,REANIM_PLAY_ONCE_AND_HOLD,3,45.0f);
+    if(s.remaining==6||s.remaining==3)gLawnApp->PlayMemeCue(1,s.direction*5.0f);
+    --s.remaining;s.direction=-s.direction;s.delay=14;s.pulse=14;
+    if(!s.remaining){s.phase=0;s.delay=250;}
+   }
+  }else if(s.id==516&&!s.delay){
+   bool hopped=false;
+   for(auto* z:b->mZombies)if(Walker(z)&&z->mRow==p->mRow&&z->mPosX>=p->mX-65&&z->mPosX<p->mX+20&&!z->mIceTrapCounter&&!z->mButteredCounter){
+    z->TakeDamage(20,0);if(!Enemy(z))continue;
+    z->StopEating();z->mAltitude+=24;z->mZombieHeight=HEIGHT_FALLING;z->UpdateReanim();hopped=true;
+   }
+   if(hopped){s.delay=200;s.pulse=30;gLawnApp->PlayMemeCue(2,4);}
   }else if(s.id==508&&s.remaining){
    p->mLaunchCounter=std::max(p->mLaunchCounter,300);
    if(p->mState!=STATE_CACTUS_LOW&&p->mState!=STATE_CACTUS_HIGH){s.remaining=0;continue;}
@@ -238,6 +269,12 @@ void Scale(const Plant* p,float& x,float& y,float& sx,float& sy){auto it=states.
  if((s.id==505||s.id==506)&&s.pulse){const float t=s.pulse/20.0f;horizontal-=0.07f*std::sin(t*3.14159265f);vertical+=0.05f*std::sin(t*3.14159265f);}
  if(NativeSequence(s.id)&&s.pulse){const float wave=std::sin(s.pulse*3.14159265f/20);horizontal+=0.065f*wave;vertical-=0.06f*wave;}
  if(s.id==511&&s.pulse){x+=sx*3*std::sin(s.pulse*0.3f);y-=sy*4*std::sin(s.pulse*3.14159265f/20);}
+ if(s.id==514&&!p->mIsAsleep){
+  const float charge=std::min(300,s.heat)/300.0f;
+  horizontal+=0.14f*charge;vertical-=0.10f*charge;
+  if(s.pulse){const float recoil=std::sin(s.pulse*3.14159265f/40);horizontal-=0.12f*recoil;vertical+=0.16f*recoil;x-=sx*5*recoil;}
+ }
+ if(s.id==515&&s.pulse){const float kick=std::sin(s.pulse*3.14159265f/14);x+=sx*s.direction*7*kick;vertical+=0.06f*kick;}
  if(s.id==503&&(s.phase==1||s.phase==2)){
   const float crouch=s.phase==1?1-std::clamp(s.pulse/20.0f,0.0f,1.0f):std::clamp(s.pulse/30.0f,0.0f,1.0f);
   vertical=1-0.72f*crouch;horizontal=1+0.15f*crouch;

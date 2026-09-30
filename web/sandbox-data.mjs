@@ -166,6 +166,9 @@ export const ORIGINAL_PLANTS = [
   [511,29,'蹦迪杨桃','每轮转方向 · 五向星弹'],
   [512,34,'爆米花玉米','第三发黄油 · 定住后追打'],
   [513,13,'嘴硬胆小菇','躲着攒话 · 安全后连喷'],
+  [514,10,'打嗝大喷菇','憋三秒 · 连打三个嗝'],
+  [515,28,'左右互搏裂荚','两个头吵架 · 左右轮流喷'],
+  [516,21,'烫脚地刺','踩上来 · 烫得跳脚'],
 ].map(([id,base,name,note])=>({id,base,name,note}));
 export const nativeBase = id => ORIGINAL_PLANTS.find(p=>p.id===id)?.base ?? RETIRED_PLANTS.find(p=>p.id===id)?.base ?? id;
 export const PLANTS = [...plantNames.map((name,id) => ({id,name,note:notes[id] ?? '免费 · 无冷却'})),...ORIGINAL_PLANTS];
@@ -175,6 +178,7 @@ export const ZOMBIES = [[0,'普通僵尸'],[1,'旗帜僵尸'],[2,'路障僵尸']
 ZOMBIES.push(...ORIGINAL_ZOMBIES);
 for(const z of ZOMBIES){if(z.id===1){z.name='催更旗手';z.note='附近同伴加速50%';}else if(z.id===2){z.name='碰瓷路障';z.note='路障被打掉 · 倒地装死三秒';}}
 for(const [id,name,note] of [[0,'摸鱼僵尸','走六秒 · 歇两秒'],[6,'护短铁门','替附近同伴分担普通伤害'],[7,'急停橄榄球','冲两秒 · 喘气后再走'],[16,'空投气球','草地空投一名同伴 · 仅一次']])Object.assign(ZOMBIES.find(z=>z.id===id),{name,note});
+for(const [id,name,note] of [[24,'倒车小鬼','每六秒倒走一秒'],[21,'插队梯子','前路拥堵 · 挑空路插队']])Object.assign(ZOMBIES.find(z=>z.id===id),{name,note});
 export function plantsFor(category) { return category === 'original' ? ORIGINAL_PLANTS : category === 'all' ? PLANTS : (groups[category] ?? groups.common).map(id=>PLANTS[id]); }
 export function boardCell(x,y,pool=false) {
   if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
