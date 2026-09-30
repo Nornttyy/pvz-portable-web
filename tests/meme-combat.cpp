@@ -39,6 +39,28 @@ int main(){
   const auto state=SandboxPlants::SavePower(p);w.mPaused=true;w.step(100);
   assert(SandboxPlants::SavePower(p)==state); // Includes the ready indicator's clock.
  }
+ // The bottom of the rage bar is a real touch target, including pot/pool
+ // offsets. A tap still cannot spend rage while paused/asleep/airborne.
+ for(int offset:{-5,-2,0,2}){World w;auto* p=w.add(500);p->drawHeightOffset=offset;
+  assert(SandboxPlants::RestorePower(p,{500,300,0,100,0,50,40,0,0,2}));
+  const int x=p->mX+40,y=p->mY+offset+82;
+  w.mPaused=true;assert(!MemeCharacters::Click(&w,x,y));w.mPaused=false;
+  p->mIsAsleep=true;assert(!MemeCharacters::Click(&w,x,y));p->mIsAsleep=false;
+  p->airborne=true;assert(!MemeCharacters::Click(&w,x,y));p->airborne=false;
+  assert(!MemeCharacters::Click(&w,p->mX-1,y)&&!MemeCharacters::Click(&w,p->mX+80,y));
+  assert(!MemeCharacters::Click(&w,x,p->mY+offset-1)&&!MemeCharacters::Click(&w,x,p->mY+offset+86));
+  assert(MemeCharacters::Click(&w,x,y)&&!MemeCharacters::Click(&w,x,y));
+  assert(MemeCharacters::Data(p,4)==150&&p->mPlantHealth==300);
+ }
+ {World w;auto* unready=w.add(500);auto* ready=w.add(500);
+  assert(SandboxPlants::RestorePower(ready,{500,300,0,100,0,50,40,0,0,2}));
+  assert(MemeCharacters::Click(&w,ready->mX+40,ready->mY+82));
+  assert(MemeCharacters::Data(unready,0)==0&&MemeCharacters::Data(ready,0)==1);
+ }
+ for(int offset:{-5,-2,0,2}){World w;auto* p=w.add(503);p->drawHeightOffset=offset;
+  assert(SandboxPlants::RestorePower(p,{503,300,2,0,180,1,0,0,3,1}));w.step();
+  assert(w.mProjectiles.mSize==1&&w.mProjectiles.values[0]->mPosY==p->mY+offset+22);
+ }
  // Playable characters have independent, observable mechanics.
  {World w;auto* p=w.add(500);auto* z=w.enemy();const int sounds=app.rageReleaseRequests;p->mPlantHealth=123;w.step(500);
   assert(MemeCharacters::Data(p,1)==80&&w.mProjectiles.mSize==4&&!MemeCharacters::Activate(p));

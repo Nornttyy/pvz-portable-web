@@ -90,6 +90,7 @@ public:
  int mBodyReanimID=0,mHeadReanimID=0,mHeadReanimID2=0,mHeadReanimID3=0,mBlinkReanimID=0;
  int mRenderOrder=0,mEatenFlashCountdown=0;
  bool mDead=false,mIsAsleep=false,mSquished=false,airborne=false;
+ float drawHeightOffset=0;
  bool NotOnGround(){return airborne;}
  void SetSleeping(bool value){mIsAsleep=value;}void Die(){mDead=true;}
  int GetDamageRangeFlags(PlantWeapon){return 0;};Zombie* FindTargetZombie(int row,PlantWeapon);
@@ -138,7 +139,7 @@ public:
 };
 inline Zombie* Plant::FindTargetZombie(int row,PlantWeapon){for(auto* z:mBoard->mZombies)if(!z->IsDeadOrDying()&&z->mRow==row&&!z->mMindControlled&&z->mPosX>=mX)return z;return nullptr;}
 inline void Plant::Fire(Zombie* target,int row,PlantWeapon){auto* s=mBoard->AddProjectile(mX+60,mY+25,mRenderOrder,row,int(mSeedType)==5?PROJECTILE_SNOWPEA:PROJECTILE_PEA);SandboxPlants::OnFired(this,s,target);}
-inline float PlantDrawHeightOffset(Board*,Plant*,SeedType,int,int){return 0;}
+inline float PlantDrawHeightOffset(Board*,Plant* p,SeedType,int,int){return p?p->drawHeightOffset:0;}
 struct PlantDefinition{ReanimationType mReanimationType=REANIM_ZOMBIE;PlantSubClass mSubClass=SUBCLASS_SHOOTER;int mLaunchRate=150;};
 inline PlantDefinition GetPlantDefinition(SeedType type){return {REANIM_ZOMBIE,int(type)==1||int(type)==3?SUBCLASS_NORMAL:SUBCLASS_SHOOTER};}
 inline void DrawSeedPacket(Sexy::Graphics*,int,int,SeedType,SeedType,int,int,bool,bool){}

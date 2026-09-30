@@ -262,10 +262,13 @@ static int PlacePlant(Board* board, int type, int col, int row) {
 static int Spawn(Board* board, int type, int col, int row) {
     if (!SandboxRules::ValidZombie(type) || !SandboxRules::ValidCell(col, row, mapType == 1)) return -2;
     if (ZombieCount(board) >= SandboxRules::MaxZombies || board->mZombies.mSize >= board->mZombies.mMaxSize - 8) return -3;
-    auto zombieType = static_cast<ZombieType>(SandboxZombies::Base(type));
+    const auto requestedType = static_cast<ZombieType>(SandboxZombies::Base(type));
     const bool water = board->IsPoolSquare(col, row);
+    if (!water && (requestedType == ZOMBIE_SNORKEL || requestedType == ZOMBIE_DOLPHIN_RIDER || requestedType == ZOMBIE_DUCKY_TUBE)) return -5;
+    // Native swimming is the ordinary zombie plus its row-dependent duck rig.
+    // The catalogue-only DUCKY_TUBE type is not accepted by native pool motion.
+    auto zombieType = requestedType == ZOMBIE_DUCKY_TUBE ? ZOMBIE_NORMAL : requestedType;
     if (water && !Zombie::ZombieTypeCanGoInPool(zombieType) && zombieType != ZOMBIE_BALLOON) return -5;
-    if (!water && (zombieType == ZOMBIE_SNORKEL || zombieType == ZOMBIE_DOLPHIN_RIDER || zombieType == ZOMBIE_DUCKY_TUBE)) return -5;
     Zombie::PreloadZombieResources(zombieType);
     auto* zombie = board->AddZombieInRow(zombieType, row, Zombie::ZOMBIE_WAVE_DEBUG);
     if (!zombie) return -3;

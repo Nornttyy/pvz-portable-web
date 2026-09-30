@@ -31,6 +31,7 @@ void Burst(State& s){
 // Native zombie IDs are stable through DataArray recycling; never retain pointers.
 std::map<unsigned,int> laneCooldown;
 bool Enemy(Zombie* z){return !z->mDead&&z->IsOnBoard()&&!z->mMindControlled&&!z->IsDeadOrDying()&&z->mHasHead;}
+int VisualY(const Plant* p){return p->mY+int(std::lround(PlantDrawHeightOffset(p->mBoard,const_cast<Plant*>(p),p->mSeedType,p->mPlantCol,p->mRow)));}
 bool Walker(Zombie* z){const int type=int(z->mZombieType);return Enemy(z)&&(type==0||type==1||type==2||type==4||type==5||type==6||type==7||type==24)&&z->mZombiePhase==PHASE_ZOMBIE_NORMAL&&z->mZombieHeight==HEIGHT_ZOMBIE_NORMAL&&!z->mInPool;}
 bool Lane(Board* b,int from,int to){return to>=0&&to<(b->StageHasPool()?6:5)&&b->RowCanHaveZombies(to)&&!(b->StageHasPool()&&(from==2||from==3||to==2||to==3));}
 bool ReadyToMove(Board* b,Zombie* z){return Walker(z)&&!laneCooldown.contains(unsigned(b->ZombieGetID(z)));}
@@ -82,8 +83,10 @@ bool Activate(Plant* p,int direction){
  return false;
 }
 bool Click(Board* b,int x,int y){
- for(auto* p:b->mPlants)if(!p->mDead&&Is(p)&&x>=p->mX&&x<p->mX+80&&y>=p->mY&&y<p->mY+80){
-  if(Type(p)==500&&Activate(p))return true;
+ for(auto* p:b->mPlants)if(!p->mDead&&Type(p)==500&&x>=p->mX&&x<p->mX+80){
+  // Include the full ready bar, and follow the same pot/pool offset as its art.
+  const int top=VisualY(p);
+  if(y>=top&&y<top+86&&Activate(p))return true;
  }return false;
 }
 void Tick(Board* b){
@@ -147,7 +150,7 @@ void Tick(Board* b){
    }
    if(s.phase==2){
     if(s.remaining&&!s.delay&&b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8){
-     auto* shot=b->AddProjectile(p->mX+12,p->mY+22,p->mRenderOrder-1,p->mRow,PROJECTILE_PEA);
+     auto* shot=b->AddProjectile(p->mX+12,VisualY(p)+22,p->mRenderOrder-1,p->mRow,PROJECTILE_PEA);
      shot->mMotionType=MOTION_BACKWARDS;shot->mDamageRangeFlags=p->GetDamageRangeFlags(WEAPON_PRIMARY);SandboxPlants::RestoreShot(shot,300);
      --s.remaining;s.delay=16;gLawnApp->PlayFoley(FOLEY_THROW);
     }
@@ -200,8 +203,8 @@ void Scale(const Plant* p,float& x,float& y,float& sx,float& sy){auto it=states.
  x+=40*sx*(1-horizontal);y+=65*sy*(1-vertical);sx*=horizontal;sy*=vertical;
 }
 void Effects(Sexy::Graphics* g,Board* b,int row){
- for(const auto& [p,s]:states)if(!p->mDead&&p->mRow==row&&!p->mSquished){
-  const int x=p->mX,y=p->mY;
+ for(const auto& [p,s]:states)if(!p->mDead&&p->mRow==row&&!p->mSquished&&!const_cast<Plant*>(p)->NotOnGround()){
+  const int x=p->mX,y=VisualY(p);
   if(s.id==500){
    const int glow=p->mIsAsleep?0:MemeShooterRules::ReadyGlow(s.heat,s.phase,s.age);
    if(glow){

@@ -25,6 +25,16 @@ int main(){
   }
   const auto& bar=Sexy::drawnRects[ready?4:0];assert(bar.bounds.mX==p->mX+12&&bar.bounds.mY==p->mY+77&&bar.bounds.mWidth==56&&bar.bounds.mHeight==6);
  }
+ // Native flowerpot lift and pool bobbing move indicators and steam together.
+ for(int offset:{-5,-2,0,2})for(int phase:{0,1}){
+  SandboxPlants::Reset();Board w;auto* p=w.plant(1,2);p->drawHeightOffset=offset;SandboxPlants::Assign(p,500);
+  assert(SandboxPlants::RestorePower(p,{500,300,phase,phase?0:100,0,50,40,0,phase?25:0,2}));
+  Sexy::Graphics g(nullptr);g.mTransX=224;g.mTransY=17;Sexy::drawnRects.clear();testBlits.clear();MemeCharacters::Effects(&g,&w,2);
+  const auto& bar=Sexy::drawnRects[phase?0:4];assert(bar.bounds.mY==p->mY+offset+77);
+  if(phase){assert(testBlits.size()==1);near(testBlits[0].matrix.m02,p->mX+45+224);near(testBlits[0].matrix.m12,p->mY+offset+15-10+17);}
+  p->airborne=true;Sexy::drawnRects.clear();testBlits.clear();MemeCharacters::Effects(&g,&w,2);
+  assert(Sexy::drawnRects.empty()&&testBlits.empty());
+ }
  // Bumping walnut never replaces the native face with a mouth or teeth,
  // including both original damage stages.
  for(int stage=0;stage<3;++stage){

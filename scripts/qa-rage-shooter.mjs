@@ -26,12 +26,14 @@ try{
  assert.ok(positive&&negative&&maxY-minY>60);results.wobbleRange=maxY-minY;await shot('normal-wavy-pea');
  await api(4,0);await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,5)===100,{},{timeout:15000});await api(4,1);assert.equal(await pd(3),300);
  await shot('gradual-rage-100');
- await api(6);await click(718,61);await api(4,0);await page.touchscreen.tap(...await point(384,330));await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,4)===1,{},{timeout:1500});
+ await api(6);await click(718,61);await page.setViewportSize({width:844,height:390});await shot('phone-ready-bar');
+ // The last two pixels of the ready bar used to sit outside the hit box.
+ await api(4,0);await page.touchscreen.tap(...await point(384,362));await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,4)===1,{},{timeout:1500});results.mobileBarTap=true;
  assert.deepEqual(await page.evaluate(()=>[0,1,2].map(f=>Module._pvz_rage_audio_data(f))),[1,1,600]);results.releaseAudio=true;
  await page.waitForTimeout(850);await api(4,1);const fan=await shots(),spread=fan.filter(s=>s[0]===9);
  assert.ok(spread.length>=30&&spread.some(s=>s[4]<0)&&spread.some(s=>s[4]>0));
  const speeds=spread.map(s=>Math.hypot(s[3],s[4])/1000);assert.ok(Math.max(...speeds)-Math.min(...speeds)>1.8);results.irregularSpread=true;
- assert.equal(await pd(3),300);await shot('manual-150-random-burst');
+ assert.equal(await pd(3),300);await shot('manual-150-random-burst');await page.setViewportSize({width:1100,height:750});
  await page.waitForTimeout(300);assert.deepEqual(await shots(),fan);results.pauseSafe=true;
  await api(4,0);await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,4)===0,{},{timeout:4000});assert.equal(await pd(5),0);assert.equal(await pd(3),300);results.manualBurst=true;
  await page.waitForFunction(()=>Module._pvz_rage_audio_data(0)===0,{},{timeout:3000});
@@ -45,6 +47,17 @@ try{
  await page.waitForFunction(()=>[0,1].every(i=>Module._pvz_sandbox_plant_data(i,5)>=100),{},{timeout:15000});
  await page.evaluate(()=>{Module._pvz_sandbox_command(23,0,1,1);Module._pvz_sandbox_command(23,0,1,3);});
  assert.equal(await page.evaluate(()=>Module._pvz_rage_audio_data(1)),1);results.noVoiceStacking=true;
+ // Real native support plants, not injected coordinates or synthetic rage.
+ for(const [name,map,support,barY] of [['pot',0,33,357],['pool',1,16,332]]){
+  await api(8,map);assert.ok(await api(1,support,1,2)>0);assert.ok(await api(1,500,1,2)>0);
+  if(map)assert.equal(await api(2,10,8,0),-5,'ducky remains water-only');
+  assert.ok(await api(2,map?10:23,8,2)>0,'target must really spawn');await api(5,2);await api(4,0);
+  await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(1,5)>=100,{},{timeout:12000});await api(4,1);await api(5,1);await api(6);
+  await page.setViewportSize({width:844,height:390});await page.waitForTimeout(250);await click(718,61);await shot(name+'-ready-bar');
+  await api(4,0);await page.touchscreen.tap(...await point(384,barY));
+  await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(1,4)===1,{},{timeout:1500});await api(4,1);
+  assert.equal(await page.evaluate(()=>Module._pvz_sandbox_plant_data(1,3)),300);await shot(name+'-bar-released');results[name+'BarTap']=true;
+ }
  assert.deepEqual(errors,[]);await writeFile(join(out,'report.json'),JSON.stringify({results,errors},null,2));console.log('Rage shooter QA passed',results);
 }catch(e){await shot('failure');console.log('DATA',await pd(4),await pd(5),await shots());console.log('ENGINE',await page.evaluate(()=>window.pvzEngineLog));throw e;}
 finally{await browser.close();}

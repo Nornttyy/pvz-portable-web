@@ -2,7 +2,7 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Gradual rage to 200, 10% normal accuracy and 150 chaotic peas; angry counter walnut every 3s without push; retreat ice, echo repeater, haste flag and moonwalk bucket",
+  "mode": "Gradual 200-rage and 150 chaotic peas; mobile rage-bar activation, native support-height alignment and playable sandbox duck swimmers; angry counter walnut every 3s without push",
   "files": [
     {
       "name": "pvz-portable.js",
@@ -11,8 +11,8 @@
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7459059,
-      "sha256": "5194b1e44e7a50d68496a7baf88a0619b6b7e20549bbc9e73090918bff320200"
+      "size": 7459139,
+      "sha256": "b04719186a848ee5fed87219668ef7f258a2f26f6a80f12dd8ecfd2a3fd22bab"
     }
   ]
 }

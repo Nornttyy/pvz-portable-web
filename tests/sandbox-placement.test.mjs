@@ -21,6 +21,14 @@ test('production placement function and repeat state machine pass native tests',
  assert.match(result.stdout,/Production placement.*passed/);
  assert.match(result.stdout,/Fixed characters:.*passed/);
 });
+test('production zombie spawning normalizes duck swimmers without bypassing terrain or capacity',async()=>{
+ const src=await read('src/Sandbox.cpp'),dir=await mkdtemp(join(tmpdir(),'pvz-spawn-'));
+ const start=src.indexOf('static int Spawn('),end=src.indexOf('extern "C"',start);
+ assert.ok(start>0&&end>start);
+ await writeFile(join(dir,'spawn-under-test.inc'),src.slice(start,end));
+ await run('c++',['-std=c++20','-Isrc','-I'+dir,'tests/sandbox-spawn-native.cpp','-o',join(dir,'spawn')],{cwd:root});
+ assert.match((await run(join(dir,'spawn'))).stdout,/Production zombie spawning.*passed/);
+});
 test('stacked formations round-trip duplicates, mixed units, shells and two-cell cannons',()=>{
  for(const plants of [[plant(),plant()],[plant(),plant(126),plant(30),plant(30)],[plant(47),plant(0,1)]]){
    const layout={schema:1,map:0,stacked:true,plants};
