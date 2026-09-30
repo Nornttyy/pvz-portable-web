@@ -341,21 +341,23 @@ void DrawCard(Sexy::Graphics* g,int x,int y,int id){
  PvzpDrawString(g,"0",x+25,y+65,Sexy::FONT_BRIANNETOD12,Sexy::Color(55,64,23),DS_ALIGN_CENTER);
 }
 bool DrawBody(Sexy::Graphics* g,const Plant* p,float,float,bool squished){
+ AbstractRigVisuals::Scope allPoses(p);
  if((MemeCharacters::Type(p)==517||MemeCharacters::Type(p)==518)&&!squished){
   auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID);if(!body)return false;
-  AbstractRigVisuals::Scope pose(p);body->Draw(g);return true;
+  body->Draw(g);return true;
  }
  if(MemeCharacters::Type(p)==501&&MemeCharacters::Data(p,0)==1&&!squished){
   auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID);if(!body)return false;
   body->Draw(g);NutBrows(g,body,std::min(255,MemeCharacters::Save(p)[7]*32));return true;
  }
- if(MemeCharacters::Type(p)==500&&(MemeCharacters::Data(p,0)==1||MemeCharacters::Data(p,1)>0)&&!squished){
+ if(MemeCharacters::Type(p)==500&&!squished){
   auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID);if(!body)return false;
   const int level=MemeCharacters::Data(p,0)==1?24:std::clamp(MemeCharacters::Data(p,1)*24/MemeShooterRules::MaxRage,0,24);
   WarmSkin warm;for(auto id:{p->mBodyReanimID,p->mHeadReanimID})warm.Apply(gLawnApp->ReanimationTryToGet(id),120,level,p->mPlantHealth,p->mPlantMaxHealth);
   warm.Apply(gLawnApp->ReanimationTryToGet(p->mBlinkReanimID),120,level,p->mPlantHealth,p->mPlantMaxHealth,true);
   body->Draw(g);HeatBrow(g,gLawnApp->ReanimationTryToGet(p->mHeadReanimID),level,std::clamp((level-8)*15,0,230));return true;
  }
+ if(MemeCharacters::Is(p)&&!squished){if(auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID)){body->Draw(g);return true;}}
  auto it=states.find(p);if(it==states.end()||squished||!SandboxMemeRules::LegacyBase(int(p->mSeedType)))return false;const auto& s=it->second;
  WarmSkin warm;const int level=SandboxMemeRules::PowerOf(s.id)==180?2+s.heat.heat*22/1000:12+s.heat.heat*12/1000;
  auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID);if(!body)return false;

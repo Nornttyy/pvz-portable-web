@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Nineteen mechanic plants and eleven native zombie replacements. Returning three-lane peas with connected head turns; three-stomp exercise squash with generated native-size body; bucket glove with connected punch; pole-vault reload gesture and spare pole. Draw-scoped poses preserve original rigs and saved layouts. Embedded alpha sprites and CC0 three-second human rage scream. Burst remains 300 rage, 50 peas in 300 ticks; burst speed reduced 25%, recovery 300 ticks. Extra pea-thrower occupies the native nine-column almanac grid. Adventure unlocks, ordinary-size 25 suns at double production frequency, no manual rage release, no normal-shot knockback and showoff lifetime retained.",
+  "mode": "Behavior pass across all nineteen mechanic plants, preserving user-defined rage/wallnut/sun/lifetime rules. Chomper returns the same armored living zombie; cactus staples pairs; butter slides a walker into companions; scaredy misdirects a walker; cabbage rolls back; repeater copies neighbor pea/ice/fire/puff types; fume breath physically inhales/exhales walkers. Native serialized interaction phases, bounded durations and no duplicate rewards. Scoped connected-part poses, original Squash body/face/blinks plus generated headband only. Sharper three-second CC0 male scream with no artificial tremolo. Adventure and sandbox share identities/unlocks/almanac. 300 rage, 3-second 50-pea burst, 25% slower burst peas, 3-second recovery, ordinary-sized 25 sun retained.",
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 277744,
-      "sha256": "04aeb9d347f0fb42c53118510c83d6527bf23fdb5f078d6c1c11b7baedd4ddb1"
+      "size": 278037,
+      "sha256": "678d35d6c3936c40a2fa1d6cc7966d87763817da75fe420e082859d900f09fe6"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7665110,
-      "sha256": "3cf920af52cd2e6427fbdae1801f6919d47c684ee42dbabc62b13505f35b65f4"
+      "size": 7667904,
+      "sha256": "c605c91387856f363518bb2a8e04fc11fceb337ef1e45473a2acc7ee4479a12f"
     }
   ]
 }

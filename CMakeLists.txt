@@ -200,7 +200,7 @@ if(EMSCRIPTEN)
 	set_property(TARGET pvz-portable APPEND PROPERTY LINK_DEPENDS
 		"${CMAKE_CURRENT_SOURCE_DIR}/wasm/shell.html"
 		"${CMAKE_CURRENT_SOURCE_DIR}/addons/audio/rage-scream.wav"
-		"${CMAKE_CURRENT_SOURCE_DIR}/addons/art/squash-exercise.png"
+		"${CMAKE_CURRENT_SOURCE_DIR}/addons/art/squash-headband.png"
 		"${CMAKE_CURRENT_SOURCE_DIR}/addons/art/bucket-glove.png"
 	)
 	target_link_libraries(pvz-portable PRIVATE

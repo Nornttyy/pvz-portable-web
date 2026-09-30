@@ -4343,7 +4343,7 @@ void Zombie::Update()
 		}
 		else
 		{
-			if (mPhaseCounter > 0 && !IsImmobilizied())
+			if (mPhaseCounter > 0 && !IsImmobilizied() && !SandboxZombies::HasInteraction(this))
 			{
 				mPhaseCounter--;
 			}
@@ -4639,6 +4639,7 @@ void Zombie::UpdatePlaying()
 		}
 	}
 
+	if (SandboxZombies::UpdateInteraction(this)) return;
 	if (mZombiePhase == ZombiePhase::PHASE_RISING_FROM_GRAVE)
 	{
 		UpdateZombieRiseFromGrave();
@@ -6300,6 +6301,7 @@ void Zombie::DrawButter(Graphics* g, const ZombieDrawPosition& theDrawPos)
 
 void Zombie::Draw(Graphics* g)
 {
+	if (SandboxZombies::IsHeld(this)) return;
 	SandboxZombies::RefreshDamageArt(this);
 	if (mZombieHeight == ZombieHeight::HEIGHT_GETTING_BUNGEE_DROPPED)
 		return;
@@ -8102,6 +8104,7 @@ bool Zombie::CanBeFrozen()
 
 bool Zombie::EffectedByDamage(unsigned int theDamageRangeFlags)
 {
+	if (SandboxZombies::IsHeld(this)) return false;
 	if (!TestBit(theDamageRangeFlags, static_cast<int>(DamageRangeFlags::DAMAGES_DYING)) && IsDeadOrDying())
 	{
 		return false;
@@ -9386,6 +9389,7 @@ bool Zombie::SetupDrawZombieWon(Graphics* g)
 
 void Zombie::DrawShadow(Graphics* g)
 {
+	if (SandboxZombies::IsHeld(this)) return;
 	ZombieDrawPosition aDrawPos;
 	GetDrawPos(aDrawPos);
 	if (mApp->mGameScene == GameScenes::SCENE_ZOMBIES_WON && !SetupDrawZombieWon(g))

@@ -1,5 +1,21 @@
 # Gag animation assets, version 1
 
+## Version 2: accessories only (current runtime)
+
+The entire generated Squash body is RETIRED. Its source remains archived below, and its registered sprite was moved from `addons/art/squash-exercise.png` to `art/abstract/squash-exercise-retired-v1.png` (recoverable, no longer embedded). The original `Squash_body.png`, stem, animated face, eyes and blink are retained. At runtime a temporary cached composition adds only the generated accessory; native image definitions are never overwritten.
+
+Built-in image generation (not CLI), final prompt:
+
+> Use case: background-extraction / accessory-only game sprite. Image 1 is the ORIGINAL character whose body and face must NOT be redrawn. Image 2 is a reference ONLY for its muted dusty-purple exercise headband. Output ONLY that headband as one isolated usable transparent game accessory: a shallow curved purple front cloth strip, knot at left, two short floppy tails extending left. The cloth strip is thin and wide, slight upward slant to the right, seen from the same front three-quarter view as the references. Keep exactly the muted purple palette, simple dark irregular outline, 2 broad shade regions, modest old 2009 cartoon game detail. Genuine transparent alpha everywhere outside the fabric, including the whole area where the head would be. ABSOLUTELY NO vegetable, body, face, eyes, skin, stem, mannequin, outline of a head, floor, cast shadow, text, checkerboard or extra object. Do not generate an entire character. Accessory only, centered and fully visible, intended to be attached ABOVE the original eyes using the existing skeleton. No realistic cloth texture or tiny decorative detail.
+
+Saved generation: `art/abstract/squash-headband-source-v2.png`. Runtime part: `addons/art/squash-headband.png`, 86×96 true-alpha canvas, 73×26 visible registration at (0,8). `scripts/register-gag-art.swift` performs only mechanical crop/resize/registration.
+
+Current vocal: `art/abstract/rage-open-source-v2.mp3`, JohnsonBrandEditing, **human male scream 1**, https://freesound.org/people/JohnsonBrandEditing/sounds/243377/ ; CC0 https://creativecommons.org/publicdomain/zero/1.0/ . Public preview https://cdn.freesound.org/previews/243/243377_3229685-hq.mp3 . Not generated, cloned or celebrity imitation. Source is trimmed, WSOLA time-stretched with waveform-matched overlaps and pitched up six semitones, brightened gently, faded, normalized to peak 0.8. No artificial tremolo/vibrato, no voice stacking. Runtime 24 kHz mono PCM, exactly three seconds, native SFX volume 60%.
+
+Reproduction: `afconvert -f WAVE -d LEI16 art/abstract/rage-open-source-v2.mp3 /tmp/pvz-rage-open-source.wav` and `node scripts/make-rage-audio.mjs /tmp/pvz-rage-open-source.wav`.
+
+Everything below documents the retired first attempt, not the current Squash body or vocal.
+
 The two PNG source files were made with the built-in image-generation tool, using the original Squash body and zombie hand/bucket as visual references. Native parts are mechanically alpha-cropped and scaled by `scripts/register-gag-art.swift`; no original texture is overwritten.
 
 ## Prompts

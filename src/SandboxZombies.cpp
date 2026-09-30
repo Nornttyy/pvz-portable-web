@@ -1,11 +1,14 @@
 // Abstract newspaper replacement uses native phase/health/save fields and rig.
 #include "SandboxZombies.h"
 #include "SandboxArt.h"
+#include "MemeCharacters.h"
 #include "LawnApp.h"
 #include "Lawn/Zombie.h"
 #include "Lawn/Board.h"
 #include "Lawn/Plant.h"
 #include "PvzpLib/Reanimator.h"
+#include "PvzpLib/PvzpCommon.h"
+#include "graphics/Graphics.h"
 #include <algorithm>
 #include <cmath>
 #include <vector>
@@ -14,6 +17,56 @@ namespace SandboxZombies {
 namespace {
 bool Enabled(){return gSandboxEnabled||(gLawnApp&&gLawnApp->IsAdventureMode());}
 bool Walker(Zombie* z){return z&&z->IsOnBoard()&&!z->mDead&&!z->IsDeadOrDying()&&z->mHasHead&&!z->mMindControlled&&z->mZombiePhase==PHASE_ZOMBIE_NORMAL&&z->mZombieHeight==HEIGHT_ZOMBIE_NORMAL&&!z->mInPool;}
+bool Portable(Zombie* z){if(!Walker(z))return false;const int t=int(z->mZombieType);return t==0||t==1||t==2||t==4||t==6||t==7||t==24;}
+void Phase(Zombie* z,int phase,int ticks){z->StopEating();z->mZombiePhase=static_cast<decltype(z->mZombiePhase)>(phase);z->mPhaseCounter=ticks;}
+void Land(Zombie* z){Phase(z,PHASE_ZOMBIE_NORMAL,0);z->mTargetPlantID=static_cast<decltype(z->mTargetPlantID)>(0);z->mAltitude=0;z->mZombieHeight=HEIGHT_ZOMBIE_NORMAL;z->StartWalkAnim(10);}
+}
+bool HasInteraction(const Zombie* z){return z&&int(z->mZombiePhase)>=Held&&int(z->mZombiePhase)<=Misdirected;}
+bool IsHeld(const Zombie* z){return z&&int(z->mZombiePhase)==Held;}
+bool CatchForReturn(Plant* p,Zombie* z){
+ if(!p||p->mDead||p->mSquished||p->mPlantHealth<=0||MemeCharacters::Type(p)!=509||!Portable(z))return false;
+ for(auto* other:p->mBoard->mZombies)if(IsHeld(other)&&other->mTargetCol==p->mPlantCol&&other->mRow==p->mRow)return false;
+ Phase(z,Held,100);z->mTargetCol=p->mPlantCol;z->mPosX=p->mX+45;z->mX=int(z->mPosX);z->mAltitude=0;
+ z->mTargetPlantID=static_cast<decltype(z->mTargetPlantID)>(p->mBoard->mPlants.DataArrayGetID(p));
+ p->mState=STATE_CHOMPER_DIGESTING;p->mStateCountdown=100;p->PlayBodyReanim("anim_chew",REANIM_LOOP,5,18);return true;
+}
+bool Staple(Zombie* z){
+ if(!Portable(z))return false;Zombie* neighbor=nullptr;
+ for(auto* q:z->mBoard->mZombies)if(q!=z&&Portable(q)&&q->mRow==z->mRow&&q->mPosX>z->mPosX+10&&q->mPosX<z->mPosX+130&&(!neighbor||q->mPosX<neighbor->mPosX))neighbor=q;
+ if(!neighbor)return false; // One isolated zombie cannot be stapled to itself.
+ const int anchor=int((z->mPosX+neighbor->mPosX)*.5f);
+ for(auto* q:{z,neighbor}){Phase(q,Pinned,180);q->mTargetCol=anchor;}
+ gLawnApp->PlayMemeCue(3,-4);return true;
+}
+bool Slip(Zombie* z){if(!Portable(z))return false;Phase(z,Slipping,80);z->mTargetCol=int(z->mPosX);gLawnApp->PlayMemeCue(2,-4);return true;}
+bool Misdirect(Zombie* z){if(!Portable(z))return false;Phase(z,Misdirected,130);gLawnApp->PlayMemeCue(1,5);return true;}
+bool UpdateInteraction(Zombie* z){
+ if(!HasInteraction(z))return false;
+ if(z->mBoard->mPaused)return true;
+ if(z->mDead||z->IsDeadOrDying()||!z->mHasHead||z->mMindControlled){Land(z);return false;}
+ const int phase=int(z->mZombiePhase);
+ if(phase==Held){
+  Plant* owner=z->mBoard->mPlants.DataArrayTryToGet(static_cast<unsigned>(z->mTargetPlantID));
+  if(owner&&(owner->mDead||owner->mSquished||owner->mPlantHealth<=0||MemeCharacters::Type(owner)!=509))owner=nullptr;
+  if(!owner){Land(z);return true;} // Shovel/crush/death releases the SAME living zombie.
+  if(z->mPhaseCounter>0)--z->mPhaseCounter;
+  if(z->mPhaseCounter==0){
+   Phase(z,Returned,70);z->mTargetCol=int(z->mPosX);owner->mState=STATE_CHOMPER_DIGESTING;owner->mStateCountdown=650;owner->PlayBodyReanim("anim_bite",REANIM_PLAY_ONCE_AND_HOLD,5,30);gLawnApp->PlayMemeCue(0,6);
+  }
+  return true;
+ }
+ // Pin/flight clocks and movement freeze together. Butter stays attached while sliding.
+ if(z->mIceTrapCounter>0||(z->mButteredCounter>0&&phase!=Slipping))return true;
+ if(z->mPhaseCounter>0)--z->mPhaseCounter;
+ if(phase==Returned||phase==Slipping){
+  const float total=phase==Returned?70.0f:80.0f,t=1-z->mPhaseCounter/total;
+  z->mPosX=std::min(780.0f,z->mTargetCol+(phase==Returned?210:155)*t);
+  z->mPosY=z->GetPosYBasedOnRow(z->mRow);z->mAltitude=phase==Returned?62*std::sin(t*3.14159265f):0;
+  for(auto* other:z->mBoard->mZombies)if(other!=z&&Portable(other)&&other->mRow==z->mRow&&std::abs(other->mPosX-z->mPosX)<26){Phase(other,Tripped,100);gLawnApp->PlayMemeCue(2,3);}
+ }else if(phase==Misdirected){z->mPosX=std::min(780.0f,z->mPosX+.65f);}
+ z->mX=int(z->mPosX);z->mY=int(z->mPosY);
+ if(!z->mPhaseCounter)Land(z);
+ return true;
 }
 bool IsRetreating(Zombie* z){return Enabled()&&Walker(z)&&int(z->mZombieType)==24&&z->mZombieAge%600>=400&&z->mZombieAge%600<500&&z->mPosX<760;}
 // The normal cone's native phase counter is serialized with the zombie. Only
@@ -32,7 +85,13 @@ void ArmorBroken(Zombie* z){
 void AdjustPose(Zombie* z,Reanimation* body){
  if(!body||!Enabled())return;
  float angle=0;
- if(IsRetreating(z)){
+ const int interaction=int(z->mZombiePhase);
+ if(interaction==Returned){angle=-1.25f*std::sin((70-z->mPhaseCounter)*3.14159265f/70);}
+ else if(interaction==Tripped){angle=-1.42f*std::min(1.0f,std::min((100-z->mPhaseCounter)/12.0f,z->mPhaseCounter/25.0f));}
+ else if(interaction==Slipping){angle=1.1f*std::sin((80-z->mPhaseCounter)*3.14159265f/80);}
+ else if(interaction==Pinned){angle=.12f*std::sin(z->mPhaseCounter*.16f);}
+ else if(interaction==Misdirected){auto& m=body->mOverlayMatrix;m.m02+=90*m.m00;m.m00=-m.m00;m.m10=-m.m10;return;}
+ else if(IsRetreating(z)){
   angle=0.24f*std::sin((z->mZombieAge%600-400)*3.14159265f/100);
  }else if(int(z->mZombieType)==21&&z->mZombiePhase==PHASE_LADDER_CARRYING&&z->mPhaseCounter>0&&z->mPhaseCounter<=35){
   angle=0.18f*std::sin(z->mPhaseCounter*3.14159265f/35);
@@ -123,7 +182,19 @@ int Damage(Zombie* z,int damage,unsigned flags){
  return damage-share;
 }
 bool ElectricHit(Zombie*){return false;} void CombatDeath(Zombie*){}
-void DrawEffects(Sexy::Graphics*,Board*,int){}
+void DrawEffects(Sexy::Graphics* g,Board* b,int row){
+ // Native thorn art across the two ankles: the binding is visible, with no labels.
+ auto* thorn=SandboxArt::NativeImage("SpikeRock_spike.png");if(!thorn)return;
+ for(auto* z:b->mZombies)if(!z->mDead&&int(z->mZombiePhase)==Pinned&&z->mRow==row){
+  const float y=z->mPosY+112,x=z->mPosX+45;
+  Sexy::SexyTransform2D m;m.LoadIdentity();m.m00=.4f;m.m11=.4f;m.m02=x+g->mTransX;m.m12=y+g->mTransY;
+  PvzpBltMatrix(g,thorn,m,g->mClipRect,Sexy::Color(255,255,255),g->mDrawMode,Sexy::Rect(0,0,thorn->mWidth,thorn->mHeight));
+  for(auto* other:b->mZombies)if(other!=z&&!other->mDead&&int(other->mZombiePhase)==Pinned&&other->mTargetCol==z->mTargetCol&&other->mRow==row&&other->mPosX>z->mPosX){
+   g->SetColor(Sexy::Color(65,70,29));g->DrawLine(int(x),int(y),int(other->mPosX+45),int(other->mPosY+112));
+   g->SetColor(Sexy::Color(179,177,102));g->DrawLine(int(x),int(y-1),int(other->mPosX+45),int(other->mPosY+111));
+  }
+ }
+}
 bool HasShot(const Projectile*){return false;} bool DrawShot(Sexy::Graphics*,const Projectile*){return false;}
 bool Impact(Projectile*,Plant*){return false;} Plant* CollisionTarget(Projectile*){return nullptr;}
 void ForgetShot(Projectile*){} void ForgetPlant(Plant*){} bool AttackSlowed(const Plant*){return false;}

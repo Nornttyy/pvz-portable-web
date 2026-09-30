@@ -321,18 +321,25 @@ int main(){
  for(int id=508;id<=513;++id){World w;auto* p=w.add(id);p->mLaunchCounter=81;p->mShootingCounter=17;auto state=SandboxPlants::SavePower(p);SandboxPlants::Forget(p);
   assert(SandboxPlants::RestorePower(p,state));w.step();assert(p->mLaunchCounter==81&&p->mShootingCounter==17);
  }
- {World w;auto* p=w.add(508);p->mState=STATE_CACTUS_LOW;p->Fire(nullptr,2,WEAPON_SECONDARY);assert(MemeCharacters::Data(p,4)==5);
-  w.step(16);assert(w.mProjectiles.mSize==3);auto save=SandboxPlants::SavePower(p);SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,save));w.step(24);
-  assert(w.mProjectiles.mSize==6&&MemeCharacters::Data(p,4)==0);for(auto* shot:w.mProjectiles)assert(shot->mProjectileType==PROJECTILE_SPIKE);
-  w.step(350);assert(w.mProjectiles.mSize==6); // No native first shot is simulated by this state-only fixture.
-  p->mState=STATE_CACTUS_HIGH;p->Fire(nullptr,2,WEAPON_PRIMARY);w.step(40);assert(w.mProjectiles.mSize==12);
+ {World w;auto* p=w.add(508);p->mState=STATE_CACTUS_LOW;p->Fire(nullptr,2,WEAPON_SECONDARY);w.step(400);assert(w.mProjectiles.mSize==1);
+  auto* a=w.enemy(500),*b=w.enemy(600);auto* shot=w.mProjectiles.values[0];assert(MemeCharacters::ShotStyle(shot)==291);MemeCharacters::OnImpact(shot,a);
+  assert(a->mZombiePhase==SandboxZombies::Pinned&&b->mZombiePhase==SandboxZombies::Pinned);assert(a->mBodyHealth==1000&&b->mBodyHealth==1000);
+  assert(!SandboxZombies::Staple(a));for(int i=0;i<180;i++){SandboxZombies::UpdateInteraction(a);SandboxZombies::UpdateInteraction(b);}assert(a->mZombiePhase==0&&b->mZombiePhase==0);
+  b->mRow=3;assert(!SandboxZombies::Staple(a));b->mRow=2;b->mZombieType=ZOMBIE_GARGANTUAR;assert(!SandboxZombies::Staple(a));
  }
- {World w;auto* p=w.add(509);p->mState=STATE_CHOMPER_DIGESTING;p->mStateCountdown=4000;p->mPlantHealth=111;
-  auto* neighbor=w.plant(2,2);neighbor->Fire(nullptr,2,WEAPON_PRIMARY);assert(p->mStateCountdown==3800&&p->mPlantHealth==111);
-  for(int i=0;i<80;++i)neighbor->Fire(nullptr,2,WEAPON_PRIMARY);assert(p->mStateCountdown==3800);w.step(50);neighbor->Fire(nullptr,2,WEAPON_PRIMARY);assert(p->mStateCountdown==3600);
-  auto* far=w.plant(4,4);w.step(50);far->Fire(nullptr,4,WEAPON_PRIMARY);assert(p->mStateCountdown==3600);
-  p->mStateCountdown=100;neighbor->Fire(nullptr,2,WEAPON_PRIMARY);assert(p->mStateCountdown==0&&p->mPlantHealth==111);
+ {World w;auto* p=w.add(509);auto* z=w.enemy(240,2,static_cast<ZombieType>(4));z->mHelmHealth=321;const auto id=z->id;
+  auto* friendZ=w.enemy(p->mX+180);assert(SandboxZombies::CatchForReturn(p,z));assert(SandboxZombies::IsHeld(z)&&w.mZombies.mSize==2);
+  w.mPaused=true;SandboxZombies::UpdateInteraction(z);assert(z->mPhaseCounter==100);w.mPaused=false;
+  for(int i=0;i<100;i++)SandboxZombies::UpdateInteraction(z);assert(z->mZombiePhase==SandboxZombies::Returned);
+  z->mIceTrapCounter=10;const float frozen=z->mPosX;SandboxZombies::UpdateInteraction(z);assert(z->mPosX==frozen&&z->mPhaseCounter==70);z->mIceTrapCounter=0;
+  for(int i=0;i<70;i++)SandboxZombies::UpdateInteraction(z);
+  assert(z->mZombiePhase==0&&z->mAltitude==0&&z->mHelmHealth==321&&z->mBodyHealth==1000&&z->id==id&&!z->mDead);
+  assert(friendZ->mZombiePhase==SandboxZombies::Tripped&&friendZ->mBodyHealth==1000);
+  assert(SandboxZombies::CatchForReturn(p,z));p->mDead=true;SandboxZombies::UpdateInteraction(z);assert(z->mZombiePhase==0&&!z->mDead);
+  auto* giant=w.enemy(250,2,ZOMBIE_GARGANTUAR);assert(!SandboxZombies::CatchForReturn(p,giant));
  }
+ {World w;auto* first=w.add(509);auto* z=w.enemy(200);assert(SandboxZombies::CatchForReturn(first,z));first->mDead=true;auto* replacement=w.add(509);assert(replacement->mPlantCol==first->mPlantCol);SandboxZombies::UpdateInteraction(z);assert(z->mZombiePhase==0&&replacement->mState==STATE_READY);}
+ {World w;auto* echo=w.add(506);auto* source=w.plant(2,2);source->mSeedType=static_cast<SeedType>(5);source->Fire(nullptr,2,WEAPON_PRIMARY);w.step(60);assert(w.mProjectiles.mSize==2&&w.mProjectiles.values.back()->mProjectileType==PROJECTILE_SNOWPEA);}
  {World w;auto* p=w.add(510);auto* front=w.enemy(200),*last=w.enemy(650);auto* wrongLane=w.enemy(750,1),*preview=w.enemy(900);assert(MemeCharacters::PickTarget(p,front)==last);
   last->mMindControlled=true;assert(MemeCharacters::PickTarget(p,front)==front);last->mMindControlled=false;last->mDead=true;assert(MemeCharacters::PickTarget(p,front)==front);
   assert(MemeCharacters::PickTarget(p,nullptr)==nullptr);assert(MemeCharacters::PickTarget(w.plant(2,2),front)==front);
@@ -344,13 +351,13 @@ int main(){
   }
  }
  {World w;auto* p=w.add(512);auto* z=w.enemy();assert(!MemeCharacters::ButterReady(p));p->Fire(z,2,WEAPON_PRIMARY);p->Fire(z,2,WEAPON_PRIMARY);assert(MemeCharacters::ButterReady(p));
-  p->Fire(z,2,WEAPON_SECONDARY);assert(!MemeCharacters::ButterReady(p)&&MemeCharacters::Data(p,4)==5);w.step(130);assert(w.mProjectiles.mSize==3);z->mButteredCounter=200;
-  w.step(60);assert(w.mProjectiles.mSize==8&&MemeCharacters::Data(p,4)==0&&!MemeCharacters::ButterReady(p));
-  p->Fire(z,2,WEAPON_SECONDARY);z->mButteredCounter=0;w.step(400);assert(w.mProjectiles.mSize==9&&MemeCharacters::Data(p,4)==0);
+  p->Fire(z,2,WEAPON_SECONDARY);assert(!MemeCharacters::ButterReady(p)&&MemeCharacters::Data(p,4)==0);w.step(500);assert(w.mProjectiles.mSize==3);
+  MemeCharacters::OnImpact(w.mProjectiles.values.back(),z);assert(z->mZombiePhase==SandboxZombies::Slipping);z->mButteredCounter=200;const float x=z->mPosX;
+  for(int i=0;i<80;i++)SandboxZombies::UpdateInteraction(z);assert(z->mPosX>x+150&&z->mZombiePhase==0&&z->mBodyHealth==1000);
  }
- {World w;auto* p=w.add(513);p->mState=STATE_SCAREDYSHROOM_SCARED;w.step(1000);assert(MemeCharacters::Data(p,4)==6&&w.mProjectiles.mSize==0);
-  p->mState=STATE_READY;w.enemy();w.step(61);assert(w.mProjectiles.mSize==6&&MemeCharacters::Data(p,4)==0);for(auto* s:w.mProjectiles)assert(s->mProjectileType==PROJECTILE_PUFF);
-  p->mState=STATE_SCAREDYSHROOM_SCARED;p->mIsAsleep=true;w.step(500);assert(MemeCharacters::Data(p,4)==0);
+ {World w;auto* p=w.add(513);auto* z=w.enemy(p->mX+80);p->mState=STATE_SCAREDYSHROOM_SCARED;w.step();assert(z->mZombiePhase==SandboxZombies::Misdirected&&w.mProjectiles.mSize==0);
+  const float x=z->mPosX;for(int i=0;i<130;i++)SandboxZombies::UpdateInteraction(z);assert(z->mPosX>x+80&&z->mZombiePhase==0);w.step();assert(z->mZombiePhase==0);
+  p->mIsAsleep=true;w.step(1000);assert(MemeCharacters::Data(p,4)==0&&z->mZombiePhase==0);
  }
  {World w;auto* z=w.enemy();for(int age:{0,599,800}){z->mZombieAge=age;assert(!SandboxZombies::IsResting(z));}for(int age:{600,650,799}){z->mZombieAge=age;z->mIsEating=true;w.step();assert(SandboxZombies::IsResting(z)&&SandboxZombies::Speed(z)==0&&!z->mIsEating);}
   auto* football=w.enemy(600,2,static_cast<ZombieType>(7));football->mZombieAge=100;assert(SandboxZombies::Speed(football)==1.8f);football->mZombieAge=200;assert(SandboxZombies::IsResting(football));football->mZombieAge=350;assert(SandboxZombies::Speed(football)==1);
@@ -373,13 +380,16 @@ int main(){
   p->mIsAsleep=true;w.step(600);assert(z->mBodyHealth==940);p->mIsAsleep=false;
   p->mShootingCounter=17;const auto mid=SandboxPlants::SavePower(p);SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,mid)&&p->mShootingCounter==17);
  }
- {World w;auto* p=w.add(515);auto* z=w.enemy();const auto sounds=app.memeCues.size();w.step(50);assert(w.mProjectiles.mSize==1&&MemeCharacters::Data(p,4)==5);
-  w.step(28);auto state=SandboxPlants::SavePower(p);assert(state[8]==3);SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,state));w.step(42);
-  assert(w.mProjectiles.mSize==6&&app.memeCues.size()==sounds+2);
-  for(int i=0;i<6;++i)assert((w.mProjectiles.values[i]->mMotionType==MOTION_BACKWARDS)==bool(i%2));
-  const float x=z->mPosX;w.step(249);assert(w.mProjectiles.mSize==6&&z->mPosX==x);w.step();assert(w.mProjectiles.mSize==7);
+ {World w;auto* p=w.add(515);w.enemy();w.step(500);assert(w.mProjectiles.mSize==0); // No self-made volley.
+  for(int style:{0,9,10,32,287,19,290}){
+   const auto type=style==19?PROJECTILE_SNOWPEA:PROJECTILE_PEA;
+   auto* shot=w.AddProjectile(p->mX+28,p->mY+23,0,2,type);shot->mMotionType=style==19||style==0?MOTION_STRAIGHT:MOTION_STAR;shot->mVelX=style==0?0:3.33f;
+   assert(MemeCharacters::RestoreShotStyle(shot,style));const bool couldHit=MemeCharacters::CanHit(shot);const int count=w.mProjectiles.mSize;
+   w.step();assert(shot->mVelX<0&&w.mProjectiles.mSize==count&&MemeCharacters::ShotStyle(shot)==(style|512)&&MemeCharacters::CanHit(shot)==couldHit);
+   const auto save=SandboxPlants::SaveShot(shot);SandboxPlants::ForgetShot(shot);SandboxPlants::RestoreShot(shot,save);assert(MemeCharacters::ShotStyle(shot)==(style|512));
+   w.step(100);assert(shot->mVelX<0&&w.mProjectiles.mSize==count); // No ping-pong or extra damage.
+  }
  }
- {World w;auto* p=w.add(515);w.enemy(p->mX-50);w.step(50);assert(w.mProjectiles.mSize==1&&w.mProjectiles.values[0]->mMotionType==MOTION_BACKWARDS);}
  {World w;auto* p=w.add(516);auto* z=w.enemy(p->mX-10);auto* giant=w.enemy(p->mX-10,2,ZOMBIE_GARGANTUAR);const float x=z->mPosX;
   w.step(50);assert(z->mBodyHealth==980&&z->mAltitude==24&&z->mZombieHeight==HEIGHT_FALLING&&z->mPosX==x&&giant->mBodyHealth==1000);
   z->mZombieHeight=HEIGHT_ZOMBIE_NORMAL;z->mAltitude=0;w.step(199);assert(z->mBodyHealth==980);w.step();assert(z->mBodyHealth==960);

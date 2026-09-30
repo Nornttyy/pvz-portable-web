@@ -31,6 +31,7 @@
 #include "SeedPacket.h"
 #include "../LawnApp.h"
 #include "../SandboxPlants.h"
+#include "../SandboxZombies.h"
 #include "../MemeAdventure.h"
 #include "../SandboxMemeRules.h"
 #include "CursorObject.h"
@@ -1828,8 +1829,11 @@ void Plant::UpdateChomper()
 			}
 			else
 			{
-				aZombie->DieWithLoot();
-				mState = PlantState::STATE_CHOMPER_BITING_GOT_ONE;
+				if (!SandboxZombies::CatchForReturn(this, aZombie))
+				{
+					aZombie->DieWithLoot();
+					mState = PlantState::STATE_CHOMPER_BITING_GOT_ONE;
+				}
 			}
 		}
 	}

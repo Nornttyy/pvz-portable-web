@@ -44,6 +44,19 @@ test('release vocal is a dedicated non-looping native SFX, with overlap and volu
  const board=(await read('src/Lawn/Board.cpp')).toString(),dispose=board.slice(board.indexOf('void Board::DisposeBoard()'),board.indexOf('bool Board::AreEnemyZombiesOnScreen()'));
  assert.match(dispose,/StopFoley\(FoleyType::FOLEY_RAGE_RELEASE\)/);
 });
+test('generated squash accessory preserves native body, animated face and alpha registration',async()=>{
+ const png=await read('addons/art/squash-headband.png');assert.equal(png.readUInt32BE(16),86);assert.equal(png.readUInt32BE(20),96);assert.equal(png[25],6);
+ await assert.rejects(()=>read('addons/art/squash-exercise.png'));
+ const rig=(await read('src/AbstractRigVisuals.cpp')).toString();assert.match(rig,/NativeImage\("Squash_body\.png"\)/);assert.match(rig,/std::copy\(original->GetBits\(\)/);assert.match(rig,/Art\("squash-headband"\)/);
+ assert.doesNotMatch(rig,/t\.mAlpha\s*=\s*0/); // No hiding original face, eyes, stem or blink.
+ const audio=(await read('scripts/make-rage-audio.mjs')).toString();assert.match(audio,/WSOLA/);assert.doesNotMatch(audio,/\.83\+\.17/);
+});
+test('return interactions serialize native phase, owner identity and timers without changing save layouts',async()=>{
+ const save=(await read('src/Lawn/System/SaveGame.cpp')).toString(),z=(await read('src/SandboxZombies.cpp')).toString();
+ for(const field of ['mZombiePhase','mPhaseCounter','mTargetPlantID','mTargetCol','mPosX','mAltitude'])assert.ok(save.includes('theZombie.'+field));
+ assert.match(z,/DataArrayTryToGet\(static_cast<unsigned>\(z->mTargetPlantID\)\)/);assert.match(z,/mBoard->mPaused/);
+ const native=(await read('src/Lawn/Zombie.cpp')).toString();assert.match(native,/!SandboxZombies::HasInteraction\(this\)/);assert.match(native,/SandboxZombies::UpdateInteraction\(this\)/);
+});
 test('persistent native sidebar fits both rosters and keeps the lawn in original units',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'pvz-sidebar-')),binary=join(dir,'sidebar');
  await run(process.env.CXX||'c++',['-std=c++20','-Isrc','tests/sidebar-layout.cpp','-o',binary],{cwd:root});

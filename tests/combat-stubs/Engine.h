@@ -71,7 +71,7 @@ class Zombie{
 public:
  static constexpr int ZOMBIE_WAVE_DEBUG=-1;
  Board* mBoard=nullptr;ZombieType mZombieType=ZOMBIE_NORMAL;ZombieID id=ZOMBIEID_NULL;
- float mPosX=0,mPosY=0,mScaleZombie=1;int mX=0,mY=0,mRow=0,mBodyReanimID=0,mBodyHealth=1000,mBodyMaxHealth=1000,mHelmHealth=0,mHelmMaxHealth=0;
+ float mPosX=0,mPosY=0,mScaleZombie=1;int mTargetCol=0,mX=0,mY=0,mRow=0,mBodyReanimID=0,mBodyHealth=1000,mBodyMaxHealth=1000,mHelmHealth=0,mHelmMaxHealth=0;
  bool mDead=false,mMindControlled=false,mHasHead=true,mHasArm=true,mIsEating=false;int chill=0,mIceTrapCounter=0,mButteredCounter=0,mRenderOrder=0;
  bool mHasObject=false;Sexy::Rect mZombieAttackRect;
  int mZombiePhase=0,mZombieHeight=0;bool mInPool=false;
@@ -79,11 +79,13 @@ public:
  bool IsFlying(){return flying;}
  void StopEating(){mIsEating=false;}void AttachShield(){}void PickRandomSpeed(){}
  void SetRow(int row){mRow=row;}
+ float GetPosYBasedOnRow(int row){return row*100.0f;}
  bool IsOnBoard(){return true;}
  void StartWalkAnim(int){}
  void PlayZombieReanim(const char*,int,int,float){}
  void ReanimShowPrefix(const char*,int){}
  int mSpecialHeadReanimID=0;
+ unsigned mTargetPlantID=0;
  bool IsDeadOrDying(){return mDead||mBodyHealth<=0;};bool EffectedByDamage(unsigned){return !IsDeadOrDying();}
  void TakeDamage(int n,unsigned){int shield=std::min(n,mShieldHealth);mShieldHealth-=shield;n-=shield;int armor=std::min(n,mHelmHealth);mHelmHealth-=armor;mBodyHealth-=n-armor;}
  void UpdateReanim(){};void RemoveColdEffects(){chill=0;}
@@ -118,12 +120,15 @@ public:
  int mProjectileAge=0;
  void Die(){mDead=true;SandboxPlants::ForgetShot(this);SandboxZombies::ForgetShot(this);}
  ProjectileType mProjectileType=PROJECTILE_PEA;
+ void ConvertToFireball(int){mProjectileType=PROJECTILE_FIREBALL;}
  int GetDamageFlags(Zombie*){return 0;}
 };
 template<class T>struct Array{
  std::vector<T*> values;int mSize=0,mMaxSize=256;
  auto begin(){return values.begin();}auto end(){return values.end();}
  void add(T* t){values.push_back(t);++mSize;}
+ unsigned DataArrayGetID(T* t){for(unsigned i=0;i<values.size();++i)if(values[i]==t)return i+1;return 0;}
+ T* DataArrayTryToGet(unsigned id){return id>0&&id<=values.size()?values[id-1]:nullptr;}
 };
 class Board{
  unsigned nextID=1;

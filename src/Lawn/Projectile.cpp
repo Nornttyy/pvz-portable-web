@@ -229,7 +229,7 @@ bool Projectile::PeaAboutToHitTorchwood()
 Zombie* Projectile::FindCollisionTarget()
 {
 	if (!MemeCharacters::CanHit(this)) return nullptr;
-	const bool freeAim = MemeShooterRules::UsesFreeAim(MemeCharacters::ShotStyle(this));
+	const bool freeAim = MemeShooterRules::UsesFreeAim(MemeCharacters::BaseShotStyle(MemeCharacters::ShotStyle(this)));
 	if (PeaAboutToHitTorchwood())  // a pea about to hit a torchwood skips zombie collision ("torchwood clip" trick)
 		return nullptr;
 
@@ -1202,7 +1202,7 @@ void Projectile::Die()
 
 Rect Projectile::GetProjectileRect()
 {
-    if(SandboxPlants::HasShot(this)){
+    if(SandboxPlants::HasShot(this) && (mProjectileType == PROJECTILE_PEA || mProjectileType == PROJECTILE_SNOWPEA || mProjectileType == PROJECTILE_FIREBALL)){
         const int radius=SandboxPlants::ShotRadius(this);
         return Rect(mX+12-radius,mY+12-radius,radius*2,radius*2);
     }

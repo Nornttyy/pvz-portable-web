@@ -17,7 +17,7 @@ try{
  await page.goto(process.env.PVZ_QA_URL||'http://127.0.0.1:8097/');await wait(()=>!document.getElementById('start').disabled,undefined,90000);
  await page.evaluate(async()=>{const FS=Module.FS;if(!FS.analyzePath('/saves/userdata').exists)FS.mkdir('/saves/userdata');const name=new TextEncoder().encode('VisualQA'),users=new Uint8Array(16+name.length),v=new DataView(users.buffer);v.setUint32(0,14,true);v.setUint16(4,1,true);v.setUint16(6,name.length,true);users.set(name,8);v.setUint32(8+name.length,1,true);v.setUint32(12+name.length,1,true);FS.writeFile('/saves/userdata/users.dat',users);const profile=new Uint8Array(4096),p=new DataView(profile.buffer);p.setUint32(0,12,true);p.setUint32(4,37,true);FS.writeFile('/saves/userdata/user1.dat',profile);await new Promise((r,j)=>FS.syncfs(false,e=>e?j(e):r()));});
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);
- results.embedded=await page.evaluate(()=>['/addons/art/squash-exercise.png','/addons/art/bucket-glove.png','/addons/audio/rage-scream.wav'].map(p=>Module.FS.stat(p).size));assert.ok(results.embedded.every(n=>n>100));
+ results.embedded=await page.evaluate(()=>['/addons/art/squash-headband.png','/addons/art/bucket-glove.png','/addons/audio/rage-scream.wav'].map(p=>Module.FS.stat(p).size));assert.ok(results.embedded.every(n=>n>100));
  await click(370,455);await page.waitForTimeout(1000);await shot('almanac-index');await click(208,366);await page.waitForTimeout(500);await click(416,123);await shot('almanac-extra-card-inside-grid');await click(720,580);await page.waitForTimeout(600);await click(260,348);await wait(()=>Module.canvas.width===1024);
 
  await fresh();await api(1,517,1,2);await api(2,4,8,2);await api(4,0);

@@ -40,7 +40,7 @@ int main(){
   Reanimation body;body.track="anim_face";body.matrix.m02=120;body.matrix.m12=220;Track tracks[]={{"anim_face"}};TrackInstance instances[1];body.def.mTracks={1,tracks};body.mTrackInstances=instances;
   auto* original=SandboxArt::NativeImage(stage==0?"Wallnut_body.png":stage==1?"Wallnut_cracked1.png":"Wallnut_cracked2.png");instances[0].mImageOverride=original;app.reanims[80]=&body;p->mBodyReanimID=80;
   Sexy::Graphics g(nullptr);for(int tick=0;tick<60;++tick){SandboxPlants::Tick(&w);testBlits.clear();const bool angry=MemeCharacters::Data(p,0)==1;
-   assert(SandboxPlants::DrawBody(&g,p,0,0)==angry);assert(instances[0].mImageOverride==original);
+   assert(SandboxPlants::DrawBody(&g,p,0,0));assert(instances[0].mImageOverride==original);
    assert(testBlits.size()==(angry?2:0));if(angry){near(testBlits[0].matrix.m02,114);near(testBlits[0].matrix.m12,199);near(testBlits[1].matrix.m02,143);near(testBlits[1].matrix.m12,196);}
   }
   app.reanims.clear();
@@ -112,7 +112,7 @@ int main(){
   assert(SandboxPlants::RestorePower(rage,{500,300,1,0,0,0,0,0,50,2}));
   assert(SandboxPlants::DrawBody(&g,rage,0,0)&&instances[0].mImageOverride==native);
   assert(SandboxPlants::RestorePower(rage,{500,300,0,0,0,0,0,0,0,2}));
-  assert(!SandboxPlants::DrawBody(&g,rage,0,0)&&instances[0].mImageOverride==native);
+  assert(SandboxPlants::DrawBody(&g,rage,0,0)&&instances[0].mImageOverride==native);
   for(int heat:{20,60,100,140,180,200,240,280,300}){assert(SandboxPlants::RestorePower(rage,{500,300,0,heat,0,0,0,0,0,2}));drawnOverrides.clear();
    assert(SandboxPlants::DrawBody(&g,rage,0,0));assert(drawnOverrides[0]==SandboxArt::WarmNative("PeaShooter_Head.png",heat*24/MemeShooterRules::MaxRage));assert(instances[0].mImageOverride==native);
   }app.reanims.erase(80);

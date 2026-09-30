@@ -16,6 +16,15 @@ bool IsFeigning(Zombie* zombie);
 bool IsResting(Zombie* zombie);
 void ArmorBroken(Zombie* zombie);
 void PoleLanded(Zombie* zombie);
+// Explicit, serialized native phases; never store raw plant/zombie pointers.
+inline constexpr int Held=1024,Returned=1025,Tripped=1026,Slipping=1027,Pinned=1028,Misdirected=1029;
+bool HasInteraction(const Zombie*);
+bool IsHeld(const Zombie*);
+bool CatchForReturn(Plant*,Zombie*);
+bool UpdateInteraction(Zombie*);
+bool Staple(Zombie*);
+bool Slip(Zombie*);
+bool Misdirect(Zombie*);
 void AdjustPose(Zombie* zombie,Reanimation* body);
 bool ElectricHit(Zombie* zombie);void CombatDeath(Zombie* zombie);
 void DrawEffects(Sexy::Graphics* g,Board* board,int row);
