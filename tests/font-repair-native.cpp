@@ -51,5 +51,11 @@ int main(){
     assert(batch.mFontLayerList.size()==12&&newNames.prepared==5);
     for(char32_t c:U"蹭饭杨摸迪"){if(!c)continue;int count=0;for(const auto& layer:batch.mFontLayerList)if(layer.mCharDataMap.contains(c)){const auto& g=layer.mCharDataMap.at(c);assert(g.mWidth==14&&g.mImageRect.mWidth>0&&g.mImageRect.mHeight>0);++count;}assert(count>=2);}
     SandboxRepairFonts();assert(batch.mFontLayerList.size()==12&&newNames.prepared==5);FONT_BRIANNETOD12=nullptr;
+    FontData awkward;awkward.mFontLayerList.emplace_back();auto& glyphs=awkward.mFontLayerList.back();
+    for(char32_t c:U"优价池杆")glyphs.mCharDataMap[c]={{0,0,24,24},{-5,-4},14};
+    ImageFont awkwardFont;awkwardFont.mFontData=&awkward;FONT_BRIANNETOD12=&awkwardFont;SandboxRepairFonts();
+    assert(awkward.mFontLayerList.size()==6&&awkwardFont.prepared==2);
+    for(char32_t c:U"尬汗"){if(!c)continue;int n=0;for(const auto& l:awkward.mFontLayerList)if(l.mCharDataMap.contains(c)){const auto& g=l.mCharDataMap.at(c);assert(g.mWidth==14&&g.mImageRect.mWidth>0&&g.mImageRect.mHeight>0);++n;}assert(n>=2);}
+    SandboxRepairFonts();assert(awkward.mFontLayerList.size()==6&&awkwardFont.prepared==2);FONT_BRIANNETOD12=nullptr;
     std::cout<<"Three font sizes, prior measurement, original glyph preservation and idempotence passed.\n";
 }

@@ -43,14 +43,17 @@
 #include <algorithm>
 #include "../../MemeAdventure.h"
 #include "../../SeedChooserLayout.h"
+#include "../../SandboxFonts.h"
 
-static int AbstractChooserCount(){return gLawnApp->HasSeedType(SEED_LEFTPEATER)?NUM_SEED_TYPES:NUM_SEEDS_IN_CHOOSER;}
+static bool AbstractChooserExpanded(){return gLawnApp->HasSeedType(SEED_LEFTPEATER)||gLawnApp->HasSeedType(SEED_AWKWARD_SUNFLOWER);}
+static int AbstractChooserCount(){return AbstractChooserExpanded()?NUM_SEED_TYPES:NUM_SEEDS_IN_CHOOSER;}
 
 SeedChooserScreen::SeedChooserScreen()
 {
 	mApp = (LawnApp*)gSexyAppBase;
+	SandboxRepairFonts();
 	mBoard = mApp->mBoard;
-	const int aExtraWidth = SeedChooserLayout::ExtraWidth(mApp->HasSeedType(SEED_LEFTPEATER));
+	const int aExtraWidth = SeedChooserLayout::ExtraWidth(AbstractChooserExpanded());
 	mClip = false;
 	// mSeedChooserAge is deliberately not initialized here
 	mSeedsInFlight = 0;
@@ -296,7 +299,7 @@ void SeedChooserScreen::GetSeedPositionInChooser(int theIndex, int& x, int& y)
 	}
 	else
 	{
-		const auto aPosition = SeedChooserLayout::Card(theIndex, mApp->HasSeedType(SEED_LEFTPEATER), Has7Rows());
+		const auto aPosition = SeedChooserLayout::Card(theIndex, AbstractChooserExpanded(), Has7Rows());
 		x = aPosition.x;
 		y = aPosition.y;
 	}
@@ -338,7 +341,7 @@ void SeedChooserScreen::Draw(Graphics* g)
 	if (!mBoard->ChooseSeedsOnCurrentLevel() || (mBoard->mCutScene && mBoard->mCutScene->IsBeforePreloading()))
 		return;
 
-	const bool aExpanded = mApp->HasSeedType(SEED_LEFTPEATER);
+	const bool aExpanded = AbstractChooserExpanded();
 	const int aExtraWidth = SeedChooserLayout::ExtraWidth(aExpanded);
 	Image* aBackground = Sexy::IMAGE_SEEDCHOOSER_BACKGROUND;
 	if (aExpanded)
@@ -384,11 +387,17 @@ void SeedChooserScreen::Draw(Graphics* g)
 		}
 	}
 
-	if (aExpanded && mChosenSeeds[SEED_LEFTPEATER].mSeedState != SEED_IN_CHOOSER)
+	if (mApp->HasSeedType(SEED_LEFTPEATER) && mChosenSeeds[SEED_LEFTPEATER].mSeedState != SEED_IN_CHOOSER)
 	{
 		int x, y;
 		GetSeedPositionInChooser(SEED_LEFTPEATER, x, y);
 		DrawSeedPacket(g, x, y, SEED_LEFTPEATER, SEED_NONE, 0, 55, true, false);
+	}
+	if (mApp->HasSeedType(SEED_AWKWARD_SUNFLOWER) && mChosenSeeds[SEED_AWKWARD_SUNFLOWER].mSeedState != SEED_IN_CHOOSER)
+	{
+		int x, y;
+		GetSeedPositionInChooser(SEED_AWKWARD_SUNFLOWER, x, y);
+		DrawSeedPacket(g, x, y, SEED_AWKWARD_SUNFLOWER, SEED_NONE, 0, 55, true, false);
 	}
 
 	int aNumSeedsInBank = mBoard->mSeedBank->mNumPackets;
@@ -641,7 +650,7 @@ void SeedChooserScreen::OnStartButton()
 			return;
 		}
 	}
-	if (!PickedPlantType(SEED_SUNFLOWER) && !PickedPlantType(SEED_TWINSUNFLOWER) && !PickedPlantType(SEED_SUNSHROOM) &&
+	if (!PickedPlantType(SEED_SUNFLOWER) && !PickedPlantType(SEED_TWINSUNFLOWER) && !PickedPlantType(SEED_SUNSHROOM) && !PickedPlantType(SEED_AWKWARD_SUNFLOWER) &&
 		!mBoard->mCutScene->IsSurvivalRepick() && mApp->mGameMode != GAMEMODE_CHALLENGE_LAST_STAND)
 	{
 		if (mApp->IsFirstTimeAdventureMode() && mBoard->mLevel == 11)
@@ -720,7 +729,7 @@ void SeedChooserScreen::PickRandomSeeds()
 	for (int anIndex = mSeedsInBank; anIndex < mBoard->mSeedBank->mNumPackets; anIndex++)
 	{
 		SeedType aSeedType;
-		do aSeedType = (SeedType)Rand(mApp->HasSeedType(SEED_LEFTPEATER)?NUM_SEED_TYPES:mApp->GetSeedsAvailable());
+		do aSeedType = (SeedType)Rand(AbstractChooserExpanded()?NUM_SEED_TYPES:mApp->GetSeedsAvailable());
 		while (!mApp->HasSeedType(aSeedType) || aSeedType == SEED_IMITATER || mChosenSeeds[aSeedType].mSeedState != SEED_IN_CHOOSER);
 		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
 		aChosenSeed.mTimeStartMotion = 0;

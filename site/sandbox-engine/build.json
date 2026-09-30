@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Three retained abstract plants (500,501,519), Louis XVI (212), and Runaway Zombie (213). Runner sprints to the rearmost plant in its lane, brakes for 0.24 seconds, turns and flees off the right edge without eating or breaching the house. Native damage, freezing, slowing, pool/roof motion and death remain active. Run phases 1040-1042, turn timer, target and facing round-trip in existing native save fields with identity chunk 23. Separate sandbox/almanac entry; adventure from 1-6, at most one runner in every fourth eligible wave. Retired characters remain removed; no new art pack, overlays or extra ability buffs.",
+  "mode": "Four abstract plants (500,501,519,520), Louis XVI (212), and Runaway Zombie (213). Awkward Sunflower (520, native slot 53) is a separate 50-sun card unlocked from adventure 1-6. Produces native 25-value suns; adjacent same-species flowers turn toward a producer, which loses its smile, sweats and advances production at half speed for four seconds. Ordinary sunflower remains unchanged. Face-only generated PNG is embedded; original petals, stem, leaves, blink and sweat are reused. Native production countdown plus optional ten-int state preserve progress across saves. Chooser/almanac extra cards remain inside the grid; all original special-card IDs remain stable. Retired characters stay removed.",
   "files": [
     {
       "name": "pvz-portable.js",
       "size": 277501,
-      "sha256": "d4fce1c1ee69fd5ecf4c27bbee0b0de42a1ee5d42769bb83a3afa716d66d90ce"
+      "sha256": "e64f3894cceb839d54b4597d413256992a8277277e4e2e6ea66a3164d6900036"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7559749,
-      "sha256": "7983c23fc241b482fe4680e4c4c7a077e7fe395ae94c3f815b66381ff22037ac"
+      "size": 7581238,
+      "sha256": "5bc407de2d0e5f44553e11f34881d4d41808e49f95acdcca9d05f35b17b3fd52"
     }
   ]
 }

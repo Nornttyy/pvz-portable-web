@@ -9,7 +9,7 @@ using namespace Sexy;
 namespace {
 // Compose missing characters using the same atlas, strokes and advance.
 // Fractions describe source cells; each fragment retains its native placement.
-struct Fragment {char32_t source;float x,y,w,h;};
+struct Fragment {char32_t source;float x,y,w,h;float dx=0,dy=0;};
 void Supplement(_Font* source,char32_t target,const char* name,std::initializer_list<Fragment> parts){
  auto* font=dynamic_cast<ImageFont*>(source);if(!font||!font->mFontData)return;
  auto* data=font->mFontData;const std::string key=std::string("MEMEGLYPH")+name;
@@ -24,7 +24,7 @@ void Supplement(_Font* source,char32_t target,const char* name,std::initializer_
   const int x=int(width*part.x+0.5f),y=int(height*part.y+0.5f);
   glyph.mImageRect.mX+=x;glyph.mImageRect.mY+=y;
   glyph.mImageRect.mWidth=int(width*(part.x+part.w)+0.5f)-x;glyph.mImageRect.mHeight=int(height*(part.y+part.h)+0.5f)-y;
-  glyph.mOffset.mX+=x;glyph.mOffset.mY+=y;
+  glyph.mOffset.mX+=x+int(width*part.dx);glyph.mOffset.mY+=y+int(height*part.dy);
   data->mFontLayerList.emplace_back(*main);auto& layer=data->mFontLayerList.back();layer.mLayerName=key+std::to_string(index++);layer.mCharDataMap.clear();layer.mCharDataMap.emplace(target,glyph);data->mFontLayerMap.emplace(layer.mLayerName,&layer);
  }
  font->mActiveListValid=false;font->Prepare();
@@ -66,6 +66,10 @@ void Repair(_Font* source) {
 void SandboxRepairFonts(){
     for(auto* font:{FONT_BRIANNETOD12,FONT_BRIANNETOD16,FONT_DWARVENTODCRAFT18,FONT_DWARVENTODCRAFT24,FONT_DWARVENTODCRAFT18YELLOW,FONT_DWARVENTODCRAFT18GREENINSET,FONT_DWARVENTODCRAFT18BRIGHTGREENINSET,FONT_HOUSEOFTERROR16,FONT_HOUSEOFTERROR28}){
         Repair(font);
+        // 尢 from 优 (omit its top-right dot), and 介 from 价. Keep the
+        // original bitmap strokes, cell size, baseline and character advance.
+        Supplement(font,U'尬',"GA",{{U'优',.46f,0,.28f,.29f,-.40f,0},{U'优',.46f,.29f,.54f,.71f,-.40f,0},{U'价',.46f,0,.54f,1}});
+        Supplement(font,U'汗',"HAN",{{U'池',0,0,.46f,1},{U'杆',.46f,0,.54f,1}});
         Supplement(font,U'罡',"GANG",{{U'四',0,0,1,0.46f},{U'正',0,0.46f,1,0.54f}});
         Supplement(font,U'梗',"GENG",{{U'样',0,0,0.46f,1},{U'硬',0.46f,0,0.54f,1}});
         Supplement(font,U'锅',"GUO",{{U'钢',0,0,0.46f,1},{U'蜗',0.46f,0,0.54f,1}});

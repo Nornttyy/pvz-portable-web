@@ -103,7 +103,8 @@ constinit const PlantDefinition gPlantDefs[SeedType::NUM_SEED_TYPES] = {
 	{ .mSeedType = SeedType::SEED_EXPLODE_O_NUT,     .mPlantImage = nullptr, .mReanimationType = ReanimationType::REANIM_WALLNUT,       .mPacketIndex = 2,  .mSeedCost = 0,   .mRefreshTime = 3000,   .mSubClass = PlantSubClass::SUBCLASS_NORMAL,  .mLaunchRate = 0,    .mPlantName = "EXPLODE_O_NUT" },
 	{ .mSeedType = SeedType::SEED_GIANT_WALLNUT,     .mPlantImage = nullptr, .mReanimationType = ReanimationType::REANIM_WALLNUT,       .mPacketIndex = 2,  .mSeedCost = 0,   .mRefreshTime = 3000,   .mSubClass = PlantSubClass::SUBCLASS_NORMAL,  .mLaunchRate = 0,    .mPlantName = "GIANT_WALLNUT" },
 	{ .mSeedType = SeedType::SEED_SPROUT,            .mPlantImage = nullptr, .mReanimationType = ReanimationType::REANIM_ZENGARDEN_SPROUT, .mPacketIndex = 33, .mSeedCost = 0,   .mRefreshTime = 3000,   .mSubClass = PlantSubClass::SUBCLASS_NORMAL,  .mLaunchRate = 0,    .mPlantName = "SPROUT" },
-	{ .mSeedType = SeedType::SEED_LEFTPEATER,        .mPlantImage = nullptr, .mReanimationType = ReanimationType::REANIM_REPEATER,      .mPacketIndex = 5,  .mSeedCost = 200, .mRefreshTime = 750,    .mSubClass = PlantSubClass::SUBCLASS_SHOOTER, .mLaunchRate = 150,  .mPlantName = "REPEATER" }
+	{ .mSeedType = SeedType::SEED_LEFTPEATER,        .mPlantImage = nullptr, .mReanimationType = ReanimationType::REANIM_REPEATER,      .mPacketIndex = 5,  .mSeedCost = 200, .mRefreshTime = 750,    .mSubClass = PlantSubClass::SUBCLASS_SHOOTER, .mLaunchRate = 150,  .mPlantName = "REPEATER" },
+	{ .mSeedType = SeedType::SEED_AWKWARD_SUNFLOWER, .mPlantImage = nullptr, .mReanimationType = ReanimationType::REANIM_SUNFLOWER,     .mPacketIndex = 1,  .mSeedCost = 50,  .mRefreshTime = 300,    .mSubClass = PlantSubClass::SUBCLASS_NORMAL,  .mLaunchRate = 2500, .mPlantName = "AWKWARD_SUNFLOWER" }
 };
 
 Plant::Plant()
@@ -1011,7 +1012,7 @@ void Plant::UpdateShooter()
 
 bool Plant::MakesSun()
 {
-	return mSeedType == SeedType::SEED_SUNFLOWER || mSeedType == SeedType::SEED_TWINSUNFLOWER || mSeedType == SeedType::SEED_SUNSHROOM;
+	return mSeedType == SeedType::SEED_SUNFLOWER || mSeedType == SeedType::SEED_TWINSUNFLOWER || mSeedType == SeedType::SEED_SUNSHROOM || mSeedType == SeedType::SEED_AWKWARD_SUNFLOWER;
 }
 
 void Plant::UpdateProductionPlant()
@@ -1040,6 +1041,7 @@ void Plant::UpdateProductionPlant()
 	// Keep the native countdown units so existing saves retain their progress.
 	// Sunflowers and fully grown sun-shrooms now give 25 sun twice as often.
 	const bool aFastSun = mSeedType == SeedType::SEED_SUNFLOWER ||
+		(mSeedType == SeedType::SEED_AWKWARD_SUNFLOWER && !MemeCharacters::Embarrassed(this)) ||
 		(mSeedType == SeedType::SEED_SUNSHROOM && mState == PlantState::STATE_SUNSHROOM_BIG);
 	mLaunchCounter -= aFastSun ? 2 : 1;
 	if (mLaunchCounter <= 100)
@@ -1065,9 +1067,10 @@ void Plant::UpdateProductionPlant()
 				mBoard->AddCoin(mX, mY, CoinType::COIN_SUN, CoinMotion::COIN_MOTION_FROM_PLANT);
 			}
 		}
-		else if (mSeedType == SeedType::SEED_SUNFLOWER)
+		else if (mSeedType == SeedType::SEED_SUNFLOWER || mSeedType == SeedType::SEED_AWKWARD_SUNFLOWER)
 		{
 			mBoard->AddCoin(mX, mY, CoinType::COIN_SUN, CoinMotion::COIN_MOTION_FROM_PLANT);
+			MemeCharacters::OnSunProduced(this);
 		}
 		else if (mSeedType == SeedType::SEED_TWINSUNFLOWER)
 		{
@@ -4174,6 +4177,11 @@ void Plant::DrawSeedType(Graphics* g, SeedType theSeedType, SeedType theImitater
 	if (aSeedType == SeedType::SEED_LEFTPEATER && (gSandboxEnabled || MemeAdventure::RosterEnabled()))
 	{
 		SandboxPlants::DrawPeaHeadPreview(&aSeedG, thePosX, thePosY, aDrawVariation == VARIATION_IMITATER);
+		return;
+	}
+	if (aSeedType == SeedType::SEED_AWKWARD_SUNFLOWER)
+	{
+		SandboxPlants::DrawAwkwardPreview(&aSeedG, thePosX, thePosY, aDrawVariation == VARIATION_IMITATER);
 		return;
 	}
 	if (aSeedType == SeedType::SEED_LEFTPEATER)

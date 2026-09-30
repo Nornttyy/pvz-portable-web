@@ -38,14 +38,17 @@
 #include "../../MemeAdventure.h"
 #include "../../SandboxZombies.h"
 #include "../../AlmanacPlantLayout.h"
+#include "../../SandboxFonts.h"
 
-static int AbstractAlmanacCount(){return gLawnApp->HasSeedType(SEED_LEFTPEATER)?NUM_SEED_TYPES:NUM_ALMANAC_SEEDS;}
+static bool AbstractAlmanacExpanded(){return gLawnApp->HasSeedType(SEED_LEFTPEATER)||gLawnApp->HasSeedType(SEED_AWKWARD_SUNFLOWER);}
+static int AbstractAlmanacCount(){return AbstractAlmanacExpanded()?NUM_SEED_TYPES:NUM_ALMANAC_SEEDS;}
 
 bool gZombieDefeated[NUM_ZOMBIE_TYPES] = { false };
 
 AlmanacDialog::AlmanacDialog(LawnApp* theApp) : LawnDialog(theApp, DIALOG_ALMANAC, true, theApp->GetString("ALMANAC_HEADER", "Almanac"), "", "", BUTTONS_NONE)
 {
 	mApp = (LawnApp*)gSexyAppBase;
+	SandboxRepairFonts();
 	mOpenPage = ALMANAC_PAGE_INDEX;
 	mSelectedSeed = SEED_PEASHOOTER;
 	mSelectedZombie = ZOMBIE_NORMAL;
@@ -158,6 +161,7 @@ void AlmanacDialog::SetupPlant()
 	mPlant->mIsOnBoard = false;
 	mPlant->PlantInitialize(0, 0, mSelectedSeed, SEED_NONE);
 	if (mSelectedSeed == SEED_LEFTPEATER && MemeAdventure::RosterEnabled()) SandboxPlants::Assign(mPlant.get(), MemeCharacters::ShooterPea);
+	if (mSelectedSeed == SEED_AWKWARD_SUNFLOWER && MemeAdventure::RosterEnabled()) SandboxPlants::Assign(mPlant.get(), MemeCharacters::AwkwardSunflower);
 	mPlant->mX = aPosX;
 	mPlant->mY = aPosY;
 }
@@ -302,7 +306,7 @@ void AlmanacDialog::DrawPlants(Graphics* g)
 			else
 			{
 				Graphics aCard(*g);
-				const float aScale = AlmanacPlantLayout::Scale(MemeAdventure::RosterEnabled() && mApp->HasSeedType(SEED_LEFTPEATER));
+				const float aScale = AlmanacPlantLayout::Scale(MemeAdventure::RosterEnabled() && AbstractAlmanacExpanded());
 				aCard.SetScale(aScale, aScale, aPosX, aPosY);
 				DrawSeedPacket(&aCard, aPosX, aPosY, aSeedType, SeedType::SEED_NONE, 0, 255, true, false);
 				if (aSeedType == aSeedMouseOn)
@@ -535,7 +539,7 @@ void AlmanacDialog::Draw(Graphics* g)
 
 void AlmanacDialog::GetSeedPosition(SeedType theSeedType, int& x, int& y)
 {
-	const auto aBox = AlmanacPlantLayout::Card(theSeedType, MemeAdventure::RosterEnabled() && mApp->HasSeedType(SEED_LEFTPEATER));
+	const auto aBox = AlmanacPlantLayout::Card(theSeedType, MemeAdventure::RosterEnabled() && AbstractAlmanacExpanded());
 	x = aBox.x; y = aBox.y;
 }
 
@@ -549,7 +553,7 @@ SeedType AlmanacDialog::SeedHitTest(int x, int y)
 			{
 				int aSeedX, aSeedY;
 				GetSeedPosition(aSeedType, aSeedX, aSeedY);
-				const auto aBox = AlmanacPlantLayout::Card(aSeedType, MemeAdventure::RosterEnabled() && mApp->HasSeedType(SEED_LEFTPEATER));
+				const auto aBox = AlmanacPlantLayout::Card(aSeedType, MemeAdventure::RosterEnabled() && AbstractAlmanacExpanded());
 				Rect aSeedRect(aSeedX, aSeedY, aBox.w, aBox.h);
 				if (aSeedRect.Contains(x, y)) return aSeedType;
 			}

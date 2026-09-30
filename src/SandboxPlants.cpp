@@ -1,4 +1,4 @@
-// Three independent characters; all other plants retain native behavior.
+// Independent characters; all other plants retain native behavior.
 #include "SandboxPlants.h"
 #include "SandboxArt.h"
 #include "SandboxMemeRules.h"
@@ -71,6 +71,22 @@ void NutBrows(Sexy::Graphics* g,Reanimation* body,int alpha){
   m.m00=(face.m00*c+face.m01*s)*sx;m.m10=(face.m10*c+face.m11*s)*sx;
   m.m01=(-face.m00*s+face.m01*c)*sy;m.m11=(-face.m10*s+face.m11*c)*sy;
   PvzpBltMatrix(g,brow,m,g->mClipRect,Sexy::Color(85,65,35,alpha),g->mDrawMode,Sexy::Rect(0,4,13,7));
+ }
+}
+void AwkwardSweat(Sexy::Graphics* g,Reanimation* body,int time){
+ if(!body||!time||!body->TrackExists("anim_idle"))return;
+ auto* drop=SandboxArt::NativeImage("ScaredyShroom_sweat.png");if(!drop)return;
+ Sexy::SexyTransform2D face;body->GetTrackMatrix(body->FindTrackIndex("anim_idle"),face);
+ // Local face coordinates: small native droplets follow the posed forehead.
+ for(int i=0;i<2;++i){
+  const float progress=((MemeCharacters::AwkwardDuration-time+i*45)%120)/120.0f;
+  const float x=(i?7.0f:49.0f)-28.5f,y=(i?2.0f:0.0f)+progress*12-21.5f;
+  Sexy::SexyTransform2D m=face;
+  m.m02+=face.m00*x+face.m01*y+g->mTransX;m.m12+=face.m10*x+face.m11*y+g->mTransY;
+  const float sx=5.0f/drop->mWidth,sy=10.0f/drop->mHeight;
+  m.m00*=sx;m.m10*=sx;m.m01*=sy;m.m11*=sy;
+  const int alpha=std::min(255,time*12)*std::min(1.0f,(1-progress)*4);
+  PvzpBltMatrix(g,drop,m,g->mClipRect,Sexy::Color(255,255,255,alpha),g->mDrawMode,Sexy::Rect(0,0,drop->mWidth,drop->mHeight));
  }
 }
 
@@ -159,8 +175,21 @@ void DrawCard(Sexy::Graphics* g,int x,int y,int id){
  if(MemeCharacters::Is(id)){MemeCharacters::Card(g,x,y,id);return;}
  if(id>=0&&id<48)DrawSeedPacket(g,x,y,static_cast<SeedType>(id),SEED_NONE,0,255,false,false);
 }
+void DrawAwkwardPreview(Sexy::Graphics* g,float x,float y,bool imitater){
+ static std::unique_ptr<Sexy::MemoryImage> previews[2];auto& cached=previews[imitater?1:0];
+ if(!cached){
+  cached=gLawnApp->mReanimatorCache->MakeBlankMemoryImage(120,120);Sexy::Graphics canvas(cached.get());canvas.SetLinearBlend(true);
+  Reanimation anim;anim.ReanimationInitializeType(20,20,REANIM_SUNFLOWER);anim.SetFramesForLayer("anim_idle");
+  if(imitater)gLawnApp->mReanimatorCache->UpdateReanimationForVariation(&anim,VARIATION_IMITATER);
+  AbstractRigVisuals::Scope pose(&anim,MemeCharacters::AwkwardSunflower);anim.Draw(&canvas);AwkwardSweat(&canvas,&anim,340);
+ }
+ PvzpDrawImageScaledF(g,cached.get(),x-20*g->mScaleX,y-20*g->mScaleY,g->mScaleX,g->mScaleY);
+}
 bool DrawBody(Sexy::Graphics* g,const Plant* p,float,float,bool squished){
  AbstractRigVisuals::Scope allPoses(p);
+ if(MemeCharacters::Type(p)==MemeCharacters::AwkwardSunflower&&!squished){
+  if(auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID)){body->Draw(g);AwkwardSweat(g,body,MemeCharacters::Data(p,2));return true;}
+ }
  if(MemeCharacters::Type(p)==501&&MemeCharacters::Data(p,0)==1&&!squished){
   auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID);if(!body)return false;
   body->Draw(g);NutBrows(g,body,std::min(255,MemeCharacters::Save(p)[7]*32));return true;

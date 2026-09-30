@@ -12,6 +12,7 @@ LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 namespace SandboxArt {
 Sexy::Image* Image(const char*,const char*){return nullptr;}
 Sexy::Image* NativeImage(const char*){return nullptr;}
+Sexy::Image* AwkwardFace(){return nullptr;}
 Sexy::Image* Phone(int){return nullptr;}
 Sexy::Image* PhoneHands(const char*){return nullptr;}
 Sexy::Image* WarmNative(const char*,int){return nullptr;}
@@ -28,6 +29,33 @@ struct World:Board {
  void step(int count=1){while(count--){SandboxPlants::Tick(this);SandboxZombies::Tick(this);if(!mPaused)++mMainCounter;}}
 };
 int main(){
+ // Production keeps its native countdown; only a real sun notifies neighbours.
+ {World w;auto* p=w.add(520);const int countdown=p->mLaunchCounter;
+  assert(MemeCharacters::Producing(p));w.step(500);assert(p->mLaunchCounter==countdown&&!MemeCharacters::Embarrassed(p));
+  MemeCharacters::OnSunProduced(p);w.step();assert(!MemeCharacters::Embarrassed(p));
+  auto* neighbour=w.add(520);neighbour->mPlantCol=2;
+  auto* distant=w.add(520);distant->mPlantCol=5;
+  auto* ordinary=w.add(1);ordinary->mPlantCol=0;
+  MemeCharacters::OnSunProduced(p);
+  const auto pending=MemeCharacters::Save(p);assert(pending[7]==1);MemeCharacters::Forget(p);assert(MemeCharacters::Restore(p,pending));w.step();
+  assert(MemeCharacters::Embarrassed(p)&&MemeCharacters::Data(p,4)==1);
+  assert(MemeCharacters::Data(neighbour,1)==1+p->mPlantCol+p->mRow*9&&MemeCharacters::Data(neighbour,5)==400);
+  assert(!MemeCharacters::Embarrassed(neighbour)&&MemeCharacters::Data(distant,5)==0&&!MemeCharacters::Is(ordinary));
+  w.step(73);const auto saved=MemeCharacters::Save(p),look=MemeCharacters::Save(neighbour);
+  w.mPaused=true;w.step(200);assert(MemeCharacters::Save(p)==saved);w.mPaused=false;
+  MemeCharacters::Forget(p);MemeCharacters::Forget(neighbour);
+  assert(MemeCharacters::Restore(p,saved)&&MemeCharacters::Restore(neighbour,look)&&p->mLaunchCounter==countdown);
+  w.step(327);assert(!MemeCharacters::Embarrassed(p)&&MemeCharacters::Data(neighbour,1)==0&&MemeCharacters::Data(neighbour,5)==0);
+  neighbour->mDead=true;MemeCharacters::OnSunProduced(p);w.step();assert(!MemeCharacters::Embarrassed(p));
+ }
+ // All eight adjacent cells count; other rows, removed/asleep/lifted plants don't.
+ {World w;auto* p=w.add(520);p->mPlantCol=4;
+  for(int dx=-1;dx<=1;++dx)for(int dy=-1;dy<=1;++dy)if(dx||dy){auto* q=w.add(520,2+dy);q->mPlantCol=4+dx;}
+  auto* q=w.add(520,0);q->mPlantCol=4;
+  MemeCharacters::OnSunProduced(p);w.step();assert(MemeCharacters::Data(p,4)==8&&MemeCharacters::Data(q,5)==0);
+  auto corrupt=MemeCharacters::Save(p);corrupt[3]=55;assert(!MemeCharacters::Restore(p,corrupt));
+  corrupt=MemeCharacters::Save(p);corrupt[4]=401;assert(!MemeCharacters::Restore(p,corrupt));
+ }
  using namespace SandboxMemeRules;
  static_assert(MemeShooterRules::BurstCount==50&&MemeShooterRules::MaxRage==300&&MemeShooterRules::PerShot==20&&MemeShooterRules::BurstTicks==300);
  static_assert(MemeShooterRules::RecoveryDelay==300);
@@ -180,7 +208,7 @@ int main(){
  }
 
  // Removed originals cannot be assigned, restored or re-entered through legacy powers.
- static_assert(MemeCharacters::Definitions.size()==3&&SandboxPlants::Definitions.size()==3);
+ static_assert(MemeCharacters::Definitions.size()==4&&SandboxPlants::Definitions.size()==4);
  {World w;auto* p=w.add(519);const int x=p->mX,y=p->mY;w.step(100);assert(w.mProjectiles.mSize==0);
   auto* z=w.enemy();w.step();assert(w.mProjectiles.mSize==1);w.step(149);assert(w.mProjectiles.mSize==1);w.step();assert(w.mProjectiles.mSize==2);
   auto* shot=w.mProjectiles.values[0];assert(shot->mVelX>0&&shot->mVelY==0&&shot->mMotionType==MOTION_STAR);
@@ -207,7 +235,7 @@ int main(){
   if(id==504||id==518)assert(p->mX==80&&p->mY==200);
   if(id==502)assert(p->mIsAsleep==!night);
  }
- for(int id:{500,501,519}){World w;auto* p=w.add(id);w.step(100);const auto saved=SandboxPlants::SavePower(p);
+ for(int id:{500,501,519,520}){World w;auto* p=w.add(id);w.step(100);const auto saved=SandboxPlants::SavePower(p);
   for(int field=0;field<10;++field){auto bad=saved;bad[field]=-999;assert(!SandboxPlants::RestorePower(p,bad));assert(SandboxPlants::SavePower(p)==saved);}
   SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved)&&SandboxPlants::SavePower(p)==saved);
  }
