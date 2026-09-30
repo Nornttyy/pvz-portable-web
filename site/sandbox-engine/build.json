@@ -2,7 +2,7 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Automatic rage threshold restored to 300, still +20 per normal shot and an 80-pea burst; random-amplitude floating misses, no manual release or ordinary knockback. Plant-produced 50-value suns retain ordinary visual size; young sun-shroom stays 15; native sky suns unchanged. Fourteen mechanic plants and seven zombie replacements; integrated native seed chooser",
+  "mode": "Showoff shroom expires after 60 simulation seconds in sandbox and adventure; pause and save/resume retain remaining lifetime; supports and native puff-shrooms are unaffected. Automatic 300-rage/80-pea burst and ordinary-size 50-value plant suns retained. Fourteen mechanic plants and seven zombie replacements; integrated native seed chooser",
   "files": [
     {
       "name": "pvz-portable.js",
@@ -11,8 +11,8 @@
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7466279,
-      "sha256": "95cce92ab68952287f31c096294a55d84de6ae61acaaedbd3c26f9ec8f6b9f98"
+      "size": 7466683,
+      "sha256": "45e6924cdaef022fb22c9e9f16e859e24670cffbfb1ef52d8bc3d93e0a349f79"
     }
   ]
 }

@@ -13,7 +13,7 @@ struct Definition { int id, base; Element element; const char* name; const char*
 inline constexpr std::array<Definition,158> Definitions{{
     {500,0,Element::Native,"红温豌豆","满300怒气自动乱射80发"},
     {501,3,Element::Native,"反咬坚果","被啃后反击 · 冷却3秒"},
-    {502,8,Element::Native,"显眼包蘑菇","近距离射击 · 吸引邻路僵尸"},
+    {502,8,Element::Native,"显眼包蘑菇","吸引邻路僵尸 · 存活60秒"},
     {503,1,Element::Native,"已读不回花","平时产阳光 · 装死后反击"},
     {504,52,Element::Native,"豌豆吐射手","射手飞出去，豌豆留原地"},
     {505,5,Element::Native,"退退退寒冰","冰弹命中后打退敌人"},

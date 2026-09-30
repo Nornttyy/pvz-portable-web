@@ -218,6 +218,33 @@ int main(){
   for(auto* shot:w.mProjectiles)assert(shot->mMotionType==MOTION_BACKWARDS&&SandboxPlants::ShotDamage(shot,20)==60);
   assert(!MemeCharacters::Producing(p));w.step(180);assert(MemeCharacters::Producing(p));}
  {World w;auto* p=w.add(502);w.enemy(p->mX+130);w.step(400);assert(w.mProjectiles.mSize>=3);}
+ // The free showoff shroom lasts exactly 60 simulation seconds in both modes.
+ // Each planting owns its deadline; native puff-shrooms and supports survive.
+ static_assert(MemeCharacters::ShowoffLifetime==6000);
+ for(bool sandbox:{false,true}){World w;gSandboxEnabled=sandbox;
+  auto* native=w.plant(0,2);native->mSeedType=static_cast<SeedType>(8);
+  auto* support=w.plant(1,2);support->mSeedType=static_cast<SeedType>(16);
+  auto* first=w.add(502);assert(MemeCharacters::Data(first,5)==6000);
+  w.step(1000);auto* later=w.add(502,3);w.step(4999);
+  assert(!first->mDead&&!later->mDead&&MemeCharacters::Data(first,5)==1);
+  w.step();assert(first->mDead&&!MemeCharacters::Is(first)&&!later->mDead);
+  assert(MemeCharacters::Data(later,5)==1000&&!native->mDead&&!support->mDead);
+  w.step(999);assert(!later->mDead);w.step();assert(later->mDead);
+ }gSandboxEnabled=true;
+ {World w;auto* p=w.add(502);w.step(2500);const auto saved=SandboxPlants::SavePower(p);
+  w.mPaused=true;w.step(10000);assert(SandboxPlants::SavePower(p)==saved&&!p->mDead);
+  SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved));
+  assert(MemeCharacters::Data(p,5)==3500);w.step(1000);assert(SandboxPlants::SavePower(p)==saved);
+  w.mPaused=false;w.step(3499);assert(!p->mDead);w.step();assert(p->mDead);
+ }
+ {World w;auto* p=w.add(502);p->SetSleeping(true);w.step(5999);
+  assert(!p->mDead&&p->mIsAsleep&&MemeCharacters::Data(p,5)==1);w.step();assert(p->mDead);
+ }
+ // Older unlimited-life saves still load, then expire on a live tick if due.
+ for(int age:{5999,6000,50000}){World w;auto* p=w.add(502);auto state=SandboxPlants::SavePower(p);state[6]=age;
+  assert(SandboxPlants::RestorePower(p,state));w.mPaused=true;w.step(10);assert(!p->mDead);
+  w.mPaused=false;w.step();assert(p->mDead);
+ }
  // A threat can disappear without ever walking behind the flower. Returning
  // to full size/production must not wait out the entire ambush timeout.
  for(int gone=0;gone<5;++gone){World w;auto* p=w.add(503);auto* z=w.enemy(p->mX+20);w.step(30);

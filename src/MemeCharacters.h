@@ -3,11 +3,12 @@
 class Plant; class Board; class Zombie; class Projectile;
 namespace Sexy {class Graphics;class Color;}
 namespace MemeCharacters {
+inline constexpr int ShowoffLifetime=60*100; // Native simulation ticks, not wall-clock time.
 struct Definition {int id,base,cost,unlock;const char* name;const char* shortName;const char* hint;const char* key;const char* description;};
 inline constexpr std::array<Definition,14> Definitions{{
  {500,0,100,1,"红温豌豆","红温","满300怒气自动乱射80发","PEASHOOTER","普通攻击只有10%命中判定，其余豌豆飞行中反复上下飘，每次摆幅随机，不击退僵尸。每发增加20怒气，逐渐变红；满300自动乱射80发，不能手动释放。射完恢复绿色，不消耗生命。"},
  {501,3,50,4,"反咬坚果","反咬","被啃后反击 · 冷却3秒","WALL_NUT","被啃后反击面前的僵尸，造成80伤害。每3秒一次，不击退僵尸。"},
- {502,8,0,11,"显眼包蘑菇","显眼包","近距离射击 · 吸引邻路僵尸","PUFF_SHROOM","近距离喷射孢子，每五秒吸引一只邻路普通步行僵尸。白天也能工作。不能吸引巨人和冰车。"},
+ {502,8,0,11,"显眼包蘑菇","显眼包","吸引邻路僵尸 · 存活60秒","PUFF_SHROOM","种下60秒后消失。近距离喷射孢子，每五秒吸引一只邻路普通步行僵尸。白天也能工作。不能吸引巨人和冰车。"},
  {503,1,50,2,"已读不回花","已读","平时产阳光 · 装死后反击","SUNFLOWER","平时每次生产50阳光。僵尸靠近时装死，经过后向后连发三颗豌豆。装死和反击时暂停生产，不能躲过碾压和巨人砸击。"},
  {504,52,125,8,"豌豆吐射手","倒飞","射手飞出去，豌豆留原地","SELF_THROWER","把自己弹出去撞击前方三格内的僵尸，再飞回原位。每次撞击造成80伤害，落地后休息三秒。冒险1-8解锁。"},
  {505,5,175,7,"退退退寒冰","退退退","冰弹命中后打退敌人","SNOW_PEA","每3秒射出一颗冰豌豆，命中后造成普通寒冰伤害，并让普通步行僵尸后退半格。不能推动巨人和车辆。"},

@@ -79,7 +79,7 @@ bool Restore(Plant* p,const std::array<int,10>& a){
  if(shooter)s.remaining=std::min(s.remaining,MemeShooterRules::BurstCount); // Read old 150-pea saves without adding shots.
  states[p]=s;if(!NativeSequence(a[0])){p->mLaunchCounter=a[0]==503?std::clamp(p->mLaunchCounter,0,2500):9999;p->mShootingCounter=0;}return true;
 }
-int Data(const Plant* p,int field){const auto it=states.find(p);if(it==states.end())return -1;const auto& s=it->second;return field==0?s.phase:field==1?s.heat:field==2?s.timer:field==3?s.direction:s.remaining;}
+int Data(const Plant* p,int field){const auto it=states.find(p);if(it==states.end())return -1;const auto& s=it->second;if(field==5)return s.id==502?std::max(0,ShowoffLifetime-s.age):-1;return field==0?s.phase:field==1?s.heat:field==2?s.timer:field==3?s.direction:s.remaining;}
 // Keep legacy input/ABI callers harmless; rage is automatic only.
 bool Activate(Plant*,int){return false;}
 bool Click(Board*,int,int){return false;}
@@ -103,9 +103,13 @@ void Tick(Board* b){
  for(auto it=laneCooldown.begin();it!=laneCooldown.end();)if(--it->second<=0||!b->ZombieTryToGet(static_cast<ZombieID>(it->first)))it=laneCooldown.erase(it);else ++it;
  for(auto* p:b->mPlants){
   auto it=states.find(p);if(it==states.end())continue;if(p->mDead){states.erase(it);continue;}auto& s=it->second;
+  // Age is already part of the native adventure save record. Reloading must
+  // not refill this lifetime; pause freezes it and sandbox speed advances it.
+  // Expire even without targets or while asleep, without harming supports.
+  if(s.id==502&&++s.age>=ShowoffLifetime){Forget(p);p->Die();continue;}
   if(!NativeSequence(s.id)){if(s.id!=503)p->mLaunchCounter=9999;p->mShootingCounter=0;}
   if(p->mIsAsleep||p->mSquished||p->NotOnGround()||p->mPlantHealth<=0)continue;
-  s.age=(s.age+1)%1000000;if(s.pulse)--s.pulse;if(s.delay)--s.delay;if(s.timer)--s.timer;
+  if(s.id!=502)s.age=(s.age+1)%1000000;if(s.pulse)--s.pulse;if(s.delay)--s.delay;if(s.timer)--s.timer;
   if(s.id==500){
    if(s.phase==0&&s.heat>=MemeShooterRules::MaxRage)Burst(s);
    const bool room=b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8;
