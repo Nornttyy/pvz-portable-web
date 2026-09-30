@@ -341,6 +341,15 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_zombie_data(int index,int field)
     return -1;
 }
 
+// Read-only sun diagnostics for both adventure and sandbox; no balance setters.
+extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sun_data(int index,int field) {
+    if(!gLawnApp||gLawnApp->mGameScene!=SCENE_PLAYING||!gLawnApp->mBoard||index<0||field<0||field>6)return -1;
+    for(auto* sun:gLawnApp->mBoard->mCoins)if(!sun->mDead&&!sun->mIsBeingCollected&&sun->IsSun()){
+        if(index--==0)return field==0?sun->GetSunValue():field==1?int(sun->mPosX+30):field==2?int(sun->mPosY+30):field==3?int(sun->mCoinMotion):field==4?sun->mCoinAge:field==5?int(sun->mType):sun->mDisappearCounter;
+    }
+    return -1;
+}
+
 // Read-only live projectile diagnostics, also available in adventure QA.
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_rage_audio_data(int field) {
     if(!gLawnApp||!gLawnApp->mSoundSystem)return -1;

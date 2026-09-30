@@ -269,7 +269,7 @@ index 2293690..543a195 100644
  	void							MouseDown(int x, int y, int theClickCount) override;
  	void							MouseUp(int x, int y, int theClickCount) override;
 diff --git a/src/Lawn/Plant.cpp b/src/Lawn/Plant.cpp
-index c934659..9975c72 100644
+index c934659..9d2c1bd 100644
 --- a/src/Lawn/Plant.cpp
 +++ b/src/Lawn/Plant.cpp
 @@ -30,6 +30,9 @@
@@ -359,7 +359,22 @@ index c934659..9975c72 100644
  		if (mSeedType == SeedType::SEED_SUNSHROOM)
  		{
  			if (mState == PlantState::STATE_SUNSHROOM_SMALL)
-@@ -1059,6 +1073,7 @@ void Plant::UpdateProductionPlant()
+@@ -1042,12 +1056,12 @@ void Plant::UpdateProductionPlant()
+ 			}
+ 			else
+ 			{
+-				mBoard->AddCoin(mX, mY, CoinType::COIN_SUN, CoinMotion::COIN_MOTION_FROM_PLANT);
++				mBoard->AddCoin(mX, mY, CoinType::COIN_LARGESUN, CoinMotion::COIN_MOTION_FROM_PLANT);
+ 			}
+ 		}
+ 		else if (mSeedType == SeedType::SEED_SUNFLOWER)
+ 		{
+-			mBoard->AddCoin(mX, mY, CoinType::COIN_SUN, CoinMotion::COIN_MOTION_FROM_PLANT);
++			mBoard->AddCoin(mX, mY, CoinType::COIN_LARGESUN, CoinMotion::COIN_MOTION_FROM_PLANT);
+ 		}
+ 		else if (mSeedType == SeedType::SEED_TWINSUNFLOWER)
+ 		{
+@@ -1059,11 +1073,12 @@ void Plant::UpdateProductionPlant()
  			mBoard->AddCoin(mX, mY, (Sexy::Rand(100) < 10) ? CoinType::COIN_GOLD : CoinType::COIN_SILVER, CoinMotion::COIN_MOTION_COIN);
  		}
  
@@ -367,6 +382,12 @@ index c934659..9975c72 100644
  		if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BIG_TIME)
  		{
  			if (mSeedType == SeedType::SEED_SUNFLOWER)
+ 			{
+-				mBoard->AddCoin(mX, mY, CoinType::COIN_SUN, CoinMotion::COIN_MOTION_FROM_PLANT);
++				mBoard->AddCoin(mX, mY, CoinType::COIN_LARGESUN, CoinMotion::COIN_MOTION_FROM_PLANT);
+ 			}
+ 			else if (mSeedType == SeedType::SEED_MARIGOLD)
+ 			{
 @@ -1123,6 +1138,7 @@ void Plant::UpdateGraveBuster()
  		}
  

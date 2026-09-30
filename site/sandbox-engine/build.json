@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Self-Thrower integrated into the native full-size chooser grid, including selection, return and full unlocks; six new plant mechanics and four zombie replacements in adventure and sandbox; random-amplitude floating peas; automatic 200-rage/80-pea burst, 10% normal eligibility, no manual release, no knockback",
+  "mode": "Sunflower and mature sun-shroom produce native 50-value suns; young sun-shroom stays 15 and ordinary sky sun stays 25; production timing unchanged. Self-Thrower uses the native chooser grid; fourteen mechanic plants and seven zombie replacements; random-amplitude floating peas, automatic 200-rage/80-pea burst, no manual release or ordinary knockback",
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 277137,
-      "sha256": "bb2ec0e441e80f8e56095c6107d81c305b392f8dfa0cf58657cc36ad075c81b5"
+      "size": 277207,
+      "sha256": "622c35f6bdbccad955a7e4b7f54cc4c8d32d8f156f096cab014b73ec9672ece1"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7465771,
-      "sha256": "93bdf8d00ee19efb055dad65d32d2aa97a0640aa5db690b6df2aacd89978e8fb"
+      "size": 7466166,
+      "sha256": "02b3e56e0b5f81c27e7b3efe482780dc64165d6e8ee0ec94c164b5fba096d056"
     }
   ]
 }

@@ -14,10 +14,10 @@ async function shot(name){await page.screenshot({path:join(out,name+'.png')});}
 async function api(...v){return page.evaluate(v=>Module._pvz_sandbox_command(...[...v,0,0,0,0].slice(0,4)),v);}
 async function ad(i,f){return page.evaluate(([i,f])=>Module._pvz_adventure_power_data(i,f),[i,f]);}
 async function sd(i,f){return page.evaluate(([i,f])=>Module._pvz_adventure_seed_data(i,f),[i,f]);}
-async function sun(){await hover(780,590);await page.waitForFunction(()=>Module._pvz_adventure_power_data(0,10)>=0,{},{timeout:25000});return [await ad(0,10),await ad(0,11)];}
+async function sun(){await hover(780,590);await page.waitForFunction(()=>Module._pvz_adventure_power_data(0,10)>=0,{},{timeout:25000});return [await ad(0,10),await ad(0,11),await page.evaluate(()=>Module._pvz_sun_data(0,0))];}
 async function hoverSun(pos=undefined){const xy=pos||await sun(),before=await ad(-1,2),downs=await page.evaluate(()=>window.qaMouseDowns);
- await hover(...xy);await page.waitForFunction(n=>Module._pvz_adventure_power_data(-1,2)===n,before+25,{timeout:4000});assert.equal(await page.evaluate(()=>window.qaMouseDowns),downs);
- return before+25;
+ await hover(...xy);await page.waitForFunction(n=>Module._pvz_adventure_power_data(-1,2)===n,before+xy[2],{timeout:4000});assert.equal(await page.evaluate(()=>window.qaMouseDowns),downs);
+ return before+xy[2];
 }
 try{
  await page.goto(process.env.PVZ_QA_URL||'http://127.0.0.1:8097/');await page.waitForFunction(()=>!document.getElementById('start').disabled,{},{timeout:90000});
@@ -39,12 +39,12 @@ try{
  assert.equal(await sd(1,0),503);await click(await sd(1,5)+25,await sd(1,6)+35);await click(80,330);assert.equal(await ad(0,0),503);assert.equal(await ad(-1,2),0);
  await hoverSun();results.hoverWithoutClick=true;await shot('adventure-hover-collected');
  const pos=await sun();await click(748,14);const before=await ad(-1,2);assert.equal(await ad(-1,6),1);
- await hover(...pos);await page.waitForTimeout(500);assert.equal(await ad(-1,2),before);assert.deepEqual([await ad(0,10),await ad(0,11)],pos);results.pauseSafe=true;
- await hover(780,590);await click(400,450);await hoverSun();assert.equal(await ad(-1,2),50);
- const heldSun=await sun();await click(await sd(1,5)+25,await sd(1,6)+35);await hoverSun(heldSun);await click(80,230);
- assert.equal(await ad(1,0),503);assert.equal(await ad(-1,2),25);results.heldSeedPreserved=true;
+ await hover(...pos);await page.waitForTimeout(500);assert.equal(await ad(-1,2),before);assert.deepEqual([await ad(0,10),await ad(0,11)],pos.slice(0,2));results.pauseSafe=true;
+ await hover(780,590);await click(400,450);await hoverSun();assert.equal(await ad(-1,2),before+pos[2]);
+ const heldSun=await sun(),heldBefore=await ad(-1,2);await click(await sd(1,5)+25,await sd(1,6)+35);await hoverSun(heldSun);await click(80,230);
+ assert.equal(await ad(1,0),503);assert.equal(await ad(-1,2),heldBefore+heldSun[2]-50);results.heldSeedPreserved=true;
  await page.setViewportSize({width:844,height:390});const mobileSun=await sun(),mobileBefore=await ad(-1,2);
- await page.touchscreen.tap(...await point(...mobileSun));await page.waitForFunction(n=>Module._pvz_adventure_power_data(-1,2)===n,mobileBefore+25,{timeout:4000});results.mobileTap=true;await shot('mobile-tap-collected');
+ await page.touchscreen.tap(...await point(...mobileSun));await page.waitForFunction(n=>Module._pvz_adventure_power_data(-1,2)===n,mobileBefore+mobileSun[2],{timeout:4000});results.mobileTap=true;await shot('mobile-tap-collected');
  assert.deepEqual(errors,[]);await writeFile(join(out,'report.json'),JSON.stringify({results,errors},null,2));console.log('Sun hover QA passed',results);
 }catch(e){await shot('failure');console.log('ADVENTURE',await ad(-1,2),await ad(-1,8),await ad(-1,6));console.log('ENGINE',await page.evaluate(()=>window.pvzEngineLog));throw e;}
 finally{await browser.close();}

@@ -1056,12 +1056,12 @@ void Plant::UpdateProductionPlant()
 			}
 			else
 			{
-				mBoard->AddCoin(mX, mY, CoinType::COIN_SUN, CoinMotion::COIN_MOTION_FROM_PLANT);
+				mBoard->AddCoin(mX, mY, CoinType::COIN_LARGESUN, CoinMotion::COIN_MOTION_FROM_PLANT);
 			}
 		}
 		else if (mSeedType == SeedType::SEED_SUNFLOWER)
 		{
-			mBoard->AddCoin(mX, mY, CoinType::COIN_SUN, CoinMotion::COIN_MOTION_FROM_PLANT);
+			mBoard->AddCoin(mX, mY, CoinType::COIN_LARGESUN, CoinMotion::COIN_MOTION_FROM_PLANT);
 		}
 		else if (mSeedType == SeedType::SEED_TWINSUNFLOWER)
 		{
@@ -1078,7 +1078,7 @@ void Plant::UpdateProductionPlant()
 		{
 			if (mSeedType == SeedType::SEED_SUNFLOWER)
 			{
-				mBoard->AddCoin(mX, mY, CoinType::COIN_SUN, CoinMotion::COIN_MOTION_FROM_PLANT);
+				mBoard->AddCoin(mX, mY, CoinType::COIN_LARGESUN, CoinMotion::COIN_MOTION_FROM_PLANT);
 			}
 			else if (mSeedType == SeedType::SEED_MARIGOLD)
 			{
