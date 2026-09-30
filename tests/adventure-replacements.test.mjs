@@ -30,6 +30,8 @@ int main(){using namespace MemeAdventure;
  assert(Translate("SEED_CHOOSER_QA","豌豆射手、小喷菇、坚果墙") == "红温豌豆、显眼包蘑菇、反咬坚果");
  assert(Translate("FLAG_ZOMBIE","old")=="催更旗手"&&Translate("BUCKETHEAD_ZOMBIE","铁桶僵尸")=="铁桶僵尸");
  assert(Translate("BUCKETHEAD_ZOMBIE_DESCRIPTION","native")=="native");
+ assert(Replacement(4,-1)->id==507&&Replacement(4,-1)->cost==75&&Replacement(4,-1)->unlock==6);
+ assert(Translate("CONEHEAD_ZOMBIE","old")=="碰瓷路障");
  assert(Translate("GOLD_SUNFLOWER_TROPHY","金色向日葵奖杯") == "金色向日葵奖杯");
  for(bool* boundary:{&app.bowling,&app.pots,&app.whack,&gSandboxEnabled}){*boundary=true;assert(!Replacement(0,-1));assert(Translate("PEASHOOTER","original")=="original");*boundary=false;}
  app.adventure=false;assert(!Replacement(0,-1));app.adventure=true;gLawnApp=nullptr;assert(!Replacement(0,-1));

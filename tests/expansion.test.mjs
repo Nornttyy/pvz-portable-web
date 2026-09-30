@@ -17,7 +17,7 @@ test('meme powers exercise real production combat and preserve native pixel shad
  assert.match((await run(binary)).stdout,/Meme powers:.*passed/);
 });
 test('power token is not a plant or a save entry; only results round-trip',()=>{
- for(const type of [500,501,502,503,504,505,506])assert.equal(validateLayout({schema:1,map:0,plants:[{type,col:0,row:0}]}).plants[0].type,type);
+ for(const type of [500,501,502,503,504,505,506,507])assert.equal(validateLayout({schema:1,map:0,plants:[{type,col:0,row:0}]}).plants[0].type,type);
  assert.throws(()=>validateLayout({schema:1,map:0,plants:[{type:180,col:0,row:0}]}));
 });
 test('release vocal is a dedicated non-looping native SFX, with overlap and volume guards',async()=>{
@@ -58,8 +58,8 @@ test('native projectile integration retains splats, centered scaling and fire at
  const plant=source.slice(source.indexOf('void Plant::Fire('),source.indexOf('Zombie* Plant::FindTargetZombie('));
  assert.ok(plant.indexOf('aProjectile->ConvertToFireball(mPlantCol)')>plant.indexOf('SandboxPlants::OnFired(this,aProjectile,theTargetZombie)'),'fire attaches only after muzzle correction');
 });
-test('seven mechanic characters replace infusion; old results migrate without losing plants',async()=>{
- assert.equal(ORIGINAL_PLANTS.length,7);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,502,503,504,505,506]);assert.deepEqual(ORIGINAL_ZOMBIES,[]);assert.equal(ZOMBIES.length,23);
+test('eight mechanic characters replace infusion; old results migrate without losing plants',async()=>{
+ assert.equal(ORIGINAL_PLANTS.length,8);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,502,503,504,505,506,507]);assert.deepEqual(ORIGINAL_ZOMBIES,[]);assert.equal(ZOMBIES.length,23);
  const bases=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
  for(let id=100;id<120;++id)assert.equal(validateLayout({schema:1,map:0,plants:[{type:id,col:0,row:0}]}).plants[0].type,bases[id-100]);
  for(const p of RETIRED_PLANTS){
@@ -72,6 +72,15 @@ test('seven mechanic characters replace infusion; old results migrate without lo
  const m=JSON.parse(await read('site/resource-manifest.json'));assert.equal(m.totalFiles,2912);assert.equal(m.files.filter(f=>f.path.startsWith('images/sandbox/')).length,0);
  const code=(await read('src/SandboxPlants.cpp')).toString();assert.doesNotMatch(code,/NutMouthMatrix|dandelion|poison|echo-lily|Rig\(/);
  assert.doesNotMatch((await read('src/SandboxUI.cpp')).toString(),/Button\(g,CustomFilter/);
+});
+test('nested mine and feigning cone use native lifecycle, poses and adventure slots',async()=>{
+ const plant=(await read('src/Lawn/Plant.cpp')).toString(),zombie=(await read('src/Lawn/Zombie.cpp')).toString(),save=(await read('src/Lawn/System/SaveGame.cpp')).toString();
+ assert.match(plant,/if \(MemeCharacters::RearmPotato\(this\)\)[\s\S]*?mStateCountdown = 600;[\s\S]*?else Die\(\)/);
+ assert.match(zombie,/if \(hadHelm && mHelmHealth == 0\) SandboxZombies::ArmorBroken\(this\)/);
+ assert.match(zombie,/SandboxZombies::AdjustPose\(this, aBodyReanim\)/);
+ assert.match(zombie,/IsImmobilizied\(\) \|\| SandboxZombies::IsFeigning\(this\)/);
+ assert.match(save,/SyncInt32\(theZombie.mPhaseCounter\)/);
+ assert.equal(ZOMBIES.find(z=>z.id===2).name,'碰瓷路障');
 });
 test('adventure replaces native cards, preserving optional saves and combat ticks',async()=>{
  const adventure=(await read('src/MemeAdventure.cpp')).toString(),save=(await read('src/Lawn/System/SaveGame.cpp')).toString();

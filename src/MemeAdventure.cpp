@@ -55,6 +55,8 @@ std::string_view Translate(std::string_view key,std::string_view original){
  if(gSandboxEnabled||RosterEnabled()){
   if(key=="FLAG_ZOMBIE")return "催更旗手";
   if(key=="FLAG_ZOMBIE_DESCRIPTION")return "挥旗催着同伴赶路，让附近一格、横向两格内的普通步行僵尸移速提高50%。多面旗帜不会叠加。";
+  if(key=="CONEHEAD_ZOMBIE")return "碰瓷路障";
+  if(key=="CONEHEAD_ZOMBIE_DESCRIPTION")return "路障被打掉就倒地装死三秒，再爬起来继续走。装死时不移动、不啃植物，仍会受伤；不会回血或击退。";
   if(key=="NEWSPAPER_ZOMBIE")return "读手机僵尸";
   if(key=="NEWSPAPER_ZOMBIE_DESCRIPTION")return "边走边刷手机。手机碎了就红温冲锋，四秒后掏出备用机继续刷。身体不会回血。";
  }

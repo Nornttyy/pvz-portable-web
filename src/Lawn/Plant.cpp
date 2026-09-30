@@ -4421,7 +4421,15 @@ void Plant::DoSpecial()
 		mBoard->ShakeBoard(3, -4);
 
 		SandboxPlants::OneShot(this);
-		Die();
+		if (MemeCharacters::RearmPotato(this))
+		{
+			mApp->RemoveReanimation(mLightReanimID);
+			mLightReanimID = ReanimationID::REANIMATIONID_NULL;
+			mState = PlantState::STATE_NOTREADY;
+			mStateCountdown = 600;
+			PlayBodyReanim("anim_idle", ReanimLoopType::REANIM_LOOP, 0, 12.0f);
+		}
+		else Die();
 		break;
 	}
 	case SeedType::SEED_INSTANT_COFFEE:

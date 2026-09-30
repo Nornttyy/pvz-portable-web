@@ -225,7 +225,30 @@ int main(){
  }
  static_assert(MemeCharacters::ForBase(0)->cost==100&&MemeCharacters::ForBase(1)->cost==50&&MemeCharacters::ForBase(3)->cost==50&&MemeCharacters::ForBase(8)->cost==0);
  static_assert(MemeCharacters::ForBase(0)->unlock==1&&MemeCharacters::ForBase(1)->unlock==2&&MemeCharacters::ForBase(3)->unlock==4&&MemeCharacters::ForBase(8)->unlock==11);
- for(int id:{500,501,502,503,504,505,506}){World w;auto* p=w.add(id);w.step(100);auto state=SandboxPlants::SavePower(p);
+ {World w;auto* p=w.add(507);p->mPlantHealth=137;
+  for(int lives=3;lives>0;--lives){
+   assert(MemeCharacters::Data(p,4)==lives);float x=0,y=0,sx=1,sy=1;MemeCharacters::Scale(p,x,y,sx,sy);
+   assert(std::abs(sx-(0.6f+0.2f*(lives-1)))<0.001f&&sx==sy&&std::abs(x+40*sx-40)<0.001f&&std::abs(y+65*sy-65)<0.001f);
+   auto save=SandboxPlants::SavePower(p);SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,save));
+   assert(MemeCharacters::RearmPotato(p)==(lives>1));assert(p->mPlantHealth==137&&!p->mDead);
+  }
+  auto invalid=SandboxPlants::SavePower(p);invalid[8]=0;assert(!SandboxPlants::RestorePower(p,invalid));
+  auto* native=w.plant(2,2);assert(!MemeCharacters::RearmPotato(native));p->mDead=true;assert(!MemeCharacters::RearmPotato(p));
+ }
+ {World w;auto* cone=w.enemy(400,2,static_cast<ZombieType>(2));cone->mHelmHealth=20;
+  SandboxZombies::ArmorBroken(cone);assert(!SandboxZombies::IsFeigning(cone));
+  cone->mHelmHealth=0;cone->mIsEating=true;const int hp=cone->mBodyHealth;SandboxZombies::ArmorBroken(cone);
+  assert(SandboxZombies::IsFeigning(cone)&&cone->mPhaseCounter==300&&!cone->mIsEating&&SandboxZombies::Speed(cone)==0&&cone->mBodyHealth==hp);
+  cone->mPhaseCounter=240;assert(SandboxZombies::Damage(cone,20)==20&&cone->mPhaseCounter==240);cone->TakeDamage(20,0);assert(cone->mBodyHealth==hp-20);
+  Reanimation body;body.mOverlayMatrix.m02=15;body.mOverlayMatrix.m12=20;SandboxZombies::AdjustPose(cone,&body);const auto& m=body.mOverlayMatrix;
+  assert(m.m01>0.9f&&m.m10<-0.9f&&std::abs(m.m00*45+m.m01*120+m.m02-60)<0.001f&&std::abs(m.m10*45+m.m11*120+m.m12-140)<0.001f);
+  for(int timer:{300,1,0}){cone->mPhaseCounter=timer;body.mOverlayMatrix={};SandboxZombies::AdjustPose(cone,&body);assert(std::abs(body.mOverlayMatrix.m01)<0.01f);}
+  assert(!SandboxZombies::IsFeigning(cone)&&SandboxZombies::Speed(cone)==1&&cone->mBodyHealth==hp-20);
+  cone->mPhaseCounter=200;cone->mMindControlled=true;assert(!SandboxZombies::IsFeigning(cone));cone->mMindControlled=false;cone->mHasHead=false;assert(!SandboxZombies::IsFeigning(cone));
+  auto* normal=w.enemy();SandboxZombies::ArmorBroken(normal);assert(normal->mPhaseCounter==0);
+  cone->mHasHead=true;gSandboxEnabled=false;app.adventure=false;assert(!SandboxZombies::IsFeigning(cone));gSandboxEnabled=true;app.adventure=true;
+ }
+ for(int id:{500,501,502,503,504,505,506,507}){World w;auto* p=w.add(id);w.step(100);auto state=SandboxPlants::SavePower(p);
   w.mPaused=true;w.step(1000);assert(SandboxPlants::SavePower(p)==state);SandboxPlants::Forget(p);assert(!SandboxPlants::IsCustom(p));
   assert(SandboxPlants::RestorePower(p,state)&&SandboxPlants::SavePower(p)==state);state[9]=0;assert(!SandboxPlants::RestorePower(p,state));}
  static_assert(MemeAdventureRules::Cooldown==300);

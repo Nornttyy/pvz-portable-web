@@ -53,9 +53,9 @@ test('published sandbox engine matches the recorded build and really initializes
   assert.equal(Module._pvz_sandbox_plant_data(0, 0), -1);
 });
 
-test('sandbox exposes seven individual mechanic characters', async () => {
-  assert.equal(ORIGINAL_PLANTS.length,7);assert.equal(new Set(ORIGINAL_PLANTS.map(p=>p.id)).size,7);
-  assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.base),[0,3,8,1,52,5,7]);
+test('sandbox exposes eight individual mechanic characters', async () => {
+  assert.equal(ORIGINAL_PLANTS.length,8);assert.equal(new Set(ORIGINAL_PLANTS.map(p=>p.id)).size,8);
+  assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.base),[0,3,8,1,52,5,7,4]);
   const layout = {schema: 1, map: 0, plants: [{type: 500, col: 2, row: 2}]};
   assert.deepEqual(validateLayout(layout), layout);
   for (const file of ['Sandbox.cpp', 'SandboxUI.cpp', 'SandboxPlants.cpp', 'SandboxButton.cpp']) assert.ok((await read('src/' + file)).length > 1000);

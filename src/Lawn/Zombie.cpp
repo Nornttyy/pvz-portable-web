@@ -3957,7 +3957,7 @@ float Zombie::ZombieTargetLeadX(float theTime)
 
 bool Zombie::ZombieNotWalking()
 {
-	if (mIsEating || IsImmobilizied())
+	if (mIsEating || IsImmobilizied() || SandboxZombies::IsFeigning(this))
 	{
 		return true;
 	}
@@ -5356,6 +5356,7 @@ void Zombie::UpdateReanim()
 		anOffsetX += 90.0f * mScaleZombie;
 	}
 
+	aBodyReanim->mOverlayMatrix.m01 = 0.0f;
 	aBodyReanim->mOverlayMatrix.m10 = 0.0f;
 	aBodyReanim->mOverlayMatrix.m20 = 0.0f;
 	aBodyReanim->mOverlayMatrix.m11 = 0.0f;
@@ -5385,6 +5386,7 @@ void Zombie::UpdateReanim()
 		aBodyReanim->mOverlayMatrix = aOverlayMatrix;
 	}
 
+	SandboxZombies::AdjustPose(this, aBodyReanim);
 	aBodyReanim->Update();
 	aBodyReanim->PropogateColorToAttachments();
 }
@@ -6657,7 +6659,7 @@ void Zombie::UpdateAnimSpeed()
 	if (aBodyReanim == nullptr)
 		return;
 
-	if (IsImmobilizied() || (mYuckyFace && mYuckyFaceCounter < 170))
+	if (IsImmobilizied() || SandboxZombies::IsFeigning(this) || (mYuckyFace && mYuckyFaceCounter < 170))
 	{
 		ApplyAnimRate(0.0f);
 		return;
@@ -6825,7 +6827,7 @@ void Zombie::StopEating()
 
 void Zombie::CheckIfPreyCaught()
 {
-	if (SandboxZombies::IsRetreating(this)) { StopEating(); return; }
+	if (SandboxZombies::IsRetreating(this) || SandboxZombies::IsFeigning(this)) { StopEating(); return; }
 	if (mZombieType == ZombieType::ZOMBIE_BUNGEE ||
 		mZombieType == ZombieType::ZOMBIE_GARGANTUAR ||
 		mZombieType == ZombieType::ZOMBIE_REDEYE_GARGANTUAR ||
@@ -7986,6 +7988,7 @@ void Zombie::TakeDamage(int theDamage, unsigned int theDamageFlags)
 	if (mZombiePhase == ZombiePhase::PHASE_JACK_IN_THE_BOX_POPPING || IsDeadOrDying())
 		return;
 
+	const bool hadHelm = mHelmHealth > 0;
 	int aDamageRemaining = theDamage;
 
 	if (IsFlying())
@@ -8008,6 +8011,7 @@ void Zombie::TakeDamage(int theDamage, unsigned int theDamageFlags)
 	{
 		TakeBodyDamage(aDamageRemaining, theDamageFlags);
 	}
+	if (hadHelm && mHelmHealth == 0) SandboxZombies::ArmorBroken(this);
 }
 
 float Zombie::GetPosYBasedOnRow(int theRow)

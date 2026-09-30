@@ -362,10 +362,13 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_projectile_data(int index,int field) {
 
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_plant_data(int index, int field) {
     auto* board = ActiveBoard();
-    if (!board || index < 0 || index >= SandboxRules::MaxPlants || field < 0 || field > 6) return -1;
+    if (!board || index < 0 || index >= SandboxRules::MaxPlants || field < 0 || field > 9) return -1;
     for (auto* plant : board->mPlants) {
         if (plant->mDead) continue;
         if (index-- == 0) {
+            if(field==7)return MemeCharacters::Data(plant,4);
+            if(field==8)return int(plant->mState);
+            if(field==9)return plant->mStateCountdown;
             if(field==3)return plant->mPlantHealth;
             if(field>=4)return SandboxPlants::HeatData(plant,field-4);
             return field == 0 ? SandboxPlants::Type(plant) : field == 1 ? plant->mPlantCol : plant->mRow;

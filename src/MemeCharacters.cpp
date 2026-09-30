@@ -57,6 +57,7 @@ void Reset(){states.clear();laneCooldown.clear();shotStyles.clear();}
 void Forget(Plant* p){states.erase(p);}
 void Assign(Plant* p,int id){const auto* d=Find(id);if(!d||int(p->mSeedType)!=d->base)return;
  State s;s.id=id;s.health=p->mPlantHealth;s.timer=id==502?180:0;if(id==500)s.direction=2;states[p]=s;
+ if(id==507)states[p].remaining=3;
  p->mLaunchCounter=id==503?std::clamp(p->mLaunchCounter,300,2500):9999;p->mShootingCounter=0;
  if(id==502)p->SetSleeping(false); // Keep the native short-range shot and add a daytime lure.
 }
@@ -65,6 +66,7 @@ bool Restore(Plant* p,const std::array<int,10>& a){
  const bool shooter=a[0]==500,newShooter=shooter&&a[9]==2;
  const auto* d=Find(a[0]);if(!d||int(p->mSeedType)!=d->base||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>(newShooter?1:2)||a[3]<0||a[3]>(newShooter?300:1000)||a[4]<0||a[4]>2000||a[5]<0||a[5]>2000||a[6]<0||a[6]>=1000000||a[7]<0||a[7]>50||a[8]<0||a[8]>(newShooter?150:a[0]==506?6:3)||(!newShooter&&a[9]!=1&&a[9]!=-1))return false;
  if(newShooter&&((a[2]==1&&(a[8]==0||a[3]!=0))||(a[2]==0&&a[8]!=0)))return false;
+ if(a[0]==507&&a[8]<1)return false;
  State s{a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9]};
  // Direction was unused for this character: 2 versions the new burst state.
  // Migrate old overheating saves without healing or inventing a free volley.
@@ -77,6 +79,10 @@ int Data(const Plant* p,int field){const auto it=states.find(p);if(it==states.en
 // Keep legacy input/ABI callers harmless; rage is automatic only.
 bool Activate(Plant*,int){return false;}
 bool Click(Board*,int,int){return false;}
+bool RearmPotato(Plant* p){
+ auto it=states.find(p);if(it==states.end()||it->second.id!=507||p->mDead||p->mPlantHealth<=0||it->second.remaining<=1)return false;
+ --it->second.remaining;it->second.timer=600;it->second.pulse=40;return true;
+}
 void Tick(Board* b){
  if(b->mPaused)return;
  for(auto it=laneCooldown.begin();it!=laneCooldown.end();)if(--it->second<=0||!b->ZombieTryToGet(static_cast<ZombieID>(it->first)))it=laneCooldown.erase(it);else ++it;
@@ -172,6 +178,7 @@ void Tint(const Plant* p,Sexy::Color& c){auto it=states.find(p);if(it==states.en
 }
 void Scale(const Plant* p,float& x,float& y,float& sx,float& sy){auto it=states.find(p);if(it==states.end()||p->mSquished)return;const auto& s=it->second;
  float horizontal=1,vertical=1;
+ if(s.id==507)horizontal=vertical=0.6f+0.2f*(s.remaining-1);
  if(s.id==500&&s.phase==1){const float recoil=std::sin(s.pulse*0.3f)*0.025f;horizontal+=0.04f+recoil;vertical-=0.03f+recoil;}
  if(s.id==501&&s.phase==1&&s.pulse){
   // Keep the original face, damage frames and grid anchor during the bump.

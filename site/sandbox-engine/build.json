@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Automatic-only 200-rage, 80 chaotic peas; independently random up/down normal shots; no manual release or ordinary-hit bucket retreat; native support-height alignment preserved",
+  "mode": "Nested potato: three native explosions with smaller rearming bodies; feigning cone: fall and stand on armor break; adventure and sandbox native-slot content; automatic 200-rage/80 peas unchanged",
   "files": [
     {
       "name": "pvz-portable.js",
       "size": 277137,
-      "sha256": "4116f4a9f3e23b740928b6486baed1f93cc05a68e611e38f4f0740c5d9ab85a8"
+      "sha256": "0db5fcc08af46a11ac56e774be2b5cb4ede4e5007ab49a2a66c79f39d269ce5b"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7456348,
-      "sha256": "c6ea1f76df1c13261a03a3d9072a8aca6ab53e95562fc196565b3bb5249acbd9"
+      "size": 7459737,
+      "sha256": "ce5c7f6a11276e6158f3db0a0e069d8198a9f44b7210866591154a91b3ba84f0"
     }
   ]
 }

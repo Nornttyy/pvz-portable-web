@@ -11,7 +11,7 @@ int main(){
  assert(BoardX(true)==WorldOffset);assert(BoardX(false)==0);
  for(int i=0;i<35;++i){const auto a=SidebarZombie(i);assert(a.x>=0&&a.x+a.w<SidebarWidth&&a.y>=80&&a.y+a.h<=550);for(int j=0;j<i;++j)assert(!overlaps(a,SidebarZombie(j)));}
  for(int i=0;i<25;++i){const auto a=SidebarPlant(i);assert(a.x>=0&&a.x+a.w<=SidebarWidth&&a.y>=80&&a.y+a.h<520);for(int j=0;j<i;++j)assert(!overlaps(a,SidebarPlant(j)));}
- for(int i=0;i<5;++i){const auto a=Character(i);assert(a.w==50&&a.h==70&&a.y+a.h<NativeFilter.y);for(int j=0;j<i;++j)assert(!overlaps(a,Character(j)));}
+ for(int i=0;i<8;++i){const auto a=Character(i);assert(a.w==50&&a.h==70&&a.y+a.h<NativeFilter.y);for(int j=0;j<i;++j)assert(!overlaps(a,Character(j)));}
  for(int i=0;i<ControlCount;++i){
    const auto b=Control(i);assert(b.x>=548&&b.x+b.w<=CanvasWidth&&b.y+b.h<=80);
    assert(!overlaps(b,Shovel));for(int j=0;j<i;++j)assert(!overlaps(b,Control(j)));
