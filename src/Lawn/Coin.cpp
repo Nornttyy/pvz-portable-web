@@ -384,20 +384,7 @@ void Coin::CoinInitialize(int theX, int theY, CoinType theCoinType, CoinMotion t
 		break;
 	}
 
-	float aScale;
-	if (mType == CoinType::COIN_SMALLSUN)
-	{
-		aScale = 0.5f;
-	}
-	else if (mType == CoinType::COIN_LARGESUN)
-	{
-		aScale = 2.0f;
-	}
-	else
-	{
-		aScale = 1.0f;
-	}
-	mScale *= aScale;
+	mScale *= GetSunScale();
 
 	if (CoinGetsBouncyArrow())
 	{
@@ -1291,7 +1278,11 @@ void Coin::Collect()
 
 float Coin::GetSunScale()
 {
-	return mType == CoinType::COIN_SMALLSUN ? 0.5f : mType == CoinType::COIN_LARGESUN ? 2.0f : 1.0f;
+	// Plant income is 50, but its sun should retain the ordinary visual size.
+	// Native large sky/reward suns (e.g. Sunny Day) keep their original scale.
+	if (mType == CoinType::COIN_SMALLSUN) return 0.5f;
+	if (mType == CoinType::COIN_LARGESUN && mCoinMotion != CoinMotion::COIN_MOTION_FROM_PLANT) return 2.0f;
+	return 1.0f;
 }
 
 int Coin::GetSunValue()

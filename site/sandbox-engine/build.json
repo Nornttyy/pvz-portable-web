@@ -2,7 +2,7 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Sunflower and mature sun-shroom produce native 50-value suns; young sun-shroom stays 15 and ordinary sky sun stays 25; production timing unchanged. Self-Thrower uses the native chooser grid; fourteen mechanic plants and seven zombie replacements; random-amplitude floating peas, automatic 200-rage/80-pea burst, no manual release or ordinary knockback",
+  "mode": "Plant-produced 50-value suns retain ordinary sun size while spawning, resting and collecting; income remains 50. Young sun-shroom stays 15; native sky and special-mode suns unchanged. Self-Thrower uses the native chooser grid; fourteen mechanic plants and seven zombie replacements; random-amplitude floating peas, automatic 200-rage/80-pea burst, no manual release or ordinary knockback",
   "files": [
     {
       "name": "pvz-portable.js",
@@ -11,8 +11,8 @@
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7466166,
-      "sha256": "02b3e56e0b5f81c27e7b3efe482780dc64165d6e8ee0ec94c164b5fba096d056"
+      "size": 7466278,
+      "sha256": "9f4fbed6e06ff1c5d493786cff26e5c464de913434d43cd513970a6c6f269906"
     }
   ]
 }

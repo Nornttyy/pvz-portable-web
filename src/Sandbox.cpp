@@ -343,9 +343,9 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_zombie_data(int index,int field)
 
 // Read-only sun diagnostics for both adventure and sandbox; no balance setters.
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sun_data(int index,int field) {
-    if(!gLawnApp||gLawnApp->mGameScene!=SCENE_PLAYING||!gLawnApp->mBoard||index<0||field<0||field>6)return -1;
+    if(!gLawnApp||gLawnApp->mGameScene!=SCENE_PLAYING||!gLawnApp->mBoard||index<0||field<0||field>8)return -1;
     for(auto* sun:gLawnApp->mBoard->mCoins)if(!sun->mDead&&!sun->mIsBeingCollected&&sun->IsSun()){
-        if(index--==0)return field==0?sun->GetSunValue():field==1?int(sun->mPosX+30):field==2?int(sun->mPosY+30):field==3?int(sun->mCoinMotion):field==4?sun->mCoinAge:field==5?int(sun->mType):sun->mDisappearCounter;
+        if(index--==0)return field==0?sun->GetSunValue():field==1?int(sun->mPosX+30):field==2?int(sun->mPosY+30):field==3?int(sun->mCoinMotion):field==4?sun->mCoinAge:field==5?int(sun->mType):field==6?sun->mDisappearCounter:field==7?int(sun->mScale*1000):int(sun->GetSunScale()*1000);
     }
     return -1;
 }

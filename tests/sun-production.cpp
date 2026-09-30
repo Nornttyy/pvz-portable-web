@@ -11,14 +11,14 @@ struct App {
  bool IsIZombieLevel(){return izombie;}void PlayFoley(FoleyType){}
  Reanimation* ReanimationGet(int){return &animation;}
 };
-struct Coin {CoinType mType;int GetSunValue();};
+struct Coin {CoinType mType;CoinMotion mCoinMotion=COIN_MOTION_FROM_SKY;int GetSunValue();float GetSunScale();};
 struct Board {
  struct {int mSize=0,mMaxSize=1000;} mCoins;
  struct Challenge {ChallengeState mChallengeState=STATECHALLENGE_LAST_STAND_ONSLAUGHT;} challenge;
  Challenge* mChallenge=&challenge;int mCurrentWave=1,mNumWaves=10;bool award=false;
  std::vector<Coin> coins;std::vector<CoinMotion> motions;
  bool HasLevelAwardDropped(){return award;}
- void AddCoin(int,int,CoinType type,CoinMotion motion){coins.push_back({type});motions.push_back(motion);++mCoins.mSize;}
+ void AddCoin(int,int,CoinType type,CoinMotion motion){coins.push_back({type,motion});motions.push_back(motion);++mCoins.mSize;}
 };
 struct Plant {
  App app;Board board;App* mApp=&app;Board* mBoard=&board;
@@ -39,11 +39,13 @@ int main(){
  for(bool replacement:{false,true}){
   Plant p;p.meme=replacement;p.UpdateProductionPlant();assert(p.board.coins.size()==1);
   assert(p.board.coins[0].GetSunValue()==50&&p.board.motions[0]==COIN_MOTION_FROM_PLANT);
+  assert(p.board.coins[0].GetSunScale()==1.0f);
   assert(p.mLaunchCounter==2500);p.UpdateProductionPlant();assert(p.board.coins.size()==1&&p.mLaunchCounter==2499);
  }
  for(auto state:{STATE_SUNSHROOM_SMALL,STATE_SUNSHROOM_BIG}){
   Plant p;p.mSeedType=SEED_SUNSHROOM;p.mState=state;p.mStateCountdown=100;p.UpdateSunShroom();
   assert(p.board.coins.size()==1&&p.board.coins[0].GetSunValue()==(state==STATE_SUNSHROOM_SMALL?15:50));
+  assert(p.board.coins[0].GetSunScale()==(state==STATE_SUNSHROOM_SMALL?0.5f:1.0f));
  }
  {Plant p;p.mSeedType=SEED_SUNSHROOM;p.mState=STATE_SUNSHROOM_GROWING;p.UpdateSunShroom();assert(p.board.coins.empty()&&p.mLaunchCounter==1);
   p.app.animation.mLoopCount=1;p.UpdateSunShroom();assert(p.mState==STATE_SUNSHROOM_BIG&&p.board.coins.empty());
@@ -52,5 +54,9 @@ int main(){
  {Plant p;p.app.mGameMode=GAMEMODE_CHALLENGE_BIG_TIME;p.UpdateProductionPlant();assert(p.board.coins.size()==2);for(auto c:p.board.coins)assert(c.GetSunValue()==50);}
  for(int guard=0;guard<5;++guard){Plant p;switch(guard){case 0:p.meme=true;p.producing=false;break;case 1:p.inPlay=false;break;case 2:p.app.izombie=true;break;case 3:p.board.award=true;break;case 4:p.board.mCoins.mSize=992;break;}p.UpdateProductionPlant();assert(p.board.coins.empty());}
  {Coin sky{COIN_SUN};assert(sky.GetSunValue()==25);}
+ for(auto motion:{COIN_MOTION_FROM_SKY,COIN_MOTION_FROM_SKY_SLOW,COIN_MOTION_FROM_PLANT,COIN_MOTION_COIN,COIN_MOTION_FROM_PRESENT}){
+  Coin sun{COIN_LARGESUN,motion};assert(sun.GetSunValue()==50);
+  assert(sun.GetSunScale()==(motion==COIN_MOTION_FROM_PLANT?1.0f:2.0f));
+ }
  std::cout<<"Native sun production: sunflower 50, mature shroom 50, young 15; timing, guards and sky unchanged\n";
 }

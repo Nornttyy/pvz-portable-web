@@ -268,6 +268,45 @@ index 2293690..543a195 100644
  	void							MouseDrag(int x, int y) override;
  	void							MouseDown(int x, int y, int theClickCount) override;
  	void							MouseUp(int x, int y, int theClickCount) override;
+diff --git a/src/Lawn/Coin.cpp b/src/Lawn/Coin.cpp
+index cdec611..8979b9e 100644
+--- a/src/Lawn/Coin.cpp
++++ b/src/Lawn/Coin.cpp
+@@ -384,20 +384,7 @@ void Coin::CoinInitialize(int theX, int theY, CoinType theCoinType, CoinMotion t
+ 		break;
+ 	}
+ 
+-	float aScale;
+-	if (mType == CoinType::COIN_SMALLSUN)
+-	{
+-		aScale = 0.5f;
+-	}
+-	else if (mType == CoinType::COIN_LARGESUN)
+-	{
+-		aScale = 2.0f;
+-	}
+-	else
+-	{
+-		aScale = 1.0f;
+-	}
+-	mScale *= aScale;
++	mScale *= GetSunScale();
+ 
+ 	if (CoinGetsBouncyArrow())
+ 	{
+@@ -1291,7 +1278,11 @@ void Coin::Collect()
+ 
+ float Coin::GetSunScale()
+ {
+-	return mType == CoinType::COIN_SMALLSUN ? 0.5f : mType == CoinType::COIN_LARGESUN ? 2.0f : 1.0f;
++	// Plant income is 50, but its sun should retain the ordinary visual size.
++	// Native large sky/reward suns (e.g. Sunny Day) keep their original scale.
++	if (mType == CoinType::COIN_SMALLSUN) return 0.5f;
++	if (mType == CoinType::COIN_LARGESUN && mCoinMotion != CoinMotion::COIN_MOTION_FROM_PLANT) return 2.0f;
++	return 1.0f;
+ }
+ 
+ int Coin::GetSunValue()
 diff --git a/src/Lawn/Plant.cpp b/src/Lawn/Plant.cpp
 index c934659..9d2c1bd 100644
 --- a/src/Lawn/Plant.cpp
