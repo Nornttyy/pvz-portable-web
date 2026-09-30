@@ -59,7 +59,8 @@ bool UpdateRunner(Zombie* z){
  }
  if(!IsRunning(z))return false;
  z->StopEating();
- if(z->IsImmobilizied())return true;
+ // Preserve native grounding gates too (e.g. a runner carried by a bungee).
+ if(z->ZombieNotWalking())return true;
  if(z->mTargetCol<0){
   int last=9;for(auto* p:z->mBoard->mPlants)if(!p->mDead&&!p->mSquished&&!p->NotOnGround()&&p->mRow==z->mRow)last=std::min(last,p->mPlantCol);
   z->mTargetCol=last==9?0:last;

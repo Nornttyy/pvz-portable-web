@@ -257,6 +257,10 @@ int main(){
   z->mHasHead=false;assert(!SandboxZombies::UpdateRunner(z)&&z->mZombiePhase==PHASE_ZOMBIE_NORMAL);
   z->mDead=true;assert(!SandboxZombies::UpdateRunner(z));
  }
+ {World w;auto* z=w.enemy(650);SandboxZombies::Assign(z,213);z->movementBlocked=true;
+  for(int i=0;i<300;++i)assert(SandboxZombies::UpdateRunner(z));assert(z->mPosX==650&&z->mTargetCol==-1);
+  z->movementBlocked=false;SandboxZombies::UpdateRunner(z);assert(z->mPosX<650);
+ }
  {World w;w.plant(8,2);auto* z=w.enemy(50);SandboxZombies::Assign(z,213);SandboxZombies::UpdateRunner(z);assert(z->mPosX==50&&z->mZombiePhase==SandboxZombies::RunBrake);}
  {World w;auto* z=w.enemy(700);SandboxZombies::Assign(z,213);Reanimation body;SandboxZombies::AdjustPose(z,&body);assert(body.mOverlayMatrix.m01>0&&body.mOverlayMatrix.m02<0);
   z->mZombiePhase=SandboxZombies::RunOut;z->mHasObject=true;body.mOverlayMatrix={};SandboxZombies::AdjustPose(z,&body);assert(body.mOverlayMatrix.m01<0&&body.mOverlayMatrix.m02>0);

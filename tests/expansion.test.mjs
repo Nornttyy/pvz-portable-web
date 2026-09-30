@@ -136,6 +136,7 @@ test('runner movement uses native status, terrain, mirroring and saved phase wit
  const playing=z.slice(z.indexOf('void Zombie::UpdatePlaying()'),z.indexOf('bool Zombie::HasYuckyFaceImage()'));
  for(const path of ['UpdateZombiePosition();','CheckForPool();','CheckForHighGround();','CheckForBoardEdge();','TakeDamage(aDamage, 9U)'])assert.ok(playing.includes(path));
  assert.doesNotMatch(playing,/UpdateRunner/); // Do not skip damage decay/status timers.
+ assert.match(custom,/if\(z->ZombieNotWalking\(\)\)return true;/);
  const restore=custom.slice(custom.indexOf('bool Restore('),custom.indexOf('void Assign('));
  assert.doesNotMatch(restore,/mZombiePhase\s*=|mPhaseCounter\s*=|mTargetCol\s*=|mHasObject\s*=/);
  const save=(await read('src/Lawn/System/SaveGame.cpp')).toString();
