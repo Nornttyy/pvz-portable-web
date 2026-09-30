@@ -11,7 +11,6 @@
 #include "graphics/Graphics.h"
 #include <algorithm>
 #include <cmath>
-#include <vector>
 extern bool gSandboxEnabled;
 namespace SandboxZombies {
 namespace {
@@ -19,9 +18,32 @@ bool Enabled(){return gSandboxEnabled||(gLawnApp&&gLawnApp->IsAdventureMode());}
 bool Walker(Zombie* z){return z&&z->IsOnBoard()&&!z->mDead&&!z->IsDeadOrDying()&&z->mHasHead&&!z->mMindControlled&&z->mZombiePhase==PHASE_ZOMBIE_NORMAL&&z->mZombieHeight==HEIGHT_ZOMBIE_NORMAL&&!z->mInPool;}
 bool Portable(Zombie* z){if(!Walker(z))return false;const int t=int(z->mZombieType);return t==0||t==1||t==2||t==4||t==6||t==7||t==24;}
 void Phase(Zombie* z,int phase,int ticks){z->StopEating();z->mZombiePhase=static_cast<decltype(z->mZombiePhase)>(phase);z->mPhaseCounter=ticks;}
-void Land(Zombie* z){Phase(z,PHASE_ZOMBIE_NORMAL,0);z->mTargetPlantID=static_cast<decltype(z->mTargetPlantID)>(0);z->mAltitude=0;z->mZombieHeight=HEIGHT_ZOMBIE_NORMAL;z->StartWalkAnim(10);}
+void Land(Zombie* z){
+ Phase(z,int(z->mZombieType)==21&&z->mShieldHealth>0?PHASE_LADDER_CARRYING:PHASE_ZOMBIE_NORMAL,0);
+ z->mTargetPlantID=static_cast<decltype(z->mTargetPlantID)>(0);z->mTargetRow=-1;
+ z->mAltitude=0;z->mZombieHeight=HEIGHT_ZOMBIE_NORMAL;z->mPosY=z->GetPosYBasedOnRow(z->mRow);z->mY=int(z->mPosY);z->StartWalkAnim(10);
 }
-bool HasInteraction(const Zombie* z){return z&&int(z->mZombiePhase)>=Held&&int(z->mZombiePhase)<=Misdirected;}
+bool Ready(Zombie* z){return Portable(z)&&!IsFeigning(z)&&!IsResting(z)&&!z->mIceTrapCounter&&!z->mButteredCounter;}
+bool DryRow(Board* b,int row){return row>=0&&row<(b->StageHasPool()?6:5)&&b->RowCanHaveZombies(row)&&!(b->StageHasPool()&&(row==2||row==3));}
+// Advance in small steps but never skip a plant, pumpkin or the mower/house edge.
+// Native eating resumes after landing. Ground spikes and support pots are not walls.
+float ForwardLimit(Zombie* z,float desired){
+ float stop=std::max(95.0f,desired);
+ for(auto* p:z->mBoard->mPlants)if(!p->mDead&&!p->mSquished&&p->mPlantHealth>0&&p->mRow==z->mRow){
+  const int type=int(p->mSeedType);if(type==16||type==33||type==21||type==46)continue;
+  const float right=p->mX+(type==47?145:65)-z->mZombieAttackRect.mX;
+  if(p->mX<z->mPosX+z->mZombieAttackRect.mX+20&&right>stop)stop=std::min(z->mPosX,right);
+ }
+ return std::min(z->mPosX,stop);
+}
+void TripNeighbors(Zombie* z,float reach){
+ for(auto* other:z->mBoard->mZombies)if(other!=z&&Ready(other)&&other->mRow==z->mRow&&std::abs(other->mPosX-z->mPosX)<reach){Phase(other,Tripped,100);gLawnApp->PlayMemeCue(2,3);}
+}
+void DropPassenger(Zombie* z){
+ const int height=std::max(0,int(z->mAltitude));Phase(z,AirDrop,45);z->mTargetCol=height;z->mTargetPlantID=static_cast<decltype(z->mTargetPlantID)>(0);
+}
+}
+bool HasInteraction(const Zombie* z){return z&&int(z->mZombiePhase)>=Held&&int(z->mZombiePhase)<=AirDrop;}
 bool IsHeld(const Zombie* z){return z&&int(z->mZombiePhase)==Held;}
 bool CatchForReturn(Plant* p,Zombie* z){
  if(!p||p->mDead||p->mSquished||p->mPlantHealth<=0||MemeCharacters::Type(p)!=509||!Portable(z))return false;
@@ -55,6 +77,19 @@ bool UpdateInteraction(Zombie* z){
   }
   return true;
  }
+ if(phase==Airlift){
+  // A generation-bearing ID in a phase-tagged, serialized slot, NOT a native
+  // related-zombie link: killing/charming a passenger must not kill the carrier.
+  auto* carrier=z->mBoard->mZombies.DataArrayTryToGet(static_cast<unsigned>(z->mTargetPlantID));
+  if(!carrier||carrier->mDead||carrier->IsDeadOrDying()||!carrier->IsOnBoard()||!carrier->mHasHead||carrier->mMindControlled||carrier->mBlowingAway||carrier->mPosX<95||carrier->mPosX>780||int(carrier->mZombieType)!=16||carrier->mZombiePhase!=PHASE_BALLOON_FLYING||!DryRow(z->mBoard,carrier->mRow)){DropPassenger(z);return true;}
+  if(z->mIceTrapCounter||z->mButteredCounter){DropPassenger(z);return true;}
+  if(!carrier->mIceTrapCounter&&!carrier->mButteredCounter&&z->mPhaseCounter>0)--z->mPhaseCounter;
+  const float lift=std::min(1.0f,(150-z->mPhaseCounter)/30.0f);
+  z->mPosX=z->mTargetCol+(carrier->mPosX+75-z->mTargetCol)*lift;z->mPosY=z->GetPosYBasedOnRow(z->mRow);
+  z->mAltitude=35*lift;z->mX=int(z->mPosX);z->mY=int(z->mPosY);
+  if(!z->mPhaseCounter)DropPassenger(z);
+  return true;
+ }
  // Pin/flight clocks and movement freeze together. Butter stays attached while sliding.
  if(z->mIceTrapCounter>0||(z->mButteredCounter>0&&phase!=Slipping))return true;
  if(z->mPhaseCounter>0)--z->mPhaseCounter;
@@ -64,6 +99,28 @@ bool UpdateInteraction(Zombie* z){
   z->mPosY=z->GetPosYBasedOnRow(z->mRow);z->mAltitude=phase==Returned?62*std::sin(t*3.14159265f):0;
   for(auto* other:z->mBoard->mZombies)if(other!=z&&Portable(other)&&other->mRow==z->mRow&&std::abs(other->mPosX-z->mPosX)<26){Phase(other,Tripped,100);gLawnApp->PlayMemeCue(2,3);}
  }else if(phase==Misdirected){z->mPosX=std::min(780.0f,z->mPosX+.65f);}
+ else if(phase==Hurried||phase==BrakeSlide){
+  const float total=phase==Hurried?60.0f:70.0f,t=1-z->mPhaseCounter/total;
+  const float desired=z->mTargetCol-(phase==Hurried?105:110)*t*(2-t);
+  z->mPosX=ForwardLimit(z,desired);z->mAltitude=phase==Hurried?35*std::sin(t*3.14159265f):0;
+  if(phase==BrakeSlide)TripNeighbors(z,28);
+  if(z->mPosX>desired+.1f||!z->mPhaseCounter){
+   const bool skid=phase==BrakeSlide;Land(z);if(skid)Phase(z,Tripped,100);
+  }
+ }else if(phase==DoorDash){
+  if(!z->mShieldHealth){Land(z);return true;}
+  const float desired=z->mPosX+(z->mTargetCol-z->mPosX)/(z->mPhaseCounter+1.0f);
+  z->mPosX=ForwardLimit(z,desired);
+  if(z->mPosX>desired+.1f)Land(z);
+ }else if(phase==LaneStep){
+  if(!DryRow(z->mBoard,z->mTargetCol)||!DryRow(z->mBoard,z->mTargetRow)){Land(z);return true;}
+  const float t=1-z->mPhaseCounter/45.0f,ease=t*t*(3-2*t);
+  const float from=z->GetPosYBasedOnRow(z->mTargetCol),to=z->GetPosYBasedOnRow(z->mTargetRow);
+  if(t>=.5f&&z->mRow!=z->mTargetRow)z->SetRow(z->mTargetRow);
+  z->mPosY=from+(to-from)*ease;
+ }else if(phase==AirDrop){
+  const float t=1-z->mPhaseCounter/45.0f;z->mAltitude=z->mTargetCol*(1-t*t);
+ }
  z->mX=int(z->mPosX);z->mY=int(z->mPosY);
  if(!z->mPhaseCounter)Land(z);
  return true;
@@ -75,7 +132,8 @@ bool IsFeigning(Zombie* z){return Enabled()&&Walker(z)&&int(z->mZombieType)==2&&
 bool IsResting(Zombie* z){
  if(!Enabled()||!Walker(z))return false;
  const int age=z->mZombieAge%800,type=int(z->mZombieType);
- return (type==0&&age>=600)||(type==7&&age>=200&&age<350)||(type==4&&z->mPhaseCounter>0&&z->mPhaseCounter<=40);
+ const int flagAge=z->mZombieAge%600;
+ return (type==0&&age>=600)||(type==1&&flagAge>=270&&flagAge<330)||(type==4&&z->mPhaseCounter>0&&z->mPhaseCounter<=40);
 }
 void PoleLanded(Zombie* z){if(Enabled()&&z&&int(z->mZombieType)==3)z->mPhaseCounter=800;}
 void ArmorBroken(Zombie* z){
@@ -90,6 +148,12 @@ void AdjustPose(Zombie* z,Reanimation* body){
  else if(interaction==Tripped){angle=-1.42f*std::min(1.0f,std::min((100-z->mPhaseCounter)/12.0f,z->mPhaseCounter/25.0f));}
  else if(interaction==Slipping){angle=1.1f*std::sin((80-z->mPhaseCounter)*3.14159265f/80);}
  else if(interaction==Pinned){angle=.12f*std::sin(z->mPhaseCounter*.16f);}
+ else if(interaction==Hurried){angle=-.40f*std::sin((60-z->mPhaseCounter)*3.14159265f/60);}
+ else if(interaction==DoorDash){angle=-.32f*std::sin((45-z->mPhaseCounter)*3.14159265f/45);}
+ else if(interaction==BrakeSlide){angle=.9f*std::sin((70-z->mPhaseCounter)*3.14159265f/140);}
+ else if(interaction==Airlift){angle=.20f*std::sin((150-z->mPhaseCounter)*.10f);}
+ else if(interaction==AirDrop){angle=.20f*std::sin(z->mPhaseCounter*3.14159265f/45);}
+ else if(interaction==LaneStep){angle=(z->mTargetRow>z->mTargetCol?.20f:-.20f)*std::sin(z->mPhaseCounter*3.14159265f/45);}
  else if(interaction==Misdirected){auto& m=body->mOverlayMatrix;m.m02+=90*m.m00;m.m00=-m.m00;m.m10=-m.m10;return;}
  else if(IsRetreating(z)){
   angle=0.24f*std::sin((z->mZombieAge%600-400)*3.14159265f/100);
@@ -100,13 +164,11 @@ void AdjustPose(Zombie* z,Reanimation* body){
   angle=-1.36f*t*t*(3-2*t);
  }else if(Walker(z)&&int(z->mZombieType)==4&&z->mPhaseCounter>0&&z->mPhaseCounter<=40){
   angle=-0.22f*std::sin(z->mPhaseCounter*3.14159265f/40);
- }else if(IsResting(z)){
-  const int start=int(z->mZombieType)==0?600:200,end=int(z->mZombieType)==0?800:350,age=z->mZombieAge%800;
+ }else if(IsResting(z)&&int(z->mZombieType)==0){
+  const int start=600,end=800,age=z->mZombieAge%800;
   const float fade=std::clamp(std::min(age-start,end-age)/20.0f,0.0f,1.0f);
-  angle=(int(z->mZombieType)==0?0.18f:-0.14f)*fade+0.015f*fade*std::sin(age*0.10f);
- }else if(Walker(z)&&int(z->mZombieType)==7&&z->mZombieAge%800<200&&!z->mIsEating){
-  const int age=z->mZombieAge%800;angle=-0.12f*std::clamp(std::min(age,200-age)/20.0f,0.0f,1.0f);
- }else if(Walker(z)&&int(z->mZombieType)==6&&z->mPhaseCounter>0&&z->mPhaseCounter<=20)angle=-0.09f*std::sin(z->mPhaseCounter*3.14159265f/20);
+  angle=-1.24f*fade+0.02f*fade*std::sin(age*.1f);
+ }else if(IsResting(z)&&int(z->mZombieType)==1){angle=-.20f*std::sin((z->mZombieAge%600-270)*3.14159265f/60);}
  else return;
  const float c=std::cos(angle),s=std::sin(angle);
  auto& m=body->mOverlayMatrix;
@@ -126,8 +188,22 @@ void RecoverPhone(Zombie* z){
 void Reset(){} void Forget(Zombie*){} void Assign(Zombie*,int){}
 void Tick(Board* b){
  if(!Enabled()||b->mPaused)return;
- struct Delivery{float x;int row,wave;};std::vector<Delivery> pending;
  for(auto* z:b->mZombies){
+  if(Walker(z)&&!z->mIceTrapCounter&&!z->mButteredCounter){
+   const int type=int(z->mZombieType);
+   if((type==0&&z->mZombieAge%800==630)||(IsFeigning(z)&&z->mPhaseCounter==275))TripNeighbors(z,65);
+   if(type==1&&z->mHasArm&&z->mZombieAge%600==300){
+    Zombie* follower=nullptr;
+    for(auto* q:b->mZombies)if(q!=z&&Ready(q)&&!q->mIsEating&&q->mRow==z->mRow&&q->mPosX>z->mPosX+20&&q->mPosX<z->mPosX+170&&(!follower||q->mPosX<follower->mPosX))follower=q;
+    if(follower){Phase(follower,Hurried,60);follower->mTargetCol=int(follower->mPosX);gLawnApp->PlayMemeCue(3,4);}
+   }
+   if(type==6&&z->mShieldHealth>0&&!z->mIsEating&&z->mZombieAge%600==300){
+    Zombie* friendZ=nullptr;
+    for(auto* q:b->mZombies)if(q!=z&&Ready(q)&&int(q->mZombieType)!=6&&q->mRow==z->mRow&&q->mPosX<z->mPosX-15&&q->mPosX>z->mPosX-120&&(!friendZ||q->mPosX<friendZ->mPosX))friendZ=q;
+    if(friendZ){const float target=ForwardLimit(z,friendZ->mPosX-65);if(target<z->mPosX-20){Phase(z,DoorDash,45);z->mTargetCol=int(target);gLawnApp->PlayMemeCue(1,-3);}}
+   }
+   if(type==7&&!z->mIsEating&&z->mZombieAge%800==200){Phase(z,BrakeSlide,70);z->mTargetCol=int(z->mPosX);gLawnApp->PlayMemeCue(2,-3);}
+  }
   if(Walker(z)&&int(z->mZombieType)==4&&z->mHasArm&&z->mHelmHealth>0&&!z->mIceTrapCounter&&!z->mButteredCounter&&((z->mZombieAge>0&&z->mZombieAge%600==0)||z->mPhaseCounter==20)){
    Zombie* victim=nullptr;
    for(auto* other:b->mZombies)if(other!=z&&Walker(other)&&(int(other->mZombieType)==0||int(other->mZombieType)==1||int(other->mZombieType)==2||int(other->mZombieType)==4||int(other->mZombieType)==6||int(other->mZombieType)==7||int(other->mZombieType)==24)&&other->mRow==z->mRow&&other->mPosX<z->mPosX&&other->mPosX>z->mPosX-100&&(!victim||other->mPosX>victim->mPosX))victim=other;
@@ -148,14 +224,13 @@ void Tick(Board* b){
    auto crowd=[&](int row){int n=0;for(auto* p:b->mPlants)if(!p->mDead&&!p->mSquished&&p->mRow==row&&int(p->mSeedType)!=16&&int(p->mSeedType)!=33&&int(p->mSeedType)!=21&&int(p->mSeedType)!=46&&p->mX<z->mPosX+60&&p->mX>z->mPosX-180)++n;return n;};
    int best=z->mRow,count=crowd(best);
    for(int row:{z->mRow-1,z->mRow+1})if(row>=0&&row<(b->StageHasPool()?6:5)&&b->RowCanHaveZombies(row)&&!(b->StageHasPool()&&(row==2||row==3||z->mRow==2||z->mRow==3))){const int n=crowd(row);if(n<count){count=n;best=row;}}
-   if(best!=z->mRow){z->StopEating();z->SetRow(best);z->mPhaseCounter=35;gLawnApp->PlayMemeCue(2,-5);}
+   if(best!=z->mRow){z->mTargetCol=z->mRow;z->mTargetRow=best;Phase(z,LaneStep,45);gLawnApp->PlayMemeCue(2,-5);}
   }
-  // Age is a native saved field: a single delivery, not a timer reset on load.
-  if(!z->mDead&&z->IsOnBoard()&&!z->IsDeadOrDying()&&z->mHasHead&&!z->mMindControlled&&int(z->mZombieType)==16&&z->IsFlying()&&z->mZombieAge==600&&z->mPosX>100&&z->mPosX<740&&!(b->StageHasPool()&&(z->mRow==2||z->mRow==3)))pending.push_back({z->mPosX+25,z->mRow,z->mFromWave});
- }
- for(const auto& drop:pending)if(b->mZombies.mSize<b->mZombies.mMaxSize-8){
-  if(auto* z=b->AddZombieInRow(ZOMBIE_NORMAL,drop.row,drop.wave)){
-   z->mPosX=drop.x;z->mX=int(drop.x);z->mAltitude=80;z->mZombieHeight=HEIGHT_FALLING;z->UpdateReanim();
+  // Each balloon can lift one EXISTING walker once. No spawning/duplicate loot.
+  if(!z->mDead&&z->IsOnBoard()&&!z->IsDeadOrDying()&&z->mHasHead&&!z->mMindControlled&&int(z->mZombieType)==16&&z->mZombiePhase==PHASE_BALLOON_FLYING&&!z->mIceTrapCounter&&!z->mButteredCounter&&!z->mSummonCounter&&z->mZombieAge%600==300&&z->mPosX>180&&z->mPosX<740&&DryRow(b,z->mRow)){
+   Zombie* passenger=nullptr;
+   for(auto* q:b->mZombies)if(q!=z&&Ready(q)&&!q->mIsEating&&q->mRow==z->mRow&&std::abs(q->mPosX-z->mPosX)<95&&(!passenger||std::abs(q->mPosX-z->mPosX)<std::abs(passenger->mPosX-z->mPosX)))passenger=q;
+   if(passenger){Phase(passenger,Airlift,150);passenger->mTargetCol=int(passenger->mPosX);passenger->mTargetPlantID=static_cast<decltype(passenger->mTargetPlantID)>(b->mZombies.DataArrayGetID(z));z->mSummonCounter=1;gLawnApp->PlayMemeCue(3,-3);}
   }
  }
 }
@@ -164,25 +239,19 @@ float Speed(Zombie* z){
  if(!Enabled()||!Walker(z))return 1.0f;
  if(IsRetreating(z))return -1.4f;
  if(IsFeigning(z)||IsResting(z))return 0.0f;
- const int type=int(z->mZombieType);
- if(type==7&&z->mZombieAge%800<200)return 1.8f;
- if(type==0||type==2||type==4||type==6)for(auto* leader:z->mBoard->mZombies)
-  if(leader!=z&&int(leader->mZombieType)==1&&Walker(leader)&&std::abs(leader->mRow-z->mRow)<=1&&std::abs(leader->mPosX-z->mPosX)<160)return 1.5f;
- return 1.0f; // Flags do not stack, and vehicles/giants keep their native pace.
+ return 1.0f; // Native pace; flag encouragement and football skidding are physical actions.
 }
-int Damage(Zombie* z,int damage,unsigned flags){
- static bool sharing=false;
- if(sharing||!Enabled()||!Walker(z)||int(z->mZombieType)==6||damage<2||damage>100||flags)return damage;
- Zombie* guard=nullptr;float nearest=10000;
- for(auto* other:z->mBoard->mZombies)if(other!=z&&Walker(other)&&int(other->mZombieType)==6&&other->mShieldHealth>0&&std::abs(other->mRow-z->mRow)<=1&&std::abs(other->mPosX-z->mPosX)<100){
-  const float distance=std::abs(other->mPosX-z->mPosX)+100*std::abs(other->mRow-z->mRow);if(distance<nearest){guard=other;nearest=distance;}
- }
- if(!guard)return damage;
- const int share=std::min(guard->mShieldHealth,damage/2);sharing=true;guard->TakeDamage(share,0);sharing=false;guard->mPhaseCounter=20;
- return damage-share;
-}
+int Damage(Zombie*,int damage,unsigned){return damage;} // A door must physically intercept the shot.
 bool ElectricHit(Zombie*){return false;} void CombatDeath(Zombie*){}
 void DrawEffects(Sexy::Graphics* g,Board* b,int row){
+ // Draw the tow-line in lawn coordinates. Passenger and carrier retain their
+ // own native bodies, armor, hit reactions and shadows.
+ for(auto* z:b->mZombies)if(!z->mDead&&int(z->mZombiePhase)==Airlift&&z->mRow==row){
+  auto* carrier=b->mZombies.DataArrayTryToGet(static_cast<unsigned>(z->mTargetPlantID));
+  if(!carrier||carrier->mDead)continue;
+  const int x1=int(carrier->mPosX+72),y1=int(carrier->mPosY+66-carrier->mAltitude),x2=int(z->mPosX+44),y2=int(z->mPosY+53-z->mAltitude);
+  g->SetColor(Sexy::Color(68,61,37));g->DrawLine(x1,y1,x2,y2);g->DrawLine(x1,y1+1,x2,y2+1);
+ }
  // Native thorn art across the two ankles: the binding is visible, with no labels.
  auto* thorn=SandboxArt::NativeImage("SpikeRock_spike.png");if(!thorn)return;
  for(auto* z:b->mZombies)if(!z->mDead&&int(z->mZombiePhase)==Pinned&&z->mRow==row){

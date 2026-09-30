@@ -215,8 +215,8 @@ int main(){
    assert(bucket->mPhaseCounter==oldCounter&&bucket->mPosX==x&&bucket->mIsEating&&SandboxZombies::Speed(bucket)==1&&!SandboxZombies::IsRetreating(bucket));
   }
  }
- {World w;auto* normal=w.enemy(450),*flag=w.enemy(550,2,static_cast<ZombieType>(1));assert(SandboxZombies::Speed(normal)==1.5f);
-  w.enemy(520,2,static_cast<ZombieType>(1));assert(SandboxZombies::Speed(normal)==1.5f);flag->mDead=true;
+ {World w;auto* normal=w.enemy(550),*flag=w.enemy(450,2,static_cast<ZombieType>(1));assert(SandboxZombies::Speed(normal)==1);
+  w.enemy(420,2,static_cast<ZombieType>(1));assert(SandboxZombies::Speed(normal)==1);flag->mDead=true;
   auto* giant=w.enemy(450,2,ZOMBIE_GARGANTUAR);assert(SandboxZombies::Speed(giant)==1);
   gSandboxEnabled=false;app.adventure=false;assert(SandboxZombies::Speed(normal)==1);gSandboxEnabled=true;app.adventure=true;
  }
@@ -360,19 +360,22 @@ int main(){
   p->mIsAsleep=true;w.step(1000);assert(MemeCharacters::Data(p,4)==0&&z->mZombiePhase==0);
  }
  {World w;auto* z=w.enemy();for(int age:{0,599,800}){z->mZombieAge=age;assert(!SandboxZombies::IsResting(z));}for(int age:{600,650,799}){z->mZombieAge=age;z->mIsEating=true;w.step();assert(SandboxZombies::IsResting(z)&&SandboxZombies::Speed(z)==0&&!z->mIsEating);}
-  auto* football=w.enemy(600,2,static_cast<ZombieType>(7));football->mZombieAge=100;assert(SandboxZombies::Speed(football)==1.8f);football->mZombieAge=200;assert(SandboxZombies::IsResting(football));football->mZombieAge=350;assert(SandboxZombies::Speed(football)==1);
+  auto* football=w.enemy(600,2,static_cast<ZombieType>(7));football->mZombieAge=100;assert(SandboxZombies::Speed(football)==1);football->mZombieAge=200;assert(!SandboxZombies::IsResting(football));football->mZombieAge=350;assert(SandboxZombies::Speed(football)==1);
   football->mZombieAge=250;football->mMindControlled=true;assert(!SandboxZombies::IsResting(football));
  }
- {World w;auto* victim=w.enemy(500),*guard=w.enemy(510,1,static_cast<ZombieType>(6));guard->mShieldHealth=100;
-  assert(SandboxZombies::Damage(victim,20)==10&&guard->mShieldHealth==90&&guard->mPhaseCounter==20);assert(SandboxZombies::Damage(victim,40,1)==40&&guard->mShieldHealth==90);
-  assert(SandboxZombies::Damage(victim,1800)==1800);guard->mShieldHealth=3;assert(SandboxZombies::Damage(victim,20)==17&&guard->mShieldHealth==0);assert(SandboxZombies::Damage(victim,20)==20);
-  guard->mShieldHealth=100;guard->mMindControlled=true;assert(SandboxZombies::Damage(victim,20)==20);guard->mMindControlled=false;guard->mPosX=650;assert(SandboxZombies::Damage(victim,20)==20);
-  guard->mPosX=510;assert(SandboxZombies::Damage(guard,20)==20);
+ {World w;auto* victim=w.enemy(500),*guard=w.enemy(570,2,static_cast<ZombieType>(6));guard->mShieldHealth=100;guard->mZombieAge=300;
+  assert(SandboxZombies::Damage(victim,20)==20&&guard->mShieldHealth==100);w.step();assert(guard->mZombiePhase==SandboxZombies::DoorDash&&guard->mPosX==570);
+  for(int i=0;i<45;i++)SandboxZombies::UpdateInteraction(guard);assert(guard->mPosX==435&&guard->mZombiePhase==0&&guard->mShieldHealth==100&&victim->mBodyHealth==1000);
+  assert(SandboxZombies::Damage(victim,40,1)==40&&SandboxZombies::Damage(victim,1800)==1800); // No invisible damage sharing.
  }
- {World w;auto* balloon=w.enemy(600,2,static_cast<ZombieType>(16));balloon->flying=true;balloon->mZombieAge=599;w.step();assert(w.mZombies.mSize==1);balloon->mZombieAge=600;w.step();assert(w.mZombies.mSize==2);
-  auto* drop=w.mZombies.values[1];assert(drop->mPosX==625&&drop->mRow==2&&drop->mAltitude==80&&drop->mZombieHeight==HEIGHT_FALLING);balloon->mZombieAge=601;w.step(1000);assert(w.mZombies.mSize==2);
+ {World w;auto* balloon=w.enemy(600,2,static_cast<ZombieType>(16));balloon->mZombiePhase=PHASE_BALLOON_FLYING;auto* passenger=w.enemy(660,2,static_cast<ZombieType>(2));passenger->mHelmHealth=123;passenger->mBodyHealth=89;
+  balloon->mZombieAge=300;w.step();assert(w.mZombies.mSize==2&&passenger->mZombiePhase==SandboxZombies::Airlift&&balloon->mSummonCounter==1);
+  assert(passenger->mTargetPlantID==w.mZombies.DataArrayGetID(balloon));
+  for(int i=0;i<150;i++)SandboxZombies::UpdateInteraction(passenger);assert(passenger->mZombiePhase==SandboxZombies::AirDrop&&passenger->mAltitude==35);
+  for(int i=0;i<45;i++)SandboxZombies::UpdateInteraction(passenger);assert(passenger->mZombiePhase==0&&passenger->mAltitude==0&&passenger->mPosX==675&&passenger->mBodyHealth==89&&passenger->mHelmHealth==123);
+  balloon->mZombieAge=900;w.step();assert(w.mZombies.mSize==2&&passenger->mZombiePhase==0);
  }
- {World w;w.pool=true;auto* balloon=w.enemy(600,2,static_cast<ZombieType>(16));balloon->flying=true;balloon->mZombieAge=600;w.step();assert(w.mZombies.mSize==1);}
+ {World w;w.pool=true;auto* balloon=w.enemy(600,2,static_cast<ZombieType>(16));balloon->mZombiePhase=PHASE_BALLOON_FLYING;balloon->mZombieAge=300;auto* passenger=w.enemy(650);w.step();assert(passenger->mZombiePhase==0&&balloon->mSummonCounter==0);}
  {World w;auto* p=w.add(514);w.step(500);assert(MemeCharacters::Data(p,1)==0);
   auto* z=w.enemy(p->mX+130);w.step(299);assert(z->mBodyHealth==1000&&MemeCharacters::Data(p,1)==299);
   const auto saved=SandboxPlants::SavePower(p);w.mPaused=true;w.step(1000);assert(SandboxPlants::SavePower(p)==saved);w.mPaused=false;
@@ -401,13 +404,51 @@ int main(){
   imp->mZombieAge=500;assert(SandboxZombies::Speed(imp)==1);imp->mZombieAge=1000;assert(SandboxZombies::IsRetreating(imp));
  }
  {World w;auto* z=w.enemy(400,2,static_cast<ZombieType>(21));z->mShieldHealth=500;z->mZombiePhase=PHASE_LADDER_CARRYING;z->mZombieAge=600;w.plant(4,2);
-  const float x=z->mPosX;w.step();assert(z->mRow==1&&z->mPosX==x&&z->mShieldHealth==500&&z->mPhaseCounter==35);
+  const float x=z->mPosX;w.step();assert(z->mRow==2&&z->mPosX==x&&z->mShieldHealth==500&&z->mZombiePhase==SandboxZombies::LaneStep);
+  for(int i=0;i<15;i++)SandboxZombies::UpdateInteraction(z);assert(z->mRow==2&&z->mPosY<200&&z->mPosY>150);
+  w.mPaused=true;const auto y=z->mPosY;SandboxZombies::UpdateInteraction(z);assert(z->mPosY==y&&z->mPhaseCounter==30);w.mPaused=false;
+  for(int i=0;i<30;i++)SandboxZombies::UpdateInteraction(z);assert(z->mRow==1&&z->mPosY==100&&z->mPosX==x&&z->mZombiePhase==PHASE_LADDER_CARRYING);
  }
  for(int blocked=0;blocked<4;++blocked){World w;auto* z=w.enemy(400,0,static_cast<ZombieType>(21));z->mShieldHealth=500;z->mZombiePhase=PHASE_LADDER_CARRYING;z->mZombieAge=600;w.plant(4,0);
   if(blocked==0)z->mShieldHealth=0;if(blocked==1)z->mZombiePhase=PHASE_LADDER_PLACING;if(blocked==2)z->mMindControlled=true;if(blocked==3)z->mIceTrapCounter=100;
   w.step();assert(z->mRow==0);
  }
  {World w;w.pool=true;auto* z=w.enemy(400,1,static_cast<ZombieType>(21));z->mShieldHealth=500;z->mZombiePhase=PHASE_LADDER_CARRYING;z->mZombieAge=600;w.plant(4,1);w.plant(4,0);w.step();assert(z->mRow==1);}
+ // Zombie behavior pass: real displacements, no aura multipliers, damage gifts or clones.
+ {World w;auto* flag=w.enemy(400,2,static_cast<ZombieType>(1));auto* a=w.enemy(470),*b=w.enemy(530),*otherLane=w.enemy(460,1);
+  flag->mZombieAge=300;w.step();assert(a->mZombiePhase==SandboxZombies::Hurried&&b->mZombiePhase==0&&otherLane->mZombiePhase==0);
+  const float x=a->mPosX;w.mPaused=true;SandboxZombies::UpdateInteraction(a);assert(a->mPosX==x&&a->mPhaseCounter==60);w.mPaused=false;
+  a->mIceTrapCounter=5;SandboxZombies::UpdateInteraction(a);assert(a->mPhaseCounter==60);a->mIceTrapCounter=0;
+  for(int i=0;i<30;i++)SandboxZombies::UpdateInteraction(a);assert(a->mAltitude>34&&a->mPosX<x-70&&a->mPosX>x-105);
+  for(int i=0;i<30;i++)SandboxZombies::UpdateInteraction(a);assert(a->mPosX==365&&a->mZombiePhase==0&&a->mBodyHealth==1000&&a->mAltitude==0);
+ }
+ for(int blocked=0;blocked<6;blocked++){World w;auto* flag=w.enemy(400,2,static_cast<ZombieType>(1)),*follower=w.enemy(470);flag->mZombieAge=300;
+  if(blocked==0)flag->mHasArm=false;if(blocked==1)flag->mIceTrapCounter=10;if(blocked==2)follower->mMindControlled=true;if(blocked==3)follower->mInPool=true;if(blocked==4)follower->mZombieType=ZOMBIE_GARGANTUAR;if(blocked==5)follower->mIsEating=true;
+  w.step();assert(follower->mZombiePhase==0);
+ }
+ {World w;auto* flag=w.enemy(400,2,static_cast<ZombieType>(1)),*follower=w.enemy(470);w.plant(5,2)->mSeedType=static_cast<SeedType>(3);flag->mZombieAge=300;w.step();
+  for(int i=0;i<60;i++)SandboxZombies::UpdateInteraction(follower);assert(follower->mPosX>=415&&follower->mZombiePhase==0); // No hopping through a nut.
+ }
+ {World w;auto* z=w.enemy(500),*friendZ=w.enemy(540,2,static_cast<ZombieType>(2)),*heavy=w.enemy(520,2,ZOMBIE_GARGANTUAR);z->mZombieAge=630;w.step();
+  assert(friendZ->mZombiePhase==SandboxZombies::Tripped&&friendZ->mBodyHealth==1000&&heavy->mZombiePhase==0);z->mZombieAge=631;
+  for(int i=0;i<100;i++)SandboxZombies::UpdateInteraction(friendZ);w.step();assert(friendZ->mZombiePhase==0); // One fall, not a permanent trip field.
+ }
+ {World w;auto* z=w.enemy(500,2,static_cast<ZombieType>(2)),*friendZ=w.enemy(540);SandboxZombies::ArmorBroken(z);z->mPhaseCounter=275;w.step();assert(friendZ->mZombiePhase==SandboxZombies::Tripped&&z->mPhaseCounter==275);}
+ {World w;auto* z=w.enemy(600,2,static_cast<ZombieType>(7)),*friendZ=w.enemy(540);z->mZombieAge=200;w.step();assert(z->mZombiePhase==SandboxZombies::BrakeSlide&&SandboxZombies::Speed(friendZ)==1);
+  for(int i=0;i<70;i++)SandboxZombies::UpdateInteraction(z);assert(z->mPosX==490&&z->mZombiePhase==SandboxZombies::Tripped&&friendZ->mZombiePhase==SandboxZombies::Tripped&&friendZ->mBodyHealth==1000);
+  for(int i=0;i<100;i++)SandboxZombies::UpdateInteraction(z);assert(z->mZombiePhase==0&&z->mBodyHealth==1000);
+ }
+ {World w;auto* z=w.enemy(520,2,static_cast<ZombieType>(7));auto* nut=w.plant(6,2);nut->mSeedType=static_cast<SeedType>(3);z->mZombieAge=200;w.step();for(int i=0;i<70;i++)SandboxZombies::UpdateInteraction(z);assert(z->mPosX>=495&&nut->mPlantHealth==300);}
+ {World w;auto* guard=w.enemy(570,2,static_cast<ZombieType>(6));guard->mShieldHealth=100;guard->mZombieAge=300;w.enemy(500);w.step();SandboxZombies::UpdateInteraction(guard);const auto x=guard->mPosX;guard->mShieldHealth=0;SandboxZombies::UpdateInteraction(guard);assert(guard->mZombiePhase==0&&guard->mPosX==x);}
+ for(int mode=0;mode<6;mode++){World w;auto* balloon=w.enemy(600,2,static_cast<ZombieType>(16));balloon->mZombiePhase=PHASE_BALLOON_FLYING;balloon->mZombieAge=300;auto* passenger=w.enemy(660);w.step();
+  for(int i=0;i<40;i++)SandboxZombies::UpdateInteraction(passenger);assert(passenger->mAltitude==35);
+  w.mPaused=true;SandboxZombies::UpdateInteraction(passenger);assert(passenger->mPhaseCounter==110);w.mPaused=false;
+  if(mode==0)balloon->mDead=true;if(mode==1)balloon->mZombiePhase=PHASE_ZOMBIE_NORMAL;if(mode==2)balloon->mMindControlled=true;if(mode==3)passenger->mTargetPlantID=999;if(mode==4)balloon->mBlowingAway=true;if(mode==5)balloon->mPosX=790;
+  auto* replacement=w.enemy(600,2,static_cast<ZombieType>(16));replacement->mZombiePhase=PHASE_BALLOON_FLYING;
+  SandboxZombies::UpdateInteraction(passenger);assert(passenger->mZombiePhase==SandboxZombies::AirDrop&&passenger->mTargetPlantID==0);
+  for(int i=0;i<45;i++)SandboxZombies::UpdateInteraction(passenger);assert(passenger->mZombiePhase==0&&passenger->mAltitude==0&&passenger->mBodyHealth==1000&&w.mZombies.mSize==3);
+ }
+ {World w;auto* balloon=w.enemy(600,2,static_cast<ZombieType>(16));balloon->mZombiePhase=PHASE_BALLOON_FLYING;balloon->mZombieAge=300;w.step();assert(w.mZombies.mSize==1&&balloon->mSummonCounter==0);}
  for(int id=500;id<=516;++id){World w;auto* p=w.add(id);w.step(100);auto state=SandboxPlants::SavePower(p);
   w.mPaused=true;w.step(1000);assert(SandboxPlants::SavePower(p)==state);SandboxPlants::Forget(p);assert(!SandboxPlants::IsCustom(p));
   assert(SandboxPlants::RestorePower(p,state)&&SandboxPlants::SavePower(p)==state);state[9]=0;assert(!SandboxPlants::RestorePower(p,state));}

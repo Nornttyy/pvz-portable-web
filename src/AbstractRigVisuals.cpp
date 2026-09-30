@@ -2,6 +2,7 @@
 #include "LawnApp.h"
 #include "MemeCharacters.h"
 #include "MemeAdventure.h"
+#include "SandboxZombies.h"
 #include "Lawn/Plant.h"
 #include "Lawn/Board.h"
 #include "Lawn/Zombie.h"
@@ -17,7 +18,7 @@
 extern bool gSandboxEnabled;
 namespace AbstractRigVisuals {
 namespace {
-struct Pose {Reanimation* anim;int kind,pulse;const Plant* plant=nullptr;std::array<int,10> state{};int part=0;bool held=false;};
+struct Pose {Reanimation* anim;int kind,pulse;const Plant* plant=nullptr;std::array<int,10> state{};int part=0;bool held=false;const Zombie* zombie=nullptr;};
 std::vector<Pose> poses;
 Sexy::Image* Art(const char* name){static std::map<std::string,std::unique_ptr<Sexy::GLImage>> cache;auto& im=cache[name];if(!im)im.reset(gLawnApp->GetImage(std::string("/addons/art/")+name+".png"));return im.get();}
 Sexy::Image* SquashWithHeadband(){
@@ -56,9 +57,10 @@ Scope::Scope(const Plant* p):mark(poses.size()){
 }
 Scope::Scope(Zombie* z):mark(poses.size()){
  if(!(gSandboxEnabled||gLawnApp->IsAdventureMode())||!z->mHasArm||z->IsDeadOrDying())return;
- const int kind=int(z->mZombieType);if(kind!=4&&kind!=3)return;
+ const int kind=int(z->mZombieType);if(kind!=4&&kind!=3&&kind!=7&&int(z->mZombiePhase)!=SandboxZombies::Airlift)return;
  const int pulse=kind==4?(z->mZombiePhase==PHASE_ZOMBIE_NORMAL?z->mPhaseCounter:0):(z->mZombiePhase==PHASE_POLEVAULTER_POST_VAULT?z->mPhaseCounter:-1);
  Add(gLawnApp->ReanimationTryToGet(z->mBodyReanimID),kind,pulse);
+ if(poses.size()>mark)poses.back().zombie=z;
 }
 Scope::Scope(Reanimation* a,int previewBase):mark(poses.size()){
  if(!gSandboxEnabled&&!MemeAdventure::RosterEnabled())return;
@@ -68,6 +70,19 @@ Scope::~Scope(){for(auto it=images.rbegin();it!=images.rend();++it)it->first->mI
 void Transform(Reanimation* a,int index,ReanimatorTransform& t){
  const Pose* p=nullptr;for(auto i=poses.rbegin();i!=poses.rend();++i)if(i->anim==a){p=&*i;break;}if(!p)return;
  const std::string_view name=a->mDefinition->mTracks.tracks[index].mName;
+ if(p->zombie){
+  const auto* z=p->zombie;const int phase=int(z->mZombiePhase);
+  if(phase==SandboxZombies::Airlift&&name.starts_with("Zombie_outerarm_")&&a->TrackExists("Zombie_outerarm_upper")){
+   const auto shoulder=Raw(a,"Zombie_outerarm_upper");const float reach=std::min(1.0f,(150-z->mPhaseCounter)/30.0f);
+   Rotate(t,shoulder.mTransX+7,shoulder.mTransY+3,-1.1f*reach);return;
+  }
+  if(p->kind==7&&phase==SandboxZombies::BrakeSlide){
+   const float amount=std::sin((70-z->mPhaseCounter)*3.14159265f/140);
+   for(const char* prefix:{"zombie_football_leftleg_","zombie_football_rightleg_"})if(name.starts_with(prefix)){
+    const std::string anchor=std::string(prefix)+"upper";if(a->TrackExists(anchor.c_str())){const auto hip=Raw(a,anchor.c_str());Rotate(t,hip.mTransX+6,hip.mTransY+3,-.65f*amount);}return;
+   }
+  }
+ }
  if(p->plant&&!p->plant->mIsAsleep){
   const auto& s=p->state;const float pulse=std::sin(std::clamp(s[7]/40.0f,0.0f,1.0f)*3.14159265f);
   const bool head=p->part==1||p->part==4;

@@ -15,6 +15,7 @@ constexpr int STATE_READY=1,STATE_CHOMPER_DIGESTING=13,STATE_SCAREDYSHROOM_SCARE
 constexpr int PHASE_NEWSPAPER_MAD=2,PHASE_NEWSPAPER_READING=3,SHIELDTYPE_NEWSPAPER=1;
 constexpr int PHASE_LADDER_CARRYING=4,PHASE_LADDER_PLACING=5;
 constexpr int PHASE_POLEVAULTER_PRE_VAULT=6,PHASE_POLEVAULTER_POST_VAULT=7;
+constexpr int PHASE_BALLOON_FLYING=8;
 constexpr int STATE_NOTREADY=0,STATE_SQUASH_DONE_FALLING=50;
 enum ReanimationType {REANIM_ZOMBIE,REANIM_FLAG};
 enum ProjectileType {PROJECTILE_PEA,PROJECTILE_SNOWPEA,PROJECTILE_FIREBALL,PROJECTILE_ZOMBIE_PEA,PROJECTILE_SPIKE,PROJECTILE_BUTTER,PROJECTILE_KERNEL,PROJECTILE_CABBAGE,PROJECTILE_STAR,PROJECTILE_PUFF};
@@ -72,8 +73,8 @@ public:
  static constexpr int ZOMBIE_WAVE_DEBUG=-1;
  Board* mBoard=nullptr;ZombieType mZombieType=ZOMBIE_NORMAL;ZombieID id=ZOMBIEID_NULL;
  float mPosX=0,mPosY=0,mScaleZombie=1;int mTargetCol=0,mX=0,mY=0,mRow=0,mBodyReanimID=0,mBodyHealth=1000,mBodyMaxHealth=1000,mHelmHealth=0,mHelmMaxHealth=0;
- bool mDead=false,mMindControlled=false,mHasHead=true,mHasArm=true,mIsEating=false;int chill=0,mIceTrapCounter=0,mButteredCounter=0,mRenderOrder=0;
- bool mHasObject=false;Sexy::Rect mZombieAttackRect;
+ bool mDead=false,mMindControlled=false,mHasHead=true,mHasArm=true,mIsEating=false,mBlowingAway=false;int chill=0,mIceTrapCounter=0,mButteredCounter=0,mRenderOrder=0;
+ bool mHasObject=false;Sexy::Rect mZombieAttackRect{50,0,20,115};int mTargetRow=-1,mSummonCounter=0;
  int mZombiePhase=0,mZombieHeight=0;bool mInPool=false;
  int mPhaseCounter=0,mShieldHealth=0,mShieldMaxHealth=0,mShieldType=0,mZombieAge=0,mFromWave=0;float mAltitude=0;bool flying=false;
  bool IsFlying(){return flying;}

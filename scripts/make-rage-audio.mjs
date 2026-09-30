@@ -8,10 +8,11 @@ let first=input.findIndex(v=>Math.abs(v)>.06),last=count-1;
 while(last>first&&Math.abs(input[last])<=.06)--last;
 first=Math.max(0,first-Math.floor(rate*.008));last=Math.min(count-1,last+Math.floor(rate*.008));
 if(first<0||last-first<rate)throw Error('No sustained vocal found');
-const sr=24000,n=sr*3,out=new Float32Array(n),pitch=2**(6/12);let peak=0;
+const pitchSemitones=8; // Two semitones sharper than the previous six-semitone release.
+const sr=24000,n=sr*3,out=new Float32Array(n),pitch=2**(pitchSemitones/12);let peak=0;
 const dry=Float32Array.from({length:Math.ceil((last-first)*sr/rate)},(_,i)=>{const p=first+i*rate/sr,lo=Math.floor(p),f=p-lo;return input[lo]*(1-f)+input[Math.min(last,lo+1)]*f;});
 // WSOLA separates duration from pitch. Match overlapping waveform phases before
-// stretching, then resample up six semitones; the released cue stays three seconds.
+// stretching, then resample up eight semitones; the released cue stays three seconds.
 const size=1024,hop=256,length=Math.ceil(n*pitch),stretch=length/dry.length;
 const sum=new Float32Array(length+size),weight=new Float32Array(length+size);
 for(let pos=0;pos<length;pos+=hop){
@@ -32,4 +33,4 @@ for(let i=0;i<n;i++){low+=smooth*(out[i]-low);out[i]+=0.16*(out[i]-low);peak=Mat
 const wav=Buffer.alloc(44+n*2);wav.write('RIFF');wav.writeUInt32LE(36+n*2,4);wav.write('WAVEfmt ',8);wav.writeUInt32LE(16,16);wav.writeUInt16LE(1,20);wav.writeUInt16LE(1,22);wav.writeUInt32LE(sr,24);wav.writeUInt32LE(sr*2,28);wav.writeUInt16LE(2,32);wav.writeUInt16LE(16,34);wav.write('data',36);wav.writeUInt32LE(n*2,40);
 for(let i=0;i<n;i++)wav.writeInt16LE(Math.round(out[i]*.8/Math.max(peak,.01)*32767),44+i*2);
 await writeFile(new URL('../addons/audio/rage-scream.wav',import.meta.url),wav);
-console.log({sourceSeconds:count/rate,trimmedSeconds:(last-first)/rate,pitchSemitones:6,duration:3,peak:.8,bytes:wav.length});
+console.log({sourceSeconds:count/rate,trimmedSeconds:(last-first)/rate,pitchSemitones,duration:3,peak:.8,bytes:wav.length});

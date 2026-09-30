@@ -49,13 +49,19 @@ test('generated squash accessory preserves native body, animated face and alpha 
  await assert.rejects(()=>read('addons/art/squash-exercise.png'));
  const rig=(await read('src/AbstractRigVisuals.cpp')).toString();assert.match(rig,/NativeImage\("Squash_body\.png"\)/);assert.match(rig,/std::copy\(original->GetBits\(\)/);assert.match(rig,/Art\("squash-headband"\)/);
  assert.doesNotMatch(rig,/t\.mAlpha\s*=\s*0/); // No hiding original face, eyes, stem or blink.
- const audio=(await read('scripts/make-rage-audio.mjs')).toString();assert.match(audio,/WSOLA/);assert.doesNotMatch(audio,/\.83\+\.17/);
+ const audio=(await read('scripts/make-rage-audio.mjs')).toString();assert.match(audio,/WSOLA/);assert.match(audio,/pitchSemitones=8/);assert.doesNotMatch(audio,/\.83\+\.17/);
 });
 test('return interactions serialize native phase, owner identity and timers without changing save layouts',async()=>{
  const save=(await read('src/Lawn/System/SaveGame.cpp')).toString(),z=(await read('src/SandboxZombies.cpp')).toString();
- for(const field of ['mZombiePhase','mPhaseCounter','mTargetPlantID','mTargetCol','mPosX','mAltitude'])assert.ok(save.includes('theZombie.'+field));
+ for(const field of ['mZombiePhase','mPhaseCounter','mTargetPlantID','mTargetCol','mTargetRow','mSummonCounter','mPosX','mPosY','mAltitude'])assert.ok(save.includes('theZombie.'+field));
  assert.match(z,/DataArrayTryToGet\(static_cast<unsigned>\(z->mTargetPlantID\)\)/);assert.match(z,/mBoard->mPaused/);
  const native=(await read('src/Lawn/Zombie.cpp')).toString();assert.match(native,/!SandboxZombies::HasInteraction\(this\)/);assert.match(native,/SandboxZombies::UpdateInteraction\(this\)/);
+});
+test('zombie rework replaces statistical auras with bounded native interactions',async()=>{
+ for(const [id,name] of [[1,'催更旗手'],[6,'抢镜铁门'],[7,'刹不住橄榄球'],[16,'搭便车气球']])assert.equal(ZOMBIES.find(z=>z.id===id).name,name);
+ const source=(await read('src/SandboxZombies.cpp')).toString();assert.doesNotMatch(source,/AddZombieInRow|return 1\.5f|return 1\.8f|damage\/2/);
+ for(const phase of ['Hurried','DoorDash','BrakeSlide','Airlift','LaneStep','AirDrop'])assert.ok(source.includes(phase));
+ assert.match(source,/carrier->mBlowingAway/);assert.match(source,/mZombies\.DataArrayGetID\(z\)/);assert.match(source,/ForwardLimit/);
 });
 test('persistent native sidebar fits both rosters and keeps the lawn in original units',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'pvz-sidebar-')),binary=join(dir,'sidebar');

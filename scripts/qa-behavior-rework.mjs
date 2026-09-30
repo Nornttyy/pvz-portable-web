@@ -33,7 +33,9 @@ try{
 
  await fresh();await api(1,513,3,2);await api(2,2,4,2);await api(4,0);await wait(()=>Module._pvz_sandbox_zombie_data(0,6)===1029);const x=await zd(0,2);await page.waitForTimeout(400);await api(4,1);assert.ok(await zd(0,2)>x);await shot('scared-mushroom-misdirects-walker');results.misdirectionChangesWalkDirection=true;
 
- await fresh();await api(1,510,1,2);await api(2,23,5,2);await api(2,23,7,2);await api(4,0);await wait(()=>{for(let i=0;i<100;i++){const s=Module._pvz_projectile_data(i,0);if(s<0)break;if(s===295)return true;}return false;});await api(4,1);await shot('cabbage-rolls-back-from-rear');results.returningCabbage=true;
+ // Ordinary-width colliders leave room to observe the return. A giant can
+ // immediately absorb it within the same tick, which is not a failed emission.
+ await fresh();await api(1,510,1,2);await api(2,4,5,2);await api(2,4,7,2);await api(4,0);await wait(()=>{for(let i=0;i<100;i++){const s=Module._pvz_projectile_data(i,0);if(s<0)break;if(s===295)return true;}return false;});await api(4,1);await shot('cabbage-rolls-back-from-rear');results.returningCabbage=true;
  }
  await fresh();await api(1,515,4,2);await api(1,0,1,2);await api(2,4,8,2);await api(4,0);await wait(()=>{for(let i=0;i<100;i++){const s=Module._pvz_projectile_data(i,0);if(s<0)break;if(s>=512&&Module._pvz_projectile_data(i,3)<0)return true;}return false;});await api(4,1);await shot('split-pea-returns-existing-pea');results.splitReturnsExistingPea=true;
  assert.deepEqual(errors,[]);await writeFile(join(out,'report.json'),JSON.stringify({results,errors},null,2));console.log(results);

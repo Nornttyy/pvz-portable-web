@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Behavior pass across all nineteen mechanic plants, preserving user-defined rage/wallnut/sun/lifetime rules. Chomper returns the same armored living zombie; cactus staples pairs; butter slides a walker into companions; scaredy misdirects a walker; cabbage rolls back; repeater copies neighbor pea/ice/fire/puff types; fume breath physically inhales/exhales walkers. Native serialized interaction phases, bounded durations and no duplicate rewards. Scoped connected-part poses, original Squash body/face/blinks plus generated headband only. Sharper three-second CC0 male scream with no artificial tremolo. Adventure and sandbox share identities/unlocks/almanac. 300 rage, 3-second 50-pea burst, 25% slower burst peas, 3-second recovery, ordinary-sized 25 sun retained.",
+  "mode": "Zombie behavior pass: lying walkers and feigning cones trip companions; flags hurry one walker into a bounded hop; doors physically rush to the front instead of sharing damage; football zombies skid and fall; balloons tow existing walkers without spawning clones; ladders smoothly change adjacent dry lanes. Native saved phases and original connected rigs, health/armor/damage unchanged. Shared adventure/sandbox native identities and unlock order. Existing nineteen plant mechanics retained. Same CC0 rage vocal raised a further two semitones, still exactly three seconds at 100% cue gain with no voice stacking. 300 rage, 3-second 50-pea burst, slower burst peas, 3-second recovery and ordinary-sized 25 sun retained.",
   "files": [
     {
       "name": "pvz-portable.js",
       "size": 278037,
-      "sha256": "678d35d6c3936c40a2fa1d6cc7966d87763817da75fe420e082859d900f09fe6"
+      "sha256": "e7500b1fee38d4b46db19126f3ada032aa632e6a3337625a0dca7e7752eda338"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7667904,
-      "sha256": "8d834e6cc8ce45e5c2d747cf987076aeaa52373226df63fcec44d69d7c314ebe"
+      "size": 7671325,
+      "sha256": "41ad8167bea4d735c495dfe1580f10d71f732079321ea9cd416ed83d7d3d5000"
     }
   ]
 }

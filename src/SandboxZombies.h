@@ -18,6 +18,7 @@ void ArmorBroken(Zombie* zombie);
 void PoleLanded(Zombie* zombie);
 // Explicit, serialized native phases; never store raw plant/zombie pointers.
 inline constexpr int Held=1024,Returned=1025,Tripped=1026,Slipping=1027,Pinned=1028,Misdirected=1029;
+inline constexpr int Hurried=1030,DoorDash=1031,BrakeSlide=1032,Airlift=1033,LaneStep=1034,AirDrop=1035;
 bool HasInteraction(const Zombie*);
 bool IsHeld(const Zombie*);
 bool CatchForReturn(Plant*,Zombie*);

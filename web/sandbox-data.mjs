@@ -178,8 +178,8 @@ const validPlant = id => (id>=0&&id<48)||ORIGINAL_PLANTS.some(p=>p.id===id);
 export const ORIGINAL_ZOMBIES = [];
 export const ZOMBIES = [[0,'普通僵尸'],[1,'旗帜僵尸'],[2,'路障僵尸'],[3,'撑杆僵尸'],[4,'铁桶僵尸'],[5,'读手机僵尸'],[6,'铁门僵尸'],[7,'橄榄球僵尸'],[8,'舞王僵尸'],[10,'鸭子救生圈'],[11,'潜水僵尸'],[12,'冰车僵尸'],[14,'海豚骑士'],[15,'玩偶匣僵尸'],[16,'气球僵尸'],[17,'矿工僵尸'],[18,'跳跳僵尸'],[19,'雪人僵尸'],[21,'梯子僵尸'],[22,'投石车僵尸'],[23,'巨人僵尸'],[24,'小鬼僵尸'],[32,'红眼巨人']].map(([id,name])=>({id,name,note:[10,11,14].includes(id)?'仅限水路':'手动放置'}));
 ZOMBIES.push(...ORIGINAL_ZOMBIES);
-for(const z of ZOMBIES){if(z.id===1){z.name='催更旗手';z.note='附近同伴加速50%';}else if(z.id===2){z.name='碰瓷路障';z.note='路障被打掉 · 倒地装死三秒';}}
-for(const [id,name,note] of [[0,'摸鱼僵尸','走六秒 · 歇两秒'],[6,'护短铁门','替附近同伴分担普通伤害'],[7,'急停橄榄球','冲两秒 · 喘气后再走'],[16,'空投气球','草地空投一名同伴 · 仅一次']])Object.assign(ZOMBIES.find(z=>z.id===id),{name,note});
+for(const z of ZOMBIES){if(z.id===1){z.name='催更旗手';z.note='把身后同伴催得往前蹦';}else if(z.id===2){z.name='碰瓷路障';z.note='掉帽碰瓷 · 顺便绊倒同伴';}}
+for(const [id,name,note] of [[0,'摸鱼僵尸','躺平摸鱼 · 绊倒同伴'],[6,'抢镜铁门','抢到前排 · 举门挡弹'],[7,'刹不住橄榄球','伸腿滑倒 · 绊倒同伴'],[16,'搭便车气球','搬运现有同伴 · 不造新僵尸']])Object.assign(ZOMBIES.find(z=>z.id===id),{name,note});
 for(const [id,name,note] of [[24,'倒车小鬼','每六秒倒走一秒'],[21,'插队梯子','前路拥堵 · 挑空路插队']])Object.assign(ZOMBIES.find(z=>z.id===id),{name,note});
 for(const [id,name,note] of [[4,'急眼铁桶','前面有同伴 · 急眼揍一下'],[3,'续杯撑杆','跳完八秒 · 再掏一根杆']])Object.assign(ZOMBIES.find(z=>z.id===id),{name,note});
 export function plantsFor(category) { return category === 'original' ? ORIGINAL_PLANTS : category === 'all' ? PLANTS : (groups[category] ?? groups.common).map(id=>PLANTS[id]); }
