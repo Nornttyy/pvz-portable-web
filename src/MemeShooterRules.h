@@ -2,9 +2,9 @@
 #include <cmath>
 #include <cstdint>
 namespace MemeShooterRules {
-inline constexpr int PerShot=20,MaxRage=300,BurstCount=80,NormalDelay=150,BurstTicks=300;
-// Native simulation runs at 100 ticks/sec. Distribute all 80 shots over exactly
-// 300 ticks (4, 4, 4, 3 tick intervals), rather than rounding to a 3.2s volley.
+inline constexpr int PerShot=20,MaxRage=300,BurstCount=50,NormalDelay=150,BurstTicks=300;
+// Native simulation runs at 100 ticks/sec. Distribute all 50 shots over exactly
+// 300 ticks: one pea every 6 ticks, retaining the three-second release.
 // Derive the interval from the saved remaining count; reload needs no new clock.
 inline constexpr int BurstInterval(int fired){
  return ((fired+1)*BurstTicks+BurstCount-1)/BurstCount-(fired*BurstTicks+BurstCount-1)/BurstCount;

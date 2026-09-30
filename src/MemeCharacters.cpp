@@ -78,7 +78,7 @@ bool Restore(Plant* p,const std::array<int,10>& a){
  // Migrate old overheating saves without healing or inventing a free volley.
  if(shooter&&!newShooter){s.phase=0;s.heat=a[2]==0?a[3]*300/1000:0;s.timer=0;s.delay=std::min(a[5],150);s.remaining=0;s.pulse=0;s.direction=2;}
  if(shooter)s.heat=std::min(s.heat,MemeShooterRules::MaxRage); // Keep old 300-rage saves readable.
- if(shooter)s.remaining=std::min(s.remaining,MemeShooterRules::BurstCount); // Read old 150-pea saves without adding shots.
+ if(shooter)s.remaining=std::min(s.remaining,MemeShooterRules::BurstCount); // Read old 80/150-pea saves without adding shots.
  states[p]=s;if(!NativeSequence(a[0])){p->mLaunchCounter=a[0]==503?std::clamp(p->mLaunchCounter,0,2500):9999;if(a[0]!=514)p->mShootingCounter=0;}return true;
 }
 int Data(const Plant* p,int field){const auto it=states.find(p);if(it==states.end())return -1;const auto& s=it->second;if(field==5)return s.id==502?std::max(0,ShowoffLifetime-s.age):-1;return field==0?s.phase:field==1?s.heat:field==2?s.timer:field==3?s.direction:s.remaining;}

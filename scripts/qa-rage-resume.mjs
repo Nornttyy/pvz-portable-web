@@ -48,7 +48,7 @@ try{
  assert.equal(await page.evaluate(()=>Module._pvz_rage_audio_data(0)),1);
  await page.waitForTimeout(200);await click(748,14);
  const before=await snapshot(),remaining=before.plants[0].remaining;
- assert.ok(remaining>0&&remaining<80);assert.ok(before.shots.some(s=>s[0]===9));
+ assert.ok(remaining>0&&remaining<50);assert.ok(before.shots.some(s=>s[0]===9));
  // Return while the dedicated release voice is still active.
  assert.equal(await page.evaluate(()=>Module._pvz_rage_audio_data(0)),1);
  await click(400,401);await page.waitForTimeout(250);await click(305,394);
