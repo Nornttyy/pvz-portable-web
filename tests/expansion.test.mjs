@@ -63,7 +63,7 @@ test('native projectile integration retains splats, centered scaling and fire at
  assert.ok(plant.indexOf('aProjectile->ConvertToFireball(mPlantCol)')>plant.indexOf('SandboxPlants::OnFired(this,aProjectile,theTargetZombie)'),'fire attaches only after muzzle correction');
 });
 test('three originals remain; retired formations migrate without losing native plants',async()=>{
- assert.equal(ORIGINAL_PLANTS.length,3);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,519]);assert.deepEqual(ORIGINAL_ZOMBIES,[]);assert.equal(ZOMBIES.length,23);
+ assert.equal(ORIGINAL_PLANTS.length,3);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,519]);assert.deepEqual(ORIGINAL_ZOMBIES.map(z=>z.id),[212]);assert.equal(ZOMBIES.length,24);
  const bases=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
  for(let id=100;id<120;++id)assert.equal(validateLayout({schema:1,map:0,plants:[{type:id,col:0,row:0}]}).plants[0].type,bases[id-100]);
  for(const p of [...RETIRED_PLANTS,...RETIRED_CHARACTERS]){
@@ -110,6 +110,22 @@ test('deferred disposal cannot reset a newly loaded board',async()=>{
  assert.match(board,/Board::~Board\(\) = default;/);
  const kill=app.slice(app.indexOf('void LawnApp::KillBoard()'),app.indexOf('bool LawnApp::CanPauseNow()'));
  for(const state of ['MemeAdventure','SandboxPlants','SandboxZombies'])assert.ok(kill.indexOf(state+'::Reset()')<kill.indexOf('SafeDeleteWidget(mBoard)'));
+});
+
+test('Louis remains visually headless without entering native terminal head-loss at spawn',async()=>{
+ const zombie=(await read('src/Lawn/Zombie.cpp')).toString(),custom=(await read('src/SandboxZombies.cpp')).toString();
+ const drop=zombie.slice(zombie.indexOf('void Zombie::DropHead('),zombie.indexOf('void Zombie::DropArm('));
+ assert.ok(drop.indexOf('mHasHead = false')<drop.indexOf('if (SandboxZombies::IsLouis(this)) return;'));
+ assert.ok(drop.indexOf('if (SandboxZombies::IsLouis(this)) return;')<drop.indexOf('PARTICLE_ZOMBIE_HEAD'));
+ const restore=custom.slice(custom.indexOf('bool Restore('),custom.indexOf('void Assign('));
+ assert.match(restore,/z->SetupReanimForLostHead\(\)/);assert.doesNotMatch(restore,/mHasHead\s*=|mBodyHealth\s*=/);
+ const save=(await read('src/Lawn/System/SaveGame.cpp')).toString(),adventure=(await read('src/MemeAdventure.cpp')).toString();
+ assert.match(save,/SAVE4_CHUNK_MEME_ZOMBIES = 23/);assert.match(save,/MemeAdventure::LoadZombies\(save.zombies\)/);
+ assert.match(save,/WriteChunkV4\(aPayload, SAVE4_CHUNK_MEME_ZOMBIES, theBoard\)/);
+ assert.match(adventure,/SandboxZombies::Restore\(z,saved.type\)/);assert.doesNotMatch(adventure,/pending=save/);
+ const almanac=(await read('src/Lawn/Widget/AlmanacDialog.cpp')).toString();
+ assert.match(almanac,/GetZombieDefinition\(static_cast<ZombieType>\(SandboxZombies::Base\(int\(mSelectedZombie\)\)\)\)/);
+ assert.match((await read('src/SandboxUI.cpp')).toString(),/SandboxZombies::Definitions\[i-Zombies.size\(\)\].id/);
 });
 
 test('retired zombie art and extra seed cannot leak into native previews or menus',async()=>{

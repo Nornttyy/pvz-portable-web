@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Three abstract plants: rage pea (500), counterattack walnut (501), and independent shooter pea (519). Shooter pea has an original projectile-pea head on the native animated stem, firing tumbling whole native peashooters every 1.5 seconds for ordinary pea damage without moving itself or adding knockback. Adventure 1-8 unlock, 125 sun, 3-second card cooldown; integrated chooser, almanac, previews, sandbox and versioned save/resume. Old 502-518 identities remain retired, not reused. Other plants/zombies and the two retained characters keep their previous behavior.",
+  "mode": "Three retained abstract plants (500 rage pea, 501 counterattack walnut, 519 shooter pea) plus Louis XVI (212), a headless native normal zombie. Louis preserves normal health, movement and eating, with no phantom severed head; independent sandbox/almanac entry, adventure unlock from 1-3 in every third ordinary wave, and optional identity save chunk 23. Native zombies, original plant mechanics and old save state are preserved. Retired plant IDs 502-518 and zombie IDs 200-211 are not reused.",
   "files": [
     {
       "name": "pvz-portable.js",
       "size": 277501,
-      "sha256": "26e8e2c7979723ef90a23404b3c4731fd3566a687ec0f1df6b4b41535ca91567"
+      "sha256": "510880ed0a8e5841d0585911448f2cda52e0b245e24768a0b28e2640636f7c69"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7547132,
-      "sha256": "e65e4295b42e67c11d874b04fd1f51d5fc98205ae35a8678424d92bbdbac4569"
+      "size": 7555814,
+      "sha256": "3ded37214fd47a71756f15c58c71c6e7752e5af5f3ca34f2417fd4d646e3fee5"
     }
   ]
 }

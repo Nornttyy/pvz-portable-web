@@ -243,7 +243,7 @@ void SandboxDrawUI(Graphics* g) {
     if(catalog==2){
         const int count=int(Zombies.size()+SandboxZombies::Definitions.size());
         for(int i=0;i<count;++i){
-            const int id=i<int(Zombies.size())?Zombies[i]:200+i-int(Zombies.size());
+            const int id=i<int(Zombies.size())?Zombies[i]:SandboxZombies::Definitions[i-Zombies.size()].id;
             const auto b=SidebarZombie(i);Portrait(g,b,id);
             if(tool==ZombieTool&&selectedZombie==id)Outline(g,b);
             if(Hover(b)){
@@ -345,7 +345,7 @@ bool SandboxMouseDown(int x,int y,int clicks) {
         StopPainting();
         if(catalog==2){
             for(int i=0;i<int(Zombies.size()+SandboxZombies::Definitions.size());++i)if(SidebarZombie(i).Contains(x,y)){
-                selectedZombie=i<int(Zombies.size())?Zombies[i]:200+i-int(Zombies.size());
+                selectedZombie=i<int(Zombies.size())?Zombies[i]:SandboxZombies::Definitions[i-Zombies.size()].id;
                 tool=ZombieTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;
             }
         }else{

@@ -19,11 +19,13 @@ struct Board {
  Zombie* AddZombieInRow(ZombieType t,int r,int){if(allocationFails)return nullptr;type=t;row=r;++count;++mZombies.mSize;return &zombie;}
  void MarkAllDirty(){marked=true;}
 };
-namespace SandboxZombies {void Assign(Zombie*,int){}}
+int assignedZombie=-1;
+namespace SandboxZombies {void Assign(Zombie*,int id){assignedZombie=id;}}
 int ZombieCount(Board* b){return b->count;}
 #include "spawn-under-test.inc"
 int main(){
  Board b;
+ for(int row:{0,2,3,4}){Board louis;assert(Spawn(&louis,212,8,row)==1&&louis.type==ZOMBIE_NORMAL&&assignedZombie==212);}
  assert(Spawn(&b,10,8,2)==1&&b.type==ZOMBIE_NORMAL&&b.row==2);
  assert(b.zombie.mPosX==690&&b.zombie.mX==690&&b.zombie.updated&&b.marked);
  for(int waterOnly:{10,11,14}){Board land;assert(Spawn(&land,waterOnly,8,0)==-5&&land.count==0);}

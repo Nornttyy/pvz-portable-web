@@ -49,6 +49,11 @@ void OnPlanted(Plant* p){
  // Imitaters acquire the new identity when their normal morph creates the plant.
  if(const auto* d=Replacement(int(p->mSeedType)))MemeCharacters::Assign(p,d->id);
 }
+void OnZombieSpawned(Zombie* z){
+ // Replace only regular walkers in every third wave. Roadside previews,
+ // flag/armored zombies, special modes and the opening tutorial stay native.
+ if(RosterEnabled()&&z&&z->mBoard&&z->IsOnBoard()&&SandboxZombies::LouisWave(z->mBoard->mLevel,int(z->mZombieType),z->mFromWave))SandboxZombies::Assign(z,SandboxZombies::Louis);
+}
 void Draw(Board* b,Sexy::Graphics*){
  if(Visible(b)&&!fontsReady){SandboxRepairFonts();fontsReady=true;}
  // No second tray or floating menu: native cards now own every planting action.
@@ -75,10 +80,12 @@ std::string_view Translate(std::string_view key,std::string_view original){
 }
 Save Capture(Board* b){Save out;out.power=0;out.cooldown=RosterSaveVersion;
  for(auto* p:b->mPlants)if(!p->mDead&&MemeCharacters::Is(p))out.plants.push_back({b->mPlants.DataArrayGetID(p),SandboxPlants::SavePower(p)});
+ for(auto* z:b->mZombies)if(!z->mDead&&SandboxZombies::Find(SandboxZombies::Type(z)))out.zombies.push_back({b->mZombies.DataArrayGetID(z),SandboxZombies::Type(z)});
  for(auto* shot:b->mProjectiles)if(!shot->mDead&&SandboxPlants::SaveShot(shot)!=100)out.shots.push_back({b->mProjectiles.DataArrayGetID(shot),SandboxPlants::SaveShot(shot)});return out;
 }
-void Load(const Save& save){pending=save;}
+void Load(const Save& save){pending.power=save.power;pending.cooldown=save.cooldown;pending.plants=save.plants;}
 void LoadShots(const std::vector<SavedShot>& shots){pending.shots=shots;}
+void LoadZombies(const std::vector<SavedZombie>& zombies){pending.zombies=zombies;}
 void Restore(Board* b){
  if(b->mApp->IsAdventureMode())for(const auto& saved:pending.plants)if(auto* p=b->mPlants.DataArrayTryToGet(saved.key)){
   if(MemeCharacters::Is(saved.state[0]))SandboxPlants::RestorePower(p,saved.state);
@@ -102,6 +109,7 @@ void Restore(Board* b){
  }
  if(b->mApp->IsAdventureMode())for(const auto& saved:pending.shots)if(auto* p=b->mProjectiles.DataArrayTryToGet(saved.key))SandboxPlants::RestoreShot(p,saved.percent);
  if(b->mApp->IsAdventureMode())SandboxZombies::RestoreNative(b);
+ if(b->mApp->IsAdventureMode())for(const auto& saved:pending.zombies)if(auto* z=b->mZombies.DataArrayTryToGet(saved.key))SandboxZombies::Restore(z,saved.type);
  pending={};
 }
 }

@@ -4,10 +4,17 @@ class Board; class Zombie; class Reanimation; class Plant; class Projectile;
 namespace Sexy { class Graphics; class Image; }
 namespace SandboxZombies {
 struct Definition {int id,base;const char* name;const char* note;const char* art;int health,armor;};
-// Previous original zombies are retired; the native roster is unchanged.
-inline constexpr std::array<Definition,0> Definitions{};
-constexpr const Definition* Find(int id){return nullptr;}
+// IDs 200..211 remain retired. Never reinterpret old characters as Louis.
+inline constexpr int Louis=212, LouisUnlock=3;
+inline constexpr std::array<Definition,1> Definitions{{
+ {Louis,0,"路易十六","天生无头，照常走路啃咬。",nullptr,270,0}
+}};
+constexpr const Definition* Find(int id){for(const auto& d:Definitions)if(d.id==id)return &d;return nullptr;}
 constexpr int Base(int id){auto* d=Find(id);return d?d->base:id;}
+constexpr bool LouisWave(int level,int base,int wave){return level>=LouisUnlock&&base==0&&wave>=0&&wave%3==0;}
+int Type(const Zombie*);
+bool IsLouis(const Zombie*);
+bool Restore(Zombie*,int id);
 void RestoreNative(Board* board);
 void Reset();void Forget(Zombie* zombie);void Assign(Zombie* zombie,int id);
 void Tick(Board* board);void DrawPortrait(Sexy::Graphics* g,int x,int y,int w,int h,int id);

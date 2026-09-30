@@ -93,7 +93,8 @@ enum SaveChunkTypeV4
 	SAVE4_CHUNK_CHALLENGE = 19,
 	SAVE4_CHUNK_MUSIC = 20,
 	SAVE4_CHUNK_MEME_POWERS = 21,
-	SAVE4_CHUNK_MEME_PROJECTILES = 22
+	SAVE4_CHUNK_MEME_PROJECTILES = 22,
+	SAVE4_CHUNK_MEME_ZOMBIES = 23
 };
 
 static constexpr const uint32_t SAVE4_CHUNK_VERSION = 1U;
@@ -1987,6 +1988,16 @@ static void SyncMemeProjectilesPortable(PortableSaveContext& c,Board* board)
 	if(c.mReading&&!c.mFailed)MemeAdventure::LoadShots(save.shots);
 }
 
+static void SyncMemeZombiesPortable(PortableSaveContext& c,Board* board)
+{
+	auto save=c.mReading?MemeAdventure::Save{}:MemeAdventure::Capture(board);
+	int count=static_cast<int>(save.zombies.size());c.SyncInt32(count);
+	if(count<0||count>1024){c.mFailed=true;return;}
+	if(c.mReading)save.zombies.resize(count);
+	for(auto& zombie:save.zombies){c.SyncUInt32(zombie.key);c.SyncInt32(zombie.type);}
+	if(c.mReading&&!c.mFailed)MemeAdventure::LoadZombies(save.zombies);
+}
+
 static ChunkSyncFn GetChunkSyncFn(uint32_t theChunkType)
 {
 	switch (theChunkType)
@@ -2035,6 +2046,8 @@ static ChunkSyncFn GetChunkSyncFn(uint32_t theChunkType)
 		return SyncMemePowersPortable;
 	case SAVE4_CHUNK_MEME_PROJECTILES:
 		return SyncMemeProjectilesPortable;
+	case SAVE4_CHUNK_MEME_ZOMBIES:
+		return SyncMemeZombiesPortable;
 	default:
 		return nullptr;
 	}
@@ -2848,6 +2861,7 @@ bool LawnSaveGame(Board* theBoard, const std::string& theFilePath)
 	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_MUSIC, theBoard)) return false;
 	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_MEME_POWERS, theBoard)) return false;
 	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_MEME_PROJECTILES, theBoard)) return false;
+	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_MEME_ZOMBIES, theBoard)) return false;
 
 	SaveFileHeaderV4 aHeader{};
 	memcpy(aHeader.mMagic, SAVE_FILE_MAGIC_V4, sizeof(aHeader.mMagic));

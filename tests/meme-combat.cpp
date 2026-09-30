@@ -212,6 +212,26 @@ int main(){
   SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved)&&SandboxPlants::SavePower(p)==saved);
  }
  // Every formerly modified native zombie retains its armor, position and phase.
+ static_assert(SandboxZombies::Definitions.size()==1&&SandboxZombies::Find(212)->base==0);
+ for(int id=200;id<212;++id)assert(!SandboxZombies::Find(id));
+ for(int level:{1,2,3,8,20,50})for(int base:{0,1,2,4,23})for(int wave=-3;wave<30;++wave){
+  assert(SandboxZombies::LouisWave(level,base,wave)==(level>=3&&base==0&&wave>=0&&wave%3==0));
+ }
+ {World w;auto* z=w.enemy();z->mBodyHealth=z->mBodyMaxHealth=270;
+  Reanimation rig;Track tracks[]={{"anim_head1"},{"anim_head2"},{"anim_hair"},{"anim_tongue"},{"anim_body"},{"anim_hand"},{"anim_foot"}};TrackInstance instances[7];
+  rig.def.mTracks={7,tracks};rig.mTrackInstances=instances;gLawnApp->reanims[91]=&rig;z->mBodyReanimID=91;
+  assert(SandboxZombies::Restore(z,212));assert(SandboxZombies::Type(z)==212&&SandboxZombies::IsLouis(z)&&z->headHides==1);
+  for(int i=0;i<7;++i)assert(instances[i].mRenderGroup==(i<4?RENDER_GROUP_HIDDEN:RENDER_GROUP_NORMAL));
+  w.step(3000);assert(z->mBodyHealth==270&&z->mHasHead&&SandboxZombies::Speed(z)==1&&SandboxZombies::Damage(z,20,0)==20);
+  z->mIsEating=true;SandboxZombies::RefreshDamageArt(z);assert(z->mIsEating&&z->headHides==2&&z->mHasHead);
+  z->mBodyHealth=42;z->mHasHead=false;SandboxZombies::Forget(z);assert(SandboxZombies::Type(z)==0);
+  assert(SandboxZombies::Restore(z,212)&&z->mBodyHealth==42&&!z->mHasHead); // Never heal or resurrect while loading.
+  SandboxZombies::Reset();assert(SandboxZombies::Type(z)==0&&!SandboxZombies::IsLouis(z));
+  for(int id=200;id<212;++id)assert(!SandboxZombies::Restore(z,id));
+  z->mZombieType=static_cast<ZombieType>(4);assert(!SandboxZombies::Restore(z,212));
+  z->mZombieType=ZOMBIE_NORMAL;z->mDead=true;assert(!SandboxZombies::Restore(z,212));
+  gLawnApp->reanims.erase(91);
+ }
  for(int type:{0,1,2,3,4,5,6,7,16,21,24}){World w;auto* z=w.enemy(500,2,static_cast<ZombieType>(type));auto* buddy=w.enemy(450);
   z->mBodyHealth=321;z->mHelmHealth=75;z->mShieldHealth=80;z->mIsEating=true;
   for(int age=0;age<1800;++age){z->mZombieAge=age;w.step();assert(SandboxZombies::Speed(z)==1);

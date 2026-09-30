@@ -3524,6 +3524,9 @@ void Zombie::DropHead(unsigned int theDamageFlags)
 
 	mHasHead = false;
 	SetupReanimForLostHead();
+	// Born headless: retain ordinary low-health death behavior, but never
+	// create a severed-head particle from an invisible/nonexistent head.
+	if (SandboxZombies::IsLouis(this)) return;
 	if (TestBit(theDamageFlags, DamageFlags::DAMAGE_DOESNT_LEAVE_BODY))
 	{
 		return;

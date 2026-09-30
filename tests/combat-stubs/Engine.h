@@ -62,6 +62,7 @@ struct Reanimation{
  void ReanimationInitializeType(int,int,ReanimationType){};bool TrackExists(const char* name){return track==name;}
  void PlayReanim(const char*,int,int,float){}
  void SetFramesForLayer(const char*){};void Draw(Sexy::Graphics*){for(int i=0;i<def.mTracks.count;++i)drawnOverrides.push_back(mTrackInstances[i].mImageOverride);};void SetImageOverride(const char* name,Sexy::Image* image){for(int i=0;i<def.mTracks.count;++i)if(std::string(def.mTracks.tracks[i].mName)==name)mTrackInstances[i].mImageOverride=image;};Reanimation* FindSubReanim(ReanimationType){return nullptr;}
+ void AssignRenderGroupToPrefix(const char* prefix,int group){for(int i=0;i<def.mTracks.count;++i)if(std::string(def.mTracks.tracks[i].mName).starts_with(prefix))mTrackInstances[i].mRenderGroup=group;}
  int mFrameBasePose=0;Sexy::SexyTransform2D mOverlayMatrix;int FindTrackIndex(const char*){return 0;}void GetAttachmentOverlayMatrix(int,Sexy::SexyTransform2D&){};
  void GetTrackMatrix(int,Sexy::SexyTransform2D& out){out=matrix;}void GetCurrentTransform(int,ReanimatorTransform* out){*out=pose;}
 };
@@ -88,6 +89,8 @@ public:
  float GetPosYBasedOnRow(int row){return row*100.0f;}
  bool IsOnBoard(){return true;}
  void StartWalkAnim(int){}
+ int headHides=0;
+ void SetupReanimForLostHead(){++headHides;if(auto* anim=gLawnApp->ReanimationTryToGet(mBodyReanimID))for(const char* prefix:{"anim_head","anim_hair","anim_tongue"})anim->AssignRenderGroupToPrefix(prefix,RENDER_GROUP_HIDDEN);}
  void PlayZombieReanim(const char*,int,int,float){}
  void ReanimShowPrefix(const char*,int){}
  int mSpecialHeadReanimID=0;

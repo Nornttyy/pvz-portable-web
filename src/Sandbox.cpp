@@ -336,8 +336,10 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
 }
 
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_zombie_data(int index,int field) {
-    auto* board=ActiveBoard();if(!board||index<0||field<0||field>12)return -1;
-    for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard()){if(index--==0)return field==0?int(z->mZombieType):field==1?z->mRow:field==2?int(z->mPosX):field==3?int(z->mPosY):field==4?z->mBodyHealth:field==5?z->mHelmHealth:field==6?int(z->mZombiePhase):field==7?z->mShieldHealth:field==9?int(SandboxZombies::Speed(z)*100):field==10?z->mZombieAge:field==11?int(z->mAltitude):field==12?int(SandboxZombies::IsResting(z)):z->mPhaseCounter;}
+    // Read-only diagnostics also cover adventure save/resume. Commands remain
+    // sandbox-only; this cannot spawn enemies or alter campaign progress.
+    auto* board=gLawnApp?gLawnApp->mBoard:nullptr;if(!board||index<0||field<0||field>15)return -1;
+    for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard()){if(index--==0)return field==0?SandboxZombies::Type(z):field==1?z->mRow:field==2?int(z->mPosX):field==3?int(z->mPosY):field==4?z->mBodyHealth:field==5?z->mHelmHealth:field==6?int(z->mZombiePhase):field==7?z->mShieldHealth:field==9?int(SandboxZombies::Speed(z)*100):field==10?z->mZombieAge:field==11?int(z->mAltitude):field==12?int(SandboxZombies::IsResting(z)):field==13?int(z->mHasHead&&!SandboxZombies::IsLouis(z)):field==14?int(z->mHasHead):field==15?int(z->mZombieType):z->mPhaseCounter;}
     return -1;
 }
 

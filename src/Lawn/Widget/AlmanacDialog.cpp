@@ -36,6 +36,7 @@
 #include "../../PvzpLib/PvzpStringFile.h"
 #include "widget/WidgetManager.h"
 #include "../../MemeAdventure.h"
+#include "../../SandboxZombies.h"
 #include "../../AlmanacPlantLayout.h"
 
 static int AbstractAlmanacCount(){return gLawnApp->HasSeedType(SEED_LEFTPEATER)?NUM_SEED_TYPES:NUM_ALMANAC_SEEDS;}
@@ -167,7 +168,8 @@ void AlmanacDialog::SetupZombie()
 
 	mZombie = std::make_unique<Zombie>();
 	mZombie->mBoard = nullptr;
-	mZombie->ZombieInitialize(0, mSelectedZombie, false, nullptr, Zombie::ZOMBIE_WAVE_UI);
+	mZombie->ZombieInitialize(0, static_cast<ZombieType>(SandboxZombies::Base(int(mSelectedZombie))), false, nullptr, Zombie::ZOMBIE_WAVE_UI);
+	SandboxZombies::Assign(mZombie.get(),int(mSelectedZombie));
 	mZombie->mPosX = ALMANAC_ZOMBIE_POSITION_X;
 	mZombie->mPosY = ALMANAC_ZOMBIE_POSITION_Y;
 }
@@ -256,6 +258,7 @@ void AlmanacDialog::Update()
 
 ZombieType AlmanacDialog::GetZombieType(int theIndex)
 {
+	if (theIndex == NUM_ALMANAC_ZOMBIES && MemeAdventure::RosterEnabled()) return static_cast<ZombieType>(SandboxZombies::Louis);
 	return theIndex < NUM_ZOMBIE_TYPES ? (ZombieType)theIndex : ZOMBIE_INVALID;
 }
 
@@ -368,7 +371,7 @@ void AlmanacDialog::DrawZombies(Graphics* g)
 	PvzpDrawString(g, "[SUBURBAN_ALMANAC_ZOMBIES]", BOARD_WIDTH / 2, 54, Sexy::FONT_DWARVENTODCRAFT24, Color(0, 196, 0), DS_ALIGN_CENTER);
 
 	ZombieType aZombieMouseOn = ZombieHitTest(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY);
-	for (int i = 0; i < NUM_ALMANAC_ZOMBIES; i++)
+	for (int i = 0; i < NUM_ALMANAC_ZOMBIES + int(MemeAdventure::RosterEnabled()); i++)
 	{
 		ZombieType aZombieType = GetZombieType(i);
 		int aPosX, aPosY;
@@ -425,7 +428,8 @@ void AlmanacDialog::DrawZombies(Graphics* g)
 					aZombieGraphics.SetColor(Color(0, 0, 0, 40));
 					aZombieGraphics.SetColorizeImages(true);
 				}
-				mApp->mReanimatorCache->DrawCachedZombie(&aZombieGraphics, 0, 0, aZombieTypeToDraw);
+				if (SandboxZombies::Find(int(aZombieType))) SandboxZombies::DrawPortrait(g,aPosX,aPosY,76,76,int(aZombieType));
+				else mApp->mReanimatorCache->DrawCachedZombie(&aZombieGraphics, 0, 0, aZombieTypeToDraw);
 				aZombieGraphics.SetColorizeImages(false);
 
 				g->DrawImage(Sexy::IMAGE_ALMANAC_ZOMBIEWINDOW2, aPosX, aPosY);
@@ -467,15 +471,16 @@ void AlmanacDialog::DrawZombies(Graphics* g)
 	}
 	g->DrawImage(Sexy::IMAGE_ALMANAC_ZOMBIECARD, 455, 78);
 
-	const ZombieDefinition& aZombieDef = GetZombieDefinition(mSelectedZombie);
-	std::string aName = ZombieHasSilhouette(mSelectedZombie) ? "???" : std::format("[{}]", aZombieDef.mZombieName);
+	const auto* custom = SandboxZombies::Find(int(mSelectedZombie));
+	const ZombieDefinition& aZombieDef = GetZombieDefinition(static_cast<ZombieType>(SandboxZombies::Base(int(mSelectedZombie))));
+	std::string aName = custom ? custom->name : ZombieHasSilhouette(mSelectedZombie) ? "???" : std::format("[{}]", aZombieDef.mZombieName);
 	PvzpDrawString(g, aName, 613, 362, Sexy::FONT_DWARVENTODCRAFT18GREENINSET, Color(190, 255, 235, 255), DS_ALIGN_CENTER);
 
 	std::string aDescription;
 	DrawStringJustification aAlign;
 	if (ZombieHasDescription(mSelectedZombie))
 	{
-		aDescription = PvzpStringTranslate(std::format("[{}_DESCRIPTION]", aZombieDef.mZombieName));
+		aDescription = custom ? custom->note : PvzpStringTranslate(std::format("[{}_DESCRIPTION]", aZombieDef.mZombieName));
 		aAlign = DS_ALIGN_LEFT;
 	}
 	else
@@ -565,6 +570,7 @@ bool AlmanacDialog::ZombieHasSilhouette(ZombieType theZombieType)
 
 bool AlmanacDialog::ZombieIsShown(ZombieType theZombieType)
 {
+	if (SandboxZombies::Find(int(theZombieType))) return MemeAdventure::RosterEnabled() && (mApp->HasFinishedAdventure() || mApp->mPlayerInfo->GetLevel() >= SandboxZombies::LouisUnlock);
 	// trial mode only shows zombies up to the Snorkel Zombie
 	if (mApp->IsTrialStageLocked() && theZombieType > ZombieType::ZOMBIE_SNORKEL)
 		return false;
@@ -591,6 +597,7 @@ bool AlmanacDialog::ZombieIsShown(ZombieType theZombieType)
 
 bool AlmanacDialog::ZombieHasDescription(ZombieType theZombieType)
 {
+	if (SandboxZombies::Find(int(theZombieType))) return ZombieIsShown(theZombieType);
 	int aLevel = mApp->mPlayerInfo->GetLevel();
 	int aStart = GetZombieDefinition(theZombieType).mStartingLevel;
 
@@ -613,6 +620,7 @@ bool AlmanacDialog::ZombieHasDescription(ZombieType theZombieType)
 
 void AlmanacDialog::GetZombiePosition(ZombieType theZombieType, int& x, int& y)
 {
+	if (int(theZombieType) == SandboxZombies::Louis) {x=277;y=486;return;} // Existing free last-row cell, beside the boss.
 	if (theZombieType == ZombieType::ZOMBIE_BOSS)
 		x = 192, y = 486;
 	else
@@ -626,7 +634,7 @@ ZombieType AlmanacDialog::ZombieHitTest(int x, int y)
 {
 	if (mMouseVisible && mOpenPage == AlmanacPage::ALMANAC_PAGE_ZOMBIES)
 	{
-		for (int i = 0; i < NUM_ALMANAC_ZOMBIES; i++)
+		for (int i = 0; i < NUM_ALMANAC_ZOMBIES + int(MemeAdventure::RosterEnabled()); i++)
 		{
 			ZombieType aZombieType = GetZombieType(i);
 			if (aZombieType != ZombieType::ZOMBIE_INVALID && ZombieIsShown(aZombieType))
