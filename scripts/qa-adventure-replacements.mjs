@@ -41,7 +41,7 @@ try{
   await card(0);await click(80,330);assert.equal(await ad(0,0),500);assert.equal(await ad(-1,2),50);
   await money(100);await card(0);await click(240,330);assert.equal(await ad(1,0),500);assert.equal(await ad(-1,8),4);
   await shot('first-level-native-slots');const until=Date.now()+160000;
-  while(await ad(0,12)<0){assert.ok(Date.now()<until,'first-level victory deadline');await collect();for(let i=0;i<2;++i)if(await ad(i,5)>=600&&await ad(i,4)!==2)await click(i===0?80:240,330);await page.waitForTimeout(160);}
+  while(await ad(0,12)<0){assert.ok(Date.now()<until,'first-level victory deadline');await collect();for(let i=0;i<2;++i)if(await ad(i,5)>=100&&await ad(i,4)===0){await click(i===0?80:240,330);results.manualBurst=true;}await page.waitForTimeout(160);}
   await click(await ad(0,12),await ad(0,13));await page.waitForTimeout(7000);await shot('replacement-award');results.firstVictory=true;
  }else if(level===2){
   await play();await page.waitForFunction(()=>Module._pvz_adventure_power_data(-1,8)===5,{},{timeout:15000});

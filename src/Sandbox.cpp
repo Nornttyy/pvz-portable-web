@@ -338,6 +338,14 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_zombie_data(int index,int field)
     return -1;
 }
 
+// Read-only live projectile diagnostics, also available in adventure QA.
+extern "C" EMSCRIPTEN_KEEPALIVE int pvz_projectile_data(int index,int field) {
+    auto* board=gLawnApp?gLawnApp->mBoard:nullptr;if(!board||index<0||field<0||field>7)return -1;
+    for(auto* shot:board->mProjectiles)if(!shot->mDead&&index--==0){
+        return field==0?MemeCharacters::ShotStyle(shot):field==1?int(shot->mPosX):field==2?int(shot->mPosY+shot->mPosZ):field==3?int(shot->mVelX*1000):field==4?int(shot->mVelY*1000):field==5?shot->mRow:field==6?shot->mProjectileAge:SandboxPlants::SaveShot(shot);
+    }return -1;
+}
+
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_plant_data(int index, int field) {
     auto* board = ActiveBoard();
     if (!board || index < 0 || index >= SandboxRules::MaxPlants || field < 0 || field > 6) return -1;

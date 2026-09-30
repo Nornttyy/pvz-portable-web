@@ -80,6 +80,18 @@ int main(){
  auto* shot=board.AddProjectile(0,0,0,2,PROJECTILE_PEA);SandboxPlants::OnFired(pea,shot,nullptr);
  near(shot->mPosX+12,pea->mX+60);near(shot->mPosY+12,pea->mY+50.44f);near(SandboxPlants::ShotScale(shot),1);
  assert(SandboxPlants::HasShot(shot)&&SandboxPlants::ShotRadius(shot)==12&&!SandboxPlants::DrawShot(&g,shot)&&!SandboxPlants::Impact(shot,nullptr));
+ // New rage shots keep the exact native muzzle registration and pea scale.
+ auto* rage=board.plant(1,2);SandboxPlants::Assign(rage,500);rage->mHeadReanimID=1;
+ auto* wave=board.AddProjectile(0,0,0,2,PROJECTILE_PEA);SandboxPlants::OnFired(rage,wave,nullptr);
+ near(wave->mPosX+12,rage->mX+60);near(wave->mPosY+12,rage->mY+50.44f);near(SandboxPlants::ShotScale(wave),1);
+ assert(MemeCharacters::ShotStyle(wave)>0&&!SandboxPlants::DrawShot(&g,wave));
+ {Reanimation body;Track tracks[]={{"anim_face"}};TrackInstance instances[1];body.def.mTracks={1,tracks};body.mTrackInstances=instances;
+  auto* native=SandboxArt::NativeImage("PeaShooter_Head.png");instances[0].mImageOverride=native;app.reanims[80]=&body;rage->mBodyReanimID=80;
+  assert(SandboxPlants::RestorePower(rage,{500,300,1,0,0,0,0,0,50,2}));
+  assert(SandboxPlants::DrawBody(&g,rage,0,0)&&instances[0].mImageOverride==native);
+  assert(SandboxPlants::RestorePower(rage,{500,300,0,0,0,0,0,0,0,2}));
+  assert(!SandboxPlants::DrawBody(&g,rage,0,0)&&instances[0].mImageOverride==native);app.reanims.erase(80);
+ }
  for(int id=120;id<144;++id){auto* p=board.plant(1,1);p->mSeedType=static_cast<SeedType>(SandboxPlants::Base(id));SandboxPlants::Assign(p,id);
   assert(SandboxPlants::KeepsNativeBlink(p));float x=0,y=0,sx=1,sy=1;SandboxPlants::AdjustScale(p,x,y,sx,sy);near(x+40*sx,40);near(y+65*sy,65);
  }

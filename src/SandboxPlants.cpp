@@ -106,7 +106,7 @@ Sexy::MemoryImage* Card(int id){
 }
 void Reset(){states.clear();shots.clear();damageShots.clear();MemeCharacters::Reset();}
 void Forget(Plant* p){states.erase(p);MemeCharacters::Forget(p);}
-void ForgetShot(Projectile* p){shots.erase(p);damageShots.erase(p);}
+void ForgetShot(Projectile* p){shots.erase(p);damageShots.erase(p);MemeCharacters::ForgetShot(p);}
 bool IsCustom(const Plant* p){return states.contains(p)||MemeCharacters::Is(p);}
 int Type(const Plant* p){if(MemeCharacters::Is(p))return MemeCharacters::Type(p);auto it=states.find(p);return it==states.end()?int(p->mSeedType):it->second.id;}
 int GrowthStage(const Plant* p){auto it=states.find(p);return it==states.end()?0:it->second.heat.heat/250;}
@@ -165,15 +165,20 @@ int NativeDamage(const Plant* p,int damage){
  const int percent=power==182?300:power==180&&h.phase==SandboxMemeRules::Bursting?150:power==181&&(base==21||base==46)?100+h.heat/20:100;
  return damage*percent/100;
 }
-int SaveShot(const Projectile* p){auto it=damageShots.find(p);return it==damageShots.end()?100:it->second;}
-void RestoreShot(const Projectile* p,int percent){if(percent>=100&&percent<=300)damageShots[p]=percent;}
-int ShotDamage(const Projectile* p,int damage){return damage*SaveShot(p)/100;}
-int ShotBlastRadius(const Projectile* p,int radius){return SaveShot(p)>=300?radius*14/10:radius;}
+int ShotDamage(const Projectile* p,int damage){auto it=damageShots.find(p);return damage*(it==damageShots.end()?100:it->second)/100;}
+// Existing optional shot record: low 16 bits damage %, upper bits trajectory.
+// Old 100..300 records remain valid; native age/velocity are saved by the engine.
+int SaveShot(const Projectile* p){return ShotDamage(p,100)|(MemeCharacters::ShotStyle(p)<<16);}
+void RestoreShot(const Projectile* p,int record){
+ if(record<0)return;const int percent=record&65535,style=record>>16;
+ if(percent>=100&&percent<=300&&MemeCharacters::RestoreShotStyle(p,style))damageShots[p]=percent;
+}
+int ShotBlastRadius(const Projectile* p,int radius){return ShotDamage(p,100)>=300?radius*14/10:radius;}
 void TorchPower(Plant* p,Projectile* shot){
  if(!IsCustom(p))return;auto& h=states.at(p).heat;
  if(Power(p)==182&&h.delay>0)return;
  NativeAction(p);const int percent=Power(p)==181?100+h.heat/20:Power(p)==182?250:125;
- damageShots[shot]=std::max(SaveShot(shot),percent);h.pulse=20;
+ damageShots[shot]=std::max(ShotDamage(shot,100),percent);h.pulse=20;
  if(Power(p)==182)h.delay=400;
 }
 void OneShot(Plant* p,Zombie* exclude){
@@ -209,7 +214,7 @@ void AdjustScale(const Plant* p,float& x,float& y,float& sx,float& sy){
 }
 void AdjustShadow(const Plant*,float&,float&,float&){}
 float ShotScale(const Projectile*){return 1;}
-bool HasShot(const Projectile* p){return shots.contains(p);}
+bool HasShot(const Projectile* p){return shots.contains(p)||MemeCharacters::ShotStyle(p)!=0;}
 bool UsesCustomShotArt(const Projectile*){return false;}
 int ShotRadius(const Projectile*){return 12;}
 int NextShot(Plant*){return 0;}
@@ -230,7 +235,7 @@ void OnFired(Plant* p,Projectile* shot,Zombie*){
   shot->mX=int(shot->mPosX);shot->mY=int(shot->mPosY+shot->mPosZ);
  }
 }
-void UpdateShot(Projectile*){}
+void UpdateShot(Projectile* p){MemeCharacters::UpdateShot(p);}
 bool Impact(Projectile*,Zombie*){return false;} // Native damage, slow, fire and splats.
 void Tick(Board* b){
  if(b->mPaused)return;
@@ -317,6 +322,12 @@ void DrawCard(Sexy::Graphics* g,int x,int y,int id){
  PvzpDrawString(g,"0",x+25,y+65,Sexy::FONT_BRIANNETOD12,Sexy::Color(55,64,23),DS_ALIGN_CENTER);
 }
 bool DrawBody(Sexy::Graphics* g,const Plant* p,float,float,bool squished){
+ if(MemeCharacters::Type(p)==500&&MemeCharacters::Data(p,0)==1&&!squished){
+  auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID);if(!body)return false;
+  WarmSkin warm;for(auto id:{p->mBodyReanimID,p->mHeadReanimID})warm.Apply(gLawnApp->ReanimationTryToGet(id),120,24,p->mPlantHealth,p->mPlantMaxHealth);
+  warm.Apply(gLawnApp->ReanimationTryToGet(p->mBlinkReanimID),120,24,p->mPlantHealth,p->mPlantMaxHealth,true);
+  body->Draw(g);HeatBrow(g,gLawnApp->ReanimationTryToGet(p->mHeadReanimID),24,230);return true;
+ }
  auto it=states.find(p);if(it==states.end()||squished||!SandboxMemeRules::LegacyBase(int(p->mSeedType)))return false;const auto& s=it->second;
  WarmSkin warm;const int level=SandboxMemeRules::PowerOf(s.id)==180?2+s.heat.heat*22/1000:12+s.heat.heat*12/1000;
  auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID);if(!body)return false;

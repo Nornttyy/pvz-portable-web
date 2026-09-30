@@ -279,6 +279,7 @@ public:
 	void							SpawnZombiesFromGraves();
 	PlantingReason					CanPlantAt(int theGridX, int theGridY, SeedType theSeedType);
 	void							MouseMove(int x, int y) override;
+	void							CollectSunAt(int x, int y);
 	void							MouseDrag(int x, int y) override;
 	void							MouseDown(int x, int y, int theClickCount) override;
 	void							MouseUp(int x, int y, int theClickCount) override;

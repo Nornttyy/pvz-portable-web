@@ -26,6 +26,7 @@
 #include "Projectile.h"
 #include "../LawnApp.h"
 #include "../SandboxPlants.h"
+#include "../MemeShooterRules.h"
 #include "../SandboxVisualRules.h"
 #include "../SandboxZombies.h"
 #include "../Resources.h"
@@ -238,7 +239,7 @@ Zombie* Projectile::FindCollisionTarget()
 	{
 		if (aZombie->mDead)
 			continue;
-		if ((aZombie->mZombieType == ZombieType::ZOMBIE_BOSS || aZombie->mRow == mRow) && aZombie->EffectedByDamage(static_cast<unsigned int>(mDamageRangeFlags)))
+		if ((aZombie->mZombieType == ZombieType::ZOMBIE_BOSS || aZombie->mRow == mRow || MemeCharacters::ShotStyle(this)) && aZombie->EffectedByDamage(static_cast<unsigned int>(mDamageRangeFlags)))
 		{
 			if (aZombie->mZombiePhase == ZombiePhase::PHASE_SNORKEL_WALKING_IN_POOL && mPosZ <= 45.0f)
 			{
@@ -251,6 +252,8 @@ Zombie* Projectile::FindCollisionTarget()
 			}
 
 			Rect aZombieRect = aZombie->GetZombieRect();
+			if (MemeCharacters::ShotStyle(this) && !MemeShooterRules::OverlapsY(aProjectileRect.mY, aProjectileRect.mHeight, aZombieRect.mY, aZombieRect.mHeight))
+				continue;
 			if (GetRectOverlap(aProjectileRect, aZombieRect) >= 0)
 			{
 				if (aBestZombie == nullptr || aZombie->mX < aMinX)
@@ -737,6 +740,11 @@ void Projectile::UpdateNormalMotion()
 		mPosY += mVelZ;
 	}
 
+	if (MemeCharacters::ShotStyle(this))
+	{
+		mX = static_cast<int>(mPosX);
+		mY = static_cast<int>(mPosY + mPosZ);
+	}
 	CheckForCollision();
 	CheckForHighGround();
 }
@@ -949,6 +957,7 @@ void Projectile::DoImpact(Zombie* theZombie)
 void Projectile::Update()
 {
     SandboxPlants::UpdateShot(this);
+	if (mDead) return;
 	mProjectileAge++;
 	if (mApp->mGameScene != GameScenes::SCENE_PLAYING && !mBoard->mCutScene->ShouldRunUpsellBoard())
 		return;

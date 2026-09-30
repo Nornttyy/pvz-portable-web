@@ -7,6 +7,7 @@ import './font-repair.test.mjs';
 import './expansion.test.mjs';
 import './adventure-replacements.test.mjs';
 import './sandbox-placement.test.mjs';
+import './sun-hover.test.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile, readdir, stat } from 'node:fs/promises';

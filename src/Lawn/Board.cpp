@@ -3012,6 +3012,7 @@ void Board::MouseMove(int x, int y)
 {
 	Widget::MouseMove(x, y);
 	mChallenge->MouseMove(x, y);
+	CollectSunAt(x, y);
 }
 
 void Board::MouseDrag(int x, int y)
@@ -3019,6 +3020,26 @@ void Board::MouseDrag(int x, int y)
 	if (SandboxMouseDrag(x + (gSandboxEnabled ? mX : 0), y + (gSandboxEnabled ? mY : 0))) return;
 	Widget::MouseDrag(x, y);
 	mChallenge->MouseMove(x, y);
+	CollectSunAt(x, y);
+}
+
+void Board::CollectSunAt(int x, int y)
+{
+	if (mPaused || mTimeStopCounter > 0 || mBoardFadeOutCounter >= 0 ||
+		mApp->mGameScene != GameScenes::SCENE_PLAYING || mApp->GetDialogCount() > 0 ||
+		IsScaryPotterDaveTalking() || x < 0 || y < 0 || x >= mWidth || y >= mHeight)
+		return;
+
+	// Use the native hit area and collection path (animation, sound, tutorial,
+	// sun value). Do not consume the held seed/tool or auto-collect level awards.
+	for (Coin* coin : mCoins)
+	{
+		if (coin->mDead || coin->mIsBeingCollected || !coin->IsSun())
+			continue;
+		HitResult hit;
+		if (coin->MouseHitTest(x, y, &hit))
+			coin->MouseDown(x, y, 1);
+	}
 }
 
 Zombie* Board::ZombieHitTest(int theMouseX, int theMouseY)

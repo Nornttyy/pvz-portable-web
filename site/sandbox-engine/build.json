@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Abstract adventure: friendly bumping walnut, self-thrower unlock at 1-8, backup-phone zombie; native unlabeled cards and saves preserved",
+  "mode": "Rage peashooter: wavy normal peas, +20 rage, manual 100/auto 300, 50-shot scatter without self-damage; sun hover and sunflower recovery",
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 276955,
-      "sha256": "be40362cbcbf6969f967ce84b9ad15a298e106b1e0edd93ca2b28ea845da8f83"
+      "size": 277046,
+      "sha256": "0779a771451d6892d79e3c378ec232c2edafbafb1c56728be6e93b68d869cca9"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7444563,
-      "sha256": "133726d13fa458ebb9ff9def5f04d93c58ddbfdc17c8a24531834fd8012fa1f0"
+      "size": 7448601,
+      "sha256": "3933d13bce11a7920ced15339a3ab248c42dfb63be3ebece5c025fb01fb24544"
     }
   ]
 }

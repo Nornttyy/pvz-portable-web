@@ -34,6 +34,8 @@ test('actual projectile/effect draw code preserves bone and world coordinate con
 });
 test('native projectile integration retains splats, centered scaling and fire attachments',async()=>{
  const render=(await read('src/Lawn/Projectile.cpp')).toString();
+ assert.match(render,/MemeShooterRules::OverlapsY/);
+ assert.match(render,/SandboxPlants::UpdateShot\(this\);\s*if \(mDead\) return;/);
  const impact=render.slice(render.indexOf('void Projectile::DoImpact('),render.indexOf('void Projectile::Draw('));
  assert.match(impact,/if \(SandboxPlants::UsesCustomShotArt\(this\)\) \{ Die\(\); return; \}/);
  assert.doesNotMatch(impact,/if \(SandboxPlants::HasShot\(this\)\)/);

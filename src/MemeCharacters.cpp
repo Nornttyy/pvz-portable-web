@@ -1,5 +1,6 @@
 // Individual character mechanics using the native rigs and seed bank.
 #include "MemeCharacters.h"
+#include "MemeShooterRules.h"
 #include "SandboxPlants.h"
 #include "SandboxArt.h"
 #include "LawnApp.h"
@@ -22,6 +23,8 @@ namespace {
 // Saved in the existing ten-integer optional plant record.
 struct State {int id=0,health=0,phase=0,heat=0,timer=0,delay=50,age=0,pulse=0,remaining=0,direction=1;};
 std::map<const Plant*,State> states;
+std::map<const Projectile*,int> shotStyles; // 1..8 wobble, 9 scatter; native art/motion/save.
+void Burst(State& s){s.phase=1;s.heat=0;s.remaining=MemeShooterRules::BurstCount;s.delay=0;s.timer=0;s.pulse=30;}
 // Native zombie IDs are stable through DataArray recycling; never retain pointers.
 std::map<unsigned,int> laneCooldown;
 bool Enemy(Zombie* z){return !z->mDead&&z->IsOnBoard()&&!z->mMindControlled&&!z->IsDeadOrDying()&&z->mHasHead;}
@@ -46,27 +49,31 @@ int Type(const Plant* p){auto it=states.find(p);return it==states.end()?0:it->se
 bool Is(const Plant* p){return states.contains(p);}
 bool Hiding(const Plant* p){auto it=states.find(p);return it!=states.end()&&(it->second.id==503||it->second.id==504)&&it->second.phase==1&&!p->mIsAsleep&&!p->mSquished;}
 bool Producing(const Plant* p){auto it=states.find(p);return it!=states.end()&&it->second.id==503&&it->second.phase==0;}
-void Reset(){states.clear();laneCooldown.clear();}
+void Reset(){states.clear();laneCooldown.clear();shotStyles.clear();}
 void Forget(Plant* p){states.erase(p);}
 void Assign(Plant* p,int id){const auto* d=Find(id);if(!d||int(p->mSeedType)!=d->base)return;
- State s;s.id=id;s.health=p->mPlantHealth;s.timer=id==502?180:0;states[p]=s;
+ State s;s.id=id;s.health=p->mPlantHealth;s.timer=id==502?180:0;if(id==500)s.direction=2;states[p]=s;
  p->mLaunchCounter=id==503?std::clamp(p->mLaunchCounter,300,2500):9999;p->mShootingCounter=0;
  if(id==502)p->SetSleeping(false); // Keep the native short-range shot and add a daytime lure.
 }
 std::array<int,10> Save(const Plant* p){auto it=states.find(p);if(it==states.end())return {};const auto& s=it->second;return {s.id,s.health,s.phase,s.heat,s.timer,s.delay,s.age,s.pulse,s.remaining,s.direction};}
 bool Restore(Plant* p,const std::array<int,10>& a){
- const auto* d=Find(a[0]);if(!d||int(p->mSeedType)!=d->base||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>2||a[3]<0||a[3]>1000||a[4]<0||a[4]>2000||a[5]<0||a[5]>2000||a[6]<0||a[6]>=1000000||a[7]<0||a[7]>50||a[8]<0||a[8]>3||(a[9]!=1&&a[9]!=-1))return false;
- states[p]={a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9]};p->mLaunchCounter=a[0]==503?std::clamp(p->mLaunchCounter,0,2500):9999;p->mShootingCounter=0;return true;
+ const bool shooter=a[0]==500,newShooter=shooter&&a[9]==2;
+ const auto* d=Find(a[0]);if(!d||int(p->mSeedType)!=d->base||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>(newShooter?1:2)||a[3]<0||a[3]>(newShooter?300:1000)||a[4]<0||a[4]>2000||a[5]<0||a[5]>2000||a[6]<0||a[6]>=1000000||a[7]<0||a[7]>50||a[8]<0||a[8]>(newShooter?50:3)||(!newShooter&&a[9]!=1&&a[9]!=-1))return false;
+ if(newShooter&&((a[2]==1&&(a[8]==0||a[3]!=0))||(a[2]==0&&a[8]!=0)))return false;
+ State s{a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9]};
+ // Direction was unused for this character: 2 versions the new burst state.
+ // Migrate old overheating saves without healing or inventing a free volley.
+ if(shooter&&!newShooter){s.phase=0;s.heat=a[2]==0?a[3]*300/1000:0;s.timer=0;s.delay=std::min(a[5],150);s.remaining=0;s.pulse=0;s.direction=2;}
+ states[p]=s;p->mLaunchCounter=a[0]==503?std::clamp(p->mLaunchCounter,0,2500):9999;p->mShootingCounter=0;return true;
 }
 int Data(const Plant* p,int field){const auto it=states.find(p);if(it==states.end())return -1;const auto& s=it->second;return field==0?s.phase:field==1?s.heat:field==2?s.timer:field==3?s.direction:s.remaining;}
 bool Activate(Plant* p,int direction){
  auto it=states.find(p);if(it==states.end()||p->mDead||p->mBoard->mPaused||p->mIsAsleep||p->mSquished||p->NotOnGround()||p->mPlantHealth<=0)return false;
- auto& s=it->second;auto* b=p->mBoard;
+ auto& s=it->second;
  if(s.id==500){
-  if(s.phase==2||s.heat<300)return false;
-  const int distance=40+s.heat/15;
-  for(auto* z:b->mZombies)if(Walker(z)&&z->mRow==p->mRow&&z->mPosX>p->mX-20&&z->mPosX<p->mX+230){z->mPosX=std::min(850.0f,z->mPosX+distance);z->UpdateReanim();}
-  s.heat=0;s.delay=90;s.pulse=40;gLawnApp->PlayFoley(FOLEY_THROW);return true;
+  if(s.phase!=0||s.heat<MemeShooterRules::ManualRage)return false;
+  Burst(s);return true;
  }
  return false;
 }
@@ -84,11 +91,19 @@ void Tick(Board* b){
   if(p->mIsAsleep||p->mSquished||p->NotOnGround()||p->mPlantHealth<=0)continue;
   s.age=(s.age+1)%1000000;if(s.pulse)--s.pulse;if(s.delay)--s.delay;if(s.timer)--s.timer;
   if(s.id==500){
-   if(s.phase==2){s.heat=s.timer*2;if(!s.timer){s.phase=0;s.heat=0;}continue;}
-   auto* target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY);
-   if(!target){s.heat=std::max(0,s.heat-1);continue;}
-   if(!s.delay&&b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8){Shoot(p,target);s.heat=std::min(1000,s.heat+100);s.delay=std::max(55,110-s.heat/20);}
-   if(s.heat>=1000){s.phase=2;s.timer=500;s.pulse=50;p->mPlantHealth-=120;p->mEatenFlashCountdown=20;if(p->mPlantHealth<=0){p->Die();continue;}}
+   if(s.phase==0&&s.heat>=MemeShooterRules::MaxRage)Burst(s);
+   const bool room=b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8;
+   if(s.phase==1){
+    if(!s.delay&&room){
+     Shoot(p,nullptr);--s.remaining;s.delay=MemeShooterRules::BurstDelay;s.pulse=10;
+     if(!s.remaining){s.phase=0;s.heat=0;s.delay=MemeShooterRules::NormalDelay;}
+    }
+   }else if(!s.delay&&room){
+    if(auto* target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY)){
+     Shoot(p,target);s.heat+=MemeShooterRules::PerShot;s.delay=MemeShooterRules::NormalDelay;
+     if(s.heat>=MemeShooterRules::MaxRage)Burst(s);
+    }
+   }
   }else if(s.id==501){
    if(!s.timer&&p->mRecentlyEatenCountdown>0){
     Zombie* target=nullptr;
@@ -119,15 +134,21 @@ void Tick(Board* b){
     if(z->mPosX<p->mX-65&&z->mPosX>p->mX-330&&(!back||z->mPosX>back->mPosX))back=z;
    }
    if(s.phase==0&&!s.timer&&front){s.phase=1;s.timer=1400;s.pulse=20;}
-   if(s.phase==1&&back&&!front){s.phase=2;s.timer=180;s.remaining=3;s.delay=35;s.pulse=30;}
-   else if(s.phase==1&&!s.timer){s.phase=0;s.timer=500;}
+   if(s.phase==1&&(!front||!s.timer)){
+    // A killed, charmed or diverted enemy must not leave the flower flat.
+    // Reverse even a partially completed collapse without snapping its scale.
+    const bool ambush=back&&!front;
+    s.pulse=(20-std::clamp(s.pulse,0,20))*3/2;
+    s.phase=2;s.timer=ambush?180:std::max(1,s.pulse);
+    s.remaining=ambush?3:0;s.delay=ambush?35:0;
+   }
    if(s.phase==2){
     if(s.remaining&&!s.delay&&b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8){
      auto* shot=b->AddProjectile(p->mX+12,p->mY+22,p->mRenderOrder-1,p->mRow,PROJECTILE_PEA);
      shot->mMotionType=MOTION_BACKWARDS;shot->mDamageRangeFlags=p->GetDamageRangeFlags(WEAPON_PRIMARY);SandboxPlants::RestoreShot(shot,300);
      --s.remaining;s.delay=16;gLawnApp->PlayFoley(FOLEY_THROW);
     }
-    if(!s.timer){s.phase=0;s.timer=500;s.remaining=0;}
+    if(!s.timer){s.phase=0;s.timer=500;s.remaining=0;s.pulse=0;}
    }
    s.heat=s.phase==1?1000:s.phase==2?std::min(1000,s.timer*5):std::max(0,1000-s.timer*2);
   }else if(s.id==504){
@@ -144,13 +165,12 @@ void Tick(Board* b){
  }
 }
 void Tint(const Plant* p,Sexy::Color& c){auto it=states.find(p);if(it==states.end())return;const auto& s=it->second;
- if(s.id==500){c.mGreen=c.mGreen*(255-s.heat/7)/255;c.mBlue=c.mBlue*(235-s.heat/6)/255;}
  if(s.id==502)c.mBlue=c.mBlue*180/255;
  if(s.id==503){c.mRed=c.mRed*205/255;c.mGreen=c.mGreen*215/255;}
 }
 void Scale(const Plant* p,float& x,float& y,float& sx,float& sy){auto it=states.find(p);if(it==states.end()||p->mSquished)return;const auto& s=it->second;
  float horizontal=1,vertical=1;
- if(s.id==500){horizontal+=s.heat/16000.0f;vertical-=s.heat/20000.0f;}
+ if(s.id==500&&s.phase==1){const float recoil=std::sin(s.pulse*0.3f)*0.025f;horizontal+=0.04f+recoil;vertical-=0.03f+recoil;}
  if(s.id==501&&s.phase==1&&s.pulse){
   // Keep the original face, damage frames and grid anchor during the bump.
   const float age=50-s.pulse;float offset=0;
@@ -160,8 +180,10 @@ void Scale(const Plant* p,float& x,float& y,float& sx,float& sy){auto it=states.
   x+=std::abs(sx)*offset;
  }
  if(s.id==502&&s.pulse){vertical+=0.12f*std::sin(s.pulse*0.18f);horizontal-=0.06f*std::sin(s.pulse*0.18f);}
- if(s.id==503&&s.phase==1){vertical=0.28f+0.72f*s.pulse/20.0f;horizontal=1.15f;}
- if(s.id==503&&s.phase==2&&s.pulse)vertical=1.0f-0.72f*s.pulse/30.0f;
+ if(s.id==503&&(s.phase==1||s.phase==2)){
+  const float crouch=s.phase==1?1-std::clamp(s.pulse/20.0f,0.0f,1.0f):std::clamp(s.pulse/30.0f,0.0f,1.0f);
+  vertical=1-0.72f*crouch;horizontal=1+0.15f*crouch;
+ }
  if(s.id==504&&s.phase==1){const float t=(80-s.timer)/80.0f,travel=std::sin(3.14159265f*t);x+=std::abs(sx)*s.heat*travel;y-=sy*55*std::abs(std::sin(6.2831853f*t));horizontal=1+0.12f*travel;vertical=1-0.12f*travel;}
  x+=40*sx*(1-horizontal);y+=65*sy*(1-vertical);sx*=horizontal;sy*=vertical;
 }
@@ -170,8 +192,9 @@ void Effects(Sexy::Graphics* g,Board* b,int row){
   const int x=p->mX,y=p->mY;
   if(s.id==500){
    g->SetColor(Sexy::Color(57,37,18));g->FillRect(x+12,y+77,56,6);
-   g->SetColor(s.heat>700?Sexy::Color(238,67,37):Sexy::Color(240,164,45));g->FillRect(x+13,y+78,s.heat*54/1000,4);
-   if(s.heat>700||s.pulse){const int age=s.age%30;Puff(g,x+45,y+15-age,age,150);}
+   g->SetColor(s.phase==1?Sexy::Color(210,72,43):Sexy::Color(226,167,64));g->FillRect(x+13,y+78,s.phase==1?s.remaining*54/50:s.heat*54/300,4);
+   g->SetColor(Sexy::Color(85,57,27));g->FillRect(x+31,y+78,1,4); // 100-rage click threshold, no extra text.
+   if(s.phase==1){const int age=s.age%30;Puff(g,x+45,y+15-age,age,130);}
   }else if(s.id==504&&s.phase==1){
    auto* im=Sexy::IMAGE_PROJECTILEPEA;
    if(im){Sexy::SexyTransform2D m;m.LoadIdentity();m.m02=x+40+g->mTransX;m.m12=y+61+g->mTransY;PvzpBltMatrix(g,im,m,g->mClipRect,Sexy::Color(255,255,255),g->mDrawMode,Sexy::Rect(0,0,im->mWidth,im->mHeight));}
@@ -189,5 +212,25 @@ void Card(Sexy::Graphics* g,int x,int y,int id){const auto* d=Find(id);if(!d)ret
 }
 void OnFired(Plant* p,Projectile* shot){if(Type(p)==500){
  float x,y;if(SandboxArt::TrackPoint(gLawnApp->ReanimationTryToGet(p->mHeadReanimID),"idle_mouth",35,49,32,24.5f,x,y)){shot->mPosX=p->mX+x-12;shot->mPosY=p->mY+y-12-shot->mPosZ;shot->mX=int(shot->mPosX);shot->mY=int(shot->mPosY+shot->mPosZ);}
+ const auto& s=states.at(p);shot->mMotionType=MOTION_STAR;
+ if(s.phase==1){
+  shotStyles[shot]=9;const float angle=MemeShooterRules::SpreadAngle(50-s.remaining);
+  shot->mVelX=5.1f*std::cos(angle);shot->mVelY=5.1f*std::sin(angle);
+ }else{
+  const int style=1+(s.heat/20+p->mPlantCol*3+p->mRow)%8;
+  shotStyles[shot]=style;shot->mVelX=3.33f;shot->mVelY=MemeShooterRules::WobbleStep(style,0);
+ }
 }}
+int ShotStyle(const Projectile* shot){const auto it=shotStyles.find(shot);return it==shotStyles.end()?0:it->second;}
+bool RestoreShotStyle(const Projectile* shot,int style){
+ if(style<0||style>9||shot->mDead)return false;
+ if(style&&(shot->mMotionType!=MOTION_STAR||(shot->mProjectileType!=PROJECTILE_PEA&&shot->mProjectileType!=PROJECTILE_SNOWPEA&&shot->mProjectileType!=PROJECTILE_FIREBALL)))return false;
+ if(style)shotStyles[shot]=style;else shotStyles.erase(shot);return true;
+}
+void ForgetShot(const Projectile* shot){shotStyles.erase(shot);}
+void UpdateShot(Projectile* shot){
+ const int style=ShotStyle(shot);if(!style||shot->mDead||shot->mBoard->mPaused)return;
+ if(shot->mPosY+shot->mPosZ<-40||shot->mPosY+shot->mPosZ>640){shot->Die();return;}
+ if(style<9)shot->mVelY=MemeShooterRules::WobbleStep(style,shot->mProjectileAge);
+}
 }
