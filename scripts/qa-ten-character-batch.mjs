@@ -56,7 +56,7 @@ try{
 
  await fresh();for(let i=0;i<6;++i)await api(1,508+i,1+i,2);await page.setViewportSize({width:844,height:390});await page.waitForTimeout(300);await snap('mobile-batch-layout');await page.setViewportSize({width:1100,height:750});await page.waitForTimeout(300);
  await api(15);await page.waitForTimeout(800);await click(560,135);await page.waitForTimeout(15000);await snap('adventure-roof-chooser');
- for(const base of [26,6,32,29,34,13])await click(47+(base%8)*53,163+Math.floor(base/8)*73);
+ for(const base of [26,6,32,29,34,13]){const slot=base>=8?base+1:base;await click(47+(slot%9)*53,163+Math.floor(slot/9)*73);}
  await page.waitForTimeout(300);await snap('adventure-six-new-native-slots');await click(232,566);
  // This QA deliberately fills all six slots with new roles; confirm the
  // original game's missing-sunflower and missing-flowerpot warnings.

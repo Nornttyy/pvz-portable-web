@@ -1173,20 +1173,55 @@ index d017de9..260efd1 100644
  	bool                        mStartingGame;
  	int                         mStartingGameCounter;
 diff --git a/src/Lawn/Widget/SeedChooserScreen.cpp b/src/Lawn/Widget/SeedChooserScreen.cpp
-index b284e6a..45539ae 100644
+index b284e6a..d41c794 100644
 --- a/src/Lawn/Widget/SeedChooserScreen.cpp
 +++ b/src/Lawn/Widget/SeedChooserScreen.cpp
-@@ -41,6 +41,9 @@
+@@ -41,11 +41,16 @@
  #include "../../PvzpLib/PvzpStringFile.h"
  #include "widget/WidgetManager.h"
  #include <algorithm>
 +#include "../../MemeAdventure.h"
++#include "../../SeedChooserLayout.h"
 +
 +static int AbstractChooserCount(){return MemeAdventure::RosterEnabled()?NUM_SEED_TYPES:NUM_SEEDS_IN_CHOOSER;}
  
  SeedChooserScreen::SeedChooserScreen()
  {
-@@ -159,7 +162,7 @@ SeedChooserScreen::SeedChooserScreen()
+ 	mApp = (LawnApp*)gSexyAppBase;
+ 	mBoard = mApp->mBoard;
++	const int aExtraWidth = SeedChooserLayout::ExtraWidth(mApp->HasSeedType(SEED_LEFTPEATER));
+ 	mClip = false;
+ 	// mSeedChooserAge is deliberately not initialized here
+ 	mSeedsInFlight = 0;
+@@ -67,7 +72,7 @@ SeedChooserScreen::SeedChooserScreen()
+ 	mStartButton->mOverOverlayImage = Sexy::IMAGE_SEEDCHOOSER_BUTTON_GLOW;
+ 	mStartButton->SetFont(Sexy::FONT_DWARVENTODCRAFT18YELLOW);
+ 	mStartButton->SetLabelHiliteColor(Color::White);
+-	mStartButton->Resize(154, 545, 156, 42);
++	mStartButton->Resize(154 + aExtraWidth / 2, 545, 156, 42);
+ 	mStartButton->mTextOffsetY = -1;
+ 	EnableStartButton(false);
+ 
+@@ -84,7 +89,7 @@ SeedChooserScreen::SeedChooserScreen()
+ 	mRandomButton->SetFont(Sexy::FONT_BRIANNETOD12);
+ 	mRandomButton->SetLabelColor(Color(255, 240, 0));
+ 	mRandomButton->SetLabelHiliteColor(Color(200, 200, 255));
+-	mRandomButton->Resize(332, 546, 100, 30);
++	mRandomButton->Resize(332 + aExtraWidth, 546, 100, 30);
+ 	if (!mApp->mCheatKeys)
+ 	{
+ 		mRandomButton->mBtnNoDraw = true;
+@@ -143,7 +148,8 @@ SeedChooserScreen::SeedChooserScreen()
+ 	mImitaterButton->mOverImage = Sexy::IMAGE_IMITATERSEED;
+ 	mImitaterButton->mDownImage = Sexy::IMAGE_IMITATERSEED;
+ 	mImitaterButton->mDisabledImage = Sexy::IMAGE_IMITATERSEEDDISABLED;
+-	mImitaterButton->Resize(464, 515, Sexy::IMAGE_IMITATERSEED->mWidth, Sexy::IMAGE_IMITATERSEED->mHeight);
++	const auto aImitaterPosition = SeedChooserLayout::Imitater(aExtraWidth != 0);
++	mImitaterButton->Resize(aImitaterPosition.x, aImitaterPosition.y, Sexy::IMAGE_IMITATERSEED->mWidth, Sexy::IMAGE_IMITATERSEED->mHeight);
+ 	mImitaterButton->mParentWidget = this;
+ 
+ 	if (!mApp->CanShowAlmanac())
+@@ -159,7 +165,7 @@ SeedChooserScreen::SeedChooserScreen()
  
  	DBG_ASSERT(mApp->GetSeedsAvailable() < NUM_SEED_TYPES);
  	memset(mChosenSeeds, 0, sizeof(mChosenSeeds));
@@ -1195,7 +1230,7 @@ index b284e6a..45539ae 100644
  	{
  		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
  		aChosenSeed.mSeedType = aSeedType;
-@@ -225,7 +228,7 @@ int SeedChooserScreen::PickFromWeightedArrayUsingSpecialRandSeed(PvzpWeightedArr
+@@ -225,7 +231,7 @@ int SeedChooserScreen::PickFromWeightedArrayUsingSpecialRandSeed(PvzpWeightedArr
  void SeedChooserScreen::CrazyDavePickSeeds()
  {
  	PvzpWeightedArray aSeedArray[NUM_SEED_TYPES];
@@ -1204,7 +1239,7 @@ index b284e6a..45539ae 100644
  	{
  		aSeedArray[aSeedType].mItem = aSeedType;
  		if (!mApp->HasSeedType(aSeedType) || SeedNotRecommendedToPick(aSeedType) || SeedNotAllowedToPick(aSeedType) || Plant::IsUpgrade(aSeedType) ||
-@@ -254,7 +257,7 @@ void SeedChooserScreen::CrazyDavePickSeeds()
+@@ -254,7 +260,7 @@ void SeedChooserScreen::CrazyDavePickSeeds()
  	MTRand aLevelRNG = MTRand(mBoard->GetLevelRandSeed());
  	for (int i = 0; i < 3; i++)
  	{
@@ -1213,23 +1248,74 @@ index b284e6a..45539ae 100644
  		aSeedArray[aPickedSeed].mWeight = 0;
  		ChosenSeed& aChosenSeed = mChosenSeeds[aPickedSeed];
  
-@@ -283,6 +286,7 @@ bool SeedChooserScreen::Has7Rows()
- 
- void SeedChooserScreen::GetSeedPositionInChooser(int theIndex, int& x, int& y)
- {
-+	if (theIndex == SEED_LEFTPEATER) {x=464;y=132;return;}
- 	if (theIndex == SEED_IMITATER)
+@@ -290,18 +296,9 @@ void SeedChooserScreen::GetSeedPositionInChooser(int theIndex, int& x, int& y)
+ 	}
+ 	else
  	{
- 		x = mImitaterButton->mX;
-@@ -342,6 +346,7 @@ void SeedChooserScreen::Draw(Graphics* g)
+-		int aRow = theIndex / 8;
+-		int aCol = theIndex % 8;
+-
+-		x = aCol * 53 + 22;
+-		if (Has7Rows())
+-		{
+-			y = aRow * 70 + 123;
+-		}
+-		else
+-		{
+-			y = aRow * 73 + 128;
+-		}
++		const auto aPosition = SeedChooserLayout::Card(theIndex, mApp->HasSeedType(SEED_LEFTPEATER), Has7Rows());
++		x = aPosition.x;
++		y = aPosition.y;
+ 	}
+ }
+ 
+@@ -341,13 +338,27 @@ void SeedChooserScreen::Draw(Graphics* g)
+ 	if (!mBoard->ChooseSeedsOnCurrentLevel() || (mBoard->mCutScene && mBoard->mCutScene->IsBeforePreloading()))
  		return;
  
- 	g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_BACKGROUND, 0, 87);
-+	if (mApp->HasSeedType(SEED_LEFTPEATER)) g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_IMITATERADDON,459,120);
+-	g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_BACKGROUND, 0, 87);
++	const bool aExpanded = mApp->HasSeedType(SEED_LEFTPEATER);
++	const int aExtraWidth = SeedChooserLayout::ExtraWidth(aExpanded);
++	Image* aBackground = Sexy::IMAGE_SEEDCHOOSER_BACKGROUND;
++	if (aExpanded)
++	{
++		// Extend only the plain middle strip: keep both painted borders and
++		// ornaments at native scale, as well as every card and its hit box.
++		const int aSplit = aBackground->mWidth / 2;
++		g->DrawImage(aBackground, 0, 87, Rect(0, 0, aSplit, aBackground->mHeight));
++		g->DrawImage(aBackground, Rect(aSplit, 87, 1 + aExtraWidth, aBackground->mHeight),
++			Rect(aSplit, 0, 1, aBackground->mHeight));
++		g->DrawImage(aBackground, aSplit + 1 + aExtraWidth, 87,
++			Rect(aSplit + 1, 0, aBackground->mWidth - aSplit - 1, aBackground->mHeight));
++	}
++	else g->DrawImage(aBackground, 0, 87);
  	if (mApp->HasSeedType(SEED_IMITATER))
  	{
- 		g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_IMITATERADDON, 459, 503);
-@@ -384,7 +389,7 @@ void SeedChooserScreen::Draw(Graphics* g)
+-		g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_IMITATERADDON, 459, 503);
++		g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_IMITATERADDON, mImitaterButton->mX - 5, mImitaterButton->mY - 12);
+ 	}
+ 	// the localization key name is wrong
+-	PvzpDrawString(g, "[CHOOSE_YOUR_PLANTS]", 229, 110, Sexy::FONT_DWARVENTODCRAFT18YELLOW, Color::White, DS_ALIGN_CENTER);
++	PvzpDrawString(g, "[CHOOSE_YOUR_PLANTS]", 229 + aExtraWidth / 2, 110, Sexy::FONT_DWARVENTODCRAFT18YELLOW, Color::White, DS_ALIGN_CENTER);
+ 
+ 	int aNumSeeds = Has7Rows() ? 48 : 40;
+ 	for (SeedType aSeedShadow = SEED_PEASHOOTER; aSeedShadow < aNumSeeds; aSeedShadow = (SeedType)(aSeedShadow + 1))
+@@ -373,6 +384,13 @@ void SeedChooserScreen::Draw(Graphics* g)
+ 		}
+ 	}
+ 
++	if (aExpanded && mChosenSeeds[SEED_LEFTPEATER].mSeedState != SEED_IN_CHOOSER)
++	{
++		int x, y;
++		GetSeedPositionInChooser(SEED_LEFTPEATER, x, y);
++		DrawSeedPacket(g, x, y, SEED_LEFTPEATER, SEED_NONE, 0, 55, true, false);
++	}
++
+ 	int aNumSeedsInBank = mBoard->mSeedBank->mNumPackets;
+ 	for (int anIndex = 0; anIndex < aNumSeedsInBank; anIndex++)
+ 	{
+@@ -384,7 +402,7 @@ void SeedChooserScreen::Draw(Graphics* g)
  		}
  	}
  
@@ -1238,7 +1324,7 @@ index b284e6a..45539ae 100644
  	{
  		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
  		ChosenSeedState aSeedState = aChosenSeed.mSeedState;
-@@ -408,7 +413,7 @@ void SeedChooserScreen::Draw(Graphics* g)
+@@ -408,7 +426,7 @@ void SeedChooserScreen::Draw(Graphics* g)
  	}
  
  	mImitaterButton->Draw(g);
@@ -1247,7 +1333,7 @@ index b284e6a..45539ae 100644
  	{
  		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
  		ChosenSeedState aSeedState = aChosenSeed.mSeedState;
-@@ -520,7 +525,7 @@ void SeedChooserScreen::Update()
+@@ -520,7 +538,7 @@ void SeedChooserScreen::Update()
  	mSeedChooserAge++;
  	mToolTip->Update();
  
@@ -1256,7 +1342,7 @@ index b284e6a..45539ae 100644
  	{
  		if (mApp->HasSeedType(aSeedType))
  		{
-@@ -702,7 +707,7 @@ void SeedChooserScreen::PickRandomSeeds()
+@@ -702,7 +720,7 @@ void SeedChooserScreen::PickRandomSeeds()
  	for (int anIndex = mSeedsInBank; anIndex < mBoard->mSeedBank->mNumPackets; anIndex++)
  	{
  		SeedType aSeedType;
@@ -1265,7 +1351,7 @@ index b284e6a..45539ae 100644
  		while (!mApp->HasSeedType(aSeedType) || aSeedType == SEED_IMITATER || mChosenSeeds[aSeedType].mSeedState != SEED_IN_CHOOSER);
  		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
  		aChosenSeed.mTimeStartMotion = 0;
-@@ -714,7 +719,7 @@ void SeedChooserScreen::PickRandomSeeds()
+@@ -714,7 +732,7 @@ void SeedChooserScreen::PickRandomSeeds()
  		aChosenSeed.mSeedIndexInBank = anIndex;
  		mSeedsInBank++;
  	}
@@ -1274,7 +1360,7 @@ index b284e6a..45539ae 100644
  		LandFlyingSeed(mChosenSeeds[aSeedFlying]);
  	CloseSeedChooser();
  }
-@@ -767,7 +772,7 @@ SeedType SeedChooserScreen::SeedHitTest(int x, int y)
+@@ -767,7 +785,7 @@ SeedType SeedChooserScreen::SeedHitTest(int x, int y)
  {
  	if (mMouseVisible)
  	{
@@ -1283,7 +1369,7 @@ index b284e6a..45539ae 100644
  		{
  			ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
  			if (!mApp->HasSeedType(aSeedType) || aChosenSeed.mSeedState == SEED_PACKET_HIDDEN) continue;
-@@ -779,7 +784,7 @@ SeedType SeedChooserScreen::SeedHitTest(int x, int y)
+@@ -779,7 +797,7 @@ SeedType SeedChooserScreen::SeedHitTest(int x, int y)
  
  SeedType SeedChooserScreen::FindSeedInBank(int theIndexInBank)
  {
@@ -1292,7 +1378,7 @@ index b284e6a..45539ae 100644
  	{
  		if (mApp->HasSeedType(aSeedType))
  		{
-@@ -979,7 +984,7 @@ void SeedChooserScreen::MouseDown(int x, int y, int theClickCount)
+@@ -979,7 +997,7 @@ void SeedChooserScreen::MouseDown(int x, int y, int theClickCount)
  
  	if (mSeedsInFlight > 0)
  	{
@@ -1301,7 +1387,7 @@ index b284e6a..45539ae 100644
  		{
  			LandFlyingSeed(mChosenSeeds[i]);
  		}
-@@ -1071,7 +1076,7 @@ void SeedChooserScreen::MouseDown(int x, int y, int theClickCount)
+@@ -1071,7 +1089,7 @@ void SeedChooserScreen::MouseDown(int x, int y, int theClickCount)
  
  bool SeedChooserScreen::PickedPlantType(SeedType theSeedType)
  {
@@ -1310,7 +1396,7 @@ index b284e6a..45539ae 100644
  	{
  		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
  		if (aChosenSeed.mSeedState == SEED_IN_BANK)
-@@ -1126,7 +1131,7 @@ void SeedChooserScreen::KeyChar(char theChar)
+@@ -1126,7 +1144,7 @@ void SeedChooserScreen::KeyChar(char theChar)
  
  void SeedChooserScreen::UpdateAfterPurchase()
  {

@@ -2,7 +2,7 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Six new plant mechanics and four zombie replacements in adventure and sandbox; normal rage-shooter misses repeatedly float up/down with randomized turning amplitudes and saved seeds; automatic 200-rage/80-pea burst, 10% normal eligibility, no manual release, no knockback",
+  "mode": "Self-Thrower integrated into the native full-size chooser grid, including selection, return and full unlocks; six new plant mechanics and four zombie replacements in adventure and sandbox; random-amplitude floating peas; automatic 200-rage/80-pea burst, 10% normal eligibility, no manual release, no knockback",
   "files": [
     {
       "name": "pvz-portable.js",
@@ -11,8 +11,8 @@
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7464983,
-      "sha256": "c2c0f3f1f77052cd701e20a8b374befb9b88ae49c3998e57e302ea3e6e0f29bf"
+      "size": 7465771,
+      "sha256": "93bdf8d00ee19efb055dad65d32d2aa97a0640aa5db690b6df2aacd89978e8fb"
     }
   ]
 }

@@ -76,7 +76,7 @@ try {
  await page.setViewportSize({width:1100,height:750});await api(15);await page.waitForTimeout(900);
  await click(560,135);await page.waitForTimeout(15000);await shot('adventure-new-card');
  for(const id of [0,1,3,5,2])await click(47+(id%8)*53,163+Math.floor(id/8)*73);
- await click(489,167);await click(232,566);
+ await click(471,163);await click(232,566);
  await page.waitForFunction(()=>Module._pvz_adventure_power_data(-1,5)===1,{},{timeout:20000});
  assert.equal(await sd(5,0),504);assert.equal(await sd(5,1),125);assert.equal(await sd(5,2),300);
  const until=Date.now()+65000;

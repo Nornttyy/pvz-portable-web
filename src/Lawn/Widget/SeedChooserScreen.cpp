@@ -42,6 +42,7 @@
 #include "widget/WidgetManager.h"
 #include <algorithm>
 #include "../../MemeAdventure.h"
+#include "../../SeedChooserLayout.h"
 
 static int AbstractChooserCount(){return MemeAdventure::RosterEnabled()?NUM_SEED_TYPES:NUM_SEEDS_IN_CHOOSER;}
 
@@ -49,6 +50,7 @@ SeedChooserScreen::SeedChooserScreen()
 {
 	mApp = (LawnApp*)gSexyAppBase;
 	mBoard = mApp->mBoard;
+	const int aExtraWidth = SeedChooserLayout::ExtraWidth(mApp->HasSeedType(SEED_LEFTPEATER));
 	mClip = false;
 	// mSeedChooserAge is deliberately not initialized here
 	mSeedsInFlight = 0;
@@ -70,7 +72,7 @@ SeedChooserScreen::SeedChooserScreen()
 	mStartButton->mOverOverlayImage = Sexy::IMAGE_SEEDCHOOSER_BUTTON_GLOW;
 	mStartButton->SetFont(Sexy::FONT_DWARVENTODCRAFT18YELLOW);
 	mStartButton->SetLabelHiliteColor(Color::White);
-	mStartButton->Resize(154, 545, 156, 42);
+	mStartButton->Resize(154 + aExtraWidth / 2, 545, 156, 42);
 	mStartButton->mTextOffsetY = -1;
 	EnableStartButton(false);
 
@@ -87,7 +89,7 @@ SeedChooserScreen::SeedChooserScreen()
 	mRandomButton->SetFont(Sexy::FONT_BRIANNETOD12);
 	mRandomButton->SetLabelColor(Color(255, 240, 0));
 	mRandomButton->SetLabelHiliteColor(Color(200, 200, 255));
-	mRandomButton->Resize(332, 546, 100, 30);
+	mRandomButton->Resize(332 + aExtraWidth, 546, 100, 30);
 	if (!mApp->mCheatKeys)
 	{
 		mRandomButton->mBtnNoDraw = true;
@@ -146,7 +148,8 @@ SeedChooserScreen::SeedChooserScreen()
 	mImitaterButton->mOverImage = Sexy::IMAGE_IMITATERSEED;
 	mImitaterButton->mDownImage = Sexy::IMAGE_IMITATERSEED;
 	mImitaterButton->mDisabledImage = Sexy::IMAGE_IMITATERSEEDDISABLED;
-	mImitaterButton->Resize(464, 515, Sexy::IMAGE_IMITATERSEED->mWidth, Sexy::IMAGE_IMITATERSEED->mHeight);
+	const auto aImitaterPosition = SeedChooserLayout::Imitater(aExtraWidth != 0);
+	mImitaterButton->Resize(aImitaterPosition.x, aImitaterPosition.y, Sexy::IMAGE_IMITATERSEED->mWidth, Sexy::IMAGE_IMITATERSEED->mHeight);
 	mImitaterButton->mParentWidget = this;
 
 	if (!mApp->CanShowAlmanac())
@@ -286,7 +289,6 @@ bool SeedChooserScreen::Has7Rows()
 
 void SeedChooserScreen::GetSeedPositionInChooser(int theIndex, int& x, int& y)
 {
-	if (theIndex == SEED_LEFTPEATER) {x=464;y=132;return;}
 	if (theIndex == SEED_IMITATER)
 	{
 		x = mImitaterButton->mX;
@@ -294,18 +296,9 @@ void SeedChooserScreen::GetSeedPositionInChooser(int theIndex, int& x, int& y)
 	}
 	else
 	{
-		int aRow = theIndex / 8;
-		int aCol = theIndex % 8;
-
-		x = aCol * 53 + 22;
-		if (Has7Rows())
-		{
-			y = aRow * 70 + 123;
-		}
-		else
-		{
-			y = aRow * 73 + 128;
-		}
+		const auto aPosition = SeedChooserLayout::Card(theIndex, mApp->HasSeedType(SEED_LEFTPEATER), Has7Rows());
+		x = aPosition.x;
+		y = aPosition.y;
 	}
 }
 
@@ -345,14 +338,27 @@ void SeedChooserScreen::Draw(Graphics* g)
 	if (!mBoard->ChooseSeedsOnCurrentLevel() || (mBoard->mCutScene && mBoard->mCutScene->IsBeforePreloading()))
 		return;
 
-	g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_BACKGROUND, 0, 87);
-	if (mApp->HasSeedType(SEED_LEFTPEATER)) g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_IMITATERADDON,459,120);
+	const bool aExpanded = mApp->HasSeedType(SEED_LEFTPEATER);
+	const int aExtraWidth = SeedChooserLayout::ExtraWidth(aExpanded);
+	Image* aBackground = Sexy::IMAGE_SEEDCHOOSER_BACKGROUND;
+	if (aExpanded)
+	{
+		// Extend only the plain middle strip: keep both painted borders and
+		// ornaments at native scale, as well as every card and its hit box.
+		const int aSplit = aBackground->mWidth / 2;
+		g->DrawImage(aBackground, 0, 87, Rect(0, 0, aSplit, aBackground->mHeight));
+		g->DrawImage(aBackground, Rect(aSplit, 87, 1 + aExtraWidth, aBackground->mHeight),
+			Rect(aSplit, 0, 1, aBackground->mHeight));
+		g->DrawImage(aBackground, aSplit + 1 + aExtraWidth, 87,
+			Rect(aSplit + 1, 0, aBackground->mWidth - aSplit - 1, aBackground->mHeight));
+	}
+	else g->DrawImage(aBackground, 0, 87);
 	if (mApp->HasSeedType(SEED_IMITATER))
 	{
-		g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_IMITATERADDON, 459, 503);
+		g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_IMITATERADDON, mImitaterButton->mX - 5, mImitaterButton->mY - 12);
 	}
 	// the localization key name is wrong
-	PvzpDrawString(g, "[CHOOSE_YOUR_PLANTS]", 229, 110, Sexy::FONT_DWARVENTODCRAFT18YELLOW, Color::White, DS_ALIGN_CENTER);
+	PvzpDrawString(g, "[CHOOSE_YOUR_PLANTS]", 229 + aExtraWidth / 2, 110, Sexy::FONT_DWARVENTODCRAFT18YELLOW, Color::White, DS_ALIGN_CENTER);
 
 	int aNumSeeds = Has7Rows() ? 48 : 40;
 	for (SeedType aSeedShadow = SEED_PEASHOOTER; aSeedShadow < aNumSeeds; aSeedShadow = (SeedType)(aSeedShadow + 1))
@@ -376,6 +382,13 @@ void SeedChooserScreen::Draw(Graphics* g)
 		{
 			g->DrawImage(Sexy::IMAGE_SEEDPACKETSILHOUETTE, x, y);
 		}
+	}
+
+	if (aExpanded && mChosenSeeds[SEED_LEFTPEATER].mSeedState != SEED_IN_CHOOSER)
+	{
+		int x, y;
+		GetSeedPositionInChooser(SEED_LEFTPEATER, x, y);
+		DrawSeedPacket(g, x, y, SEED_LEFTPEATER, SEED_NONE, 0, 55, true, false);
 	}
 
 	int aNumSeedsInBank = mBoard->mSeedBank->mNumPackets;

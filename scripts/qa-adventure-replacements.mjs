@@ -55,7 +55,7 @@ try{
   if(level===11){for(let i=0;i<10;++i){await click(425,80);await page.waitForTimeout(700);}await page.waitForTimeout(3000);}
   await shot('native-seed-chooser');
   const choices=level===11?[8,1,0,3,5,2]:[0,1,3,5,6,2];
-  for(const id of choices)await click(47+(id%8)*53,163+Math.floor(id/8)*73);
+  for(const id of choices){const slot=level>=8&&id>=8?id+1:id,columns=level>=8?9:8;await click(47+(slot%columns)*53,163+Math.floor(slot/columns)*73);}
   await click(232,566);await page.waitForFunction(()=>Module._pvz_adventure_power_data(-1,5)===1,{},{timeout:20000});
   assert.equal(level,11);assert.deepEqual(await Promise.all([0,1,2,3,4,5].map(i=>seed(i,0))),[502,503,500,501,505,2]);
   for(let i=0;i<4;++i)assert.equal(await seed(i,2),300);
