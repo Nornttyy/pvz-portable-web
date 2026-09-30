@@ -90,13 +90,14 @@ int main(){
  assert(PlacePlant(&b,999,0,0)==-2);assert(PlacePlant(&b,0,-1,0)==-2);
  // Fixed seed cards plant directly, cannot overwrite an existing plant or fuse.
  mapType=0;stackPlants=false;fusionEnabled=false;
- for(int id:{500,501,502,503}){
+ for(int id:{500,501}){
    Board world;assert(PlacePlant(&world,id,1,1)==1);
    assert(world.mPlants.back()->id==id&&int(world.mPlants.back()->mSeedType)==SandboxPlants::Base(id));
    world.mPlants.back()->mPlantHealth=1;
    assert(PlacePlant(&world,id,1,1)==-4&&world.mPlants.back()->mPlantHealth==1);
  }
  for(int id:{120,143,180,181,182,302,443}){Board world;assert(PlacePlant(&world,id,1,1)==-2);assert(PlantCount(&world)==0);}
+ for(int id=502;id<=518;++id){Board world;assert(PlacePlant(&world,id,1,1)==-2);assert(PlantCount(&world)==0);}
  {Board world;assert(PlacePlant(&world,0,1,1)==1);assert(PlacePlant(&world,500,1,1)==-4);assert(PlantCount(&world)==1);}
  std::cout<<"Fixed characters: direct placement, native bases and retired recipe rejection passed\n";
  std::cout<<"Production placement, stack terrain, capacity and continuous input passed\n";

@@ -53,30 +53,6 @@ void Draw(Board* b,Sexy::Graphics*){
  // No second tray or floating menu: native cards now own every planting action.
 }
 std::string_view Translate(std::string_view key,std::string_view original){
- if(gSandboxEnabled||RosterEnabled()){
-  if(key=="BUCKETHEAD_ZOMBIE")return "急眼铁桶";
-  if(key=="BUCKETHEAD_ZOMBIE_DESCRIPTION")return "戴着桶时，每六秒急眼一次：前面一格内有同伴就揍它一下，造成40伤害，自己停手0.4秒。没有同伴就正常走，不回血。";
-  if(key=="POLE_VAULTING_ZOMBIE")return "续杯撑杆";
-  if(key=="POLE_VAULTING_ZOMBIE_DESCRIPTION")return "跳完八秒又掏出一根撑杆，还能再跳。用的是同一套起跳和落地动作，高坚果仍能拦住它。丢头、断臂或被魅惑后不再续杆。";
-  if(key=="IMP")return "倒车小鬼";
-  if(key=="IMP_DESCRIPTION")return "每六秒有一秒突然倒着走，倒车时不啃植物。巨人扔出的小鬼落地后也会倒车，不改变原来的血量。";
-  if(key=="LADDER_ZOMBIE")return "插队梯子";
-  if(key=="LADDER_ZOMBIE_DESCRIPTION")return "扛着梯子时，每六秒看一眼前路；拥堵就歪着身子挤向植物更少的邻路，换路需要0.45秒。不会跨进泳池，放梯子时不插队。";
-  if(key=="FLAG_ZOMBIE")return "催更旗手";
-  if(key=="FLAG_ZOMBIE_DESCRIPTION")return "每六秒停下来催更，把同路身后一名普通步行者催得往前蹦一格多。不能跳过植物，不加伤害，也没有隐形加速光环。";
-  if(key=="CONEHEAD_ZOMBIE")return "碰瓷路障";
-  if(key=="CONEHEAD_ZOMBIE_DESCRIPTION")return "路障被打掉就倒地装死三秒，倒下时顺便绊倒近处同路同伴。装死时不走不吃，仍会受伤；不会回血。";
-  if(key=="NEWSPAPER_ZOMBIE")return "读手机僵尸";
-  if(key=="NEWSPAPER_ZOMBIE_DESCRIPTION")return "边走边刷手机。手机碎了就红温冲锋，四秒后掏出备用机继续刷。身体不会回血。";
-  if(key=="ZOMBIE")return "摸鱼僵尸";
-  if(key=="ZOMBIE_DESCRIPTION")return "走六秒，直接躺下摸鱼两秒。躺下时绊倒近处同路同伴，自己不走不吃但仍会挨打；不会一直绊住别人。";
-  if(key=="SCREEN_DOOR_ZOMBIE")return "抢镜铁门";
-  if(key=="SCREEN_DOOR_ZOMBIE_DESCRIPTION")return "每六秒举门抢到前方同路同伴的身前，靠真正的位置挡住直射子弹。门碎就不能抢位，不再隔空分摊伤害。";
-  if(key=="FOOTBALL_ZOMBIE")return "刹不住橄榄球";
-  if(key=="FOOTBALL_ZOMBIE_DESCRIPTION")return "每八秒赶路两秒后突然刹车，伸腿往前滑倒，绊倒碰到的同路同伴。滑倒不增加伤害，植物能挡住它；摔完爬起来。";
-  if(key=="BALLOON_ZOMBIE")return "搭便车气球";
-  if(key=="BALLOON_ZOMBIE_DESCRIPTION")return "在草地拉起身边一名现有步行僵尸，带着飘一会儿再放下。每只仅一次，不凭空造僵尸；气球被打破就落下原乘客，生命和盔甲保持原样。";
- }
  if(!RosterEnabled())return original;
  for(const auto& d:MemeCharacters::Definitions){const std::string_view stem=d.key;
   if(key==stem)return d.name;
@@ -88,10 +64,9 @@ std::string_view Translate(std::string_view key,std::string_view original){
  static std::map<std::string,std::string,std::less<>> cache;
  if(auto found=cache.find(key);found!=cache.end())return found->second;
  std::string text(original);
- for(const auto& pair:{std::pair{"豌豆射手","红温豌豆"},std::pair{"向日葵","已读不回花"},std::pair{"小喷菇","显眼包蘑菇"},std::pair{"坚果墙","反咬坚果"},std::pair{"寒冰射手","退退退寒冰"},std::pair{"双发射手","复读双发"}}){
+ for(const auto& pair:{std::pair{"豌豆射手","红温豌豆"},std::pair{"坚果墙","反咬坚果"}}){
   size_t pos=0;const std::string_view from=pair.first,to=pair.second;
   while((pos=text.find(from,pos))!=std::string::npos){
-   if(from=="向日葵"&&pos>=6&&text.compare(pos-6,6,"双子")==0){pos+=from.size();continue;}
    text.replace(pos,from.size(),to);pos+=to.size();
   }
  }
@@ -106,20 +81,21 @@ void LoadShots(const std::vector<SavedShot>& shots){pending.shots=shots;}
 void Restore(Board* b){
  if(b->mApp->IsAdventureMode())for(const auto& saved:pending.plants)if(auto* p=b->mPlants.DataArrayTryToGet(saved.key)){
   if(MemeCharacters::Is(saved.state[0]))SandboxPlants::RestorePower(p,saved.state);
-  else if(SandboxMemeRules::IsResult(saved.state[0])){
-   p->mLaunchRate=GetPlantDefinition(p->mSeedType).mLaunchRate;p->mLaunchCounter=std::max(100,p->mLaunchRate);p->mShootingCounter=0;
-  }
+  else SandboxPlants::RestoreRetired(p,saved.state);
  }
  // Also migrate ordinary plants in pre-mod saves, keeping HP and positions.
  if(RosterEnabled()){
   for(auto* p:b->mPlants)OnPlanted(p);
   if(b->mSeedBank)for(int i=0;i<b->mSeedBank->mNumPackets;++i){auto& card=b->mSeedBank->mSeedPackets[i];
+   if(int(card.mPacketType)==52)card.mPacketType=SEED_PEASHOOTER;
+   if(int(card.mImitaterType)==52)card.mImitaterType=SEED_PEASHOOTER;
    if(Replacement(int(card.mPacketType),int(card.mImitaterType))&&card.mRefreshing&&card.mRefreshTime>300){
     const int left=std::clamp(card.mRefreshTime-card.mRefreshCounter,0,300);card.mRefreshTime=300;card.mRefreshCounter=300-left;
    }
   }
  }
  if(b->mApp->IsAdventureMode())for(const auto& saved:pending.shots)if(auto* p=b->mProjectiles.DataArrayTryToGet(saved.key))SandboxPlants::RestoreShot(p,saved.percent);
+ if(b->mApp->IsAdventureMode())SandboxZombies::RestoreNative(b);
  pending={};
 }
 }

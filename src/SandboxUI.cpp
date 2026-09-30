@@ -41,7 +41,7 @@ namespace {
 enum Tool { PlantTool, ZombieTool, EraseTool, InteractTool };
 int panel=0, plantPage=0, selectedPlant=0, selectedZombie=0, plantSlot=0, catalog=4, catalogPage=0;
 Tool tool=PlantTool;
-std::array<int,6> plants{0,1,500,501,502,503};
+std::array<int,6> plants{0,1,500,501,2,5};
 std::vector<int> DirectPlants(){std::vector<int> ids;for(const auto& d:SandboxPlants::Definitions)if(!SandboxMemeRules::IsResult(d.id))ids.push_back(d.id);return ids;}
 bool wasPaused=true, painting=false, dirty=false;
 int lastCell=-1, lastPlantCount=0, messageTicks=0;
@@ -90,18 +90,6 @@ void StorageAction(int action) {
 void Portrait(Graphics* g, Box b, int type) {
     const float scale=b.w/76.0f;
     g->DrawImage(IMAGE_ALMANAC_ZOMBIEWINDOW,b.x,b.y,b.w,b.h);
-    if(type==5){
-        static std::unique_ptr<MemoryImage> portrait;
-        if(!portrait){
-            portrait=gLawnApp->mReanimatorCache->MakeBlankMemoryImage(200,210);Graphics art(portrait.get());art.SetLinearBlend(true);
-            Reanimation rig;rig.ReanimationInitializeType(40,40,REANIM_ZOMBIE_NEWSPAPER);rig.SetFramesForLayer("anim_idle");
-            rig.SetImageOverride("Zombie_paper_paper",SandboxArt::Phone());
-            rig.SetImageOverride("Zombie_paper_hands",SandboxArt::PhoneHands("Zombie_paper_hands.png"));
-            rig.SetImageOverride("Zombie_paper_hands2",SandboxArt::PhoneHands("Zombie_paper_hands2.png"));rig.Draw(&art);
-        }
-        Graphics clipped(*g);clipped.SetClipRect(b.x+2,b.y+2,b.w-4,b.h-4);SandboxArt::DrawFit(&clipped,portrait.get(),b.x+4,b.y+5,b.w-8,b.h-10);
-        g->DrawImage(IMAGE_ALMANAC_ZOMBIEWINDOW2,b.x,b.y,b.w,b.h);return;
-    }
     if(SandboxZombies::Find(type)){
         Graphics clipped(*g);clipped.SetClipRect(b.x+2,b.y+2,b.w-4,b.h-4);
         SandboxZombies::DrawPortrait(&clipped,b.x,b.y,b.w,b.h,type);
@@ -193,7 +181,7 @@ void SandboxUIReset() {
     SandboxUIDetach();
     panel=0;plantPage=0;catalog=4;catalogPage=0;tool=PlantTool;painting=false;dirty=false;wasPaused=true;
     selectedPlant=0;selectedZombie=0;plantSlot=0;lastCell=-1;lastPlantCount=0;messageTicks=0;
-    plants={0,1,500,501,502,503};
+    plants={0,1,500,501,2,5};
     StopPainting();
     PvzpLoadResources("DelayLoad_Almanac");
     SandboxRepairFonts();

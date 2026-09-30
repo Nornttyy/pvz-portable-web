@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Zombie behavior pass: lying walkers and feigning cones trip companions; flags hurry one walker into a bounded hop; doors physically rush to the front instead of sharing damage; football zombies skid and fall; balloons tow existing walkers without spawning clones; ladders smoothly change adjacent dry lanes. Native saved phases and original connected rigs, health/armor/damage unchanged. Shared adventure/sandbox native identities and unlock order. Existing nineteen plant mechanics retained. Same CC0 rage vocal raised a further two semitones, still exactly three seconds at 100% cue gain with no voice stacking. 300 rage, 3-second 50-pea burst, slower burst peas, 3-second recovery and ordinary-sized 25 sun retained.",
+  "mode": "Roster trim: only rage pea (500) and counterattack walnut (501) remain. Retired plant identities and all custom zombie behaviors, names and preview art removed; native plants/zombies restored in adventure, sandbox and almanac. Old formations and adventure plants migrate to native bases; saved zombie interaction phases release without changing health or progression. Retired accessories no longer embedded. Retained mechanics unchanged: 300 rage, 3-second 50-pea burst, 3-second recovery, slower burst peas and the same sharpened 100%-gain three-second vocal; walnut counters every 3 seconds for 80 damage without knockback. Existing sun-hover and ordinary-sized 25-value faster production retained.",
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 278037,
-      "sha256": "e7500b1fee38d4b46db19126f3ada032aa632e6a3337625a0dca7e7752eda338"
+      "size": 277501,
+      "sha256": "6fc9ed3c031669bf67777d3a470db12891c5aa4a427ee02f331ead68e2f1208f"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7671325,
-      "sha256": "41ad8167bea4d735c495dfe1580f10d71f732079321ea9cd416ed83d7d3d5000"
+      "size": 7537511,
+      "sha256": "b8087cf700fd7de9b2c06db8c24bf194818d09feb6903e628c91a55c66ab7cf8"
     }
   ]
 }

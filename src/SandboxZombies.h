@@ -8,6 +8,7 @@ struct Definition {int id,base;const char* name;const char* note;const char* art
 inline constexpr std::array<Definition,0> Definitions{};
 constexpr const Definition* Find(int id){return nullptr;}
 constexpr int Base(int id){auto* d=Find(id);return d?d->base:id;}
+void RestoreNative(Board* board);
 void Reset();void Forget(Zombie* zombie);void Assign(Zombie* zombie,int id);
 void Tick(Board* board);void DrawPortrait(Sexy::Graphics* g,int x,int y,int w,int h,int id);
 float Speed(Zombie* zombie);int Damage(Zombie* zombie,int damage,unsigned flags=0);

@@ -33,19 +33,6 @@ int main(){
  static_assert(MemeShooterRules::RecoveryDelay==300);
  for(int roll=0;roll<=60;++roll)assert(std::abs(MemeShooterRules::BurstSpeed(roll)-(4.6f+roll*0.05f)*0.75f)<0.0001f);
  {World w;auto* p=w.add(500);w.enemy();w.step(2450);const int shots=w.mProjectiles.mSize;assert(shots==65);w.step(299);assert(w.mProjectiles.mSize==shots);w.step();assert(w.mProjectiles.mSize==shots+1&&MemeCharacters::Data(p,1)==20);}
- {World w;auto* p=w.add(517);p->Fire(nullptr,2,WEAPON_PRIMARY);auto* s=w.mProjectiles.values.back();assert(MemeCharacters::ShotStyle(s)==290);s->mPosX=741;s->mVelY=0.02f;s->mMotionType=MOTION_THREEPEATER;
-  w.mPaused=true;SandboxPlants::UpdateShot(s);assert(s->mMotionType==MOTION_THREEPEATER);w.mPaused=false;SandboxPlants::UpdateShot(s);assert(s->mMotionType==MOTION_STAR&&s->mVelX==-3.33f&&s->mVelY==0);
-  s->mProjectileType=PROJECTILE_FIREBALL;const int saved=SandboxPlants::SaveShot(s);SandboxPlants::ForgetShot(s);SandboxPlants::RestoreShot(s,saved);assert(MemeCharacters::ShotStyle(s)==290&&MemeCharacters::CanHit(s)&&s->mVelX<0);
-  SandboxPlants::UpdateShot(s);assert(s->mVelX==-3.33f);}
- {World w;auto* p=w.add(518);p->mPlantHealth=123;const int x=p->mX,y=p->mY;
-  for(int jump=0;jump<2;++jump){p->mState=STATE_SQUASH_DONE_FALLING;p->mTargetX=x+100;p->mX=x+100;p->mY=y+8;
-   for(int count=100;count>=0;--count){p->mStateCountdown=count;assert(MemeCharacters::ReturnSquash(p));if(count==35){assert(p->mX==x+50&&p->mY<y-80);const auto saved=SandboxPlants::SavePower(p);SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved));}}
-   assert(p->mX==x&&p->mY==y&&p->mState==STATE_NOTREADY&&p->mPlantHealth==123&&MemeCharacters::Data(p,4)==2-jump);}
-  p->mState=STATE_SQUASH_DONE_FALLING;p->mStateCountdown=0;assert(!MemeCharacters::ReturnSquash(p));}
- {World w;auto* bucket=w.enemy(500,2,static_cast<ZombieType>(4));auto* victim=w.enemy(450);bucket->mHelmHealth=100;bucket->mZombieAge=600;w.step();assert(victim->mBodyHealth==1000&&SandboxZombies::IsResting(bucket)&&SandboxZombies::Speed(bucket)==0);bucket->mZombieAge=620;bucket->mPhaseCounter=20;w.step();assert(victim->mBodyHealth==960);
-  bucket->mPhaseCounter=0;bucket->mZombieAge=1200;bucket->mHelmHealth=0;w.step();assert(victim->mBodyHealth==960);}
- {World w;auto* z=w.enemy(500,2,static_cast<ZombieType>(3));z->mZombiePhase=PHASE_POLEVAULTER_POST_VAULT;SandboxZombies::PoleLanded(z);assert(z->mPhaseCounter==800);w.step();assert(z->mZombiePhase==PHASE_POLEVAULTER_POST_VAULT);
-  z->mPhaseCounter=0;z->mButteredCounter=100;w.step();assert(!z->mHasObject);z->mButteredCounter=0;w.step();assert(z->mHasObject&&z->mZombiePhase==PHASE_POLEVAULTER_PRE_VAULT&&z->mZombieAttackRect.mX==-29);}
  {int ticks=0;for(int fired=0;fired<50;++fired){const int delay=MemeShooterRules::BurstInterval(fired);assert(delay==6);ticks+=delay;assert(ticks==(fired+1)*6);}assert(ticks==300);}
  {World w;auto* p=w.add(500);assert(SandboxPlants::RestorePower(p,{500,300,0,100,0,50,40,0,0,2}));
   const auto state=SandboxPlants::SavePower(p);w.mPaused=true;w.step(100);
@@ -68,10 +55,6 @@ int main(){
   assert(SandboxPlants::RestorePower(ready,{500,300,0,100,0,50,40,0,0,2}));
   assert(!MemeCharacters::Click(&w,ready->mX+40,ready->mY+82));
   assert(MemeCharacters::Data(unready,0)==0&&MemeCharacters::Data(ready,0)==0&&MemeCharacters::Data(ready,1)==100);
- }
- for(int offset:{-5,-2,0,2}){World w;auto* p=w.add(503);p->drawHeightOffset=offset;
-  assert(SandboxPlants::RestorePower(p,{503,300,2,0,180,1,0,0,3,1}));w.step();
-  assert(w.mProjectiles.mSize==1&&w.mProjectiles.values[0]->mPosY==p->mY+offset+22);
  }
  // Playable characters have independent, observable mechanics.
  {World w;auto* p=w.add(500);auto* z=w.enemy();const int sounds=app.rageReleaseRequests;p->mPlantHealth=123;w.step(500);
@@ -195,336 +178,49 @@ int main(){
   for(auto* s:w.mProjectiles)if(MemeCharacters::ShotStyle(s)==9){float speed=std::hypot(s->mVelX,s->mVelY);minSpeed=std::min(minSpeed,speed);maxSpeed=std::max(maxSpeed,speed);turns+=(last*s->mVelY<0);last=s->mVelY;}
   assert(maxSpeed-minSpeed>2.0f&&turns>15);
  }
- {World w;auto* p=w.add(505);auto* z=w.enemy();w.step(50);assert(w.mProjectiles.mSize==1);auto* s=w.mProjectiles.values[0];assert(s->mProjectileType==PROJECTILE_SNOWPEA&&MemeCharacters::ShotStyle(s)==19);
-  const float x=z->mPosX;assert(!SandboxPlants::Impact(s,z)&&z->mPosX==x+40);w.step(299);assert(w.mProjectiles.mSize==1);w.step();assert(w.mProjectiles.mSize==2);
-  auto* heavy=w.enemy(300,2,ZOMBIE_GARGANTUAR);SandboxPlants::Impact(s,heavy);assert(heavy->mPosX==300);
-  z->mMindControlled=true;SandboxPlants::Impact(s,z);assert(z->mPosX==x+40);
-  s->mProjectileType=PROJECTILE_FIREBALL;z->mMindControlled=false;SandboxPlants::Impact(s,z);assert(z->mPosX==x+40);
+
+ // Removed originals cannot be assigned, restored or re-entered through legacy powers.
+ static_assert(MemeCharacters::Definitions.size()==2&&SandboxPlants::Definitions.size()==2);
+ for(int id=502;id<=518;++id){World w;auto* p=w.plant(1,2);p->mSeedType=static_cast<SeedType>(MemeCharacters::RetiredBase(id));
+  SandboxPlants::Assign(p,id);assert(!SandboxPlants::IsCustom(p)&&!SandboxPlants::Find(id)&&!MemeCharacters::Find(id));
+  assert(!SandboxPlants::RestorePower(p,{id,300,0,0,0,50,0,0,0,1}));
  }
- {World w;auto* echo=w.add(506);auto* source=w.plant(0,2);auto* echo2=w.add(506,1);w.step(100);assert(w.mProjectiles.mSize==0);
-  source->Fire(nullptr,2,WEAPON_PRIMARY);assert(MemeCharacters::Data(echo,4)==1&&MemeCharacters::Data(echo2,4)==0);w.step();assert(w.mProjectiles.mSize==2);
-  w.step(300);assert(w.mProjectiles.mSize==2); // Echoes cannot create a loop.
-  for(int i=0;i<20;++i)source->Fire(nullptr,2,WEAPON_PRIMARY);assert(MemeCharacters::Data(echo,4)==6);
-  auto saved=SandboxPlants::SavePower(echo);SandboxPlants::Forget(echo);assert(SandboxPlants::RestorePower(echo,saved));
-  const int before=w.mProjectiles.mSize;w.step(180);assert(w.mProjectiles.mSize==before+6);
+ for(int power=180;power<=182;++power)for(int base:Bases){World w;auto* p=w.plant(1,2);p->mSeedType=static_cast<SeedType>(base);
+  const int id=Result(base,power);SandboxPlants::Assign(p,id);assert(!SandboxPlants::IsCustom(p)&&!SandboxPlants::Find(id));
+  assert(!SandboxPlants::RestorePower(p,{id,300,0,0,0,50,0,0,0,1}));
  }
- {World w;auto* bucket=w.enemy(500,2,static_cast<ZombieType>(4));bucket->mHelmHealth=1000;bucket->mIsEating=true;
-  const float x=bucket->mPosX;
-  for(int damage:{20,40,80})assert(SandboxZombies::Damage(bucket,damage)==damage&&bucket->mPhaseCounter==0&&bucket->mPosX==x&&bucket->mIsEating);
-  for(int oldCounter:{0,120,180}){bucket->mPhaseCounter=oldCounter;SandboxZombies::Damage(bucket,20);
-   assert(bucket->mPhaseCounter==oldCounter&&bucket->mPosX==x&&bucket->mIsEating&&SandboxZombies::Speed(bucket)==1&&!SandboxZombies::IsRetreating(bucket));
-  }
+ for(int id=502;id<=518;++id)for(bool night:{false,true}){World w;w.night=night;auto* p=w.plant(1,2);
+  p->mSeedType=static_cast<SeedType>(id==504?52:MemeCharacters::RetiredBase(id));p->mPlantHealth=123;p->mLaunchCounter=9999;
+  if(id==504||id==518){p->mX+=90;p->mY-=50;}
+  SandboxPlants::RestoreRetired(p,{id,123,1,0,50,999,20,5,1,1});
+  assert(p->mPlantHealth==123&&!SandboxPlants::IsCustom(p)&&p->mLaunchCounter==150&&p->mShootingCounter==0);
+  assert(int(p->mSeedType)==MemeCharacters::RetiredBase(id));
+  if(id==504||id==518)assert(p->mX==80&&p->mY==200);
+  if(id==502)assert(p->mIsAsleep==!night);
  }
- {World w;auto* normal=w.enemy(550),*flag=w.enemy(450,2,static_cast<ZombieType>(1));assert(SandboxZombies::Speed(normal)==1);
-  w.enemy(420,2,static_cast<ZombieType>(1));assert(SandboxZombies::Speed(normal)==1);flag->mDead=true;
-  auto* giant=w.enemy(450,2,ZOMBIE_GARGANTUAR);assert(SandboxZombies::Speed(giant)==1);
-  gSandboxEnabled=false;app.adventure=false;assert(SandboxZombies::Speed(normal)==1);gSandboxEnabled=true;app.adventure=true;
+ for(int id:{500,501}){World w;auto* p=w.add(id);w.step(100);const auto saved=SandboxPlants::SavePower(p);
+  for(int field=0;field<10;++field){auto bad=saved;bad[field]=-999;assert(!SandboxPlants::RestorePower(p,bad));assert(SandboxPlants::SavePower(p)==saved);}
+  SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved)&&SandboxPlants::SavePower(p)==saved);
  }
- {World w;auto* p=w.add(501);p->mRecentlyEatenCountdown=50;auto* far=w.enemy(500);far->mIsEating=true;auto* friendZ=w.enemy(60);friendZ->mIsEating=true;friendZ->mMindControlled=true;
-  w.step(250);assert(far->mBodyHealth==1000&&friendZ->mBodyHealth==1000&&MemeCharacters::Data(p,0)==0);}
- {World w;auto* p=w.add(504);auto* z=w.enemy(p->mX+140);w.step();assert(MemeCharacters::Hiding(p)&&MemeCharacters::Data(p,0)==1);
-  float x=80,y=0,sx=-1,sy=1;w.step(20);MemeCharacters::Scale(p,x,y,sx,sy);assert(x>80&&y<0);
-  w.step(20);assert(z->mBodyHealth==920);w.step(40);assert(!MemeCharacters::Hiding(p)&&MemeCharacters::Data(p,0)==0);assert(w.mProjectiles.mSize==0);
-  w.step(299);assert(z->mBodyHealth==920);w.step(41);assert(z->mBodyHealth==840);}
- {World w;auto* z=w.enemy();z->mZombieType=static_cast<ZombieType>(5);z->mZombiePhase=PHASE_NEWSPAPER_MAD;z->mPhaseCounter=10;z->mBodyHealth=80;
-  SandboxZombies::RecoverPhone(z);assert(z->mShieldHealth==0);z->mPhaseCounter=0;SandboxZombies::RecoverPhone(z);assert(z->mShieldHealth==100&&z->mBodyHealth==80&&z->mZombiePhase==PHASE_NEWSPAPER_READING);
-  z->mZombiePhase=PHASE_NEWSPAPER_MAD;z->mShieldHealth=0;z->mHasArm=false;SandboxZombies::RecoverPhone(z);assert(z->mShieldHealth==0);
-  z->mHasArm=true;gSandboxEnabled=false;app.adventure=false;SandboxZombies::RecoverPhone(z);assert(z->mShieldHealth==0);gSandboxEnabled=true;app.adventure=true;}
- {World w;auto* p=w.add(502);auto* z=w.enemy(180,1),*heavy=w.enemy(150,3,ZOMBIE_GARGANTUAR);w.step(180);assert(z->mRow==2&&heavy->mRow==3);assert(w.mProjectiles.mSize==0);}
- {World w;auto* p=w.add(503);assert(MemeCharacters::Producing(p));const int clock=p->mLaunchCounter;w.step(20);assert(p->mLaunchCounter==clock);
-  auto* z=w.enemy(p->mX+44);w.step();assert(MemeCharacters::Hiding(p)&&!MemeCharacters::Producing(p));
-  for(int i=0;i<1110;++i){z->mPosX-=0.1f;w.step();}assert(!MemeCharacters::Hiding(p)&&MemeCharacters::Data(p,0)==2);
-  w.step(100);assert(w.mProjectiles.mSize==3&&w.mCoins.mSize==0);
-  for(auto* shot:w.mProjectiles)assert(shot->mMotionType==MOTION_BACKWARDS&&SandboxPlants::ShotDamage(shot,20)==60);
-  assert(!MemeCharacters::Producing(p));w.step(180);assert(MemeCharacters::Producing(p));}
- {World w;auto* p=w.add(502);w.enemy(p->mX+130);w.step(400);assert(w.mProjectiles.mSize>=3);}
- // The free showoff shroom lasts exactly 60 simulation seconds in both modes.
- // Each planting owns its deadline; native puff-shrooms and supports survive.
- static_assert(MemeCharacters::ShowoffLifetime==6000);
- for(bool sandbox:{false,true}){World w;gSandboxEnabled=sandbox;
-  auto* native=w.plant(0,2);native->mSeedType=static_cast<SeedType>(8);
-  auto* support=w.plant(1,2);support->mSeedType=static_cast<SeedType>(16);
-  auto* first=w.add(502);assert(MemeCharacters::Data(first,5)==6000);
-  w.step(1000);auto* later=w.add(502,3);w.step(4999);
-  assert(!first->mDead&&!later->mDead&&MemeCharacters::Data(first,5)==1);
-  w.step();assert(first->mDead&&!MemeCharacters::Is(first)&&!later->mDead);
-  assert(MemeCharacters::Data(later,5)==1000&&!native->mDead&&!support->mDead);
-  w.step(999);assert(!later->mDead);w.step();assert(later->mDead);
- }gSandboxEnabled=true;
- {World w;auto* p=w.add(502);w.step(2500);const auto saved=SandboxPlants::SavePower(p);
-  w.mPaused=true;w.step(10000);assert(SandboxPlants::SavePower(p)==saved&&!p->mDead);
-  SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved));
-  assert(MemeCharacters::Data(p,5)==3500);w.step(1000);assert(SandboxPlants::SavePower(p)==saved);
-  w.mPaused=false;w.step(3499);assert(!p->mDead);w.step();assert(p->mDead);
+ // Every formerly modified native zombie retains its armor, position and phase.
+ for(int type:{0,1,2,3,4,5,6,7,16,21,24}){World w;auto* z=w.enemy(500,2,static_cast<ZombieType>(type));auto* buddy=w.enemy(450);
+  z->mBodyHealth=321;z->mHelmHealth=75;z->mShieldHealth=80;z->mIsEating=true;
+  for(int age=0;age<1800;++age){z->mZombieAge=age;w.step();assert(SandboxZombies::Speed(z)==1);
+   assert(!SandboxZombies::IsResting(z)&&!SandboxZombies::IsRetreating(z)&&!SandboxZombies::IsFeigning(z)&&!SandboxZombies::IsPhone(z));}
+  assert(z->mBodyHealth==321&&z->mHelmHealth==75&&z->mShieldHealth==80&&z->mPosX==500&&z->mRow==2&&z->mIsEating);
+  assert(buddy->mBodyHealth==1000&&buddy->mZombiePhase==0&&w.mZombies.mSize==2);
+  assert(SandboxZombies::Damage(z,80)==80&&!SandboxZombies::DetachedArmor(z));
  }
- {World w;auto* p=w.add(502);p->SetSleeping(true);w.step(5999);
-  assert(!p->mDead&&p->mIsAsleep&&MemeCharacters::Data(p,5)==1);w.step();assert(p->mDead);
+ {World w;auto* z=w.enemy(500,2,static_cast<ZombieType>(3));z->mZombiePhase=PHASE_POLEVAULTER_POST_VAULT;
+  SandboxZombies::PoleLanded(z);w.step(1500);assert(z->mZombiePhase==PHASE_POLEVAULTER_POST_VAULT&&!z->mHasObject);}
+ {World w;auto* z=w.enemy(500,2,static_cast<ZombieType>(5));z->mZombiePhase=PHASE_NEWSPAPER_MAD;z->mShieldHealth=0;
+  SandboxZombies::RecoverPhone(z);w.step(1500);assert(z->mShieldHealth==0&&z->mZombiePhase==PHASE_NEWSPAPER_MAD);}
+ for(int phase=SandboxZombies::Held;phase<=SandboxZombies::AirDrop;++phase){World w;auto* z=w.enemy(444,2,static_cast<ZombieType>(21));
+  z->mZombiePhase=phase;z->mAltitude=35;z->mPosY=150;z->mTargetPlantID=321;z->mBodyHealth=200;z->mHelmHealth=60;z->mShieldHealth=90;
+  SandboxZombies::RestoreNative(&w);assert(z->mZombiePhase==PHASE_LADDER_CARRYING&&z->mPosX==444&&z->mRow==2&&z->mPosY==200&&z->mAltitude==0);
+  assert(z->mBodyHealth==200&&z->mHelmHealth==60&&z->mShieldHealth==90&&z->mTargetPlantID==0&&!SandboxZombies::HasInteraction(z));
  }
- // Older unlimited-life saves still load, then expire on a live tick if due.
- for(int age:{5999,6000,50000}){World w;auto* p=w.add(502);auto state=SandboxPlants::SavePower(p);state[6]=age;
-  assert(SandboxPlants::RestorePower(p,state));w.mPaused=true;w.step(10);assert(!p->mDead);
-  w.mPaused=false;w.step();assert(p->mDead);
- }
- // A threat can disappear without ever walking behind the flower. Returning
- // to full size/production must not wait out the entire ambush timeout.
- for(int gone=0;gone<5;++gone){World w;auto* p=w.add(503);auto* z=w.enemy(p->mX+20);w.step(30);
-  float x=0,y=0,sx=1,sy=1;MemeCharacters::Scale(p,x,y,sx,sy);assert(sy<0.3f&&MemeCharacters::Hiding(p));
-  const int hp=p->mPlantHealth,clock=p->mLaunchCounter;
-  if(gone==0)z->mDead=true;else if(gone==1)z->mMindControlled=true;else if(gone==2)z->mRow=1;else if(gone==3)z->mHasHead=false;else z->mPosX=p->mX+300;
-  w.step(35);assert(MemeCharacters::Producing(p)&&!MemeCharacters::Hiding(p));
-  x=y=0;sx=sy=1;MemeCharacters::Scale(p,x,y,sx,sy);assert(x==0&&y==0&&sx==1&&sy==1);
-  assert(w.mProjectiles.mSize==0&&p->mPlantHealth==hp&&p->mLaunchCounter==clock);
- }
- // Interrupted collapse, pause/save mid-rise, and old flattened saves all
- // restore the native anchor/scale without healing or resetting production.
- for(int frames:{1,6,16,30}){World w;auto* p=w.add(503);auto* z=w.enemy(p->mX+20);w.step(frames);
-  float x=0,y=0,sx=1,sy=1;MemeCharacters::Scale(p,x,y,sx,sy);const float previous=sy;
-  z->mDead=true;w.step();x=y=0;sx=sy=1;MemeCharacters::Scale(p,x,y,sx,sy);assert(std::abs(sy-previous)<0.05f);
-  const auto state=SandboxPlants::SavePower(p);w.mPaused=true;w.step(100);assert(SandboxPlants::SavePower(p)==state);w.mPaused=false;
-  SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,state));
-  for(int i=0;i<35;++i){const float last=sy;w.step();x=y=0;sx=sy=1;MemeCharacters::Scale(p,x,y,sx,sy);assert(sy>=last&&sy<=1&&sx>=1&&sx<=1.15f);}
-  assert(MemeCharacters::Producing(p)&&sx==1&&sy==1&&x==0&&y==0);
- }
- {World w;auto* p=w.add(503);p->mPlantHealth=123;p->mLaunchCounter=91;
-  assert(SandboxPlants::RestorePower(p,{503,123,1,1000,1300,0,70,0,0,1}));w.step(31);
-  assert(MemeCharacters::Producing(p)&&p->mPlantHealth==123&&p->mLaunchCounter==91&&w.mProjectiles.mSize==0);
- }
- {World w;auto* p=w.add(503);auto* a=w.enemy(p->mX+20);w.enemy(p->mX+30);w.step(30);a->mDead=true;w.step(100);
-  assert(MemeCharacters::Hiding(p));w.step(1301);assert(MemeCharacters::Producing(p)&&w.mProjectiles.mSize==0);
- }
- static_assert(MemeCharacters::ForBase(0)->cost==100&&MemeCharacters::ForBase(1)->cost==50&&MemeCharacters::ForBase(3)->cost==50&&MemeCharacters::ForBase(8)->cost==0);
- static_assert(MemeCharacters::ForBase(0)->unlock==1&&MemeCharacters::ForBase(1)->unlock==2&&MemeCharacters::ForBase(3)->unlock==4&&MemeCharacters::ForBase(8)->unlock==11);
- {World w;auto* p=w.add(507);p->mPlantHealth=137;
-  for(int lives=3;lives>0;--lives){
-   assert(MemeCharacters::Data(p,4)==lives);float x=0,y=0,sx=1,sy=1;MemeCharacters::Scale(p,x,y,sx,sy);
-   assert(std::abs(sx-(0.6f+0.2f*(lives-1)))<0.001f&&sx==sy&&std::abs(x+40*sx-40)<0.001f&&std::abs(y+65*sy-65)<0.001f);
-   auto save=SandboxPlants::SavePower(p);SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,save));
-   assert(MemeCharacters::RearmPotato(p)==(lives>1));assert(p->mPlantHealth==137&&!p->mDead);
-  }
-  auto invalid=SandboxPlants::SavePower(p);invalid[8]=0;assert(!SandboxPlants::RestorePower(p,invalid));
-  auto* native=w.plant(2,2);assert(!MemeCharacters::RearmPotato(native));p->mDead=true;assert(!MemeCharacters::RearmPotato(p));
- }
- {World w;auto* cone=w.enemy(400,2,static_cast<ZombieType>(2));cone->mHelmHealth=20;
-  SandboxZombies::ArmorBroken(cone);assert(!SandboxZombies::IsFeigning(cone));
-  cone->mHelmHealth=0;cone->mIsEating=true;const int hp=cone->mBodyHealth;SandboxZombies::ArmorBroken(cone);
-  assert(SandboxZombies::IsFeigning(cone)&&cone->mPhaseCounter==300&&!cone->mIsEating&&SandboxZombies::Speed(cone)==0&&cone->mBodyHealth==hp);
-  cone->mPhaseCounter=240;assert(SandboxZombies::Damage(cone,20)==20&&cone->mPhaseCounter==240);cone->TakeDamage(20,0);assert(cone->mBodyHealth==hp-20);
-  Reanimation body;body.mOverlayMatrix.m02=15;body.mOverlayMatrix.m12=20;SandboxZombies::AdjustPose(cone,&body);const auto& m=body.mOverlayMatrix;
-  assert(m.m01>0.9f&&m.m10<-0.9f&&std::abs(m.m00*45+m.m01*120+m.m02-60)<0.001f&&std::abs(m.m10*45+m.m11*120+m.m12-140)<0.001f);
-  for(int timer:{300,1,0}){cone->mPhaseCounter=timer;body.mOverlayMatrix={};SandboxZombies::AdjustPose(cone,&body);assert(std::abs(body.mOverlayMatrix.m01)<0.01f);}
-  assert(!SandboxZombies::IsFeigning(cone)&&SandboxZombies::Speed(cone)==1&&cone->mBodyHealth==hp-20);
-  cone->mPhaseCounter=200;cone->mMindControlled=true;assert(!SandboxZombies::IsFeigning(cone));cone->mMindControlled=false;cone->mHasHead=false;assert(!SandboxZombies::IsFeigning(cone));
-  auto* normal=w.enemy();SandboxZombies::ArmorBroken(normal);assert(normal->mPhaseCounter==0);
-  cone->mHasHead=true;gSandboxEnabled=false;app.adventure=false;assert(!SandboxZombies::IsFeigning(cone));gSandboxEnabled=true;app.adventure=true;
- }
- // Six added roles keep native animation clocks; only their extra queues are custom.
- for(int id=508;id<=513;++id){World w;auto* p=w.add(id);p->mLaunchCounter=81;p->mShootingCounter=17;auto state=SandboxPlants::SavePower(p);SandboxPlants::Forget(p);
-  assert(SandboxPlants::RestorePower(p,state));w.step();assert(p->mLaunchCounter==81&&p->mShootingCounter==17);
- }
- {World w;auto* p=w.add(508);p->mState=STATE_CACTUS_LOW;p->Fire(nullptr,2,WEAPON_SECONDARY);w.step(400);assert(w.mProjectiles.mSize==1);
-  auto* a=w.enemy(500),*b=w.enemy(600);auto* shot=w.mProjectiles.values[0];assert(MemeCharacters::ShotStyle(shot)==291);MemeCharacters::OnImpact(shot,a);
-  assert(a->mZombiePhase==SandboxZombies::Pinned&&b->mZombiePhase==SandboxZombies::Pinned);assert(a->mBodyHealth==1000&&b->mBodyHealth==1000);
-  assert(!SandboxZombies::Staple(a));for(int i=0;i<180;i++){SandboxZombies::UpdateInteraction(a);SandboxZombies::UpdateInteraction(b);}assert(a->mZombiePhase==0&&b->mZombiePhase==0);
-  b->mRow=3;assert(!SandboxZombies::Staple(a));b->mRow=2;b->mZombieType=ZOMBIE_GARGANTUAR;assert(!SandboxZombies::Staple(a));
- }
- {World w;auto* p=w.add(509);auto* z=w.enemy(240,2,static_cast<ZombieType>(4));z->mHelmHealth=321;const auto id=z->id;
-  auto* friendZ=w.enemy(p->mX+180);assert(SandboxZombies::CatchForReturn(p,z));assert(SandboxZombies::IsHeld(z)&&w.mZombies.mSize==2);
-  w.mPaused=true;SandboxZombies::UpdateInteraction(z);assert(z->mPhaseCounter==100);w.mPaused=false;
-  for(int i=0;i<100;i++)SandboxZombies::UpdateInteraction(z);assert(z->mZombiePhase==SandboxZombies::Returned);
-  z->mIceTrapCounter=10;const float frozen=z->mPosX;SandboxZombies::UpdateInteraction(z);assert(z->mPosX==frozen&&z->mPhaseCounter==70);z->mIceTrapCounter=0;
-  for(int i=0;i<70;i++)SandboxZombies::UpdateInteraction(z);
-  assert(z->mZombiePhase==0&&z->mAltitude==0&&z->mHelmHealth==321&&z->mBodyHealth==1000&&z->id==id&&!z->mDead);
-  assert(friendZ->mZombiePhase==SandboxZombies::Tripped&&friendZ->mBodyHealth==1000);
-  assert(SandboxZombies::CatchForReturn(p,z));p->mDead=true;SandboxZombies::UpdateInteraction(z);assert(z->mZombiePhase==0&&!z->mDead);
-  auto* giant=w.enemy(250,2,ZOMBIE_GARGANTUAR);assert(!SandboxZombies::CatchForReturn(p,giant));
- }
- {World w;auto* first=w.add(509);auto* z=w.enemy(200);assert(SandboxZombies::CatchForReturn(first,z));first->mDead=true;auto* replacement=w.add(509);assert(replacement->mPlantCol==first->mPlantCol);SandboxZombies::UpdateInteraction(z);assert(z->mZombiePhase==0&&replacement->mState==STATE_READY);}
- {World w;auto* echo=w.add(506);auto* source=w.plant(2,2);source->mSeedType=static_cast<SeedType>(5);source->Fire(nullptr,2,WEAPON_PRIMARY);w.step(60);assert(w.mProjectiles.mSize==2&&w.mProjectiles.values.back()->mProjectileType==PROJECTILE_SNOWPEA);}
- {World w;auto* p=w.add(510);auto* front=w.enemy(200),*last=w.enemy(650);auto* wrongLane=w.enemy(750,1),*preview=w.enemy(900);assert(MemeCharacters::PickTarget(p,front)==last);
-  last->mMindControlled=true;assert(MemeCharacters::PickTarget(p,front)==front);last->mMindControlled=false;last->mDead=true;assert(MemeCharacters::PickTarget(p,front)==front);
-  assert(MemeCharacters::PickTarget(p,nullptr)==nullptr);assert(MemeCharacters::PickTarget(w.plant(2,2),front)==front);
- }
- {World w;auto* p=w.add(511);assert(!MemeCharacters::StarTarget(p));w.enemy(250,0);assert(MemeCharacters::StarTarget(p));
-  float lastX=0,lastY=0;for(int volley=0;volley<9;++volley){for(int i=0;i<5;++i){auto* s=w.AddProjectile(100,200,0,2,PROJECTILE_STAR);s->mMotionType=MOTION_STAR;s->mVelX=3.33f;s->mVelY=0;MemeCharacters::OnFired(p,s);
-   assert(std::abs(std::hypot(s->mVelX,s->mVelY)-3.33f)<0.001f);if(i==0){if(volley>0)assert(std::abs(s->mVelX-lastX)+std::abs(s->mVelY-lastY)>0.5f);lastX=s->mVelX;lastY=s->mVelY;}}
-   assert(MemeCharacters::Data(p,4)==0);auto save=SandboxPlants::SavePower(p);assert(SandboxPlants::RestorePower(p,save));
-  }
- }
- {World w;auto* p=w.add(512);auto* z=w.enemy();assert(!MemeCharacters::ButterReady(p));p->Fire(z,2,WEAPON_PRIMARY);p->Fire(z,2,WEAPON_PRIMARY);assert(MemeCharacters::ButterReady(p));
-  p->Fire(z,2,WEAPON_SECONDARY);assert(!MemeCharacters::ButterReady(p)&&MemeCharacters::Data(p,4)==0);w.step(500);assert(w.mProjectiles.mSize==3);
-  MemeCharacters::OnImpact(w.mProjectiles.values.back(),z);assert(z->mZombiePhase==SandboxZombies::Slipping);z->mButteredCounter=200;const float x=z->mPosX;
-  for(int i=0;i<80;i++)SandboxZombies::UpdateInteraction(z);assert(z->mPosX>x+150&&z->mZombiePhase==0&&z->mBodyHealth==1000);
- }
- {World w;auto* p=w.add(513);auto* z=w.enemy(p->mX+80);p->mState=STATE_SCAREDYSHROOM_SCARED;w.step();assert(z->mZombiePhase==SandboxZombies::Misdirected&&w.mProjectiles.mSize==0);
-  const float x=z->mPosX;for(int i=0;i<130;i++)SandboxZombies::UpdateInteraction(z);assert(z->mPosX>x+80&&z->mZombiePhase==0);w.step();assert(z->mZombiePhase==0);
-  p->mIsAsleep=true;w.step(1000);assert(MemeCharacters::Data(p,4)==0&&z->mZombiePhase==0);
- }
- {World w;auto* z=w.enemy();for(int age:{0,599,800}){z->mZombieAge=age;assert(!SandboxZombies::IsResting(z));}for(int age:{600,650,799}){z->mZombieAge=age;z->mIsEating=true;w.step();assert(SandboxZombies::IsResting(z)&&SandboxZombies::Speed(z)==0&&!z->mIsEating);}
-  auto* football=w.enemy(600,2,static_cast<ZombieType>(7));football->mZombieAge=100;assert(SandboxZombies::Speed(football)==1);football->mZombieAge=200;assert(!SandboxZombies::IsResting(football));football->mZombieAge=350;assert(SandboxZombies::Speed(football)==1);
-  football->mZombieAge=250;football->mMindControlled=true;assert(!SandboxZombies::IsResting(football));
- }
- {World w;auto* victim=w.enemy(500),*guard=w.enemy(570,2,static_cast<ZombieType>(6));guard->mShieldHealth=100;guard->mZombieAge=300;
-  assert(SandboxZombies::Damage(victim,20)==20&&guard->mShieldHealth==100);w.step();assert(guard->mZombiePhase==SandboxZombies::DoorDash&&guard->mPosX==570);
-  for(int i=0;i<45;i++)SandboxZombies::UpdateInteraction(guard);assert(guard->mPosX==435&&guard->mZombiePhase==0&&guard->mShieldHealth==100&&victim->mBodyHealth==1000);
-  assert(SandboxZombies::Damage(victim,40,1)==40&&SandboxZombies::Damage(victim,1800)==1800); // No invisible damage sharing.
- }
- {World w;auto* balloon=w.enemy(600,2,static_cast<ZombieType>(16));balloon->mZombiePhase=PHASE_BALLOON_FLYING;auto* passenger=w.enemy(660,2,static_cast<ZombieType>(2));passenger->mHelmHealth=123;passenger->mBodyHealth=89;
-  balloon->mZombieAge=300;w.step();assert(w.mZombies.mSize==2&&passenger->mZombiePhase==SandboxZombies::Airlift&&balloon->mSummonCounter==1);
-  assert(passenger->mTargetPlantID==w.mZombies.DataArrayGetID(balloon));
-  for(int i=0;i<150;i++)SandboxZombies::UpdateInteraction(passenger);assert(passenger->mZombiePhase==SandboxZombies::AirDrop&&passenger->mAltitude==35);
-  for(int i=0;i<45;i++)SandboxZombies::UpdateInteraction(passenger);assert(passenger->mZombiePhase==0&&passenger->mAltitude==0&&passenger->mPosX==675&&passenger->mBodyHealth==89&&passenger->mHelmHealth==123);
-  balloon->mZombieAge=900;w.step();assert(w.mZombies.mSize==2&&passenger->mZombiePhase==0);
- }
- {World w;w.pool=true;auto* balloon=w.enemy(600,2,static_cast<ZombieType>(16));balloon->mZombiePhase=PHASE_BALLOON_FLYING;balloon->mZombieAge=300;auto* passenger=w.enemy(650);w.step();assert(passenger->mZombiePhase==0&&balloon->mSummonCounter==0);}
- {World w;auto* p=w.add(514);w.step(500);assert(MemeCharacters::Data(p,1)==0);
-  auto* z=w.enemy(p->mX+130);w.step(299);assert(z->mBodyHealth==1000&&MemeCharacters::Data(p,1)==299);
-  const auto saved=SandboxPlants::SavePower(p);w.mPaused=true;w.step(1000);assert(SandboxPlants::SavePower(p)==saved);w.mPaused=false;
-  assert(SandboxPlants::RestorePower(p,saved));w.step();assert(z->mBodyHealth==980);w.step(130);assert(z->mBodyHealth==940&&MemeCharacters::Data(p,0)==0);
-  p->mIsAsleep=true;w.step(600);assert(z->mBodyHealth==940);p->mIsAsleep=false;
-  p->mShootingCounter=17;const auto mid=SandboxPlants::SavePower(p);SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,mid)&&p->mShootingCounter==17);
- }
- {World w;auto* p=w.add(515);w.enemy();w.step(500);assert(w.mProjectiles.mSize==0); // No self-made volley.
-  for(int style:{0,9,10,32,287,19,290}){
-   const auto type=style==19?PROJECTILE_SNOWPEA:PROJECTILE_PEA;
-   auto* shot=w.AddProjectile(p->mX+28,p->mY+23,0,2,type);shot->mMotionType=style==19||style==0?MOTION_STRAIGHT:MOTION_STAR;shot->mVelX=style==0?0:3.33f;
-   assert(MemeCharacters::RestoreShotStyle(shot,style));const bool couldHit=MemeCharacters::CanHit(shot);const int count=w.mProjectiles.mSize;
-   w.step();assert(shot->mVelX<0&&w.mProjectiles.mSize==count&&MemeCharacters::ShotStyle(shot)==(style|512)&&MemeCharacters::CanHit(shot)==couldHit);
-   const auto save=SandboxPlants::SaveShot(shot);SandboxPlants::ForgetShot(shot);SandboxPlants::RestoreShot(shot,save);assert(MemeCharacters::ShotStyle(shot)==(style|512));
-   w.step(100);assert(shot->mVelX<0&&w.mProjectiles.mSize==count); // No ping-pong or extra damage.
-  }
- }
- {World w;auto* p=w.add(516);auto* z=w.enemy(p->mX-10);auto* giant=w.enemy(p->mX-10,2,ZOMBIE_GARGANTUAR);const float x=z->mPosX;
-  w.step(50);assert(z->mBodyHealth==980&&z->mAltitude==24&&z->mZombieHeight==HEIGHT_FALLING&&z->mPosX==x&&giant->mBodyHealth==1000);
-  z->mZombieHeight=HEIGHT_ZOMBIE_NORMAL;z->mAltitude=0;w.step(199);assert(z->mBodyHealth==980);w.step();assert(z->mBodyHealth==960);
- }
- {World w;auto* p=w.add(516);auto* z=w.enemy(p->mX-10);z->mIceTrapCounter=100;w.step(200);assert(z->mBodyHealth==1000);z->mIceTrapCounter=0;z->mInPool=true;w.step();assert(z->mBodyHealth==1000);}
- {World w;auto* imp=w.enemy(500,2,ZOMBIE_IMP);imp->mZombieAge=400;imp->mIsEating=true;assert(SandboxZombies::IsRetreating(imp)&&SandboxZombies::Speed(imp)<0);w.step();assert(!imp->mIsEating);
-  imp->mZombieHeight=HEIGHT_FALLING;assert(!SandboxZombies::IsRetreating(imp));imp->mZombieHeight=HEIGHT_ZOMBIE_NORMAL;
-  imp->mMindControlled=true;assert(!SandboxZombies::IsRetreating(imp));imp->mMindControlled=false;
-  imp->mZombieAge=500;assert(SandboxZombies::Speed(imp)==1);imp->mZombieAge=1000;assert(SandboxZombies::IsRetreating(imp));
- }
- {World w;auto* z=w.enemy(400,2,static_cast<ZombieType>(21));z->mShieldHealth=500;z->mZombiePhase=PHASE_LADDER_CARRYING;z->mZombieAge=600;w.plant(4,2);
-  const float x=z->mPosX;w.step();assert(z->mRow==2&&z->mPosX==x&&z->mShieldHealth==500&&z->mZombiePhase==SandboxZombies::LaneStep);
-  for(int i=0;i<15;i++)SandboxZombies::UpdateInteraction(z);assert(z->mRow==2&&z->mPosY<200&&z->mPosY>150);
-  w.mPaused=true;const auto y=z->mPosY;SandboxZombies::UpdateInteraction(z);assert(z->mPosY==y&&z->mPhaseCounter==30);w.mPaused=false;
-  for(int i=0;i<30;i++)SandboxZombies::UpdateInteraction(z);assert(z->mRow==1&&z->mPosY==100&&z->mPosX==x&&z->mZombiePhase==PHASE_LADDER_CARRYING);
- }
- for(int blocked=0;blocked<4;++blocked){World w;auto* z=w.enemy(400,0,static_cast<ZombieType>(21));z->mShieldHealth=500;z->mZombiePhase=PHASE_LADDER_CARRYING;z->mZombieAge=600;w.plant(4,0);
-  if(blocked==0)z->mShieldHealth=0;if(blocked==1)z->mZombiePhase=PHASE_LADDER_PLACING;if(blocked==2)z->mMindControlled=true;if(blocked==3)z->mIceTrapCounter=100;
-  w.step();assert(z->mRow==0);
- }
- {World w;w.pool=true;auto* z=w.enemy(400,1,static_cast<ZombieType>(21));z->mShieldHealth=500;z->mZombiePhase=PHASE_LADDER_CARRYING;z->mZombieAge=600;w.plant(4,1);w.plant(4,0);w.step();assert(z->mRow==1);}
- // Zombie behavior pass: real displacements, no aura multipliers, damage gifts or clones.
- {World w;auto* flag=w.enemy(400,2,static_cast<ZombieType>(1));auto* a=w.enemy(470),*b=w.enemy(530),*otherLane=w.enemy(460,1);
-  flag->mZombieAge=300;w.step();assert(a->mZombiePhase==SandboxZombies::Hurried&&b->mZombiePhase==0&&otherLane->mZombiePhase==0);
-  const float x=a->mPosX;w.mPaused=true;SandboxZombies::UpdateInteraction(a);assert(a->mPosX==x&&a->mPhaseCounter==60);w.mPaused=false;
-  a->mIceTrapCounter=5;SandboxZombies::UpdateInteraction(a);assert(a->mPhaseCounter==60);a->mIceTrapCounter=0;
-  for(int i=0;i<30;i++)SandboxZombies::UpdateInteraction(a);assert(a->mAltitude>34&&a->mPosX<x-70&&a->mPosX>x-105);
-  for(int i=0;i<30;i++)SandboxZombies::UpdateInteraction(a);assert(a->mPosX==365&&a->mZombiePhase==0&&a->mBodyHealth==1000&&a->mAltitude==0);
- }
- for(int blocked=0;blocked<6;blocked++){World w;auto* flag=w.enemy(400,2,static_cast<ZombieType>(1)),*follower=w.enemy(470);flag->mZombieAge=300;
-  if(blocked==0)flag->mHasArm=false;if(blocked==1)flag->mIceTrapCounter=10;if(blocked==2)follower->mMindControlled=true;if(blocked==3)follower->mInPool=true;if(blocked==4)follower->mZombieType=ZOMBIE_GARGANTUAR;if(blocked==5)follower->mIsEating=true;
-  w.step();assert(follower->mZombiePhase==0);
- }
- {World w;auto* flag=w.enemy(400,2,static_cast<ZombieType>(1)),*follower=w.enemy(470);w.plant(5,2)->mSeedType=static_cast<SeedType>(3);flag->mZombieAge=300;w.step();
-  for(int i=0;i<60;i++)SandboxZombies::UpdateInteraction(follower);assert(follower->mPosX>=415&&follower->mZombiePhase==0); // No hopping through a nut.
- }
- {World w;auto* z=w.enemy(500),*friendZ=w.enemy(540,2,static_cast<ZombieType>(2)),*heavy=w.enemy(520,2,ZOMBIE_GARGANTUAR);z->mZombieAge=630;w.step();
-  assert(friendZ->mZombiePhase==SandboxZombies::Tripped&&friendZ->mBodyHealth==1000&&heavy->mZombiePhase==0);z->mZombieAge=631;
-  for(int i=0;i<100;i++)SandboxZombies::UpdateInteraction(friendZ);w.step();assert(friendZ->mZombiePhase==0); // One fall, not a permanent trip field.
- }
- {World w;auto* z=w.enemy(500,2,static_cast<ZombieType>(2)),*friendZ=w.enemy(540);SandboxZombies::ArmorBroken(z);z->mPhaseCounter=275;w.step();assert(friendZ->mZombiePhase==SandboxZombies::Tripped&&z->mPhaseCounter==275);}
- {World w;auto* z=w.enemy(600,2,static_cast<ZombieType>(7)),*friendZ=w.enemy(540);z->mZombieAge=200;w.step();assert(z->mZombiePhase==SandboxZombies::BrakeSlide&&SandboxZombies::Speed(friendZ)==1);
-  for(int i=0;i<70;i++)SandboxZombies::UpdateInteraction(z);assert(z->mPosX==490&&z->mZombiePhase==SandboxZombies::Tripped&&friendZ->mZombiePhase==SandboxZombies::Tripped&&friendZ->mBodyHealth==1000);
-  for(int i=0;i<100;i++)SandboxZombies::UpdateInteraction(z);assert(z->mZombiePhase==0&&z->mBodyHealth==1000);
- }
- {World w;auto* z=w.enemy(520,2,static_cast<ZombieType>(7));auto* nut=w.plant(6,2);nut->mSeedType=static_cast<SeedType>(3);z->mZombieAge=200;w.step();for(int i=0;i<70;i++)SandboxZombies::UpdateInteraction(z);assert(z->mPosX>=495&&nut->mPlantHealth==300);}
- {World w;auto* guard=w.enemy(570,2,static_cast<ZombieType>(6));guard->mShieldHealth=100;guard->mZombieAge=300;w.enemy(500);w.step();SandboxZombies::UpdateInteraction(guard);const auto x=guard->mPosX;guard->mShieldHealth=0;SandboxZombies::UpdateInteraction(guard);assert(guard->mZombiePhase==0&&guard->mPosX==x);}
- for(int mode=0;mode<6;mode++){World w;auto* balloon=w.enemy(600,2,static_cast<ZombieType>(16));balloon->mZombiePhase=PHASE_BALLOON_FLYING;balloon->mZombieAge=300;auto* passenger=w.enemy(660);w.step();
-  for(int i=0;i<40;i++)SandboxZombies::UpdateInteraction(passenger);assert(passenger->mAltitude==35);
-  w.mPaused=true;SandboxZombies::UpdateInteraction(passenger);assert(passenger->mPhaseCounter==110);w.mPaused=false;
-  if(mode==0)balloon->mDead=true;if(mode==1)balloon->mZombiePhase=PHASE_ZOMBIE_NORMAL;if(mode==2)balloon->mMindControlled=true;if(mode==3)passenger->mTargetPlantID=999;if(mode==4)balloon->mBlowingAway=true;if(mode==5)balloon->mPosX=790;
-  auto* replacement=w.enemy(600,2,static_cast<ZombieType>(16));replacement->mZombiePhase=PHASE_BALLOON_FLYING;
-  SandboxZombies::UpdateInteraction(passenger);assert(passenger->mZombiePhase==SandboxZombies::AirDrop&&passenger->mTargetPlantID==0);
-  for(int i=0;i<45;i++)SandboxZombies::UpdateInteraction(passenger);assert(passenger->mZombiePhase==0&&passenger->mAltitude==0&&passenger->mBodyHealth==1000&&w.mZombies.mSize==3);
- }
- {World w;auto* balloon=w.enemy(600,2,static_cast<ZombieType>(16));balloon->mZombiePhase=PHASE_BALLOON_FLYING;balloon->mZombieAge=300;w.step();assert(w.mZombies.mSize==1&&balloon->mSummonCounter==0);}
- for(int id=500;id<=516;++id){World w;auto* p=w.add(id);w.step(100);auto state=SandboxPlants::SavePower(p);
-  w.mPaused=true;w.step(1000);assert(SandboxPlants::SavePower(p)==state);SandboxPlants::Forget(p);assert(!SandboxPlants::IsCustom(p));
-  assert(SandboxPlants::RestorePower(p,state)&&SandboxPlants::SavePower(p)==state);state[9]=0;assert(!SandboxPlants::RestorePower(p,state));}
- static_assert(MemeAdventureRules::Cooldown==300);
- for(int power=180;power<=182;++power)for(int base:Bases){const int id=Result(base,power);assert(IsResult(id)&&SandboxPlants::Find(id)&&BaseOf(id)==base&&PowerOf(id)==power);
-  assert(!MemeAdventureRules::Unlocked(1,false,power,base));assert(MemeAdventureRules::Unlocked(50,false,power,base));assert(MemeAdventureRules::Unlocked(1,true,power,base));
-  World w;gSandboxEnabled=false;auto* p=w.add(id);assert(SandboxPlants::IsCustom(p));w.enemy();w.step(100);
-  const auto saved=SandboxPlants::SavePower(p);SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved));assert(SandboxPlants::SavePower(p)==saved);
-  for(int field=0;field<10;++field){auto invalid=saved;invalid[field]=-999;assert(!SandboxPlants::RestorePower(p,invalid));assert(SandboxPlants::SavePower(p)==saved);}
-  w.mPaused=true;w.step(1000);assert(SandboxPlants::SavePower(p)==saved);gSandboxEnabled=true;
- }
- for(int id=100;id<120;++id){World w;auto* p=w.plant(1,1);SandboxPlants::Assign(p,id);assert(!SandboxPlants::IsCustom(p)&&!SandboxPlants::Find(id));}
- for(int id=200;id<212;++id)assert(!SandboxZombies::Find(id));
- assert(!Result(120,180)&&!Result(0,183)&&!Result(48,180));
- for(int base=0;base<48;++base)for(int power=180;power<=182;++power)assert(Result(base,power));
- {World w;auto* p=w.add(Result(32,182));w.step(400);assert(SandboxPlants::NativeCanAct(p));SandboxPlants::NativeAction(p);
-  assert(!SandboxPlants::NativeCanAct(p));auto* shot=w.AddProjectile(35,-20,0,2,PROJECTILE_PEA);SandboxPlants::OnFired(p,shot,nullptr);
-  assert(shot->mPosX==35&&shot->mPosY==-20&&!SandboxPlants::HasShot(shot));assert(SandboxPlants::ShotDamage(shot,40)==120);
-  const int saved=SandboxPlants::SaveShot(shot);SandboxPlants::ForgetShot(shot);assert(SandboxPlants::ShotDamage(shot,40)==40);
-  SandboxPlants::RestoreShot(shot,saved);assert(SandboxPlants::ShotDamage(shot,40)==120);SandboxPlants::RestoreShot(shot,999);assert(SandboxPlants::ShotDamage(shot,40)==120);}
- {World w;auto* p=w.add(Result(39,181));for(int i=0;i<10;++i)SandboxPlants::NativeAction(p);assert(SandboxPlants::HeatData(p,1)==1000);assert(SandboxPlants::NativeCooldown(p,300)==120);}
- for(int base:{9,38,41}){World w;auto* p=w.add(Result(base,180));assert(SandboxPlants::NativeProduction(p)==1);assert(SandboxPlants::NativeProduction(p)==1);assert(SandboxPlants::NativeProduction(p)==4);}
- for(int base:{2,4,11,12,14,15,17,19,20,27,35}){
-  World w;auto* p=w.add(Result(base,181));w.bank.mNumPackets=1;w.bank.mSeedPackets[0].mPacketType=base;w.bank.mSeedPackets[0].mRefreshing=true;
-  SandboxPlants::OneShot(p);assert(w.mCoins.mSize==4&&w.bank.mSeedPackets[0].mRefreshCounter==375);const auto saved=SandboxPlants::SavePower(p);
-  SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved));SandboxPlants::OneShot(p);assert(w.mCoins.mSize==4);
- }
- {World w;auto* p=w.add(Result(20,182));auto* z=w.enemy(120),*far=w.enemy(700);SandboxPlants::OneShot(p);assert(z->chill==600&&far->chill==0);}
- {World w;auto* p=w.add(Result(12,180));auto* z=w.enemy(120),*other=w.enemy(150);SandboxPlants::OneShot(p,z);assert(z->mBodyHealth==1000&&z->mPosX==120&&other->mBodyHealth==920&&other->mPosX==215);}
- for(int base:{16,25,33,37}){World w;auto* p=w.add(Result(base,181));auto* neighbor=w.plant(2,2);neighbor->mPlantHealth=100;w.step(600);assert(neighbor->mPlantHealth>100);}
- {World w;auto* p=w.plant(1,2);p->mSeedType=static_cast<SeedType>(48);p->mImitaterType=static_cast<SeedType>(2);SandboxPlants::Assign(p,Result(2,180));
-  assert(SandboxPlants::Power(p)==180);const auto saved=SandboxPlants::SavePower(p);w.step(300);assert(SandboxPlants::SavePower(p)==saved);assert(SandboxPlants::RestorePower(p,saved));}
- for(int base:{0,5,7,18,40}){World w;auto* p=w.add(Result(base,182));w.enemy(500,base==18?1:2);w.step(399);assert(w.mProjectiles.mSize==0);w.step(100);
-  assert(w.mProjectiles.mSize==Volley(base)*3*(base==18?3:1));
-  for(auto* shot:w.mProjectiles)assert(shot->mProjectileType==(base==5?PROJECTILE_SNOWPEA:PROJECTILE_PEA));
- }
- {World w;auto* p=w.add(Result(0,181));w.enemy();w.step(2000);assert(SandboxPlants::HeatData(p,1)==1000&&w.mProjectiles.mSize>14);}
- {World w;auto* p=w.add(Result(1,182));w.step(2399);assert(w.mCoins.mSize==0);w.step();assert(w.mCoins.mSize==4);}
- {World w;auto* p=w.add(Result(3,182));p->mPlantHealth=2000;w.step(400);assert(p->mPlantHealth==2000);w.step();assert(p->mPlantHealth==2060);p->mPlantHealth-=10;w.step(100);assert(p->mPlantHealth==2050);}
- {World w;auto* p=w.add(Result(23,181));p->mPlantHealth=7000;w.step(600);assert(p->mPlantHealth==7140&&p->mPlantMaxHealth==8000);}
- {World w;auto* p=w.add(Pea);w.step(2000);assert(w.mProjectiles.mSize==0&&SandboxPlants::HeatData(p,1)==0);
-  w.enemy();w.step(625);assert(SandboxPlants::HeatData(p,0)==Bursting&&w.mProjectiles.mSize==5);
-  w.step(179);assert(w.mProjectiles.mSize==14);w.step();assert(SandboxPlants::HeatData(p,0)==Recovering);
-  const int count=w.mProjectiles.mSize;w.step(RecoveryTime);assert(count==w.mProjectiles.mSize&&SandboxPlants::HeatData(p,0)==Warming);
-  w.step(45);assert(w.mProjectiles.mSize==count+1);
-  for(auto* s:w.mProjectiles){assert(!SandboxPlants::UsesCustomShotArt(s));assert(!SandboxPlants::Impact(s,w.mZombies.values[0]));assert(SandboxPlants::ShotRadius(s)==12);}
- }
- {World w;auto* p=w.add(Pea);auto* z=w.enemy();w.step(200);const int heat=SandboxPlants::HeatData(p,1);assert(heat>0);
-  z->mDead=true;const int count=w.mProjectiles.mSize;w.step(1000);assert(SandboxPlants::HeatData(p,1)==0&&w.mProjectiles.mSize==count);}
- {World w;auto* p=w.add(Pea);w.enemy();w.step(100);const int heat=SandboxPlants::HeatData(p,1),shots=w.mProjectiles.mSize;
-  w.mPaused=true;w.step(3000);assert(SandboxPlants::HeatData(p,1)==heat&&shots==w.mProjectiles.mSize);
-  w.mPaused=false;p->mIsAsleep=true;w.step(3000);assert(SandboxPlants::HeatData(p,1)==heat&&shots==w.mProjectiles.mSize);
-  p->mIsAsleep=false;p->mSquished=true;w.step(3000);assert(shots==w.mProjectiles.mSize);
-  p->mSquished=false;p->airborne=true;w.step(3000);assert(shots==w.mProjectiles.mSize);}
- {World w;auto* p=w.add(Pea);w.enemy();w.mProjectiles.mSize=w.mProjectiles.mMaxSize-8;w.step(5000);
-  assert(w.ownedShots.empty()&&SandboxPlants::HeatData(p,1)==0);w.mProjectiles.mSize=0;w.step();assert(w.ownedShots.size()==1);}
- {World w;auto* p=w.add(Sunflower);w.step(600+SunInterval*2);assert(w.mCoins.mSize==3&&SandboxPlants::HeatData(p,0)==Bursting);
-  w.step(BurstTime);assert(w.mCoins.mSize==6&&SandboxPlants::HeatData(p,0)==Recovering);
-  w.step(SunRest);assert(w.mCoins.mSize==6&&SandboxPlants::HeatData(p,0)==Warming);
-  w.step(SunInterval);assert(w.mCoins.mSize==7);}
- {World w;auto* p=w.add(Sunflower);w.mCoins.mSize=w.mCoins.mMaxSize-8;w.step(5000);
-  assert(SandboxPlants::HeatData(p,1)==0);w.mCoins.mSize=0;w.step();assert(w.mCoins.mSize==1);}
- {World w;auto* p=w.add(Wallnut);auto* near=w.enemy(100),*far=w.enemy(500),*other=w.enemy(100,1),*heavy=w.enemy(110,2,ZOMBIE_GARGANTUAR),*friendly=w.enemy(100);friendly->mMindControlled=true;
-  p->mPlantHealth-=200;w.step();assert(SandboxPlants::HeatData(p,1)==600&&near->mPosX==100);
-  p->mPlantHealth-=134;w.step();assert(near->mPosX==165&&far->mPosX==500&&other->mPosX==100&&heavy->mPosX==110&&friendly->mPosX==100);
-  assert(SandboxPlants::HeatData(p,0)==Recovering&&p->mPlantHealth==3666);
-  p->mPlantHealth-=500;w.step(NutRest);assert(near->mPosX==165);w.step();assert(SandboxPlants::HeatData(p,1)==0);
-  p->mPlantHealth-=334;w.step();assert(near->mPosX==230);}
- {World w;auto* p=w.add(Wallnut);p->mPlantHealth=1;SandboxPlants::Assign(p,Wallnut);w.step();assert(SandboxPlants::HeatData(p,1)==0&&p->mPlantHealth==1);
-  p->mPlantHealth=0;w.enemy(100);w.step();assert(SandboxPlants::HeatData(p,1)==0);}
- {World w;auto* a=w.add(Pea),*b=w.add(Pea,1);w.enemy();w.step(645);assert(SandboxPlants::HeatData(a,1)==MaxHeat&&SandboxPlants::HeatData(b,1)==0);
-  SandboxPlants::Forget(a);assert(SandboxPlants::HeatData(a,0)==-1);SandboxPlants::Reset();assert(SandboxPlants::HeatData(b,0)==-1);}
- {const uint32_t white=0xffffffff,black=0xff111111,green=0x8016c54c,brown=0xffb88742;
-  assert(WarmPixel(white,24)==white&&WarmPixel(black,24)==black&&WarmPixel(0x0000ff00,24)==0x0000ff00);
-  assert(WarmPixel(green,0)==green&&(WarmPixel(green,24)>>24)==0x80);
-  assert(((WarmPixel(green,24)>>16)&255)>((WarmPixel(green,24)>>8)&255));assert(WarmPixel(brown,24)!=brown);
-  for(int level=0;level<=24;++level)assert((WarmPixel(green,level)>>24)==0x80);}
- std::cout<<"Meme powers: production phase cycles, roles, pause, caps, cleanup and recolour passed\n";
+ for(int style:{19,290,291,292,294,295,512,521}){World w;auto* shot=w.AddProjectile(100,250,0,2,PROJECTILE_PEA);
+  assert(!MemeCharacters::RestoreShotStyle(shot,style));assert(!MemeCharacters::ShotStyle(shot));}
+ std::cout<<"Meme powers: two retained characters, native roster and migration passed\\n";
 }

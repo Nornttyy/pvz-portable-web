@@ -137,7 +137,8 @@ public:
  struct Packet {int mPacketType=-1,mImitaterType=-1,mRefreshCounter=0,mRefreshTime=750;bool mRefreshing=false;};
  struct Bank {int mNumPackets=0;Packet mSeedPackets[10];} bank;
  Bank* mSeedBank=&bank;
- bool mPaused=false,pool=false;int mMainCounter=0;
+ bool mPaused=false,pool=false,night=false;int mMainCounter=0;
+ bool StageIsNight(){return night;}
  Array<Plant> mPlants;Array<Zombie> mZombies;Array<Projectile> mProjectiles;
  struct {int mSize=0,mMaxSize=256;} mCoins;
  void AddCoin(int,int,int,int){++mCoins.mSize;}

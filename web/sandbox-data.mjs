@@ -151,37 +151,18 @@ export const RETIRED_PLANTS = [
   [442,46,"摆烂地刺王","延长攻击间隔 · 蓄力重击"],
   [443,47,"摆烂玉米加农炮","慢速装填 · 扩大炮击范围"],
 ].map(([id,base,name,note])=>({id,base,name,note}));
+// Only these two originals are selectable. Old IDs exist solely for save migration.
+export const RETIRED_CHARACTERS = [8,1,0,5,7,4,26,6,32,29,34,13,10,28,21,18,17].map((base,i)=>({id:502+i,base}));
 export const ORIGINAL_PLANTS = [
   [500,0,'红温豌豆','满300怒气 · 3秒乱射50发'],
   [501,3,'反咬坚果','被啃后反击 · 冷却3秒'],
-  [502,8,'显眼包蘑菇','吸引邻路僵尸 · 存活60秒'],
-  [503,1,'已读不回花','平时产阳光 · 装死后反击'],
-  [504,52,'豌豆吐射手','射手飞出去，豌豆留原地'],
-  [505,5,'退退退寒冰','冰弹命中后打退敌人'],
-  [506,7,'复读双发','偷听邻居 · 学它吐什么'],
-  [507,4,'套娃土豆','炸完还有 · 最多三次'],
-  [508,26,'订书机仙人掌','前后两只 · 订在一起'],
-  [509,6,'退货大嘴花','吃一口嫌弃 · 连人吐回'],
-  [510,32,'甩锅卷心菜','甩给队尾 · 原路滚回来'],
-  [511,29,'蹦迪杨桃','每轮转方向 · 五向星弹'],
-  [512,34,'滑铲玉米','黄油脚滑 · 撞翻同伴'],
-  [513,13,'假导航胆小菇','自己缩起来 · 骗人走反路'],
-  [514,10,'打嗝大喷菇','先吸一口 · 再嗝出去'],
-  [515,28,'杠精裂荚','你往右 · 我偏往左'],
-  [516,21,'烫脚地刺','踩上来 · 烫得跳脚'],
-  [517,18,'回旋镖三线','没打中就回来 · 三路回旋'],
-  [518,17,'仰卧起坐窝瓜','砸完跳回去 · 最多三次'],
 ].map(([id,base,name,note])=>({id,base,name,note}));
-export const nativeBase = id => ORIGINAL_PLANTS.find(p=>p.id===id)?.base ?? RETIRED_PLANTS.find(p=>p.id===id)?.base ?? id;
+export const nativeBase = id => ORIGINAL_PLANTS.find(p=>p.id===id)?.base ?? RETIRED_CHARACTERS.find(p=>p.id===id)?.base ?? RETIRED_PLANTS.find(p=>p.id===id)?.base ?? id;
 export const PLANTS = [...plantNames.map((name,id) => ({id,name,note:notes[id] ?? '免费 · 无冷却'})),...ORIGINAL_PLANTS];
 const validPlant = id => (id>=0&&id<48)||ORIGINAL_PLANTS.some(p=>p.id===id);
 export const ORIGINAL_ZOMBIES = [];
-export const ZOMBIES = [[0,'普通僵尸'],[1,'旗帜僵尸'],[2,'路障僵尸'],[3,'撑杆僵尸'],[4,'铁桶僵尸'],[5,'读手机僵尸'],[6,'铁门僵尸'],[7,'橄榄球僵尸'],[8,'舞王僵尸'],[10,'鸭子救生圈'],[11,'潜水僵尸'],[12,'冰车僵尸'],[14,'海豚骑士'],[15,'玩偶匣僵尸'],[16,'气球僵尸'],[17,'矿工僵尸'],[18,'跳跳僵尸'],[19,'雪人僵尸'],[21,'梯子僵尸'],[22,'投石车僵尸'],[23,'巨人僵尸'],[24,'小鬼僵尸'],[32,'红眼巨人']].map(([id,name])=>({id,name,note:[10,11,14].includes(id)?'仅限水路':'手动放置'}));
+export const ZOMBIES = [[0,'普通僵尸'],[1,'旗帜僵尸'],[2,'路障僵尸'],[3,'撑杆僵尸'],[4,'铁桶僵尸'],[5,'读报僵尸'],[6,'铁门僵尸'],[7,'橄榄球僵尸'],[8,'舞王僵尸'],[10,'鸭子救生圈'],[11,'潜水僵尸'],[12,'冰车僵尸'],[14,'海豚骑士'],[15,'玩偶匣僵尸'],[16,'气球僵尸'],[17,'矿工僵尸'],[18,'跳跳僵尸'],[19,'雪人僵尸'],[21,'梯子僵尸'],[22,'投石车僵尸'],[23,'巨人僵尸'],[24,'小鬼僵尸'],[32,'红眼巨人']].map(([id,name])=>({id,name,note:[10,11,14].includes(id)?'仅限水路':'手动放置'}));
 ZOMBIES.push(...ORIGINAL_ZOMBIES);
-for(const z of ZOMBIES){if(z.id===1){z.name='催更旗手';z.note='把身后同伴催得往前蹦';}else if(z.id===2){z.name='碰瓷路障';z.note='掉帽碰瓷 · 顺便绊倒同伴';}}
-for(const [id,name,note] of [[0,'摸鱼僵尸','躺平摸鱼 · 绊倒同伴'],[6,'抢镜铁门','抢到前排 · 举门挡弹'],[7,'刹不住橄榄球','伸腿滑倒 · 绊倒同伴'],[16,'搭便车气球','搬运现有同伴 · 不造新僵尸']])Object.assign(ZOMBIES.find(z=>z.id===id),{name,note});
-for(const [id,name,note] of [[24,'倒车小鬼','每六秒倒走一秒'],[21,'插队梯子','前路拥堵 · 挑空路插队']])Object.assign(ZOMBIES.find(z=>z.id===id),{name,note});
-for(const [id,name,note] of [[4,'急眼铁桶','前面有同伴 · 急眼揍一下'],[3,'续杯撑杆','跳完八秒 · 再掏一根杆']])Object.assign(ZOMBIES.find(z=>z.id===id),{name,note});
 export function plantsFor(category) { return category === 'original' ? ORIGINAL_PLANTS : category === 'all' ? PLANTS : (groups[category] ?? groups.common).map(id=>PLANTS[id]); }
 export function boardCell(x,y,pool=false) {
   if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
@@ -218,7 +199,7 @@ export function validateLayout(value) {
     // Retired originals safely become their native base in old formations.
     const retired=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
     if(Number.isInteger(p?.type)&&p.type>=100&&p.type<120)p={...p,type:retired[p.type-100]};
-    if(RETIRED_PLANTS.some(old=>old.id===p?.type))p={...p,type:nativeBase(p.type)};
+    if([...RETIRED_PLANTS,...RETIRED_CHARACTERS].some(old=>old.id===p?.type))p={...p,type:nativeBase(p.type)};
     if (!p || ![p.type,p.col,p.row].every(Number.isInteger) || !validPlant(p.type) || p.col<0 || p.col>=9 || p.row<0 || p.row >= (value.map===1?6:5)) throw Error('阵型中有无效的植物或位置');
     const key = `${p.type}:${p.col}:${p.row}`;
     if (!stacked&&seen.has(key)) throw Error('阵型中有重复植物');

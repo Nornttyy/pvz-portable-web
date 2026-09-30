@@ -38,7 +38,7 @@
 #include "../../MemeAdventure.h"
 #include "../../AlmanacPlantLayout.h"
 
-static int AbstractAlmanacCount(){return MemeAdventure::RosterEnabled()?NUM_SEED_TYPES:NUM_ALMANAC_SEEDS;}
+static int AbstractAlmanacCount(){return NUM_ALMANAC_SEEDS;}
 
 bool gZombieDefeated[NUM_ZOMBIE_TYPES] = { false };
 

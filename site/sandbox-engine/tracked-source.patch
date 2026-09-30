@@ -1,21 +1,19 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 95ddcd6..6374e7e 100644
+index 95ddcd6..ae6a25c 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -199,12 +199,16 @@ endif()
+@@ -199,12 +199,14 @@ endif()
  if(EMSCRIPTEN)
  	set_property(TARGET pvz-portable APPEND PROPERTY LINK_DEPENDS
  		"${CMAKE_CURRENT_SOURCE_DIR}/wasm/shell.html"
 +		"${CMAKE_CURRENT_SOURCE_DIR}/addons/audio/rage-scream.wav"
-+		"${CMAKE_CURRENT_SOURCE_DIR}/addons/art/squash-headband.png"
-+		"${CMAKE_CURRENT_SOURCE_DIR}/addons/art/bucket-glove.png"
  	)
  	target_link_libraries(pvz-portable PRIVATE
  		SDL2_mixer_ext_Static
  		${OPENMPT_LIB}
  	)
  	target_link_options(pvz-portable PRIVATE
-+		"SHELL:--embed-file ${CMAKE_CURRENT_SOURCE_DIR}/addons@/addons"
++		"SHELL:--embed-file ${CMAKE_CURRENT_SOURCE_DIR}/addons/audio@/addons/audio"
  		"SHELL:-sUSE_SDL=2"
  		"SHELL:-sUSE_ZLIB=1"
  		"SHELL:-sUSE_LIBPNG=1"
@@ -1143,7 +1141,7 @@ index 804aeba..9260ff7 100644
  	SaveFileHeaderV4 aHeader{};
  	memcpy(aHeader.mMagic, SAVE_FILE_MAGIC_V4, sizeof(aHeader.mMagic));
 diff --git a/src/Lawn/Widget/AlmanacDialog.cpp b/src/Lawn/Widget/AlmanacDialog.cpp
-index 8fb1d2a..7bb8091 100644
+index 8fb1d2a..595bb46 100644
 --- a/src/Lawn/Widget/AlmanacDialog.cpp
 +++ b/src/Lawn/Widget/AlmanacDialog.cpp
 @@ -35,6 +35,10 @@
@@ -1153,7 +1151,7 @@ index 8fb1d2a..7bb8091 100644
 +#include "../../MemeAdventure.h"
 +#include "../../AlmanacPlantLayout.h"
 +
-+static int AbstractAlmanacCount(){return MemeAdventure::RosterEnabled()?NUM_SEED_TYPES:NUM_ALMANAC_SEEDS;}
++static int AbstractAlmanacCount(){return NUM_ALMANAC_SEEDS;}
  
  bool gZombieDefeated[NUM_ZOMBIE_TYPES] = { false };
  
@@ -1341,7 +1339,7 @@ index d017de9..260efd1 100644
  	bool                        mStartingGame;
  	int                         mStartingGameCounter;
 diff --git a/src/Lawn/Widget/SeedChooserScreen.cpp b/src/Lawn/Widget/SeedChooserScreen.cpp
-index b284e6a..d41c794 100644
+index b284e6a..def8038 100644
 --- a/src/Lawn/Widget/SeedChooserScreen.cpp
 +++ b/src/Lawn/Widget/SeedChooserScreen.cpp
 @@ -41,11 +41,16 @@
@@ -1351,7 +1349,7 @@ index b284e6a..d41c794 100644
 +#include "../../MemeAdventure.h"
 +#include "../../SeedChooserLayout.h"
 +
-+static int AbstractChooserCount(){return MemeAdventure::RosterEnabled()?NUM_SEED_TYPES:NUM_SEEDS_IN_CHOOSER;}
++static int AbstractChooserCount(){return NUM_SEEDS_IN_CHOOSER;}
  
  SeedChooserScreen::SeedChooserScreen()
  {
@@ -1782,7 +1780,7 @@ index c140a3d..2ce62c4 100644
  	GetDrawPos(aDrawPos);
  	if (mApp->mGameScene == GameScenes::SCENE_ZOMBIES_WON && !SetupDrawZombieWon(g))
 diff --git a/src/LawnApp.cpp b/src/LawnApp.cpp
-index d360a2f..920b6f0 100644
+index d360a2f..0e39939 100644
 --- a/src/LawnApp.cpp
 +++ b/src/LawnApp.cpp
 @@ -24,6 +24,10 @@
@@ -1873,7 +1871,7 @@ index d360a2f..920b6f0 100644
  bool LawnApp::HasSeedType(SeedType theSeedType)
  {
 +	// Existing unused left-facing shooter ID keeps old saves and enum values intact.
-+	if (theSeedType == SEED_LEFTPEATER) return MemeAdventure::RosterEnabled() && mPlayerInfo && (HasFinishedAdventure() || mPlayerInfo->GetLevel() >= 8);
++	if (theSeedType == SEED_LEFTPEATER) return false; // Retired self-thrower; keep enum/save ABI intact.
  	if (IsTrialStageLocked() && theSeedType >= SeedType::SEED_JALAPENO)
  		return false;
  

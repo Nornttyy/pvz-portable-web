@@ -26,15 +26,12 @@ namespace MemeAdventure {${mapping}\n${translate}}
 int main(){using namespace MemeAdventure;
  for(const auto& d:MemeCharacters::Definitions){assert(Replacement(d.base,-1)->id==d.id);assert(Replacement(48,d.base)->id==d.id);assert(Translate(d.key,"old")==d.name);assert(Translate(std::string(d.key)+"_TOOLTIP","old")==d.hint);assert(Translate(std::string(d.key)+"_DESCRIPTION","old")==d.description);}
  assert(!Replacement(48,-1)&&!Replacement(2,-1)&&!Replacement(503,-1));
- assert(Translate("ADVICE_QA","向日葵和双子向日葵") == "已读不回花和双子向日葵");
- assert(Translate("SEED_CHOOSER_QA","豌豆射手、小喷菇、坚果墙") == "红温豌豆、显眼包蘑菇、反咬坚果");
- assert(Translate("FLAG_ZOMBIE","old")=="催更旗手"&&Translate("BUCKETHEAD_ZOMBIE","铁桶僵尸")=="急眼铁桶");
- assert(Translate("BUCKETHEAD_ZOMBIE_DESCRIPTION","native")!="native");
- assert(Translate("POLE_VAULTING_ZOMBIE","old")=="续杯撑杆");
- assert(Replacement(4,-1)->id==507&&Replacement(4,-1)->cost==75&&Replacement(4,-1)->unlock==6);
- assert(Translate("CONEHEAD_ZOMBIE","old")=="碰瓷路障");
- assert(Translate("ZOMBIE","old")=="摸鱼僵尸");assert(Translate("SCREEN_DOOR_ZOMBIE","old")=="抢镜铁门");
- assert(Translate("FOOTBALL_ZOMBIE","old")=="刹不住橄榄球");assert(Translate("BALLOON_ZOMBIE","old")=="搭便车气球");
+ assert(MemeCharacters::Definitions.size()==2);
+ assert(Translate("ADVICE_QA","向日葵和双子向日葵") == "向日葵和双子向日葵");
+ assert(Translate("SEED_CHOOSER_QA","豌豆射手、小喷菇、坚果墙") == "红温豌豆、小喷菇、反咬坚果");
+ for(int seed=0;seed<53;++seed)if(seed!=0&&seed!=3)assert(!Replacement(seed,-1));
+ for(const char* key:{"FLAG_ZOMBIE","BUCKETHEAD_ZOMBIE","POLE_VAULTING_ZOMBIE","CONEHEAD_ZOMBIE","ZOMBIE","SCREEN_DOOR_ZOMBIE","FOOTBALL_ZOMBIE","BALLOON_ZOMBIE","NEWSPAPER_ZOMBIE","IMP","LADDER_ZOMBIE"})
+  assert(Translate(key,"native")=="native"&&Translate(std::string(key)+"_DESCRIPTION","native")=="native");
  assert(Translate("GOLD_SUNFLOWER_TROPHY","金色向日葵奖杯") == "金色向日葵奖杯");
  for(bool* boundary:{&app.bowling,&app.pots,&app.whack,&gSandboxEnabled}){*boundary=true;assert(!Replacement(0,-1));assert(Translate("PEASHOOTER","original")=="original");*boundary=false;}
  app.adventure=false;assert(!Replacement(0,-1));app.adventure=true;gLawnApp=nullptr;assert(!Replacement(0,-1));
