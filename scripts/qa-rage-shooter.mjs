@@ -32,7 +32,8 @@ try{
  await page.waitForTimeout(250);assert.equal(await pd(4),0);assert.equal(await pd(5),100);assert.equal(await page.evaluate(()=>Module._pvz_rage_audio_data(0)),0);results.noManualRelease=true;
  await page.setViewportSize({width:1100,height:750});await page.waitForTimeout(250);
  for(const row of [1,2,3])await api(2,23,8,row);await api(5,2);
- await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,5)===180,{},{timeout:14000});await api(4,1);await shot('gradual-rage-180');await api(4,0);
+ await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,5)===200,{},{timeout:14000});await api(4,1);assert.equal(await pd(4),0);await shot('rage-200-no-burst');results.noBurstAt200=true;await api(4,0);
+ await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,5)===280,{},{timeout:14000});await api(4,1);assert.equal(await pd(4),0);await shot('gradual-rage-280');await api(4,0);
  await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,4)===1,{},{timeout:22000});await api(5,1);
  assert.deepEqual(await page.evaluate(()=>[0,1,2].map(f=>Module._pvz_rage_audio_data(f))),[1,1,600]);results.releaseAudio=true;
  await page.waitForTimeout(350);await api(4,1);const fan=await shots(),spread=fan.filter(s=>s[0]===9);

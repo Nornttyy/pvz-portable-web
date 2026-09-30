@@ -5,7 +5,7 @@ namespace Sexy {class Graphics;class Color;}
 namespace MemeCharacters {
 struct Definition {int id,base,cost,unlock;const char* name;const char* shortName;const char* hint;const char* key;const char* description;};
 inline constexpr std::array<Definition,14> Definitions{{
- {500,0,100,1,"红温豌豆","红温","满200怒气自动乱射80发","PEASHOOTER","普通攻击只有10%命中判定，其余豌豆飞行中反复上下飘，每次摆幅随机，不击退僵尸。每发增加20怒气，逐渐变红；满200自动乱射80发，不能手动释放。射完恢复绿色，不消耗生命。"},
+ {500,0,100,1,"红温豌豆","红温","满300怒气自动乱射80发","PEASHOOTER","普通攻击只有10%命中判定，其余豌豆飞行中反复上下飘，每次摆幅随机，不击退僵尸。每发增加20怒气，逐渐变红；满300自动乱射80发，不能手动释放。射完恢复绿色，不消耗生命。"},
  {501,3,50,4,"反咬坚果","反咬","被啃后反击 · 冷却3秒","WALL_NUT","被啃后反击面前的僵尸，造成80伤害。每3秒一次，不击退僵尸。"},
  {502,8,0,11,"显眼包蘑菇","显眼包","近距离射击 · 吸引邻路僵尸","PUFF_SHROOM","近距离喷射孢子，每五秒吸引一只邻路普通步行僵尸。白天也能工作。不能吸引巨人和冰车。"},
  {503,1,50,2,"已读不回花","已读","平时产阳光 · 装死后反击","SUNFLOWER","平时每次生产50阳光。僵尸靠近时装死，经过后向后连发三颗豌豆。装死和反击时暂停生产，不能躲过碾压和巨人砸击。"},

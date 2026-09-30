@@ -6,6 +6,7 @@
 #include "SandboxZombies.h"
 #include "SandboxVisualRules.h"
 #include "SandboxMemeRules.h"
+#include "MemeShooterRules.h"
 #include <cassert>
 #include <cmath>
 #include <iostream>
@@ -112,8 +113,8 @@ int main(){
   assert(SandboxPlants::DrawBody(&g,rage,0,0)&&instances[0].mImageOverride==native);
   assert(SandboxPlants::RestorePower(rage,{500,300,0,0,0,0,0,0,0,2}));
   assert(!SandboxPlants::DrawBody(&g,rage,0,0)&&instances[0].mImageOverride==native);
-  for(int heat:{20,60,100,140,180}){assert(SandboxPlants::RestorePower(rage,{500,300,0,heat,0,0,0,0,0,2}));drawnOverrides.clear();
-   assert(SandboxPlants::DrawBody(&g,rage,0,0));assert(drawnOverrides[0]==SandboxArt::WarmNative("PeaShooter_Head.png",heat*24/200));assert(instances[0].mImageOverride==native);
+  for(int heat:{20,60,100,140,180,200,240,280,300}){assert(SandboxPlants::RestorePower(rage,{500,300,0,heat,0,0,0,0,0,2}));drawnOverrides.clear();
+   assert(SandboxPlants::DrawBody(&g,rage,0,0));assert(drawnOverrides[0]==SandboxArt::WarmNative("PeaShooter_Head.png",heat*24/MemeShooterRules::MaxRage));assert(instances[0].mImageOverride==native);
   }app.reanims.erase(80);
  }
  for(int id=120;id<144;++id){auto* p=board.plant(1,1);p->mSeedType=static_cast<SeedType>(SandboxPlants::Base(id));SandboxPlants::Assign(p,id);

@@ -44,7 +44,7 @@ try{
  await page.waitForFunction(()=>Module._pvz_adventure_power_data(0,5)>=100,{},{timeout:65000});
  await shot('automatic-charge');await tap(80,330);await tap(80,362);
  assert.equal(await ad(0,4),0);assert.ok(await ad(0,5)>=100);results.noManualRelease=true;
- await page.waitForFunction(()=>Module._pvz_adventure_power_data(0,4)===1,{},{timeout:15000});
+ await page.waitForFunction(()=>Module._pvz_adventure_power_data(0,4)===1,{},{timeout:25000});
  assert.equal(await page.evaluate(()=>Module._pvz_rage_audio_data(0)),1);
  await page.waitForTimeout(200);await click(748,14);
  const before=await snapshot(),remaining=before.plants[0].remaining;

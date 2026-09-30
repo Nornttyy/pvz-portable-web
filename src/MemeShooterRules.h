@@ -2,7 +2,7 @@
 #include <cmath>
 #include <cstdint>
 namespace MemeShooterRules {
-inline constexpr int PerShot=20,MaxRage=200,BurstCount=80,NormalDelay=150,BurstDelay=1;
+inline constexpr int PerShot=20,MaxRage=300,BurstCount=80,NormalDelay=150,BurstDelay=1;
 inline constexpr int FloatingFirst=32,FloatingLast=287,FloatingTurnTicks=36;
 inline constexpr bool IsFloating(int style){return style>=FloatingFirst&&style<=FloatingLast;}
 // Roll once when firing, not every collision/frame. The saved projectile style

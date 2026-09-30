@@ -29,7 +29,7 @@ struct World:Board {
 };
 int main(){
  using namespace SandboxMemeRules;
- static_assert(MemeShooterRules::BurstCount==80&&MemeShooterRules::MaxRage==200&&MemeShooterRules::PerShot==20);
+ static_assert(MemeShooterRules::BurstCount==80&&MemeShooterRules::MaxRage==300&&MemeShooterRules::PerShot==20);
  {World w;auto* p=w.add(500);assert(SandboxPlants::RestorePower(p,{500,300,0,100,0,50,40,0,0,2}));
   const auto state=SandboxPlants::SavePower(p);w.mPaused=true;w.step(100);
   assert(SandboxPlants::SavePower(p)==state);
@@ -63,32 +63,41 @@ int main(){
   w.step(150);assert(MemeCharacters::Data(p,1)==100&&w.mProjectiles.mSize==5);const float zx=z->mPosX;
   z->mDead=true;w.step(200);assert(MemeCharacters::Data(p,1)==100); // no passive rage loss
   assert(!MemeCharacters::Activate(p)&&!MemeCharacters::Click(&w,p->mX+40,p->mY+40));assert(MemeCharacters::Data(p,1)==100&&z->mPosX==zx);
-  z->mDead=false;w.step(601);assert(MemeCharacters::Data(p,0)==1&&MemeCharacters::Data(p,4)==80&&w.mProjectiles.mSize==10);z->mDead=true;
+  z->mDead=false;w.step(1351);assert(MemeCharacters::Data(p,0)==1&&MemeCharacters::Data(p,4)==80&&w.mProjectiles.mSize==15);z->mDead=true;
   assert(app.rageReleaseRequests==sounds+1);
   w.step(57);const auto save=SandboxPlants::SavePower(p);assert(save[8]==23);w.mPaused=true;w.step(300);assert(SandboxPlants::SavePower(p)==save);w.mPaused=false;
   SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,save));w.step(22);assert(MemeCharacters::Data(p,4)==1);w.step();
-  assert(w.mProjectiles.mSize==90&&MemeCharacters::Data(p,0)==0&&MemeCharacters::Data(p,1)==0&&p->mPlantHealth==123);
+  assert(w.mProjectiles.mSize==95&&MemeCharacters::Data(p,0)==0&&MemeCharacters::Data(p,1)==0&&p->mPlantHealth==123);
   int spread=0;bool up=false,down=false;for(auto* shot:w.mProjectiles)if(MemeCharacters::ShotStyle(shot)==9){++spread;up|=shot->mVelY<0;down|=shot->mVelY>0;assert(SandboxPlants::ShotDamage(shot,20)==20);}
-  assert(spread==80&&up&&down);w.step(200);assert(w.mProjectiles.mSize==90);
+  assert(spread==80&&up&&down);w.step(200);assert(w.mProjectiles.mSize==95);
   assert(app.rageReleaseRequests==sounds+1); // no sound per pea/load
  }
- {World w;auto* p=w.add(500);const int sounds=app.rageReleaseRequests;w.enemy();w.step(1399);assert(MemeCharacters::Data(p,1)==180);w.step();assert(MemeCharacters::Data(p,0)==1&&w.mProjectiles.mSize==10);
+ {World w;auto* p=w.add(500);const int sounds=app.rageReleaseRequests;w.enemy();
+  w.step(1400);assert(MemeCharacters::Data(p,1)==200&&MemeCharacters::Data(p,0)==0&&app.rageReleaseRequests==sounds);
+  w.step(749);assert(MemeCharacters::Data(p,1)==280&&MemeCharacters::Data(p,0)==0);w.step();assert(MemeCharacters::Data(p,0)==1&&w.mProjectiles.mSize==15);
   assert(app.rageReleaseRequests==sounds+1);
-  w.step(80);assert(w.mProjectiles.mSize==90&&p->mPlantHealth==300&&MemeCharacters::Data(p,0)==0);
+  w.step(80);assert(w.mProjectiles.mSize==95&&p->mPlantHealth==300&&MemeCharacters::Data(p,0)==0);
   assert(app.rageReleaseRequests==sounds+1);
  }
- {World w;auto* p=w.add(500);w.enemy();w.step(1400);assert(MemeCharacters::Data(p,0)==1);w.mProjectiles.mSize=w.mProjectiles.mMaxSize-8;
+ {World w;auto* p=w.add(500);w.enemy();w.step(2150);assert(MemeCharacters::Data(p,0)==1);w.mProjectiles.mSize=w.mProjectiles.mMaxSize-8;
   w.step(100);assert(SandboxPlants::SavePower(p)[8]==80);
-  w.mProjectiles.mSize=10;w.step(80);assert(w.mProjectiles.mSize==90&&p->mPlantHealth==300);
+  w.mProjectiles.mSize=15;w.step(80);assert(w.mProjectiles.mSize==95&&p->mPlantHealth==300);
  }
  {World w;auto* p=w.add(500);p->mPlantHealth=99;assert(SandboxPlants::RestorePower(p,{500,99,2,700,350,0,10,0,0,1}));
   assert(MemeCharacters::Data(p,0)==0&&p->mPlantHealth==99&&MemeCharacters::Data(p,1)==0);
   assert(SandboxPlants::RestorePower(p,{500,99,0,400,0,0,10,0,0,1}));assert(MemeCharacters::Data(p,1)==120&&!MemeCharacters::Activate(p));
  }
  {World w;auto* p=w.add(500);const int sounds=app.rageReleaseRequests;
-  // Last release accepted 300 rage: keep that save and fire only on resume.
+  // Preserve saved partial rage verbatim: 280 still needs one normal shot.
   assert(SandboxPlants::RestorePower(p,{500,300,0,280,0,100,10,0,0,2}));
-  assert(MemeCharacters::Data(p,1)==200&&app.rageReleaseRequests==sounds);
+  assert(MemeCharacters::Data(p,1)==280&&app.rageReleaseRequests==sounds);
+  w.mPaused=true;w.step(100);assert(MemeCharacters::Data(p,0)==0);w.mPaused=false;
+  w.step(100);assert(MemeCharacters::Data(p,1)==280&&w.mProjectiles.mSize==0);
+  w.enemy();w.step();assert(MemeCharacters::Data(p,0)==1&&app.rageReleaseRequests==sounds+1);
+  w.step(80);assert(w.mProjectiles.mSize==81&&MemeCharacters::Data(p,0)==0);
+ }
+ {World w;auto* p=w.add(500);const int sounds=app.rageReleaseRequests;
+  assert(SandboxPlants::RestorePower(p,{500,300,0,300,0,100,10,0,0,2}));
   w.mPaused=true;w.step(100);assert(MemeCharacters::Data(p,0)==0);w.mPaused=false;
   w.step(80);assert(w.mProjectiles.mSize==80&&MemeCharacters::Data(p,0)==0&&app.rageReleaseRequests==sounds+1);
  }
@@ -161,7 +170,7 @@ int main(){
  {World w;auto* s=w.AddProjectile(100,250,0,2,PROJECTILE_PEA);s->mMotionType=MOTION_STAR;s->mVelY=-0.7f;
   assert(MemeCharacters::RestoreShotStyle(s,20));for(int age=0;age<100;++age){s->mProjectileAge=age;SandboxPlants::UpdateShot(s);assert(s->mVelY==-0.7f);}
  }
- {World w;auto* p=w.add(500);w.enemy();w.step(1400);w.step(80);
+ {World w;auto* p=w.add(500);w.enemy();w.step(2150);w.step(80);
   float minSpeed=100,maxSpeed=0;int turns=0;float last=0;
   for(auto* s:w.mProjectiles)if(MemeCharacters::ShotStyle(s)==9){float speed=std::hypot(s->mVelX,s->mVelY);minSpeed=std::min(minSpeed,speed);maxSpeed=std::max(maxSpeed,speed);turns+=(last*s->mVelY<0);last=s->mVelY;}
   assert(maxSpeed-minSpeed>2.0f&&turns>15);
