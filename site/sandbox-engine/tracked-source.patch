@@ -1891,7 +1891,7 @@ index 80ba516..3910d90 100644
  	void							FastLoad(GameMode theGameMode);
  	static std::string				GetStageString(int theLevel);
 diff --git a/src/PvzpLib/PvzpFoley.cpp b/src/PvzpLib/PvzpFoley.cpp
-index 89f0a43..3134bc6 100644
+index 89f0a43..1f7c01f 100644
 --- a/src/PvzpLib/PvzpFoley.cpp
 +++ b/src/PvzpLib/PvzpFoley.cpp
 @@ -25,6 +25,7 @@
@@ -1921,7 +1921,7 @@ index 89f0a43..3134bc6 100644
  	if (thePitch != 0.0f)
  		aSoundInstance->AdjustPitch(thePitch);
 +	if (theFoleyType == FOLEY_RAGE_RELEASE)
-+		aSoundInstance->SetVolume(0.60); // Still multiplied by the native SFX volume.
++		aSoundInstance->SetVolume(1.00); // Full cue gain; native SFX volume/mute still apply. No voice stacking.
 +	if (theFoleyType >= FOLEY_MEME_HICCUP && theFoleyType <= FOLEY_MEME_SQUEAK)
 +		aSoundInstance->SetVolume(0.42);
  	if (TestBit(aFoleyParams->mFoleyFlags, FoleyFlags::FOLEYFLAGS_USES_MUSIC_VOLUME))

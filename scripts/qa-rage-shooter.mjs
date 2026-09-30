@@ -42,7 +42,7 @@ try{
   };requestAnimationFrame(sample);
  });await api(4,0);
  await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,4)===1,{},{timeout:22000});
- assert.deepEqual(await page.evaluate(()=>[0,1,2].map(f=>Module._pvz_rage_audio_data(f))),[1,1,600]);results.releaseAudio=true;
+ assert.deepEqual(await page.evaluate(()=>[0,1,2].map(f=>Module._pvz_rage_audio_data(f))),[1,1,1000]);results.releaseAudio=true;results.releaseVolume=1;
  await page.waitForTimeout(600);await api(4,1);const fan=await shots(),spread=fan.filter(s=>s[0]===9);
  assert.ok(spread.length>=7&&spread.some(s=>s[4]<0)&&spread.some(s=>s[4]>0));
  const speeds=spread.map(s=>Math.hypot(s[3],s[4])/1000);assert.ok(Math.max(...speeds)-Math.min(...speeds)>1.0);assert.ok(speeds.every(v=>v>=3.448&&v<=5.702));results.irregularSpread=true;results.slowerBurstPeas=true;
@@ -59,7 +59,7 @@ try{
  await page.waitForFunction(()=>[0,1].every(i=>Module._pvz_sandbox_plant_data(i,5)>=100),{},{timeout:15000});
  assert.equal(await api(23,0,1,1),0);assert.equal(await api(23,0,1,3),0);
  await page.waitForFunction(()=>[0,1].every(i=>Module._pvz_sandbox_plant_data(i,4)===1),{},{timeout:12000});
- assert.equal(await page.evaluate(()=>Module._pvz_rage_audio_data(1)),1);results.noVoiceStacking=true;
+ assert.deepEqual(await page.evaluate(()=>[0,1,2].map(f=>Module._pvz_rage_audio_data(f))),[1,1,1000]);results.noVoiceStacking=true;
  // Real native support plants, not injected coordinates or synthetic rage.
  for(const [name,map,support,barY] of [['pot',0,33,357],['pool',1,16,332]]){
   await api(8,map);assert.ok(await api(1,support,1,2)>0);assert.ok(await api(1,500,1,2)>0);

@@ -299,7 +299,7 @@ void PvzpFoley::PlayFoleyPitch(FoleyType theFoleyType, float thePitch)
 	if (thePitch != 0.0f)
 		aSoundInstance->AdjustPitch(thePitch);
 	if (theFoleyType == FOLEY_RAGE_RELEASE)
-		aSoundInstance->SetVolume(0.60); // Still multiplied by the native SFX volume.
+		aSoundInstance->SetVolume(1.00); // Full cue gain; native SFX volume/mute still apply. No voice stacking.
 	if (theFoleyType >= FOLEY_MEME_HICCUP && theFoleyType <= FOLEY_MEME_SQUEAK)
 		aSoundInstance->SetVolume(0.42);
 	if (TestBit(aFoleyParams->mFoleyFlags, FoleyFlags::FOLEYFLAGS_USES_MUSIC_VOLUME))

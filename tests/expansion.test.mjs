@@ -39,7 +39,7 @@ test('release vocal is a dedicated non-looping native SFX, with overlap and volu
  const samples=(wav.length-44)/2;let peak=0;
  for(let block=0;block<30;block++){let energy=0;for(let i=block*samples/30;i<(block+1)*samples/30;i++){const v=wav.readInt16LE(44+i*2)/32768;energy+=v*v;peak=Math.max(peak,Math.abs(v));}assert.ok(Math.sqrt(energy/(samples/30))>.01,'vocal must start immediately and fill the three-second release');}assert.ok(peak<=.801,'no clipping');
  assert.match(body,/LoadSound\("\/addons\/audio\/rage-scream"\)/);
- assert.match(foley,/if \(theFoleyType == FOLEY_RAGE_RELEASE\)\s*aSoundInstance->SetVolume\(0\.60\)/);
+ assert.match(foley,/if \(theFoleyType == FOLEY_RAGE_RELEASE\)\s*aSoundInstance->SetVolume\(1\.00\)/);
  const mixer=(await read('src/SexyAppFramework/sound/SDLSoundInstance.cpp')).toString();assert.match(mixer,/mBaseVolume \* mVolume \* mSoundManagerP->mMasterVolume/);
  const board=(await read('src/Lawn/Board.cpp')).toString(),dispose=board.slice(board.indexOf('void Board::DisposeBoard()'),board.indexOf('bool Board::AreEnemyZombiesOnScreen()'));
  assert.match(dispose,/StopFoley\(FoleyType::FOLEY_RAGE_RELEASE\)/);
