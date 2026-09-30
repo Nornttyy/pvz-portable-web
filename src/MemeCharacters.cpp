@@ -23,7 +23,7 @@ namespace {
 // Saved in the existing ten-integer optional plant record.
 struct State {int id=0,health=0,phase=0,heat=0,timer=0,delay=50,age=0,pulse=0,remaining=0,direction=1;};
 std::map<const Plant*,State> states;
-std::map<const Projectile*,int> shotStyles; // 1..8 legacy wobble; 9 burst; 10 hit; 11..18 miss; 19 retreat ice.
+std::map<const Projectile*,int> shotStyles; // 1..8 legacy wobble; 9 burst; 10 hit; 11..18 legacy miss; 19 retreat ice; 20 random-angle miss.
 void Burst(State& s){
  s.phase=1;s.heat=0;s.remaining=MemeShooterRules::BurstCount;s.delay=0;s.timer=0;s.pulse=30;
  gLawnApp->PlayRageRelease(); // Once per release, never once per pea or save restore.
@@ -63,32 +63,20 @@ void Assign(Plant* p,int id){const auto* d=Find(id);if(!d||int(p->mSeedType)!=d-
 std::array<int,10> Save(const Plant* p){auto it=states.find(p);if(it==states.end())return {};const auto& s=it->second;return {s.id,s.health,s.phase,s.heat,s.timer,s.delay,s.age,s.pulse,s.remaining,s.direction};}
 bool Restore(Plant* p,const std::array<int,10>& a){
  const bool shooter=a[0]==500,newShooter=shooter&&a[9]==2;
- const auto* d=Find(a[0]);if(!d||int(p->mSeedType)!=d->base||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>(newShooter?1:2)||a[3]<0||a[3]>(newShooter?300:1000)||a[4]<0||a[4]>2000||a[5]<0||a[5]>2000||a[6]<0||a[6]>=1000000||a[7]<0||a[7]>50||a[8]<0||a[8]>(newShooter?MemeShooterRules::BurstCount:a[0]==506?6:3)||(!newShooter&&a[9]!=1&&a[9]!=-1))return false;
+ const auto* d=Find(a[0]);if(!d||int(p->mSeedType)!=d->base||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>(newShooter?1:2)||a[3]<0||a[3]>(newShooter?300:1000)||a[4]<0||a[4]>2000||a[5]<0||a[5]>2000||a[6]<0||a[6]>=1000000||a[7]<0||a[7]>50||a[8]<0||a[8]>(newShooter?150:a[0]==506?6:3)||(!newShooter&&a[9]!=1&&a[9]!=-1))return false;
  if(newShooter&&((a[2]==1&&(a[8]==0||a[3]!=0))||(a[2]==0&&a[8]!=0)))return false;
  State s{a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9]};
  // Direction was unused for this character: 2 versions the new burst state.
  // Migrate old overheating saves without healing or inventing a free volley.
  if(shooter&&!newShooter){s.phase=0;s.heat=a[2]==0?a[3]*300/1000:0;s.timer=0;s.delay=std::min(a[5],150);s.remaining=0;s.pulse=0;s.direction=2;}
  if(shooter)s.heat=std::min(s.heat,MemeShooterRules::MaxRage); // Keep old 300-rage saves readable.
+ if(shooter)s.remaining=std::min(s.remaining,MemeShooterRules::BurstCount); // Read old 150-pea saves without adding shots.
  states[p]=s;p->mLaunchCounter=a[0]==503?std::clamp(p->mLaunchCounter,0,2500):9999;p->mShootingCounter=0;return true;
 }
 int Data(const Plant* p,int field){const auto it=states.find(p);if(it==states.end())return -1;const auto& s=it->second;return field==0?s.phase:field==1?s.heat:field==2?s.timer:field==3?s.direction:s.remaining;}
-bool Activate(Plant* p,int direction){
- auto it=states.find(p);if(it==states.end()||p->mDead||p->mBoard->mPaused||p->mIsAsleep||p->mSquished||p->NotOnGround()||p->mPlantHealth<=0)return false;
- auto& s=it->second;
- if(s.id==500){
-  if(s.phase!=0||s.heat<MemeShooterRules::ManualRage)return false;
-  Burst(s);return true;
- }
- return false;
-}
-bool Click(Board* b,int x,int y){
- for(auto* p:b->mPlants)if(!p->mDead&&Type(p)==500&&x>=p->mX&&x<p->mX+80){
-  // Include the full ready bar, and follow the same pot/pool offset as its art.
-  const int top=VisualY(p);
-  if(y>=top&&y<top+86&&Activate(p))return true;
- }return false;
-}
+// Keep legacy input/ABI callers harmless; rage is automatic only.
+bool Activate(Plant*,int){return false;}
+bool Click(Board*,int,int){return false;}
 void Tick(Board* b){
  if(b->mPaused)return;
  for(auto it=laneCooldown.begin();it!=laneCooldown.end();)if(--it->second<=0||!b->ZombieTryToGet(static_cast<ZombieID>(it->first)))it=laneCooldown.erase(it);else ++it;
@@ -206,15 +194,8 @@ void Effects(Sexy::Graphics* g,Board* b,int row){
  for(const auto& [p,s]:states)if(!p->mDead&&p->mRow==row&&!p->mSquished&&!const_cast<Plant*>(p)->NotOnGround()){
   const int x=p->mX,y=VisualY(p);
   if(s.id==500){
-   const int glow=p->mIsAsleep?0:MemeShooterRules::ReadyGlow(s.heat,s.phase,s.age);
-   if(glow){
-    g->SetColor(Sexy::Color(210,164,77,glow));
-    g->FillRect(x+11,y+76,58,1);g->FillRect(x+11,y+83,58,1);
-    g->FillRect(x+11,y+77,1,6);g->FillRect(x+68,y+77,1,6);
-   }
    g->SetColor(Sexy::Color(57,37,18));g->FillRect(x+12,y+77,56,6);
    g->SetColor(s.phase==1?Sexy::Color(210,72,43):Sexy::Color(226,167,64));g->FillRect(x+13,y+78,s.phase==1?s.remaining*54/MemeShooterRules::BurstCount:s.heat*54/MemeShooterRules::MaxRage,4);
-   g->SetColor(Sexy::Color(85,57,27));g->FillRect(x+13+54*MemeShooterRules::ManualRage/MemeShooterRules::MaxRage,y+78,1,4);
    if(s.phase==1){const int age=s.age%30;Puff(g,x+45,y+15-age,age,130);}
   }else if(s.id==504&&s.phase==1){
    auto* im=Sexy::IMAGE_PROJECTILEPEA;
@@ -242,8 +223,9 @@ void OnFired(Plant* p,Projectile* shot){
   shotStyles[shot]=9;const float angle=MemeShooterRules::SpreadAngle(Sexy::Rand(1001)),speed=MemeShooterRules::BurstSpeed(Sexy::Rand(61));
   shot->mVelX=speed*std::cos(angle);shot->mVelY=speed*std::sin(angle);
  }else{
-  const int style=MemeShooterRules::NormalStyle(Sexy::Rand(10),s.heat/20+p->mPlantCol*3+p->mRow);
-  shotStyles[shot]=style;shot->mVelX=3.33f;shot->mVelY=style==10?0:MemeShooterRules::MissStep(style,0);
+  const int style=MemeShooterRules::NormalStyle(Sexy::Rand(10));
+  const float angle=style==10?0:MemeShooterRules::NormalMissAngle(Sexy::Rand(2),Sexy::Rand(1001));
+  shotStyles[shot]=style;shot->mVelX=3.33f*std::cos(angle);shot->mVelY=3.33f*std::sin(angle);
  }
 }}
 int ShotStyle(const Projectile* shot){const auto it=shotStyles.find(shot);return it==shotStyles.end()?0:it->second;}
@@ -254,7 +236,7 @@ void OnImpact(Projectile* shot,Zombie* z){
  }
 }
 bool RestoreShotStyle(const Projectile* shot,int style){
- if(style<0||style>19||shot->mDead)return false;
+ if(style<0||style>20||shot->mDead)return false;
  if(style&&((style==19?shot->mMotionType!=MOTION_STRAIGHT:shot->mMotionType!=MOTION_STAR)||(shot->mProjectileType!=PROJECTILE_PEA&&shot->mProjectileType!=PROJECTILE_SNOWPEA&&shot->mProjectileType!=PROJECTILE_FIREBALL)))return false;
  if(style)shotStyles[shot]=style;else shotStyles.erase(shot);return true;
 }

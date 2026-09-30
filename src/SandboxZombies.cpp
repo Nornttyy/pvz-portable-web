@@ -12,7 +12,7 @@ namespace {
 bool Enabled(){return gSandboxEnabled||(gLawnApp&&gLawnApp->IsAdventureMode());}
 bool Walker(Zombie* z){return z&&z->IsOnBoard()&&!z->mDead&&!z->IsDeadOrDying()&&z->mHasHead&&!z->mMindControlled&&z->mZombiePhase==PHASE_ZOMBIE_NORMAL&&z->mZombieHeight==HEIGHT_ZOMBIE_NORMAL&&!z->mInPool;}
 }
-bool IsRetreating(Zombie* z){return Enabled()&&Walker(z)&&int(z->mZombieType)==4&&z->mHelmHealth>0&&z->mPhaseCounter>120&&z->mPhaseCounter<=180;}
+bool IsRetreating(Zombie*){return false;}
 bool IsPhone(const Zombie* z){return z&&int(z->mZombieType)==5&&(gSandboxEnabled||(gLawnApp&&gLawnApp->IsAdventureMode()));}
 void RecoverPhone(Zombie* z){
  if(!IsPhone(z)||z->mDead||z->IsDeadOrDying()||!z->mHasHead||!z->mHasArm||z->mZombiePhase!=PHASE_NEWSPAPER_MAD||z->mPhaseCounter>0)return;
@@ -24,19 +24,12 @@ void Reset(){} void Forget(Zombie*){} void Assign(Zombie*,int){}
 void Tick(Board*){} void DrawPortrait(Sexy::Graphics*,int,int,int,int,int){}
 float Speed(Zombie* z){
  if(!Enabled()||!Walker(z))return 1.0f;
- if(IsRetreating(z))return z->mPosX<800?-2.5f:0.0f;
  const int type=int(z->mZombieType);
  if(type==0||type==2||type==4||type==6)for(auto* leader:z->mBoard->mZombies)
   if(leader!=z&&int(leader->mZombieType)==1&&Walker(leader)&&std::abs(leader->mRow-z->mRow)<=1&&std::abs(leader->mPosX-z->mPosX)<160)return 1.5f;
  return 1.0f; // Flags do not stack, and vehicles/giants keep their native pace.
 }
-int Damage(Zombie* z,int damage){
- // Only light hits provoke the moonwalk. A walnut counter does not push it.
- if(Enabled()&&Walker(z)&&int(z->mZombieType)==4&&z->mHelmHealth>damage&&damage>0&&damage<=40&&z->mPhaseCounter==0&&z->mPosX<780){
-  z->mPhaseCounter=180;z->StopEating();
- }
- return damage;
-}
+int Damage(Zombie*,int damage){return damage;}
 bool ElectricHit(Zombie*){return false;} void CombatDeath(Zombie*){}
 void DrawEffects(Sexy::Graphics*,Board*,int){}
 bool HasShot(const Projectile*){return false;} bool DrawShot(Sexy::Graphics*,const Projectile*){return false;}

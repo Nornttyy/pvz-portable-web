@@ -43,9 +43,9 @@ try {
   const styles=await page.evaluate(()=>[0,1].map(i=>Module._pvz_projectile_data(i,0)));assert.ok(styles.includes(19)&&styles.includes(0));await shot('retreat-ice-and-echo');
   await page.evaluate(()=>{window.biggestIcePush=0;let last=Module._pvz_sandbox_zombie_data(0,2);const poll=()=>{const x=Module._pvz_sandbox_zombie_data(0,2);window.biggestIcePush=Math.max(window.biggestIcePush,x-last);last=x;if(window.biggestIcePush<30)requestAnimationFrame(poll);};requestAnimationFrame(poll);});
   await api(4,0);await page.waitForFunction(()=>window.biggestIcePush>=30,{},{timeout:6000});await api(4,1);results.icePush=true;results.echo=true;
-  await api(7);await api(1,0,0,2);await api(2,4,5,2);await api(4,0);
-  await page.waitForFunction(()=>Module._pvz_sandbox_zombie_data(0,8)>120,{},{timeout:5000});const backwardsX=await zd(0,2);await page.waitForTimeout(300);await api(4,1);
-  assert.ok(await zd(0,2)>backwardsX);await shot('moonwalking-bucket');results.bucketRetreat=true;
+  await api(7);await api(1,0,0,2);await api(2,4,5,2);const helmet=await zd(0,5);await api(4,0);
+  await page.waitForFunction(hp=>Module._pvz_sandbox_zombie_data(0,5)<hp,helmet,{timeout:5000});const hitX=await zd(0,2);await page.waitForTimeout(300);await api(4,1);
+  assert.ok(await zd(0,2)<=hitX);assert.equal(await zd(0,8),0);assert.equal(await zd(0,9),100);await shot('ordinary-hit-no-retreat');results.bucketNoRetreat=true;
   await api(7);await api(2,0,6,1);assert.equal(await zd(0,9),100);await api(2,1,6,2);assert.equal(await zd(0,9),150);
   await api(2,1,6,1);assert.equal(await zd(0,9),150);await api(4,0);await page.waitForTimeout(300);await api(4,1);await shot('haste-flags');results.flagAura=true;
   await api(15);await page.waitForTimeout(900);await click(560,135);await page.waitForTimeout(15000);

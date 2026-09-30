@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Gradual 200-rage and 150 chaotic peas; mobile rage-bar activation, native support-height alignment and playable sandbox duck swimmers; angry counter walnut every 3s without push",
+  "mode": "Automatic-only 200-rage, 80 chaotic peas; independently random up/down normal shots; no manual release or ordinary-hit bucket retreat; native support-height alignment preserved",
   "files": [
     {
       "name": "pvz-portable.js",
       "size": 277137,
-      "sha256": "557774be0127a34e0e185f3c1359b1fbdd68a85175b9cee1c616588348cb0d0b"
+      "sha256": "4116f4a9f3e23b740928b6486baed1f93cc05a68e611e38f4f0740c5d9ab85a8"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7459139,
-      "sha256": "b04719186a848ee5fed87219668ef7f258a2f26f6a80f12dd8ecfd2a3fd22bab"
+      "size": 7456348,
+      "sha256": "c6ea1f76df1c13261a03a3d9072a8aca6ab53e95562fc196565b3bb5249acbd9"
     }
   ]
 }

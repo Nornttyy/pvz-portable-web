@@ -11,7 +11,7 @@ namespace SandboxPlants {
 enum class Element { Fire, Ice, Alternating, Native };
 struct Definition { int id, base; Element element; const char* name; const char* note; const char* art=nullptr; int rate=0,damage=20; float scale=1.0f; };
 inline constexpr std::array<Definition,151> Definitions{{
-    {500,0,Element::Native,"红温豌豆","满100可点击 · 满200自动乱射"},
+    {500,0,Element::Native,"红温豌豆","满200怒气自动乱射80发"},
     {501,3,Element::Native,"反咬坚果","被啃后反击 · 冷却3秒"},
     {502,8,Element::Native,"显眼包蘑菇","近距离射击 · 吸引邻路僵尸"},
     {503,1,Element::Native,"已读不回花","平时产阳光 · 装死后反击"},

@@ -12,25 +12,20 @@
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
- // A ready shooter adds only a one-pixel muted outline around the existing
- // bar. No indicator below 100, during release or while asleep.
+ // Automatic rage has only the existing bar: no manual-ready glow or notch.
  for(int heat:{80,100,280})for(int phase:{0,1})for(bool asleep:{false,true}){
   SandboxPlants::Reset();Board w;auto* p=w.plant(1,2);SandboxPlants::Assign(p,500);p->mIsAsleep=asleep;
   assert(SandboxPlants::RestorePower(p,{500,300,phase,phase?0:heat,0,50,40,0,phase?25:0,2}));
   Sexy::Graphics g(nullptr);Sexy::drawnRects.clear();MemeCharacters::Effects(&g,&w,2);
-  const bool ready=heat>=100&&!phase&&!asleep;assert(Sexy::drawnRects.size()==(ready?7:3));
-  if(ready){const auto& edge=Sexy::drawnRects[0];
-   assert(edge.bounds.mX==p->mX+11&&edge.bounds.mY==p->mY+76&&edge.bounds.mWidth==58&&edge.bounds.mHeight==1);
-   assert(edge.color.mRed==210&&edge.color.mGreen==164&&edge.color.mBlue==77&&edge.color.mAlpha>=112&&edge.color.mAlpha<=160);
-  }
-  const auto& bar=Sexy::drawnRects[ready?4:0];assert(bar.bounds.mX==p->mX+12&&bar.bounds.mY==p->mY+77&&bar.bounds.mWidth==56&&bar.bounds.mHeight==6);
+  assert(Sexy::drawnRects.size()==2);
+  const auto& bar=Sexy::drawnRects[0];assert(bar.bounds.mX==p->mX+12&&bar.bounds.mY==p->mY+77&&bar.bounds.mWidth==56&&bar.bounds.mHeight==6);
  }
  // Native flowerpot lift and pool bobbing move indicators and steam together.
  for(int offset:{-5,-2,0,2})for(int phase:{0,1}){
   SandboxPlants::Reset();Board w;auto* p=w.plant(1,2);p->drawHeightOffset=offset;SandboxPlants::Assign(p,500);
   assert(SandboxPlants::RestorePower(p,{500,300,phase,phase?0:100,0,50,40,0,phase?25:0,2}));
   Sexy::Graphics g(nullptr);g.mTransX=224;g.mTransY=17;Sexy::drawnRects.clear();testBlits.clear();MemeCharacters::Effects(&g,&w,2);
-  const auto& bar=Sexy::drawnRects[phase?0:4];assert(bar.bounds.mY==p->mY+offset+77);
+  const auto& bar=Sexy::drawnRects[0];assert(bar.bounds.mY==p->mY+offset+77);
   if(phase){assert(testBlits.size()==1);near(testBlits[0].matrix.m02,p->mX+45+224);near(testBlits[0].matrix.m12,p->mY+offset+15-10+17);}
   p->airborne=true;Sexy::drawnRects.clear();testBlits.clear();MemeCharacters::Effects(&g,&w,2);
   assert(Sexy::drawnRects.empty()&&testBlits.empty());

@@ -42,12 +42,13 @@ try{
  while(await ad(-1,2)<100){assert.ok(Date.now()<deadline,'sun collection deadline');const sun=[await ad(0,10),await ad(0,11)];if(sun[0]>=0)await click(...sun);await page.waitForTimeout(150);}
  await tap(await seed(0,5)+25,await seed(0,6)+35);await click(240,330);
  await page.waitForFunction(()=>Module._pvz_adventure_power_data(0,5)>=100,{},{timeout:65000});
- await shot('ready-highlight');await tap(80,330);
- await page.waitForFunction(()=>Module._pvz_adventure_power_data(0,4)===1,{},{timeout:1500});
+ await shot('automatic-charge');await tap(80,330);await tap(80,362);
+ assert.equal(await ad(0,4),0);assert.ok(await ad(0,5)>=100);results.noManualRelease=true;
+ await page.waitForFunction(()=>Module._pvz_adventure_power_data(0,4)===1,{},{timeout:15000});
  assert.equal(await page.evaluate(()=>Module._pvz_rage_audio_data(0)),1);
- await page.waitForTimeout(350);await click(748,14);
+ await page.waitForTimeout(200);await click(748,14);
  const before=await snapshot(),remaining=before.plants[0].remaining;
- assert.ok(remaining>0&&remaining<150);assert.ok(before.shots.some(s=>s[0]===9));
+ assert.ok(remaining>0&&remaining<80);assert.ok(before.shots.some(s=>s[0]===9));
  // Return while the dedicated release voice is still active.
  assert.equal(await page.evaluate(()=>Module._pvz_rage_audio_data(0)),1);
  await click(400,401);await page.waitForTimeout(250);await click(305,394);
@@ -59,7 +60,7 @@ try{
  const restored=await snapshot();assert.deepEqual(restored,before,'native plants, sun, progress and in-flight projectile states survive exactly');
  assert.equal(await page.evaluate(()=>Module._pvz_rage_audio_data(0)),0);results.exactRestore=true;
  await page.waitForTimeout(250);assert.deepEqual(await snapshot(),restored,'continue dialog freezes the restored volley');
- await page.setViewportSize({width:844,height:390});await shot('restored-on-phone');
+ await page.setViewportSize({width:844,height:390});await page.waitForTimeout(250);await shot('restored-on-phone');
  await page.evaluate(()=>{
   window.rageResumeTrace=[];
   const sample=()=>{const ad=Module._pvz_adventure_power_data;window.rageResumeTrace.push({remaining:ad(0,14),phase:ad(0,4),audio:Module._pvz_rage_audio_data(0)});
