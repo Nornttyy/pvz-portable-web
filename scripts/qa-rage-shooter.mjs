@@ -20,19 +20,23 @@ try{
   const profile=new Uint8Array(4096),p=new DataView(profile.buffer);p.setUint32(0,12,true);p.setUint32(4,2,true);FS.writeFile('/saves/userdata/user1.dat',profile);await new Promise((r,j)=>FS.syncfs(false,e=>e?j(e):r()));});
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);await click(260,348);
  await page.waitForFunction(()=>Module.canvas.width===1024,{},{timeout:15000});await api(7);await api(1,500,1,2);await api(2,4,8,2);await api(4,0);
- await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,5)===20,{},{timeout:10000});await api(4,1);
- const first=(await shots())[0];assert.ok(first[0]>=1&&first[0]<=8);let positive=false,negative=false,minY=999,maxY=-999;
- for(let i=0;i<95;++i){await api(13);await page.waitForTimeout(20);const s=(await shots())[0];assert.ok(s);positive||=s[4]>0;negative||=s[4]<0;minY=Math.min(minY,s[2]);maxY=Math.max(maxY,s[2]);}
+ await page.waitForFunction(()=>{for(let i=0;i<128;++i){const s=Module._pvz_projectile_data(i,0);if(s<0)break;if(s>=11&&s<=18)return true;}return false;},{},{timeout:6500});await api(4,1);
+ let positive=false,negative=false,minY=999,maxY=-999;
+ for(let i=0;i<40;++i){await api(13);await page.waitForTimeout(20);const s=(await shots()).find(s=>s[0]>=11&&s[0]<=18);assert.ok(s);positive||=s[4]>0;negative||=s[4]<0;minY=Math.min(minY,s[2]);maxY=Math.max(maxY,s[2]);}
  assert.ok(positive&&negative&&maxY-minY>60);results.wobbleRange=maxY-minY;await shot('normal-wavy-pea');
  await api(4,0);await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,5)===100,{},{timeout:15000});await api(4,1);assert.equal(await pd(3),300);
+ await shot('gradual-rage-100');
  await api(6);await click(718,61);await api(4,0);await page.touchscreen.tap(...await point(384,330));await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,4)===1,{},{timeout:1500});
  assert.deepEqual(await page.evaluate(()=>[0,1,2].map(f=>Module._pvz_rage_audio_data(f))),[1,1,600]);results.releaseAudio=true;
  await page.waitForTimeout(850);await api(4,1);const fan=await shots(),spread=fan.filter(s=>s[0]===9);
- assert.ok(spread.length>=10&&spread.some(s=>s[4]<0)&&spread.some(s=>s[4]>0));assert.equal(await pd(3),300);await shot('manual-50-pea-fan');
+ assert.ok(spread.length>=30&&spread.some(s=>s[4]<0)&&spread.some(s=>s[4]>0));
+ const speeds=spread.map(s=>Math.hypot(s[3],s[4])/1000);assert.ok(Math.max(...speeds)-Math.min(...speeds)>1.8);results.irregularSpread=true;
+ assert.equal(await pd(3),300);await shot('manual-150-random-burst');
  await page.waitForTimeout(300);assert.deepEqual(await shots(),fan);results.pauseSafe=true;
  await api(4,0);await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,4)===0,{},{timeout:4000});assert.equal(await pd(5),0);assert.equal(await pd(3),300);results.manualBurst=true;
  await page.waitForFunction(()=>Module._pvz_rage_audio_data(0)===0,{},{timeout:3000});
  await api(7);await api(1,500,0,2);for(const row of [1,2,3])await api(2,23,8,row);await api(4,0);await api(5,2);
+ await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,5)===180,{},{timeout:14000});await api(4,1);await shot('gradual-rage-180');await api(4,0);
  await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,4)===1,{},{timeout:22000});assert.equal(await page.evaluate(()=>Module._pvz_rage_audio_data(0)),1);await api(5,1);await page.waitForTimeout(700);await api(4,1);
  assert.equal(await pd(3),300);assert.ok((await shots()).some(s=>s[0]===9));await shot('automatic-red-burst');results.automaticBurst=true;
  await api(4,0);await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,4)===0,{},{timeout:4000});await api(4,1);await shot('original-colour-restored');assert.equal(await pd(3),300);

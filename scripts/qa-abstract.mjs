@@ -29,10 +29,32 @@ async function ad(i,f){return page.evaluate(([i,f])=>Module._pvz_adventure_power
 async function sd(i,f){return page.evaluate(([i,f])=>Module._pvz_adventure_seed_data(i,f),[i,f]);}
 async function pauseAt(f,v){await page.waitForFunction(([f,v])=>Module._pvz_sandbox_plant_data(0,f)===v,[f,v],{timeout:18000});await api(4,1);}
 try {
- await boot(8);
+ await boot(process.env.PVZ_QA_WAVE2?9:8);
  await click(260,348);await page.waitForFunction(()=>Module.canvas.width===1024,{},{timeout:20000});
- await tap(234,153);await tap(464,330);assert.equal((await data())[0][0],504);await shot('five-cards');
- if(!process.env.PVZ_QA_UI_ONLY){
+ await tap(234,153);await tap(464,330);assert.equal((await data())[0][0],504);await shot('seven-cards');
+ if(process.env.PVZ_QA_WAVE2){
+  await api(7);await api(1,501,3,2);await api(2,0,3,2);const hp=await zd(0,4);await shot('nut-calm');await api(4,0);await pauseAt(4,1);
+  const x=await zd(0,2);for(let i=0;i<24;++i){await api(13);await page.waitForTimeout(20);}await shot('nut-angry-counter');
+  assert.equal(await zd(0,4),hp-80);assert.ok(await zd(0,2)<=x+1);assert.ok((await data())[0][6]>250);results.nutNoPush=true;
+  await api(6);await shot('nut-angry-face');
+  await api(4,0);await pauseAt(4,0);await shot('nut-calm-again');
+  await api(7);await api(1,505,1,2);await api(1,506,2,2);await api(2,0,6,2);await api(4,0);
+  await page.waitForFunction(()=>Module._pvz_projectile_data(1,0)>=0,{},{timeout:5000});await api(4,1);
+  const styles=await page.evaluate(()=>[0,1].map(i=>Module._pvz_projectile_data(i,0)));assert.ok(styles.includes(19)&&styles.includes(0));await shot('retreat-ice-and-echo');
+  await page.evaluate(()=>{window.biggestIcePush=0;let last=Module._pvz_sandbox_zombie_data(0,2);const poll=()=>{const x=Module._pvz_sandbox_zombie_data(0,2);window.biggestIcePush=Math.max(window.biggestIcePush,x-last);last=x;if(window.biggestIcePush<30)requestAnimationFrame(poll);};requestAnimationFrame(poll);});
+  await api(4,0);await page.waitForFunction(()=>window.biggestIcePush>=30,{},{timeout:6000});await api(4,1);results.icePush=true;results.echo=true;
+  await api(7);await api(1,0,0,2);await api(2,4,5,2);await api(4,0);
+  await page.waitForFunction(()=>Module._pvz_sandbox_zombie_data(0,8)>120,{},{timeout:5000});const backwardsX=await zd(0,2);await page.waitForTimeout(300);await api(4,1);
+  assert.ok(await zd(0,2)>backwardsX);await shot('moonwalking-bucket');results.bucketRetreat=true;
+  await api(7);await api(2,0,6,1);assert.equal(await zd(0,9),100);await api(2,1,6,2);assert.equal(await zd(0,9),150);
+  await api(2,1,6,1);assert.equal(await zd(0,9),150);await api(4,0);await page.waitForTimeout(300);await api(4,1);await shot('haste-flags');results.flagAura=true;
+  await api(15);await page.waitForTimeout(900);await click(560,135);await page.waitForTimeout(15000);
+  for(const id of [5,7,0,1,3,2])await click(47+(id%8)*53,163+Math.floor(id/8)*73);await click(232,566);
+  await page.waitForFunction(()=>Module._pvz_adventure_power_data(-1,5)===1,{},{timeout:20000});
+  assert.equal(await sd(0,0),505);assert.equal(await sd(0,1),175);assert.equal(await sd(1,0),506);assert.equal(await sd(1,1),200);
+  await page.setViewportSize({width:844,height:390});await shot('new-native-adventure-cards');results.adventureCards=true;
+ }
+ if(!process.env.PVZ_QA_UI_ONLY&&!process.env.PVZ_QA_WAVE2){
  await api(7);await api(1,501,3,2);await api(2,0,3,2);const hp=await zd(0,4);await api(4,0);await pauseAt(4,1);
  for(let i=0;i<20;++i){await api(13);await page.waitForTimeout(18);}await shot('nut-bumps-forward');
  const nutFrozen=await data();await page.waitForTimeout(250);assert.deepEqual(await data(),nutFrozen);

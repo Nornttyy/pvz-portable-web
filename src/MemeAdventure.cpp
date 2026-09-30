@@ -53,6 +53,10 @@ void Draw(Board* b,Sexy::Graphics*){
 }
 std::string_view Translate(std::string_view key,std::string_view original){
  if(gSandboxEnabled||RosterEnabled()){
+  if(key=="FLAG_ZOMBIE")return "催更旗手";
+  if(key=="FLAG_ZOMBIE_DESCRIPTION")return "挥旗催着同伴赶路，让附近一格、横向两格内的普通步行僵尸移速提高50%。多面旗帜不会叠加。";
+  if(key=="BUCKETHEAD_ZOMBIE")return "倒车铁桶";
+  if(key=="BUCKETHEAD_ZOMBIE_DESCRIPTION")return "铁桶还在时，挨轻击会倒退0.6秒，期间不啃植物。间隔至少1.8秒，铁桶打掉后就不会倒车。";
   if(key=="NEWSPAPER_ZOMBIE")return "读手机僵尸";
   if(key=="NEWSPAPER_ZOMBIE_DESCRIPTION")return "边走边刷手机。手机碎了就红温冲锋，四秒后掏出备用机继续刷。身体不会回血。";
  }
@@ -67,7 +71,7 @@ std::string_view Translate(std::string_view key,std::string_view original){
  static std::map<std::string,std::string,std::less<>> cache;
  if(auto found=cache.find(key);found!=cache.end())return found->second;
  std::string text(original);
- for(const auto& pair:{std::pair{"豌豆射手","红温豌豆"},std::pair{"向日葵","已读不回花"},std::pair{"小喷菇","显眼包蘑菇"},std::pair{"坚果墙","顶顶坚果"}}){
+ for(const auto& pair:{std::pair{"豌豆射手","红温豌豆"},std::pair{"向日葵","已读不回花"},std::pair{"小喷菇","显眼包蘑菇"},std::pair{"坚果墙","反咬坚果"},std::pair{"寒冰射手","退退退寒冰"},std::pair{"双发射手","复读双发"}}){
   size_t pos=0;const std::string_view from=pair.first,to=pair.second;
   while((pos=text.find(from,pos))!=std::string::npos){
    if(from=="向日葵"&&pos>=6&&text.compare(pos-6,6,"双子")==0){pos+=from.size();continue;}

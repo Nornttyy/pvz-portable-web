@@ -6825,6 +6825,7 @@ void Zombie::StopEating()
 
 void Zombie::CheckIfPreyCaught()
 {
+	if (SandboxZombies::IsRetreating(this)) { StopEating(); return; }
 	if (mZombieType == ZombieType::ZOMBIE_BUNGEE ||
 		mZombieType == ZombieType::ZOMBIE_GARGANTUAR ||
 		mZombieType == ZombieType::ZOMBIE_REDEYE_GARGANTUAR ||

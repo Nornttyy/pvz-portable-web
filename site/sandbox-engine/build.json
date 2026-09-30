@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Rage peashooter: subtle ready indicator, save-resume scatter verification and scoped release-vocal cleanup; native wavy peas without self-damage",
+  "mode": "Gradual rage to 200, 10% normal accuracy and 150 chaotic peas; angry counter walnut every 3s without push; retreat ice, echo repeater, haste flag and moonwalk bucket",
   "files": [
     {
       "name": "pvz-portable.js",
       "size": 277137,
-      "sha256": "b2eff0558935a6039c727d941393676afe86940f8cbfbc99c8ff5c263a4a8210"
+      "sha256": "557774be0127a34e0e185f3c1359b1fbdd68a85175b9cee1c616588348cb0d0b"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7451889,
-      "sha256": "0b5ebdce6a846d6935ac85ce738143f643578dd5bbf541ed68b271d154183b01"
+      "size": 7459059,
+      "sha256": "5194b1e44e7a50d68496a7baf88a0619b6b7e20549bbc9e73090918bff320200"
     }
   ]
 }

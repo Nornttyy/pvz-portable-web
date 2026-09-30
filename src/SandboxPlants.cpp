@@ -3,6 +3,7 @@
 #include "SandboxArt.h"
 #include "SandboxMemeRules.h"
 #include "SandboxVisualRules.h"
+#include "MemeShooterRules.h"
 #include "LawnApp.h"
 #include "Resources.h"
 #include "Lawn/Board.h"
@@ -84,6 +85,22 @@ void HeatBrow(Sexy::Graphics* g,Reanimation* head,int level,int alpha){
  m.m02+=m.m00*x+m.m01*y+g->mTransX;m.m12+=m.m10*x+m.m11*y+g->mTransY;
  m.m00*=0.8f/0.555f;m.m10*=0.8f/0.555f;m.m01*=1.6f;m.m11*=1.6f;
  PvzpBltMatrix(g,brow,m,g->mClipRect,Sexy::Color(255,255,255,alpha),g->mDrawMode,Sexy::Rect(0,0,brow->mWidth,brow->mHeight));
+}
+void NutBrows(Sexy::Graphics* g,Reanimation* body,int alpha){
+ if(!body||!body->TrackExists("anim_face"))return;
+ auto* brow=SandboxArt::NativeImage("PeaShooter_eyebrow.png");if(!brow)return;
+ Sexy::SexyTransform2D face;body->GetTrackMatrix(body->FindTrackIndex("anim_face"),face);
+ // Reuse one native eyebrow, mirrored over the walnut's two eyes. Register
+ // on its face bone, not the board, so idle sway/recoil/damage frames align.
+ for(int side:{-1,1}){
+  const float x=(side<0?44.0f:73.0f)-50,y=(side<0?29.0f:26.0f)-50;
+  const float sx=-side*1.7f,sy=1.3f,c=0.966f,s=-side*0.259f;
+  Sexy::SexyTransform2D m=face;
+  m.m02+=face.m00*x+face.m01*y+g->mTransX;m.m12+=face.m10*x+face.m11*y+g->mTransY;
+  m.m00=(face.m00*c+face.m01*s)*sx;m.m10=(face.m10*c+face.m11*s)*sx;
+  m.m01=(-face.m00*s+face.m01*c)*sy;m.m11=(-face.m10*s+face.m11*c)*sy;
+  PvzpBltMatrix(g,brow,m,g->mClipRect,Sexy::Color(85,65,35,alpha),g->mDrawMode,Sexy::Rect(0,4,13,7));
+ }
 }
 
 bool Enemy(Zombie* z){return !z->mMindControlled&&!z->IsDeadOrDying()&&z->mHasHead;}
@@ -219,7 +236,8 @@ bool UsesCustomShotArt(const Projectile*){return false;}
 int ShotRadius(const Projectile*){return 12;}
 int NextShot(Plant*){return 0;}
 void OnFired(Plant* p,Projectile* shot,Zombie*){
- if(MemeCharacters::Is(p)){MemeCharacters::OnFired(p,shot);return;}
+ MemeCharacters::OnFired(p,shot);
+ if(MemeCharacters::Is(p))return;
  if(!IsCustom(p))return;
  if(!SandboxMemeRules::LegacyBase(EffectiveBase(p))){const int percent=NativeDamage(p,100);if(percent!=100)damageShots[shot]=percent;return;}
  shots.insert(shot);
@@ -236,7 +254,7 @@ void OnFired(Plant* p,Projectile* shot,Zombie*){
  }
 }
 void UpdateShot(Projectile* p){MemeCharacters::UpdateShot(p);}
-bool Impact(Projectile*,Zombie*){return false;} // Native damage, slow, fire and splats.
+bool Impact(Projectile* p,Zombie* z){MemeCharacters::OnImpact(p,z);return false;} // Keep native damage, slow, fire and splats.
 void Tick(Board* b){
  if(b->mPaused)return;
  MemeCharacters::Tick(b);
@@ -322,11 +340,16 @@ void DrawCard(Sexy::Graphics* g,int x,int y,int id){
  PvzpDrawString(g,"0",x+25,y+65,Sexy::FONT_BRIANNETOD12,Sexy::Color(55,64,23),DS_ALIGN_CENTER);
 }
 bool DrawBody(Sexy::Graphics* g,const Plant* p,float,float,bool squished){
- if(MemeCharacters::Type(p)==500&&MemeCharacters::Data(p,0)==1&&!squished){
+ if(MemeCharacters::Type(p)==501&&MemeCharacters::Data(p,0)==1&&!squished){
   auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID);if(!body)return false;
-  WarmSkin warm;for(auto id:{p->mBodyReanimID,p->mHeadReanimID})warm.Apply(gLawnApp->ReanimationTryToGet(id),120,24,p->mPlantHealth,p->mPlantMaxHealth);
-  warm.Apply(gLawnApp->ReanimationTryToGet(p->mBlinkReanimID),120,24,p->mPlantHealth,p->mPlantMaxHealth,true);
-  body->Draw(g);HeatBrow(g,gLawnApp->ReanimationTryToGet(p->mHeadReanimID),24,230);return true;
+  body->Draw(g);NutBrows(g,body,std::min(255,MemeCharacters::Save(p)[7]*32));return true;
+ }
+ if(MemeCharacters::Type(p)==500&&(MemeCharacters::Data(p,0)==1||MemeCharacters::Data(p,1)>0)&&!squished){
+  auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID);if(!body)return false;
+  const int level=MemeCharacters::Data(p,0)==1?24:std::clamp(MemeCharacters::Data(p,1)*24/MemeShooterRules::MaxRage,0,24);
+  WarmSkin warm;for(auto id:{p->mBodyReanimID,p->mHeadReanimID})warm.Apply(gLawnApp->ReanimationTryToGet(id),120,level,p->mPlantHealth,p->mPlantMaxHealth);
+  warm.Apply(gLawnApp->ReanimationTryToGet(p->mBlinkReanimID),120,level,p->mPlantHealth,p->mPlantMaxHealth,true);
+  body->Draw(g);HeatBrow(g,gLawnApp->ReanimationTryToGet(p->mHeadReanimID),level,std::clamp((level-8)*15,0,230));return true;
  }
  auto it=states.find(p);if(it==states.end()||squished||!SandboxMemeRules::LegacyBase(int(p->mSeedType)))return false;const auto& s=it->second;
  WarmSkin warm;const int level=SandboxMemeRules::PowerOf(s.id)==180?2+s.heat.heat*22/1000:12+s.heat.heat*12/1000;

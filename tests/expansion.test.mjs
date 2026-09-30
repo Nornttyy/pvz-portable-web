@@ -17,7 +17,7 @@ test('meme powers exercise real production combat and preserve native pixel shad
  assert.match((await run(binary)).stdout,/Meme powers:.*passed/);
 });
 test('power token is not a plant or a save entry; only results round-trip',()=>{
- for(const type of [500,501,502,503,504])assert.equal(validateLayout({schema:1,map:0,plants:[{type,col:0,row:0}]}).plants[0].type,type);
+ for(const type of [500,501,502,503,504,505,506])assert.equal(validateLayout({schema:1,map:0,plants:[{type,col:0,row:0}]}).plants[0].type,type);
  assert.throws(()=>validateLayout({schema:1,map:0,plants:[{type:180,col:0,row:0}]}));
 });
 test('release vocal is a dedicated non-looping native SFX, with overlap and volume guards',async()=>{
@@ -45,6 +45,7 @@ test('actual projectile/effect draw code preserves bone and world coordinate con
 test('native projectile integration retains splats, centered scaling and fire attachments',async()=>{
  const render=(await read('src/Lawn/Projectile.cpp')).toString();
  assert.match(render,/MemeShooterRules::OverlapsY/);
+ assert.match(render,/if \(!MemeCharacters::CanHit\(this\)\) return nullptr;/);
  assert.match(render,/SandboxPlants::UpdateShot\(this\);\s*if \(mDead\) return;/);
  const impact=render.slice(render.indexOf('void Projectile::DoImpact('),render.indexOf('void Projectile::Draw('));
  assert.match(impact,/if \(SandboxPlants::UsesCustomShotArt\(this\)\) \{ Die\(\); return; \}/);
@@ -57,8 +58,8 @@ test('native projectile integration retains splats, centered scaling and fire at
  const plant=source.slice(source.indexOf('void Plant::Fire('),source.indexOf('Zombie* Plant::FindTargetZombie('));
  assert.ok(plant.indexOf('aProjectile->ConvertToFireball(mPlantCol)')>plant.indexOf('SandboxPlants::OnFired(this,aProjectile,theTargetZombie)'),'fire attaches only after muzzle correction');
 });
-test('five mechanic characters replace infusion; old results migrate without losing plants',async()=>{
- assert.equal(ORIGINAL_PLANTS.length,5);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,502,503,504]);assert.deepEqual(ORIGINAL_ZOMBIES,[]);assert.equal(ZOMBIES.length,23);
+test('seven mechanic characters replace infusion; old results migrate without losing plants',async()=>{
+ assert.equal(ORIGINAL_PLANTS.length,7);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,502,503,504,505,506]);assert.deepEqual(ORIGINAL_ZOMBIES,[]);assert.equal(ZOMBIES.length,23);
  const bases=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
  for(let id=100;id<120;++id)assert.equal(validateLayout({schema:1,map:0,plants:[{type:id,col:0,row:0}]}).plants[0].type,bases[id-100]);
  for(const p of RETIRED_PLANTS){

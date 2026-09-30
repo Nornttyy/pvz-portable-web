@@ -22,6 +22,8 @@ enum PlantWeapon {WEAPON_PRIMARY};
 enum PlantSubClass {SUBCLASS_NORMAL,SUBCLASS_SHOOTER};
 constexpr int RENDER_GROUP_HIDDEN=-1,DS_ALIGN_CENTER=0;
 namespace Sexy {
+inline int forcedRoll=-1;inline uint32_t randomSeed=123;
+inline int Rand(int n){if(forcedRoll>=0)return forcedRoll%n;randomSeed=randomSeed*1664525u+1013904223u;return (randomSeed>>1)%n;}
 struct Color{int mRed,mGreen,mBlue,mAlpha;Color(int r=0,int g=0,int b=0,int a=255):mRed(r),mGreen(g),mBlue(b),mAlpha(a){}};
 struct SexyTransform2D{float m00=1,m01=0,m02=0,m10=0,m11=1,m12=0;void LoadIdentity(){*this={};}};
 struct Rect{int mX,mY,mWidth,mHeight;Rect(int x=0,int y=0,int w=0,int h=0):mX(x),mY(y),mWidth(w),mHeight(h){}};

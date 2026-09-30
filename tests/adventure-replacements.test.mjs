@@ -27,7 +27,8 @@ int main(){using namespace MemeAdventure;
  for(const auto& d:MemeCharacters::Definitions){assert(Replacement(d.base,-1)->id==d.id);assert(Replacement(48,d.base)->id==d.id);assert(Translate(d.key,"old")==d.name);assert(Translate(std::string(d.key)+"_TOOLTIP","old")==d.hint);assert(Translate(std::string(d.key)+"_DESCRIPTION","old")==d.description);}
  assert(!Replacement(48,-1)&&!Replacement(2,-1)&&!Replacement(503,-1));
  assert(Translate("ADVICE_QA","向日葵和双子向日葵") == "已读不回花和双子向日葵");
- assert(Translate("SEED_CHOOSER_QA","豌豆射手、小喷菇、坚果墙") == "红温豌豆、显眼包蘑菇、顶顶坚果");
+ assert(Translate("SEED_CHOOSER_QA","豌豆射手、小喷菇、坚果墙") == "红温豌豆、显眼包蘑菇、反咬坚果");
+ assert(Translate("FLAG_ZOMBIE","old")=="催更旗手"&&Translate("BUCKETHEAD_ZOMBIE","old")=="倒车铁桶");
  assert(Translate("GOLD_SUNFLOWER_TROPHY","金色向日葵奖杯") == "金色向日葵奖杯");
  for(bool* boundary:{&app.bowling,&app.pots,&app.whack,&gSandboxEnabled}){*boundary=true;assert(!Replacement(0,-1));assert(Translate("PEASHOOTER","original")=="original");*boundary=false;}
  app.adventure=false;assert(!Replacement(0,-1));app.adventure=true;gLawnApp=nullptr;assert(!Replacement(0,-1));

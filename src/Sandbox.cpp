@@ -326,15 +326,15 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
     case 21: fusionEnabled = false; return 1; // Retired layout flag, accepted for compatibility only.
     case 22: { int result=0; FindFusionTarget(board,type,col,row,result); return result; }
     case 23:
-        for(auto* p:board->mPlants)if(!p->mDead&&p->mPlantCol==col&&p->mRow==row&&MemeCharacters::Is(p))return MemeCharacters::Activate(p,type)?1:0;
+        for(auto* p:board->mPlants)if(!p->mDead&&p->mPlantCol==col&&p->mRow==row&&MemeCharacters::Activate(p,type))return 1;
         return 0;
     default: return -2;
     }
 }
 
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_zombie_data(int index,int field) {
-    auto* board=ActiveBoard();if(!board||index<0||field<0||field>8)return -1;
-    for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard()){if(index--==0)return field==0?int(z->mZombieType):field==1?z->mRow:field==2?int(z->mPosX):field==3?int(z->mPosY):field==4?z->mBodyHealth:field==5?z->mHelmHealth:field==6?int(z->mZombiePhase):field==7?z->mShieldHealth:z->mPhaseCounter;}
+    auto* board=ActiveBoard();if(!board||index<0||field<0||field>9)return -1;
+    for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard()){if(index--==0)return field==0?int(z->mZombieType):field==1?z->mRow:field==2?int(z->mPosX):field==3?int(z->mPosY):field==4?z->mBodyHealth:field==5?z->mHelmHealth:field==6?int(z->mZombiePhase):field==7?z->mShieldHealth:field==9?int(SandboxZombies::Speed(z)*100):z->mPhaseCounter;}
     return -1;
 }
 

@@ -10,7 +10,8 @@ constexpr const Definition* Find(int id){return nullptr;}
 constexpr int Base(int id){auto* d=Find(id);return d?d->base:id;}
 void Reset();void Forget(Zombie* zombie);void Assign(Zombie* zombie,int id);
 void Tick(Board* board);void DrawPortrait(Sexy::Graphics* g,int x,int y,int w,int h,int id);
-float Speed(const Zombie* zombie);int Damage(const Zombie* zombie,int damage);
+float Speed(Zombie* zombie);int Damage(Zombie* zombie,int damage);
+bool IsRetreating(Zombie* zombie);
 bool ElectricHit(Zombie* zombie);void CombatDeath(Zombie* zombie);
 void DrawEffects(Sexy::Graphics* g,Board* board,int row);
 bool HasShot(const Projectile* shot);

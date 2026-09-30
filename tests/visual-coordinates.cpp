@@ -31,9 +31,12 @@ int main(){
   SandboxPlants::Reset();Board w;auto* p=w.plant(1,2);p->mSeedType=static_cast<SeedType>(3);
   p->mPlantMaxHealth=4000;p->mPlantHealth=stage==0?4000:stage==1?2000:800;SandboxPlants::Assign(p,501);
   p->mRecentlyEatenCountdown=50;auto* z=w.AddZombieInRow(ZOMBIE_NORMAL,2,-1);z->mPosX=p->mX-30;z->mIsEating=true;
-  Reanimation body;Track tracks[]={{"anim_face"}};TrackInstance instances[1];body.def.mTracks={1,tracks};body.mTrackInstances=instances;
+  Reanimation body;body.track="anim_face";body.matrix.m02=120;body.matrix.m12=220;Track tracks[]={{"anim_face"}};TrackInstance instances[1];body.def.mTracks={1,tracks};body.mTrackInstances=instances;
   auto* original=SandboxArt::NativeImage(stage==0?"Wallnut_body.png":stage==1?"Wallnut_cracked1.png":"Wallnut_cracked2.png");instances[0].mImageOverride=original;app.reanims[80]=&body;p->mBodyReanimID=80;
-  Sexy::Graphics g(nullptr);for(int tick=0;tick<60;++tick){SandboxPlants::Tick(&w);assert(!SandboxPlants::DrawBody(&g,p,0,0));assert(instances[0].mImageOverride==original);}
+  Sexy::Graphics g(nullptr);for(int tick=0;tick<60;++tick){SandboxPlants::Tick(&w);testBlits.clear();const bool angry=MemeCharacters::Data(p,0)==1;
+   assert(SandboxPlants::DrawBody(&g,p,0,0)==angry);assert(instances[0].mImageOverride==original);
+   assert(testBlits.size()==(angry?2:0));if(angry){near(testBlits[0].matrix.m02,114);near(testBlits[0].matrix.m12,199);near(testBlits[1].matrix.m02,143);near(testBlits[1].matrix.m12,196);}
+  }
   app.reanims.clear();
  }
  SandboxPlants::Reset();
@@ -103,7 +106,10 @@ int main(){
   assert(SandboxPlants::RestorePower(rage,{500,300,1,0,0,0,0,0,50,2}));
   assert(SandboxPlants::DrawBody(&g,rage,0,0)&&instances[0].mImageOverride==native);
   assert(SandboxPlants::RestorePower(rage,{500,300,0,0,0,0,0,0,0,2}));
-  assert(!SandboxPlants::DrawBody(&g,rage,0,0)&&instances[0].mImageOverride==native);app.reanims.erase(80);
+  assert(!SandboxPlants::DrawBody(&g,rage,0,0)&&instances[0].mImageOverride==native);
+  for(int heat:{20,60,100,140,180}){assert(SandboxPlants::RestorePower(rage,{500,300,0,heat,0,0,0,0,0,2}));drawnOverrides.clear();
+   assert(SandboxPlants::DrawBody(&g,rage,0,0));assert(drawnOverrides[0]==SandboxArt::WarmNative("PeaShooter_Head.png",heat*24/200));assert(instances[0].mImageOverride==native);
+  }app.reanims.erase(80);
  }
  for(int id=120;id<144;++id){auto* p=board.plant(1,1);p->mSeedType=static_cast<SeedType>(SandboxPlants::Base(id));SandboxPlants::Assign(p,id);
   assert(SandboxPlants::KeepsNativeBlink(p));float x=0,y=0,sx=1,sy=1;SandboxPlants::AdjustScale(p,x,y,sx,sy);near(x+40*sx,40);near(y+65*sy,65);

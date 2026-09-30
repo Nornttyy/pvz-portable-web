@@ -152,11 +152,13 @@ export const RETIRED_PLANTS = [
   [443,47,"摆烂玉米加农炮","慢速装填 · 扩大炮击范围"],
 ].map(([id,base,name,note])=>({id,base,name,note}));
 export const ORIGINAL_PLANTS = [
-  [500,0,'红温豌豆','满100可点击 · 满300自动散射'],
-  [501,3,'顶顶坚果','被啃后向前撞'],
+  [500,0,'红温豌豆','满100可点击 · 满200自动乱射'],
+  [501,3,'反咬坚果','被啃后反击 · 冷却3秒'],
   [502,8,'显眼包蘑菇','近距离射击 · 吸引邻路僵尸'],
   [503,1,'已读不回花','平时产阳光 · 装死后反击'],
   [504,52,'豌豆吐射手','射手飞出去，豌豆留原地'],
+  [505,5,'退退退寒冰','冰弹命中后打退敌人'],
+  [506,7,'复读双发','邻居开火 · 跟着补射'],
 ].map(([id,base,name,note])=>({id,base,name,note}));
 export const nativeBase = id => ORIGINAL_PLANTS.find(p=>p.id===id)?.base ?? RETIRED_PLANTS.find(p=>p.id===id)?.base ?? id;
 export const PLANTS = [...plantNames.map((name,id) => ({id,name,note:notes[id] ?? '免费 · 无冷却'})),...ORIGINAL_PLANTS];
@@ -164,6 +166,7 @@ const validPlant = id => (id>=0&&id<48)||ORIGINAL_PLANTS.some(p=>p.id===id);
 export const ORIGINAL_ZOMBIES = [];
 export const ZOMBIES = [[0,'普通僵尸'],[1,'旗帜僵尸'],[2,'路障僵尸'],[3,'撑杆僵尸'],[4,'铁桶僵尸'],[5,'读手机僵尸'],[6,'铁门僵尸'],[7,'橄榄球僵尸'],[8,'舞王僵尸'],[10,'鸭子救生圈'],[11,'潜水僵尸'],[12,'冰车僵尸'],[14,'海豚骑士'],[15,'玩偶匣僵尸'],[16,'气球僵尸'],[17,'矿工僵尸'],[18,'跳跳僵尸'],[19,'雪人僵尸'],[21,'梯子僵尸'],[22,'投石车僵尸'],[23,'巨人僵尸'],[24,'小鬼僵尸'],[32,'红眼巨人']].map(([id,name])=>({id,name,note:[10,11,14].includes(id)?'仅限水路':'手动放置'}));
 ZOMBIES.push(...ORIGINAL_ZOMBIES);
+for(const z of ZOMBIES){if(z.id===1){z.name='催更旗手';z.note='附近同伴加速50%';}else if(z.id===4){z.name='倒车铁桶';z.note='挨轻击倒退 · 铁桶破损后失效';}}
 export function plantsFor(category) { return category === 'original' ? ORIGINAL_PLANTS : category === 'all' ? PLANTS : (groups[category] ?? groups.common).map(id=>PLANTS[id]); }
 export function boardCell(x,y,pool=false) {
   if (!Number.isFinite(x) || !Number.isFinite(y)) return null;

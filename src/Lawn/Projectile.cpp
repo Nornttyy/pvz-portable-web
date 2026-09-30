@@ -228,6 +228,8 @@ bool Projectile::PeaAboutToHitTorchwood()
 
 Zombie* Projectile::FindCollisionTarget()
 {
+	if (!MemeCharacters::CanHit(this)) return nullptr;
+	const bool freeAim = MemeShooterRules::UsesFreeAim(MemeCharacters::ShotStyle(this));
 	if (PeaAboutToHitTorchwood())  // a pea about to hit a torchwood skips zombie collision ("torchwood clip" trick)
 		return nullptr;
 
@@ -239,7 +241,7 @@ Zombie* Projectile::FindCollisionTarget()
 	{
 		if (aZombie->mDead)
 			continue;
-		if ((aZombie->mZombieType == ZombieType::ZOMBIE_BOSS || aZombie->mRow == mRow || MemeCharacters::ShotStyle(this)) && aZombie->EffectedByDamage(static_cast<unsigned int>(mDamageRangeFlags)))
+		if ((aZombie->mZombieType == ZombieType::ZOMBIE_BOSS || aZombie->mRow == mRow || freeAim) && aZombie->EffectedByDamage(static_cast<unsigned int>(mDamageRangeFlags)))
 		{
 			if (aZombie->mZombiePhase == ZombiePhase::PHASE_SNORKEL_WALKING_IN_POOL && mPosZ <= 45.0f)
 			{
@@ -252,7 +254,7 @@ Zombie* Projectile::FindCollisionTarget()
 			}
 
 			Rect aZombieRect = aZombie->GetZombieRect();
-			if (MemeCharacters::ShotStyle(this) && !MemeShooterRules::OverlapsY(aProjectileRect.mY, aProjectileRect.mHeight, aZombieRect.mY, aZombieRect.mHeight))
+			if (freeAim && !MemeShooterRules::OverlapsY(aProjectileRect.mY, aProjectileRect.mHeight, aZombieRect.mY, aZombieRect.mHeight))
 				continue;
 			if (GetRectOverlap(aProjectileRect, aZombieRect) >= 0)
 			{
