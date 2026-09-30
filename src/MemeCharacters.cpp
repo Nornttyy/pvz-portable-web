@@ -24,7 +24,10 @@ namespace {
 struct State {int id=0,health=0,phase=0,heat=0,timer=0,delay=50,age=0,pulse=0,remaining=0,direction=1;};
 std::map<const Plant*,State> states;
 std::map<const Projectile*,int> shotStyles; // 1..8 wobble, 9 scatter; native art/motion/save.
-void Burst(State& s){s.phase=1;s.heat=0;s.remaining=MemeShooterRules::BurstCount;s.delay=0;s.timer=0;s.pulse=30;}
+void Burst(State& s){
+ s.phase=1;s.heat=0;s.remaining=MemeShooterRules::BurstCount;s.delay=0;s.timer=0;s.pulse=30;
+ gLawnApp->PlayRageRelease(); // Once per release, never once per pea or save restore.
+}
 // Native zombie IDs are stable through DataArray recycling; never retain pointers.
 std::map<unsigned,int> laneCooldown;
 bool Enemy(Zombie* z){return !z->mDead&&z->IsOnBoard()&&!z->mMindControlled&&!z->IsDeadOrDying()&&z->mHasHead;}

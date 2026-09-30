@@ -339,6 +339,17 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_zombie_data(int index,int field)
 }
 
 // Read-only live projectile diagnostics, also available in adventure QA.
+extern "C" EMSCRIPTEN_KEEPALIVE int pvz_rage_audio_data(int field) {
+    if(!gLawnApp||!gLawnApp->mSoundSystem)return -1;
+    auto* audio=gLawnApp->mSoundSystem.get();
+    if(field==0)return audio->IsFoleyPlaying(FOLEY_RAGE_RELEASE)?1:0;
+    int count=0,volume=0;
+    for(const auto& voice:audio->mFoleyTypeData[FOLEY_RAGE_RELEASE].mFoleyInstances)if(voice.mInstance&&voice.mRefCount&&!voice.mPaused&&voice.mInstance->IsPlaying()){
+        ++count;volume=int(voice.mInstance->GetVolume()*1000);
+    }
+    return field==1?count:field==2?volume:-1;
+}
+
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_projectile_data(int index,int field) {
     auto* board=gLawnApp?gLawnApp->mBoard:nullptr;if(!board||index<0||field<0||field>7)return -1;
     for(auto* shot:board->mProjectiles)if(!shot->mDead&&index--==0){

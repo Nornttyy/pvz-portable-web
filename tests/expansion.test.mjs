@@ -20,6 +20,14 @@ test('power token is not a plant or a save entry; only results round-trip',()=>{
  for(const type of [500,501,502,503,504])assert.equal(validateLayout({schema:1,map:0,plants:[{type,col:0,row:0}]}).plants[0].type,type);
  assert.throws(()=>validateLayout({schema:1,map:0,plants:[{type:180,col:0,row:0}]}));
 });
+test('release vocal is a dedicated non-looping native SFX, with overlap and volume guards',async()=>{
+ const app=(await read('src/LawnApp.cpp')).toString(),foley=(await read('src/PvzpLib/PvzpFoley.cpp')).toString();
+ const start=app.indexOf('void LawnApp::PlayRageRelease()'),body=app.slice(start,app.indexOf('std::string LawnApp::GetStageString',start));
+ assert.match(body,/mMuteSoundsForCutscene/);assert.match(body,/IsFoleyPlaying\(FOLEY_RAGE_RELEASE\)/);assert.match(body,/PlayFoleyPitch\(FOLEY_RAGE_RELEASE, 7\.0f\)/);
+ assert.match(foley,/FOLEY_RAGE_RELEASE,.*SOUND_CRAZYDAVECRAZY.*mFoleyFlags = 0U/);
+ assert.match(foley,/if \(theFoleyType == FOLEY_RAGE_RELEASE\)\s*aSoundInstance->SetVolume\(0\.60\)/);
+ const mixer=(await read('src/SexyAppFramework/sound/SDLSoundInstance.cpp')).toString();assert.match(mixer,/mBaseVolume \* mVolume \* mSoundManagerP->mMasterVolume/);
+});
 test('persistent native sidebar fits both rosters and keeps the lawn in original units',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'pvz-sidebar-')),binary=join(dir,'sidebar');
  await run(process.env.CXX||'c++',['-std=c++20','-Isrc','tests/sidebar-layout.cpp','-o',binary],{cwd:root});

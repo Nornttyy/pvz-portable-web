@@ -131,7 +131,8 @@ constinit const FoleyParams gLawnFoleyParamArray[FoleyType::NUM_FOLEY] = {
 	{ .mFoleyType = FoleyType::FOLEY_DANCER, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_DANCER}, .mFoleyFlags = 6U },
 	{ .mFoleyType = FoleyType::FOLEY_FINAL_FANFARE, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_FINALFANFARE}, .mFoleyFlags = 0U },
 	{ .mFoleyType = FoleyType::FOLEY_CRAZY_DAVE_SCREAM, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVESCREAM}, .mFoleyFlags = 0U },
-	{ .mFoleyType = FoleyType::FOLEY_CRAZY_DAVE_SCREAM_2, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVESCREAM2}, .mFoleyFlags = 0U }
+	{ .mFoleyType = FoleyType::FOLEY_CRAZY_DAVE_SCREAM_2, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVESCREAM2}, .mFoleyFlags = 0U },
+	{ .mFoleyType = FoleyType::FOLEY_RAGE_RELEASE, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVECRAZY}, .mFoleyFlags = 0U }
 };
 
 FoleyInstance::FoleyInstance()
@@ -292,6 +293,8 @@ void PvzpFoley::PlayFoleyPitch(FoleyType theFoleyType, float thePitch)
 	aFoleyData->mLastVariationPlayed = aVariation;
 	if (thePitch != 0.0f)
 		aSoundInstance->AdjustPitch(thePitch);
+	if (theFoleyType == FOLEY_RAGE_RELEASE)
+		aSoundInstance->SetVolume(0.60); // Still multiplied by the native SFX volume.
 	if (TestBit(aFoleyParams->mFoleyFlags, FoleyFlags::FOLEYFLAGS_USES_MUSIC_VOLUME))
 		ApplyMusicVolume(aFoleyInstance);
 	bool aIsLooping = TestBit(aFoleyParams->mFoleyFlags, FoleyFlags::FOLEYFLAGS_LOOP);

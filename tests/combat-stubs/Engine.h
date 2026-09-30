@@ -55,7 +55,7 @@ struct Reanimation{
  void GetTrackMatrix(int,Sexy::SexyTransform2D& out){out=matrix;}void GetCurrentTransform(int,ReanimatorTransform* out){*out=pose;}
 };
 struct ReanimatorCache{std::unique_ptr<Sexy::MemoryImage> MakeBlankMemoryImage(int,int){return std::make_unique<Sexy::MemoryImage>();}};
-struct LawnApp{bool adventure=true;bool IsAdventureMode(){return adventure;}ReanimatorCache cache;ReanimatorCache* mReanimatorCache=&cache;std::map<int,Reanimation*> reanims;Reanimation* ReanimationTryToGet(int id){return reanims.contains(id)?reanims.at(id):nullptr;}Sexy::GLImage* GetImage(std::string file){auto* im=new Sexy::GLImage;im->path=file;return im;}void PlayFoley(int){}};
+struct LawnApp{int rageReleaseRequests=0;void PlayRageRelease(){++rageReleaseRequests;}bool adventure=true;bool IsAdventureMode(){return adventure;}ReanimatorCache cache;ReanimatorCache* mReanimatorCache=&cache;std::map<int,Reanimation*> reanims;Reanimation* ReanimationTryToGet(int id){return reanims.contains(id)?reanims.at(id):nullptr;}Sexy::GLImage* GetImage(std::string file){auto* im=new Sexy::GLImage;im->path=file;return im;}void PlayFoley(int){}};
 extern LawnApp* gLawnApp;
 class Board;
 class Zombie{

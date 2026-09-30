@@ -1976,6 +1976,15 @@ void LawnApp::PlayFoleyPitch(FoleyType theFoleyType, float thePitch)
 	}
 }
 
+void LawnApp::PlayRageRelease()
+{
+	// A short, raised-pitch nonsense vocal over the native pea-fire rhythm.
+	// A dedicated channel avoids affecting Dave's dialogue and prevents a lawn
+	// full of simultaneous releases from stacking the same loud voice.
+	if (mMuteSoundsForCutscene || !mSoundSystem || mSoundSystem->IsFoleyPlaying(FOLEY_RAGE_RELEASE)) return;
+	mSoundSystem->PlayFoleyPitch(FOLEY_RAGE_RELEASE, 7.0f);
+}
+
 std::string LawnApp::GetStageString(int theLevel)
 {
 	int aArea = std::clamp((theLevel - 1) / LEVELS_PER_AREA + 1, 1, ADVENTURE_AREAS + 1);

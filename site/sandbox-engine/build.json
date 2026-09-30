@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Rage peashooter: wavy normal peas, +20 rage, manual 100/auto 300, 50-shot scatter without self-damage; sun hover and sunflower recovery",
+  "mode": "Rage peashooter: one-shot comic pitched release vocal, wavy peas and 50-shot scatter without self-damage; sun hover and sunflower recovery",
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 277046,
-      "sha256": "0779a771451d6892d79e3c378ec232c2edafbafb1c56728be6e93b68d869cca9"
+      "size": 277137,
+      "sha256": "b2eff0558935a6039c727d941393676afe86940f8cbfbc99c8ff5c263a4a8210"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7448601,
-      "sha256": "3933d13bce11a7920ced15339a3ab248c42dfb63be3ebece5c025fb01fb24544"
+      "size": 7451434,
+      "sha256": "26552f4807b16ee591f1dad6317502214ffb4d7c05f900495984866edb4a72db"
     }
   ]
 }

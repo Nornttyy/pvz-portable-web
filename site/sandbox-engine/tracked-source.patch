@@ -1379,7 +1379,7 @@ index c140a3d..554c6ec 100644
  	StopZombieSound();
  }
 diff --git a/src/LawnApp.cpp b/src/LawnApp.cpp
-index d360a2f..e11e16b 100644
+index d360a2f..1439193 100644
 --- a/src/LawnApp.cpp
 +++ b/src/LawnApp.cpp
 @@ -24,6 +24,10 @@
@@ -1430,7 +1430,23 @@ index d360a2f..e11e16b 100644
  	if (mBoard == nullptr || !mBoard->mLevelComplete)
  		return;
  
-@@ -2267,6 +2276,8 @@ int LawnApp::GetSeedsAvailable()
+@@ -1967,6 +1976,15 @@ void LawnApp::PlayFoleyPitch(FoleyType theFoleyType, float thePitch)
+ 	}
+ }
+ 
++void LawnApp::PlayRageRelease()
++{
++	// A short, raised-pitch nonsense vocal over the native pea-fire rhythm.
++	// A dedicated channel avoids affecting Dave's dialogue and prevents a lawn
++	// full of simultaneous releases from stacking the same loud voice.
++	if (mMuteSoundsForCutscene || !mSoundSystem || mSoundSystem->IsFoleyPlaying(FOLEY_RAGE_RELEASE)) return;
++	mSoundSystem->PlayFoleyPitch(FOLEY_RAGE_RELEASE, 7.0f);
++}
++
+ std::string LawnApp::GetStageString(int theLevel)
+ {
+ 	int aArea = std::clamp((theLevel - 1) / LEVELS_PER_AREA + 1, 1, ADVENTURE_AREAS + 1);
+@@ -2267,6 +2285,8 @@ int LawnApp::GetSeedsAvailable()
  
  bool LawnApp::HasSeedType(SeedType theSeedType)
  {
@@ -1438,6 +1454,53 @@ index d360a2f..e11e16b 100644
 +	if (theSeedType == SEED_LEFTPEATER) return MemeAdventure::RosterEnabled() && mPlayerInfo && (HasFinishedAdventure() || mPlayerInfo->GetLevel() >= 8);
  	if (IsTrialStageLocked() && theSeedType >= SeedType::SEED_JALAPENO)
  		return false;
+ 
+diff --git a/src/LawnApp.h b/src/LawnApp.h
+index 80ba516..8252ae4 100644
+--- a/src/LawnApp.h
++++ b/src/LawnApp.h
+@@ -231,6 +231,7 @@ public:
+ 	void							ToggleFastMo();
+ 	void							PlayFoley(FoleyType theFoleyType);
+ 	void							PlayFoleyPitch(FoleyType theFoleyType, float thePitch);
++	void							PlayRageRelease();
+ 	void							PlaySample(intptr_t theSoundNum) override;
+ 	void							FastLoad(GameMode theGameMode);
+ 	static std::string				GetStageString(int theLevel);
+diff --git a/src/PvzpLib/PvzpFoley.cpp b/src/PvzpLib/PvzpFoley.cpp
+index 89f0a43..d190283 100644
+--- a/src/PvzpLib/PvzpFoley.cpp
++++ b/src/PvzpLib/PvzpFoley.cpp
+@@ -131,7 +131,8 @@ constinit const FoleyParams gLawnFoleyParamArray[FoleyType::NUM_FOLEY] = {
+ 	{ .mFoleyType = FoleyType::FOLEY_DANCER, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_DANCER}, .mFoleyFlags = 6U },
+ 	{ .mFoleyType = FoleyType::FOLEY_FINAL_FANFARE, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_FINALFANFARE}, .mFoleyFlags = 0U },
+ 	{ .mFoleyType = FoleyType::FOLEY_CRAZY_DAVE_SCREAM, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVESCREAM}, .mFoleyFlags = 0U },
+-	{ .mFoleyType = FoleyType::FOLEY_CRAZY_DAVE_SCREAM_2, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVESCREAM2}, .mFoleyFlags = 0U }
++	{ .mFoleyType = FoleyType::FOLEY_CRAZY_DAVE_SCREAM_2, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVESCREAM2}, .mFoleyFlags = 0U },
++	{ .mFoleyType = FoleyType::FOLEY_RAGE_RELEASE, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVECRAZY}, .mFoleyFlags = 0U }
+ };
+ 
+ FoleyInstance::FoleyInstance()
+@@ -292,6 +293,8 @@ void PvzpFoley::PlayFoleyPitch(FoleyType theFoleyType, float thePitch)
+ 	aFoleyData->mLastVariationPlayed = aVariation;
+ 	if (thePitch != 0.0f)
+ 		aSoundInstance->AdjustPitch(thePitch);
++	if (theFoleyType == FOLEY_RAGE_RELEASE)
++		aSoundInstance->SetVolume(0.60); // Still multiplied by the native SFX volume.
+ 	if (TestBit(aFoleyParams->mFoleyFlags, FoleyFlags::FOLEYFLAGS_USES_MUSIC_VOLUME))
+ 		ApplyMusicVolume(aFoleyInstance);
+ 	bool aIsLooping = TestBit(aFoleyParams->mFoleyFlags, FoleyFlags::FOLEYFLAGS_LOOP);
+diff --git a/src/PvzpLib/PvzpFoley.h b/src/PvzpLib/PvzpFoley.h
+index 9fd6d07..3ef1d0e 100644
+--- a/src/PvzpLib/PvzpFoley.h
++++ b/src/PvzpLib/PvzpFoley.h
+@@ -147,6 +147,7 @@ enum FoleyType : int32_t
+ 	FOLEY_FINAL_FANFARE,
+ 	FOLEY_CRAZY_DAVE_SCREAM,
+ 	FOLEY_CRAZY_DAVE_SCREAM_2,
++	FOLEY_RAGE_RELEASE,
+ 	NUM_FOLEY
+ };
  
 diff --git a/src/PvzpLib/PvzpStringFile.cpp b/src/PvzpLib/PvzpStringFile.cpp
 index 3cc24b4..9155aaf 100644

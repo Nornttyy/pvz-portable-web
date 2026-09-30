@@ -231,6 +231,7 @@ public:
 	void							ToggleFastMo();
 	void							PlayFoley(FoleyType theFoleyType);
 	void							PlayFoleyPitch(FoleyType theFoleyType, float thePitch);
+	void							PlayRageRelease();
 	void							PlaySample(intptr_t theSoundNum) override;
 	void							FastLoad(GameMode theGameMode);
 	static std::string				GetStageString(int theLevel);

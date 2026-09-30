@@ -30,19 +30,24 @@ struct World:Board {
 int main(){
  using namespace SandboxMemeRules;
  // Playable characters have independent, observable mechanics.
- {World w;auto* p=w.add(500);auto* z=w.enemy();p->mPlantHealth=123;w.step(500);
+ {World w;auto* p=w.add(500);auto* z=w.enemy();const int sounds=app.rageReleaseRequests;p->mPlantHealth=123;w.step(500);
   assert(MemeCharacters::Data(p,1)==80&&w.mProjectiles.mSize==4&&!MemeCharacters::Activate(p));
+  assert(app.rageReleaseRequests==sounds);
   w.step(150);assert(MemeCharacters::Data(p,1)==100&&w.mProjectiles.mSize==5);const float zx=z->mPosX;
   z->mDead=true;w.step(200);assert(MemeCharacters::Data(p,1)==100); // no passive rage loss
   assert(MemeCharacters::Activate(p)&&!MemeCharacters::Activate(p));assert(MemeCharacters::Data(p,1)==0&&z->mPosX==zx);
+  assert(app.rageReleaseRequests==sounds+1);
   w.step(57);const auto save=SandboxPlants::SavePower(p);assert(save[8]==35);w.mPaused=true;w.step(300);assert(SandboxPlants::SavePower(p)==save);w.mPaused=false;
   SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,save));w.step(140);
   assert(w.mProjectiles.mSize==55&&MemeCharacters::Data(p,0)==0&&MemeCharacters::Data(p,1)==0&&p->mPlantHealth==123);
   int spread=0;bool up=false,down=false;for(auto* shot:w.mProjectiles)if(MemeCharacters::ShotStyle(shot)==9){++spread;up|=shot->mVelY<0;down|=shot->mVelY>0;assert(SandboxPlants::ShotDamage(shot,20)==20);}
   assert(spread==50&&up&&down);w.step(200);assert(w.mProjectiles.mSize==55);
+  assert(app.rageReleaseRequests==sounds+1); // pause/load/remaining 50 shots did not retrigger
  }
- {World w;auto* p=w.add(500);w.enemy();w.step(2150);assert(MemeCharacters::Data(p,0)==1&&w.mProjectiles.mSize==15);
+ {World w;auto* p=w.add(500);const int sounds=app.rageReleaseRequests;w.enemy();w.step(2150);assert(MemeCharacters::Data(p,0)==1&&w.mProjectiles.mSize==15);
+  assert(app.rageReleaseRequests==sounds+1);
   w.step(197);assert(w.mProjectiles.mSize==65&&p->mPlantHealth==300&&MemeCharacters::Data(p,0)==0);
+  assert(app.rageReleaseRequests==sounds+1);
  }
  {World w;auto* p=w.add(500);w.enemy();w.step(650);assert(MemeCharacters::Activate(p));w.mProjectiles.mSize=w.mProjectiles.mMaxSize-8;
   const auto state=SandboxPlants::SavePower(p);w.step(100);assert(SandboxPlants::SavePower(p)[8]==50);
