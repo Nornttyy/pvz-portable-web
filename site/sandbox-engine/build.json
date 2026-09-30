@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Nested potato: three native explosions with smaller rearming bodies; feigning cone: fall and stand on armor break; adventure and sandbox native-slot content; automatic 200-rage/80 peas unchanged",
+  "mode": "Six new plant mechanics and four zombie replacements in adventure and sandbox; normal rage-shooter misses repeatedly float up/down with randomized turning amplitudes and saved seeds; automatic 200-rage/80-pea burst, 10% normal eligibility, no manual release, no knockback",
   "files": [
     {
       "name": "pvz-portable.js",
       "size": 277137,
-      "sha256": "0db5fcc08af46a11ac56e774be2b5cb4ede4e5007ab49a2a66c79f39d269ce5b"
+      "sha256": "bb2ec0e441e80f8e56095c6107d81c305b392f8dfa0cf58657cc36ad075c81b5"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7459737,
-      "sha256": "ce5c7f6a11276e6158f3db0a0e069d8198a9f44b7210866591154a91b3ba84f0"
+      "size": 7464983,
+      "sha256": "c2c0f3f1f77052cd701e20a8b374befb9b88ae49c3998e57e302ea3e6e0f29bf"
     }
   ]
 }

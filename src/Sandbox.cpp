@@ -336,8 +336,8 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
 }
 
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_zombie_data(int index,int field) {
-    auto* board=ActiveBoard();if(!board||index<0||field<0||field>9)return -1;
-    for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard()){if(index--==0)return field==0?int(z->mZombieType):field==1?z->mRow:field==2?int(z->mPosX):field==3?int(z->mPosY):field==4?z->mBodyHealth:field==5?z->mHelmHealth:field==6?int(z->mZombiePhase):field==7?z->mShieldHealth:field==9?int(SandboxZombies::Speed(z)*100):z->mPhaseCounter;}
+    auto* board=ActiveBoard();if(!board||index<0||field<0||field>12)return -1;
+    for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard()){if(index--==0)return field==0?int(z->mZombieType):field==1?z->mRow:field==2?int(z->mPosX):field==3?int(z->mPosY):field==4?z->mBodyHealth:field==5?z->mHelmHealth:field==6?int(z->mZombiePhase):field==7?z->mShieldHealth:field==9?int(SandboxZombies::Speed(z)*100):field==10?z->mZombieAge:field==11?int(z->mAltitude):field==12?int(SandboxZombies::IsResting(z)):z->mPhaseCounter;}
     return -1;
 }
 
@@ -354,9 +354,9 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_rage_audio_data(int field) {
 }
 
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_projectile_data(int index,int field) {
-    auto* board=gLawnApp?gLawnApp->mBoard:nullptr;if(!board||index<0||field<0||field>7)return -1;
+    auto* board=gLawnApp?gLawnApp->mBoard:nullptr;if(!board||index<0||field<0||field>8)return -1;
     for(auto* shot:board->mProjectiles)if(!shot->mDead&&index--==0){
-        return field==0?MemeCharacters::ShotStyle(shot):field==1?int(shot->mPosX):field==2?int(shot->mPosY+shot->mPosZ):field==3?int(shot->mVelX*1000):field==4?int(shot->mVelY*1000):field==5?shot->mRow:field==6?shot->mProjectileAge:SandboxPlants::SaveShot(shot);
+        return field==0?MemeCharacters::ShotStyle(shot):field==1?int(shot->mPosX):field==2?int(shot->mPosY+shot->mPosZ):field==3?int(shot->mVelX*1000):field==4?int(shot->mVelY*1000):field==5?shot->mRow:field==6?shot->mProjectileAge:field==8?int(shot->mProjectileType):SandboxPlants::SaveShot(shot);
     }return -1;
 }
 

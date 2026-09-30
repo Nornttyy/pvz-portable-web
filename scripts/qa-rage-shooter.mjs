@@ -20,10 +20,10 @@ try{
   const profile=new Uint8Array(4096),p=new DataView(profile.buffer);p.setUint32(0,12,true);p.setUint32(4,2,true);FS.writeFile('/saves/userdata/user1.dat',profile);await new Promise((r,j)=>FS.syncfs(false,e=>e?j(e):r()));});
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);await click(260,348);
  await page.waitForFunction(()=>Module.canvas.width===1024,{},{timeout:15000});await api(7);await api(1,500,1,2);await api(2,4,8,2);await api(4,0);
- await page.waitForFunction(()=>{for(let i=0;i<128;++i){const s=Module._pvz_projectile_data(i,0);if(s<0)break;if(s===20)return true;}return false;},{},{timeout:6500});await api(4,1);
- const firstMiss=(await shots()).find(s=>s[0]===20);let minY=999,maxY=-999;
- for(let i=0;i<40;++i){await api(13);await page.waitForTimeout(20);const s=(await shots()).find(s=>s[0]===20);assert.ok(s);assert.equal(s[3],firstMiss[3]);assert.equal(s[4],firstMiss[4]);minY=Math.min(minY,s[2]);maxY=Math.max(maxY,s[2]);}
- assert.ok(maxY-minY>10);results.fixedRandomAngle=true;await shot('normal-random-angle-pea');
+ await page.waitForFunction(()=>{for(let i=0;i<128;++i){const s=Module._pvz_projectile_data(i,0);if(s<0)break;if(s>=32&&s<=287)return true;}return false;},{},{timeout:6500});await api(4,1);
+ const firstMiss=(await shots()).find(s=>s[0]>=32&&s[0]<=287);let minY=999,maxY=-999,up=false,down=false,turns=0,lastVy=firstMiss[4];const trace=[];
+ for(let i=0;i<130;++i){await api(13);await page.waitForTimeout(20);const s=(await shots()).find(s=>s[0]===firstMiss[0]);assert.ok(s);assert.equal(s[3],3330);up||=s[4]<0;down||=s[4]>0;if(s[4]*lastVy<0)++turns;lastVy=s[4];minY=Math.min(minY,s[2]);maxY=Math.max(maxY,s[2]);trace.push(s);}
+ assert.ok(up&&down&&turns>=2&&maxY-minY>50);results.repeatedUpDown=true;results.turns=turns;await writeFile(join(out,'floating-pea-trace.json'),JSON.stringify(trace));await shot('normal-random-amplitude-wave');
  await api(4,0);await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,5)===100,{},{timeout:15000});await api(4,1);assert.equal(await pd(3),300);
  await shot('gradual-rage-100');
  await api(6);await click(718,61);await page.setViewportSize({width:844,height:390});await page.waitForTimeout(250);await shot('phone-automatic-rage-bar');

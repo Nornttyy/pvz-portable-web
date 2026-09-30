@@ -70,5 +70,10 @@ void SandboxRepairFonts(){
         Supplement(font,U'梗',"GENG",{{U'样',0,0,0.46f,1},{U'硬',0.46f,0,0.54f,1}});
         Supplement(font,U'锅',"GUO",{{U'钢',0,0,0.46f,1},{U'蜗',0.46f,0,0.54f,1}});
         Supplement(font,U'甩',"SHUAI",{{U'用',0,0,1,0.55f},{U'用',0,0.55f,0.46f,0.45f},{U'电',0.46f,0.55f,0.54f,0.45f}});
+        Supplement(font,U'蹭',"CENG",{{U'蹦',0,0,0.46f,1},{U'增',0.46f,0,0.54f,1}});
+        Supplement(font,U'饭',"FAN",{{U'馆',0,0,0.46f,1},{U'板',0.46f,0,0.54f,1}});
+        Supplement(font,U'杨',"YANG",{{U'样',0,0,0.46f,1},{U'场',0.46f,0,0.54f,1}});
+        Supplement(font,U'摸',"MO",{{U'提',0,0,0.46f,1},{U'模',0.46f,0,0.54f,1}});
+        Supplement(font,U'迪',"DI",{{U'边',0,0,0.46f,1},{U'边',0.46f,0.81f,0.54f,0.19f},{U'油',0.46f,0,0.54f,0.81f}});
     }
 }

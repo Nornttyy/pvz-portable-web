@@ -5,7 +5,9 @@
 #include "Lawn/Zombie.h"
 #include "Lawn/Board.h"
 #include "PvzpLib/Reanimator.h"
+#include <algorithm>
 #include <cmath>
+#include <vector>
 extern bool gSandboxEnabled;
 namespace SandboxZombies {
 namespace {
@@ -16,14 +18,30 @@ bool IsRetreating(Zombie*){return false;}
 // The normal cone's native phase counter is serialized with the zombie. Only
 // a real armor break starts this one-time gag; hits never push or restart it.
 bool IsFeigning(Zombie* z){return Enabled()&&Walker(z)&&int(z->mZombieType)==2&&z->mHelmHealth==0&&z->mPhaseCounter>0&&z->mPhaseCounter<=300;}
+bool IsResting(Zombie* z){
+ if(!Enabled()||!Walker(z))return false;
+ const int age=z->mZombieAge%800,type=int(z->mZombieType);
+ return (type==0&&age>=600)||(type==7&&age>=200&&age<350);
+}
 void ArmorBroken(Zombie* z){
  if(!Enabled()||!Walker(z)||int(z->mZombieType)!=2||z->mHelmHealth!=0)return;
  z->mPhaseCounter=300;z->StopEating();
 }
 void AdjustPose(Zombie* z,Reanimation* body){
- if(!body||!IsFeigning(z))return;
- const float t=z->mPhaseCounter>275?(300-z->mPhaseCounter)/25.0f:z->mPhaseCounter<40?z->mPhaseCounter/40.0f:1.0f;
- const float angle=-1.36f*t*t*(3-2*t),c=std::cos(angle),s=std::sin(angle);
+ if(!body||!Enabled())return;
+ float angle=0;
+ if(IsFeigning(z)){
+  const float t=z->mPhaseCounter>275?(300-z->mPhaseCounter)/25.0f:z->mPhaseCounter<40?z->mPhaseCounter/40.0f:1.0f;
+  angle=-1.36f*t*t*(3-2*t);
+ }else if(IsResting(z)){
+  const int start=int(z->mZombieType)==0?600:200,end=int(z->mZombieType)==0?800:350,age=z->mZombieAge%800;
+  const float fade=std::clamp(std::min(age-start,end-age)/20.0f,0.0f,1.0f);
+  angle=(int(z->mZombieType)==0?0.18f:-0.14f)*fade+0.015f*fade*std::sin(age*0.10f);
+ }else if(Walker(z)&&int(z->mZombieType)==7&&z->mZombieAge%800<200&&!z->mIsEating){
+  const int age=z->mZombieAge%800;angle=-0.12f*std::clamp(std::min(age,200-age)/20.0f,0.0f,1.0f);
+ }else if(Walker(z)&&int(z->mZombieType)==6&&z->mPhaseCounter>0&&z->mPhaseCounter<=20)angle=-0.09f*std::sin(z->mPhaseCounter*3.14159265f/20);
+ else return;
+ const float c=std::cos(angle),s=std::sin(angle);
  auto& m=body->mOverlayMatrix;
  // Rotate the complete native rig around its feet, including arm/head parts.
  const float footX=m.m00*45+m.m01*120+m.m02,footY=m.m10*45+m.m11*120+m.m12;
@@ -39,16 +57,41 @@ void RecoverPhone(Zombie* z){
  z->AttachShield();z->PickRandomSpeed();z->StartWalkAnim(15);RefreshDamageArt(z);
 }
 void Reset(){} void Forget(Zombie*){} void Assign(Zombie*,int){}
-void Tick(Board*){} void DrawPortrait(Sexy::Graphics*,int,int,int,int,int){}
+void Tick(Board* b){
+ if(!Enabled()||b->mPaused)return;
+ struct Delivery{float x;int row,wave;};std::vector<Delivery> pending;
+ for(auto* z:b->mZombies){
+  if(IsResting(z))z->StopEating();
+  // Age is a native saved field: a single delivery, not a timer reset on load.
+  if(!z->mDead&&z->IsOnBoard()&&!z->IsDeadOrDying()&&z->mHasHead&&!z->mMindControlled&&int(z->mZombieType)==16&&z->IsFlying()&&z->mZombieAge==600&&z->mPosX>100&&z->mPosX<740&&!(b->StageHasPool()&&(z->mRow==2||z->mRow==3)))pending.push_back({z->mPosX+25,z->mRow,z->mFromWave});
+ }
+ for(const auto& drop:pending)if(b->mZombies.mSize<b->mZombies.mMaxSize-8){
+  if(auto* z=b->AddZombieInRow(ZOMBIE_NORMAL,drop.row,drop.wave)){
+   z->mPosX=drop.x;z->mX=int(drop.x);z->mAltitude=80;z->mZombieHeight=HEIGHT_FALLING;z->UpdateReanim();
+  }
+ }
+}
+void DrawPortrait(Sexy::Graphics*,int,int,int,int,int){}
 float Speed(Zombie* z){
  if(!Enabled()||!Walker(z))return 1.0f;
- if(IsFeigning(z))return 0.0f;
+ if(IsFeigning(z)||IsResting(z))return 0.0f;
  const int type=int(z->mZombieType);
+ if(type==7&&z->mZombieAge%800<200)return 1.8f;
  if(type==0||type==2||type==4||type==6)for(auto* leader:z->mBoard->mZombies)
   if(leader!=z&&int(leader->mZombieType)==1&&Walker(leader)&&std::abs(leader->mRow-z->mRow)<=1&&std::abs(leader->mPosX-z->mPosX)<160)return 1.5f;
  return 1.0f; // Flags do not stack, and vehicles/giants keep their native pace.
 }
-int Damage(Zombie*,int damage){return damage;}
+int Damage(Zombie* z,int damage,unsigned flags){
+ static bool sharing=false;
+ if(sharing||!Enabled()||!Walker(z)||int(z->mZombieType)==6||damage<2||damage>100||flags)return damage;
+ Zombie* guard=nullptr;float nearest=10000;
+ for(auto* other:z->mBoard->mZombies)if(other!=z&&Walker(other)&&int(other->mZombieType)==6&&other->mShieldHealth>0&&std::abs(other->mRow-z->mRow)<=1&&std::abs(other->mPosX-z->mPosX)<100){
+  const float distance=std::abs(other->mPosX-z->mPosX)+100*std::abs(other->mRow-z->mRow);if(distance<nearest){guard=other;nearest=distance;}
+ }
+ if(!guard)return damage;
+ const int share=std::min(guard->mShieldHealth,damage/2);sharing=true;guard->TakeDamage(share,0);sharing=false;guard->mPhaseCounter=20;
+ return damage-share;
+}
 bool ElectricHit(Zombie*){return false;} void CombatDeath(Zombie*){}
 void DrawEffects(Sexy::Graphics*,Board*,int){}
 bool HasShot(const Projectile*){return false;} bool DrawShot(Sexy::Graphics*,const Projectile*){return false;}

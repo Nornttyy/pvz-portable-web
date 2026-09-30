@@ -269,7 +269,7 @@ index 2293690..543a195 100644
  	void							MouseDown(int x, int y, int theClickCount) override;
  	void							MouseUp(int x, int y, int theClickCount) override;
 diff --git a/src/Lawn/Plant.cpp b/src/Lawn/Plant.cpp
-index c934659..f319a23 100644
+index c934659..9975c72 100644
 --- a/src/Lawn/Plant.cpp
 +++ b/src/Lawn/Plant.cpp
 @@ -30,6 +30,9 @@
@@ -306,26 +306,33 @@ index c934659..f319a23 100644
  	EndBlink();
  	Reanimation* aBodyReanim = mApp->ReanimationTryToGet(mBodyReanimID);
  	Reanimation* aHeadReanim = mApp->ReanimationTryToGet(mHeadReanimID);
+@@ -796,7 +802,7 @@ bool Plant::FindTargetAndFire(int theRow, PlantWeapon thePlantWeapon)
+ 		case SeedType::SEED_WINTERMELON:    mShootingCounter = 36;  break;
+ 		case SeedType::SEED_KERNELPULT:
+ 		{
+-			if (Sexy::Rand(4) == 0)
++			if (MemeCharacters::Type(this) == 512 ? MemeCharacters::ButterReady(this) : Sexy::Rand(4) == 0)
+ 			{
+ 				aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
+ 				aBodyReanim->AssignRenderGroupToPrefix("Cornpult_butter", RENDER_GROUP_NORMAL);
 @@ -911,8 +917,9 @@ bool Plant::FindStarFruitTarget()
  
  void Plant::LaunchStarFruit()
  {
 -	if (FindStarFruitTarget())
-+	if (SandboxPlants::NativeCanAct(this) && FindStarFruitTarget())
++	if (SandboxPlants::NativeCanAct(this) && (MemeCharacters::Type(this) == 511 ? MemeCharacters::StarTarget(this) : FindStarFruitTarget()))
  	{
 +		SandboxPlants::NativeAction(this);
  		PlayBodyReanim("anim_shoot", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 28.0f);
  		mShootingCounter = 40;
  	}
-@@ -927,6 +934,7 @@ void Plant::StarFruitFire()
- 	for (int i = 0; i < 5; i++)
- 	{
- 		Projectile* aProjectile = mBoard->AddProjectile(mX + 25, mY + 25, mRenderOrder - 1, mRow, ProjectileType::PROJECTILE_STAR);
+@@ -939,11 +946,15 @@ void Plant::StarFruitFire()
+ 		case 4:     aProjectile->mVelX = aShootAngleX;  aProjectile->mVelY = -aShootAngleY;     break;
+ 		default:    PVZP_ASSERT(false);                                                               break;
+ 		}
 +		SandboxPlants::OnFired(this,aProjectile,nullptr);
- 		aProjectile->mDamageRangeFlags = GetDamageRangeFlags(PlantWeapon::WEAPON_PRIMARY);
- 		aProjectile->mMotionType = ProjectileMotion::MOTION_STAR;
- 
-@@ -944,6 +952,9 @@ void Plant::StarFruitFire()
+ 	}
+ }
  
  void Plant::UpdateShooter()
  {
@@ -595,7 +602,15 @@ index c934659..f319a23 100644
  
  	mState = PlantState::STATE_COBCANNON_FIRING;
  	mShootingCounter = 206;
-@@ -4675,6 +4727,8 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
+@@ -4475,6 +4527,7 @@ void Plant::CobCannonFire(int theTargetX, int theTargetY)
+ 
+ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon)
+ {
++	theTargetZombie = MemeCharacters::PickTarget(this, theTargetZombie);
+ 	if (mSeedType == SeedType::SEED_FUMESHROOM)
+ 	{
+ 		DoRowAreaDamage(20, 2U);
+@@ -4675,6 +4728,8 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
  		mApp->AddPvzpParticle(aOriginX + 27, aOriginY + 13, aRenderPosition, ParticleEffect::PARTICLE_PUFFSHROOM_MUZZLE);
  	}
  
@@ -604,7 +619,7 @@ index c934659..f319a23 100644
  	Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder - 1, theRow, aProjectileType);
  	aProjectile->mDamageRangeFlags = GetDamageRangeFlags(thePlantWeapon);
  
-@@ -4765,6 +4819,10 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
+@@ -4765,6 +4820,10 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
  		aProjectile->mCobTargetX = mTargetX - 40;
  		aProjectile->mCobTargetRow = mBoard->PixelToGridYKeepOnBoard(mTargetX, mTargetY);
  	}
@@ -615,7 +630,7 @@ index c934659..f319a23 100644
  }
  
  Zombie* Plant::FindTargetZombie(int theRow, PlantWeapon thePlantWeapon)
-@@ -4930,6 +4988,7 @@ int Plant::DistanceToClosestZombie()
+@@ -4930,6 +4989,7 @@ int Plant::DistanceToClosestZombie()
  
  void Plant::Die()
  {
@@ -623,7 +638,7 @@ index c934659..f319a23 100644
  	if (IsOnBoard() && mSeedType == SeedType::SEED_TANGLEKELP)
  	{
  		Zombie* aZombie = mBoard->ZombieTryToGet(mTargetZombieID);
-@@ -4973,6 +5032,7 @@ const PlantDefinition& GetPlantDefinition(SeedType theSeedType)
+@@ -4973,6 +5033,7 @@ const PlantDefinition& GetPlantDefinition(SeedType theSeedType)
  
  int Plant::GetCost(SeedType theSeedType, SeedType theImitaterType)
  {
@@ -631,7 +646,7 @@ index c934659..f319a23 100644
  	if (gLawnApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED || gLawnApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED_TWIST)
  	{
  		if (theSeedType == SeedType::SEED_REPEATER)
-@@ -5036,6 +5096,7 @@ int Plant::GetCost(SeedType theSeedType, SeedType theImitaterType)
+@@ -5036,6 +5097,7 @@ int Plant::GetCost(SeedType theSeedType, SeedType theImitaterType)
  
  std::string Plant::GetNameString(SeedType theSeedType, SeedType theImitaterType)
  {
@@ -639,7 +654,7 @@ index c934659..f319a23 100644
  	const PlantDefinition& aPlantDef = GetPlantDefinition(theSeedType);
  	std::string aName = std::format("[{}]", aPlantDef.mPlantName);
  	std::string aTranslatedName(PvzpStringTranslate(aName));
-@@ -5053,6 +5114,7 @@ std::string Plant::GetNameString(SeedType theSeedType, SeedType theImitaterType)
+@@ -5053,6 +5115,7 @@ std::string Plant::GetNameString(SeedType theSeedType, SeedType theImitaterType)
  
  std::string Plant::GetToolTip(SeedType theSeedType)
  {
@@ -647,7 +662,7 @@ index c934659..f319a23 100644
  	const PlantDefinition& aPlantDef = GetPlantDefinition(theSeedType);
  	std::string aToolTip = std::format("[{}_TOOLTIP]", aPlantDef.mPlantName);
  	return std::string(PvzpStringTranslate(aToolTip));
-@@ -5060,6 +5122,7 @@ std::string Plant::GetToolTip(SeedType theSeedType)
+@@ -5060,6 +5123,7 @@ std::string Plant::GetToolTip(SeedType theSeedType)
  
  int Plant::GetRefreshTime(SeedType theSeedType, SeedType theImitaterType)
  {
@@ -655,7 +670,7 @@ index c934659..f319a23 100644
  	if (Challenge::IsZombieSeedType(theSeedType))
  	{
  		return 0;
-@@ -5079,6 +5142,7 @@ int Plant::GetRefreshTime(SeedType theSeedType, SeedType theImitaterType)
+@@ -5079,6 +5143,7 @@ int Plant::GetRefreshTime(SeedType theSeedType, SeedType theImitaterType)
  
  bool Plant::IsNocturnal(SeedType theSeedtype)
  {
@@ -1305,7 +1320,7 @@ index b284e6a..45539ae 100644
  		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
  		if (aChosenSeed.mSeedState == SEED_IN_BANK)
 diff --git a/src/Lawn/Zombie.cpp b/src/Lawn/Zombie.cpp
-index c140a3d..72d0122 100644
+index c140a3d..ed44b0d 100644
 --- a/src/Lawn/Zombie.cpp
 +++ b/src/Lawn/Zombie.cpp
 @@ -32,6 +32,8 @@
@@ -1337,7 +1352,7 @@ index c140a3d..72d0122 100644
  bool Zombie::ZombieNotWalking()
  {
 -	if (mIsEating || IsImmobilizied())
-+	if (mIsEating || IsImmobilizied() || SandboxZombies::IsFeigning(this))
++	if (mIsEating || IsImmobilizied() || SandboxZombies::IsFeigning(this) || SandboxZombies::IsResting(this))
  	{
  		return true;
  	}
@@ -1395,7 +1410,7 @@ index c140a3d..72d0122 100644
  		return;
  
 -	if (IsImmobilizied() || (mYuckyFace && mYuckyFaceCounter < 170))
-+	if (IsImmobilizied() || SandboxZombies::IsFeigning(this) || (mYuckyFace && mYuckyFaceCounter < 170))
++	if (IsImmobilizied() || SandboxZombies::IsFeigning(this) || SandboxZombies::IsResting(this) || (mYuckyFace && mYuckyFaceCounter < 170))
  	{
  		ApplyAnimRate(0.0f);
  		return;
@@ -1403,7 +1418,7 @@ index c140a3d..72d0122 100644
  
  void Zombie::CheckIfPreyCaught()
  {
-+	if (SandboxZombies::IsRetreating(this) || SandboxZombies::IsFeigning(this)) { StopEating(); return; }
++	if (SandboxZombies::IsRetreating(this) || SandboxZombies::IsFeigning(this) || SandboxZombies::IsResting(this)) { StopEating(); return; }
  	if (mZombieType == ZombieType::ZOMBIE_BUNGEE ||
  		mZombieType == ZombieType::ZOMBIE_GARGANTUAR ||
  		mZombieType == ZombieType::ZOMBIE_REDEYE_GARGANTUAR ||
@@ -1435,7 +1450,7 @@ index c140a3d..72d0122 100644
  
  void Zombie::TakeDamage(int theDamage, unsigned int theDamageFlags)
  {
-+    theDamage=SandboxZombies::Damage(this,theDamage);
++    theDamage=SandboxZombies::Damage(this,theDamage,theDamageFlags);
  	if (mZombiePhase == ZombiePhase::PHASE_JACK_IN_THE_BOX_POPPING || IsDeadOrDying())
  		return;
  

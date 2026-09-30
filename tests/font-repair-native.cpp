@@ -45,5 +45,11 @@ int main(){
     assert(added.mFontLayerList.size()==8&&fixed.prepared==3);
     for(char32_t c:U"梗锅甩"){if(!c)continue;int found=0;for(const auto& l:added.mFontLayerList)if(l.mCharDataMap.contains(c)){const auto& g=l.mCharDataMap.at(c);assert(g.mWidth==14&&g.mImageRect.mWidth>0&&g.mImageRect.mHeight>0);++found;}assert(found>=2);}
     SandboxRepairFonts();assert(added.mFontLayerList.size()==8&&fixed.prepared==3);FONT_BRIANNETOD12=nullptr;
+    FontData batch;batch.mFontLayerList.emplace_back();auto& source=batch.mFontLayerList.back();
+    for(char32_t c:U"蹦增馆板样场提模边油")source.mCharDataMap[c]={{0,0,24,24},{-5,-4},14};
+    ImageFont newNames;newNames.mFontData=&batch;FONT_BRIANNETOD12=&newNames;SandboxRepairFonts();
+    assert(batch.mFontLayerList.size()==12&&newNames.prepared==5);
+    for(char32_t c:U"蹭饭杨摸迪"){if(!c)continue;int count=0;for(const auto& layer:batch.mFontLayerList)if(layer.mCharDataMap.contains(c)){const auto& g=layer.mCharDataMap.at(c);assert(g.mWidth==14&&g.mImageRect.mWidth>0&&g.mImageRect.mHeight>0);++count;}assert(count>=2);}
+    SandboxRepairFonts();assert(batch.mFontLayerList.size()==12&&newNames.prepared==5);FONT_BRIANNETOD12=nullptr;
     std::cout<<"Three font sizes, prior measurement, original glyph preservation and idempotence passed.\n";
 }

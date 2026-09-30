@@ -10,15 +10,16 @@
 enum SeedType {SEED_PEASHOOTER=0,SEED_NONE=-1};
 enum ZombieType {ZOMBIE_NORMAL=0,ZOMBIE_IMP=24,ZOMBIE_GARGANTUAR=23,ZOMBIE_REDEYE_GARGANTUAR=32,ZOMBIE_ZAMBONI=12};
 enum ZombieID : unsigned { ZOMBIEID_NULL=0 };
-constexpr int PHASE_ZOMBIE_NORMAL=0,HEIGHT_ZOMBIE_NORMAL=0;
+constexpr int PHASE_ZOMBIE_NORMAL=0,HEIGHT_ZOMBIE_NORMAL=0,HEIGHT_FALLING=1;
+constexpr int STATE_READY=1,STATE_CHOMPER_DIGESTING=13,STATE_SCAREDYSHROOM_SCARED=21,STATE_CACTUS_LOW=30,STATE_CACTUS_HIGH=32;
 constexpr int PHASE_NEWSPAPER_MAD=2,PHASE_NEWSPAPER_READING=3,SHIELDTYPE_NEWSPAPER=1;
 enum ReanimationType {REANIM_ZOMBIE,REANIM_FLAG};
-enum ProjectileType {PROJECTILE_PEA,PROJECTILE_SNOWPEA,PROJECTILE_FIREBALL,PROJECTILE_ZOMBIE_PEA};
+enum ProjectileType {PROJECTILE_PEA,PROJECTILE_SNOWPEA,PROJECTILE_FIREBALL,PROJECTILE_ZOMBIE_PEA,PROJECTILE_SPIKE,PROJECTILE_BUTTER,PROJECTILE_KERNEL,PROJECTILE_CABBAGE,PROJECTILE_STAR,PROJECTILE_PUFF};
 enum ProjectileMotion {MOTION_STRAIGHT,MOTION_STAR,MOTION_HOMING,MOTION_THREEPEATER,MOTION_BACKWARDS};
 constexpr int REANIM_PLAY_ONCE_AND_HOLD=0;
 constexpr int FOLEY_THROW=0;
 constexpr int FOLEY_SPAWN_SUN=1,COIN_SUN=0,COIN_MOTION_FROM_PLANT=0;
-enum PlantWeapon {WEAPON_PRIMARY};
+enum PlantWeapon {WEAPON_PRIMARY,WEAPON_SECONDARY};
 enum PlantSubClass {SUBCLASS_NORMAL,SUBCLASS_SHOOTER};
 constexpr int RENDER_GROUP_HIDDEN=-1,DS_ALIGN_CENTER=0;
 namespace Sexy {
@@ -70,14 +71,15 @@ public:
  float mPosX=0,mPosY=0,mScaleZombie=1;int mX=0,mY=0,mRow=0,mBodyReanimID=0,mBodyHealth=1000,mBodyMaxHealth=1000,mHelmHealth=0,mHelmMaxHealth=0;
  bool mDead=false,mMindControlled=false,mHasHead=true,mHasArm=true,mIsEating=false;int chill=0,mIceTrapCounter=0,mButteredCounter=0,mRenderOrder=0;
  int mZombiePhase=0,mZombieHeight=0;bool mInPool=false;
- int mPhaseCounter=0,mShieldHealth=0,mShieldMaxHealth=0,mShieldType=0;
+ int mPhaseCounter=0,mShieldHealth=0,mShieldMaxHealth=0,mShieldType=0,mZombieAge=0,mFromWave=0;float mAltitude=0;bool flying=false;
+ bool IsFlying(){return flying;}
  void StopEating(){mIsEating=false;}void AttachShield(){}void PickRandomSpeed(){}
  void SetRow(int row){mRow=row;}
  bool IsOnBoard(){return true;}
  void StartWalkAnim(int){}
  int mSpecialHeadReanimID=0;
  bool IsDeadOrDying(){return mDead||mBodyHealth<=0;};bool EffectedByDamage(unsigned){return !IsDeadOrDying();}
- void TakeDamage(int n,unsigned){int armor=std::min(n,mHelmHealth);mHelmHealth-=armor;mBodyHealth-=n-armor;}
+ void TakeDamage(int n,unsigned){int shield=std::min(n,mShieldHealth);mShieldHealth-=shield;n-=shield;int armor=std::min(n,mHelmHealth);mHelmHealth-=armor;mBodyHealth-=n-armor;}
  void UpdateReanim(){};void RemoveColdEffects(){chill=0;}
  void ApplyChill(bool){chill=600;}
  static void PreloadZombieResources(ZombieType){};static void SetupReanimLayers(Reanimation*,ZombieType){}
@@ -88,7 +90,7 @@ public:
  SeedType mImitaterType=SEED_NONE;int mRecentlyEatenCountdown=0;
  int mX=0,mY=0,mRow=0,mPlantCol=0,mPlantHealth=300,mPlantMaxHealth=300,mLaunchRate=150,mLaunchCounter=100,mBlinkCountdown=0,mShootingCounter=0;
  int mBodyReanimID=0,mHeadReanimID=0,mHeadReanimID2=0,mHeadReanimID3=0,mBlinkReanimID=0;
- int mRenderOrder=0,mEatenFlashCountdown=0;
+ int mRenderOrder=0,mEatenFlashCountdown=0,mState=STATE_READY,mStateCountdown=0;
  bool mDead=false,mIsAsleep=false,mSquished=false,airborne=false;
  float drawHeightOffset=0;
  bool NotOnGround(){return airborne;}
@@ -138,7 +140,10 @@ public:
  Plant* plant(int col,int row){auto p=std::make_unique<Plant>();auto* a=p.get();a->mBoard=this;a->mPlantCol=col;a->mRow=row;a->mX=col*80;a->mY=row*100;ownedPlants.push_back(std::move(p));mPlants.add(a);return a;}
 };
 inline Zombie* Plant::FindTargetZombie(int row,PlantWeapon){for(auto* z:mBoard->mZombies)if(!z->IsDeadOrDying()&&z->mRow==row&&!z->mMindControlled&&z->mPosX>=mX)return z;return nullptr;}
-inline void Plant::Fire(Zombie* target,int row,PlantWeapon){auto* s=mBoard->AddProjectile(mX+60,mY+25,mRenderOrder,row,int(mSeedType)==5?PROJECTILE_SNOWPEA:PROJECTILE_PEA);SandboxPlants::OnFired(this,s,target);}
+inline void Plant::Fire(Zombie* target,int row,PlantWeapon weapon){
+ const int base=int(mSeedType);const auto type=base==5?PROJECTILE_SNOWPEA:base==26?PROJECTILE_SPIKE:base==34?(weapon==WEAPON_SECONDARY?PROJECTILE_BUTTER:PROJECTILE_KERNEL):base==32?PROJECTILE_CABBAGE:base==13?PROJECTILE_PUFF:PROJECTILE_PEA;
+ auto* s=mBoard->AddProjectile(mX+60,mY+25,mRenderOrder,row,type);SandboxPlants::OnFired(this,s,target);
+}
 inline float PlantDrawHeightOffset(Board*,Plant* p,SeedType,int,int){return p?p->drawHeightOffset:0;}
 struct PlantDefinition{ReanimationType mReanimationType=REANIM_ZOMBIE;PlantSubClass mSubClass=SUBCLASS_SHOOTER;int mLaunchRate=150;};
 inline PlantDefinition GetPlantDefinition(SeedType type){return {REANIM_ZOMBIE,int(type)==1||int(type)==3?SUBCLASS_NORMAL:SUBCLASS_SHOOTER};}

@@ -802,7 +802,7 @@ bool Plant::FindTargetAndFire(int theRow, PlantWeapon thePlantWeapon)
 		case SeedType::SEED_WINTERMELON:    mShootingCounter = 36;  break;
 		case SeedType::SEED_KERNELPULT:
 		{
-			if (Sexy::Rand(4) == 0)
+			if (MemeCharacters::Type(this) == 512 ? MemeCharacters::ButterReady(this) : Sexy::Rand(4) == 0)
 			{
 				aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
 				aBodyReanim->AssignRenderGroupToPrefix("Cornpult_butter", RENDER_GROUP_NORMAL);
@@ -917,7 +917,7 @@ bool Plant::FindStarFruitTarget()
 
 void Plant::LaunchStarFruit()
 {
-	if (SandboxPlants::NativeCanAct(this) && FindStarFruitTarget())
+	if (SandboxPlants::NativeCanAct(this) && (MemeCharacters::Type(this) == 511 ? MemeCharacters::StarTarget(this) : FindStarFruitTarget()))
 	{
 		SandboxPlants::NativeAction(this);
 		PlayBodyReanim("anim_shoot", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 20, 28.0f);
@@ -934,7 +934,6 @@ void Plant::StarFruitFire()
 	for (int i = 0; i < 5; i++)
 	{
 		Projectile* aProjectile = mBoard->AddProjectile(mX + 25, mY + 25, mRenderOrder - 1, mRow, ProjectileType::PROJECTILE_STAR);
-		SandboxPlants::OnFired(this,aProjectile,nullptr);
 		aProjectile->mDamageRangeFlags = GetDamageRangeFlags(PlantWeapon::WEAPON_PRIMARY);
 		aProjectile->mMotionType = ProjectileMotion::MOTION_STAR;
 
@@ -947,6 +946,7 @@ void Plant::StarFruitFire()
 		case 4:     aProjectile->mVelX = aShootAngleX;  aProjectile->mVelY = -aShootAngleY;     break;
 		default:    PVZP_ASSERT(false);                                                               break;
 		}
+		SandboxPlants::OnFired(this,aProjectile,nullptr);
 	}
 }
 
@@ -4527,6 +4527,7 @@ void Plant::CobCannonFire(int theTargetX, int theTargetY)
 
 void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon)
 {
+	theTargetZombie = MemeCharacters::PickTarget(this, theTargetZombie);
 	if (mSeedType == SeedType::SEED_FUMESHROOM)
 	{
 		DoRowAreaDamage(20, 2U);

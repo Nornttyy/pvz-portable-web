@@ -2,6 +2,7 @@
 #include "MemeAdventure.h"
 #include "MemeAdventureRules.h"
 #include "Sandbox.h"
+#include "SandboxZombies.h"
 #include "SandboxFonts.h"
 #include "LawnApp.h"
 #include "Resources.h"
@@ -36,7 +37,7 @@ const MemeCharacters::Definition* Replacement(int seed,int imitater){
 void Reset(){pending={};fontsReady=false;}
 bool Visible(Board* b){return b&&RosterEnabled()&&b->mApp->mGameScene==SCENE_PLAYING;}
 bool Cancel(){return false;} // Selection belongs to the native seed bank again.
-void Tick(Board* b){if(Running(b))SandboxPlants::Tick(b);}
+void Tick(Board* b){if(Running(b)){SandboxPlants::Tick(b);SandboxZombies::Tick(b);}}
 bool MouseDown(Board* b,int x,int y,int clicks){
  if(!Running(b)||clicks<0||b->mCursorObject->mCursorType!=CURSOR_TYPE_NORMAL)return false;
  HitResult hit;b->MouseHitTest(x,y,&hit);if(hit.mObjectType==OBJECT_TYPE_COIN)return false;
@@ -59,6 +60,14 @@ std::string_view Translate(std::string_view key,std::string_view original){
   if(key=="CONEHEAD_ZOMBIE_DESCRIPTION")return "路障被打掉就倒地装死三秒，再爬起来继续走。装死时不移动、不啃植物，仍会受伤；不会回血或击退。";
   if(key=="NEWSPAPER_ZOMBIE")return "读手机僵尸";
   if(key=="NEWSPAPER_ZOMBIE_DESCRIPTION")return "边走边刷手机。手机碎了就红温冲锋，四秒后掏出备用机继续刷。身体不会回血。";
+  if(key=="ZOMBIE")return "摸鱼僵尸";
+  if(key=="ZOMBIE_DESCRIPTION")return "走六秒，摸鱼两秒。摸鱼时不走也不吃，但还是会挨打；休息结束继续赶路。";
+  if(key=="SCREEN_DOOR_ZOMBIE")return "护短铁门";
+  if(key=="SCREEN_DOOR_ZOMBIE_DESCRIPTION")return "替身边同伴分担一半小额普通伤害，消耗自己的门板。不会层层分摊，门碎就失效；抛物线、冰弹和爆炸可以绕过。";
+  if(key=="FOOTBALL_ZOMBIE")return "急停橄榄球";
+  if(key=="FOOTBALL_ZOMBIE_DESCRIPTION")return "每八秒先加速冲两秒，再停下喘气一秒半，随后正常行走。喘气时不走不吃，仍能被攻击。";
+  if(key=="BALLOON_ZOMBIE")return "空投气球";
+  if(key=="BALLOON_ZOMBIE_DESCRIPTION")return "飞行六秒后，在草地上空投一只普通僵尸，每只气球仅一次。打破气球可阻止空投，不会向水路投放。";
  }
  if(!RosterEnabled())return original;
  for(const auto& d:MemeCharacters::Definitions){const std::string_view stem=d.key;
