@@ -14,15 +14,17 @@ constexpr int PHASE_ZOMBIE_NORMAL=0,HEIGHT_ZOMBIE_NORMAL=0,HEIGHT_FALLING=1;
 constexpr int STATE_READY=1,STATE_CHOMPER_DIGESTING=13,STATE_SCAREDYSHROOM_SCARED=21,STATE_CACTUS_LOW=30,STATE_CACTUS_HIGH=32;
 constexpr int PHASE_NEWSPAPER_MAD=2,PHASE_NEWSPAPER_READING=3,SHIELDTYPE_NEWSPAPER=1;
 constexpr int PHASE_LADDER_CARRYING=4,PHASE_LADDER_PLACING=5;
+constexpr int PHASE_POLEVAULTER_PRE_VAULT=6,PHASE_POLEVAULTER_POST_VAULT=7;
+constexpr int STATE_NOTREADY=0,STATE_SQUASH_DONE_FALLING=50;
 enum ReanimationType {REANIM_ZOMBIE,REANIM_FLAG};
 enum ProjectileType {PROJECTILE_PEA,PROJECTILE_SNOWPEA,PROJECTILE_FIREBALL,PROJECTILE_ZOMBIE_PEA,PROJECTILE_SPIKE,PROJECTILE_BUTTER,PROJECTILE_KERNEL,PROJECTILE_CABBAGE,PROJECTILE_STAR,PROJECTILE_PUFF};
 enum ProjectileMotion {MOTION_STRAIGHT,MOTION_STAR,MOTION_HOMING,MOTION_THREEPEATER,MOTION_BACKWARDS};
-constexpr int REANIM_PLAY_ONCE_AND_HOLD=0;
+constexpr int REANIM_PLAY_ONCE_AND_HOLD=0,REANIM_LOOP=1;
 constexpr int FOLEY_THROW=0;
 constexpr int FOLEY_SPAWN_SUN=1,COIN_SUN=0,COIN_MOTION_FROM_PLANT=0;
 enum PlantWeapon {WEAPON_PRIMARY,WEAPON_SECONDARY};
 enum PlantSubClass {SUBCLASS_NORMAL,SUBCLASS_SHOOTER};
-constexpr int RENDER_GROUP_HIDDEN=-1,DS_ALIGN_CENTER=0;
+constexpr int RENDER_GROUP_HIDDEN=-1,RENDER_GROUP_NORMAL=0,DS_ALIGN_CENTER=0;
 namespace Sexy {
 inline int forcedRoll=-1;inline uint32_t randomSeed=123;
 inline int Rand(int n){if(forcedRoll>=0)return forcedRoll%n;randomSeed=randomSeed*1664525u+1013904223u;return (randomSeed>>1)%n;}
@@ -71,6 +73,7 @@ public:
  Board* mBoard=nullptr;ZombieType mZombieType=ZOMBIE_NORMAL;ZombieID id=ZOMBIEID_NULL;
  float mPosX=0,mPosY=0,mScaleZombie=1;int mX=0,mY=0,mRow=0,mBodyReanimID=0,mBodyHealth=1000,mBodyMaxHealth=1000,mHelmHealth=0,mHelmMaxHealth=0;
  bool mDead=false,mMindControlled=false,mHasHead=true,mHasArm=true,mIsEating=false;int chill=0,mIceTrapCounter=0,mButteredCounter=0,mRenderOrder=0;
+ bool mHasObject=false;Sexy::Rect mZombieAttackRect;
  int mZombiePhase=0,mZombieHeight=0;bool mInPool=false;
  int mPhaseCounter=0,mShieldHealth=0,mShieldMaxHealth=0,mShieldType=0,mZombieAge=0,mFromWave=0;float mAltitude=0;bool flying=false;
  bool IsFlying(){return flying;}
@@ -78,6 +81,8 @@ public:
  void SetRow(int row){mRow=row;}
  bool IsOnBoard(){return true;}
  void StartWalkAnim(int){}
+ void PlayZombieReanim(const char*,int,int,float){}
+ void ReanimShowPrefix(const char*,int){}
  int mSpecialHeadReanimID=0;
  bool IsDeadOrDying(){return mDead||mBodyHealth<=0;};bool EffectedByDamage(unsigned){return !IsDeadOrDying();}
  void TakeDamage(int n,unsigned){int shield=std::min(n,mShieldHealth);mShieldHealth-=shield;n-=shield;int armor=std::min(n,mHelmHealth);mHelmHealth-=armor;mBodyHealth-=n-armor;}
@@ -92,6 +97,8 @@ public:
  int mX=0,mY=0,mRow=0,mPlantCol=0,mPlantHealth=300,mPlantMaxHealth=300,mLaunchRate=150,mLaunchCounter=100,mBlinkCountdown=0,mShootingCounter=0;
  int mBodyReanimID=0,mHeadReanimID=0,mHeadReanimID2=0,mHeadReanimID3=0,mBlinkReanimID=0;
  int mRenderOrder=0,mEatenFlashCountdown=0,mState=STATE_READY,mStateCountdown=0;
+ int mTargetX=0;
+ int CalcRenderOrder(){return mRow*100;}void PlayBodyReanim(const char*,int,int,float){}
  bool mDead=false,mIsAsleep=false,mSquished=false,airborne=false;
  float drawHeightOffset=0;
  bool NotOnGround(){return airborne;}
@@ -130,6 +137,8 @@ public:
  void AddCoin(int,int,int,int){++mCoins.mSize;}
  std::vector<std::unique_ptr<Plant>> ownedPlants;std::vector<std::unique_ptr<Zombie>> ownedZombies;std::vector<std::unique_ptr<Projectile>> ownedShots;
  bool StageHasPool(){return pool;}
+ int GridToPixelX(int col,int){return col*80;}int GridToPixelY(int,int row){return row*100;}
+ int PixelToGridXKeepOnBoard(int x,int){return std::clamp(x/80,0,8);}
  bool RowCanHaveZombies(int row){return row>=0&&row<(pool?6:5);}
  ZombieID ZombieGetID(Zombie* z){return z?z->id:ZOMBIEID_NULL;}
  Zombie* ZombieTryToGet(ZombieID id){for(auto* z:mZombies)if(z->id==id)return z;return nullptr;}

@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Seventeen mechanic plants and nine native zombie replacements with four single-voice-budget gag sounds. The automatic 300-rage burst fires 50 randomly scattered peas over exactly 300 native ticks (3 seconds, one shot every 6 ticks), retaining remaining shots and intervals on pause/resume. Old 80/150-shot saves remain readable with remaining shots capped at 50. Sunflowers, including the adventure replacement, and mature sun-shrooms produce ordinary-size 25-value suns at double frequency (11.75-12.5 seconds); young shrooms, twin sunflowers and sky suns unchanged. Saved production countdowns, showoff 60-second lifetime, native animations and adventure unlocks preserved",
+  "mode": "Nineteen mechanic plants and eleven native zombie replacements. Returning three-lane peas with connected head turns; three-stomp exercise squash with generated native-size body; bucket glove with connected punch; pole-vault reload gesture and spare pole. Draw-scoped poses preserve original rigs and saved layouts. Embedded alpha sprites and CC0 three-second human rage scream. Burst remains 300 rage, 50 peas in 300 ticks; burst speed reduced 25%, recovery 300 ticks. Extra pea-thrower occupies the native nine-column almanac grid. Adventure unlocks, ordinary-size 25 suns at double production frequency, no manual rage release, no normal-shot knockback and showoff lifetime retained.",
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 277298,
-      "sha256": "08a485e89f91b30217089e594cbfc58eda03d6a4581eab868448f588adbf7a3d"
+      "size": 277744,
+      "sha256": "04aeb9d347f0fb42c53118510c83d6527bf23fdb5f078d6c1c11b7baedd4ddb1"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7475632,
-      "sha256": "30e8a83a4eae7120608f20e9c89fb2d949d779bf2ac6af0c868361a5618afefd"
+      "size": 7665110,
+      "sha256": "3cf920af52cd2e6427fbdae1801f6919d47c684ee42dbabc62b13505f35b65f4"
     }
   ]
 }

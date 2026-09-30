@@ -15,6 +15,7 @@ bool IsRetreating(Zombie* zombie);
 bool IsFeigning(Zombie* zombie);
 bool IsResting(Zombie* zombie);
 void ArmorBroken(Zombie* zombie);
+void PoleLanded(Zombie* zombie);
 void AdjustPose(Zombie* zombie,Reanimation* body);
 bool ElectricHit(Zombie* zombie);void CombatDeath(Zombie* zombie);
 void DrawEffects(Sexy::Graphics* g,Board* board,int row);

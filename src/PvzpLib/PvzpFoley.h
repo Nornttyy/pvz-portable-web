@@ -23,6 +23,7 @@
 #define __PVZPFOLEY_H__
 
 #include <cstdint>
+extern intptr_t gRageScreamSound;
 #include "../Resources.h"
 #include "sound/SDLSoundInstance.h"
 using namespace Sexy;

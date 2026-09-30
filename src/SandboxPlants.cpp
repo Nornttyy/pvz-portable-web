@@ -4,6 +4,7 @@
 #include "SandboxMemeRules.h"
 #include "SandboxVisualRules.h"
 #include "MemeShooterRules.h"
+#include "AbstractRigVisuals.h"
 #include "LawnApp.h"
 #include "Resources.h"
 #include "Lawn/Board.h"
@@ -340,6 +341,10 @@ void DrawCard(Sexy::Graphics* g,int x,int y,int id){
  PvzpDrawString(g,"0",x+25,y+65,Sexy::FONT_BRIANNETOD12,Sexy::Color(55,64,23),DS_ALIGN_CENTER);
 }
 bool DrawBody(Sexy::Graphics* g,const Plant* p,float,float,bool squished){
+ if((MemeCharacters::Type(p)==517||MemeCharacters::Type(p)==518)&&!squished){
+  auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID);if(!body)return false;
+  AbstractRigVisuals::Scope pose(p);body->Draw(g);return true;
+ }
  if(MemeCharacters::Type(p)==501&&MemeCharacters::Data(p,0)==1&&!squished){
   auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID);if(!body)return false;
   body->Draw(g);NutBrows(g,body,std::min(255,MemeCharacters::Save(p)[7]*32));return true;

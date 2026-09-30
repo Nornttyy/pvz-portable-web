@@ -542,6 +542,7 @@ void BlendTransform(ReanimatorTransform* theResult, const ReanimatorTransform& t
 	theResult->mImage = theTransform1.mImage;
 }
 
+#include "AbstractRigVisuals.h"
 void Reanimation::GetCurrentTransform(int theTrackIndex, ReanimatorTransform* theTransformCurrent, ReanimatorFrameTime* theFrameTime)
 {
 	ReanimatorFrameTime aFrameTime;
@@ -558,6 +559,7 @@ void Reanimation::GetCurrentTransform(int theTrackIndex, ReanimatorTransform* th
 		float aBlendFactor = aTrack->mBlendCounter / static_cast<float>(aTrack->mBlendTime);
 		BlendTransform(theTransformCurrent, *theTransformCurrent, aTrack->mBlendTransform, aBlendFactor);  // blend with the recorded source transform
 	}
+	AbstractRigVisuals::Transform(this, theTrackIndex, *theTransformCurrent);
 }
 
 void Reanimation::GetTransformAtTime(int theTrackIndex, ReanimatorTransform* theTransform, ReanimatorFrameTime* theFrameTime)

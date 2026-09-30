@@ -5,8 +5,8 @@ namespace Sexy {class Graphics;class Color;}
 namespace MemeCharacters {
 inline constexpr int ShowoffLifetime=60*100; // Native simulation ticks, not wall-clock time.
 struct Definition {int id,base,cost,unlock;const char* name;const char* shortName;const char* hint;const char* key;const char* description;};
-inline constexpr std::array<Definition,17> Definitions{{
- {500,0,100,1,"红温豌豆","红温","满300怒气 · 3秒乱射50发","PEASHOOTER","普通攻击只有10%命中判定，其余豌豆飞行中反复上下飘，每次摆幅随机，不击退僵尸。每发增加20怒气，逐渐变红；满300自动在3秒内乱射50发，不能手动释放。射完恢复绿色，不消耗生命。"},
+inline constexpr std::array<Definition,19> Definitions{{
+ {500,0,100,1,"红温豌豆","红温","满300怒气 · 3秒乱射50发","PEASHOOTER","普通攻击只有10%命中判定，其余豌豆反复上下飘，每次摆幅随机，不击退。每发增加20怒气，逐渐变红；满300自动在3秒内乱射50发，不能手动释放。红温子弹减速25%，射完休息3秒，不消耗生命。"},
  {501,3,50,4,"反咬坚果","反咬","被啃后反击 · 冷却3秒","WALL_NUT","被啃后反击面前的僵尸，造成80伤害。每3秒一次，不击退僵尸。"},
  {502,8,0,11,"显眼包蘑菇","显眼包","吸引邻路僵尸 · 存活60秒","PUFF_SHROOM","种下60秒后消失。近距离喷射孢子，每五秒吸引一只邻路普通步行僵尸。白天也能工作。不能吸引巨人和冰车。"},
  {503,1,50,2,"已读不回花","已读","平时产阳光 · 装死后反击","SUNFLOWER","平时每次生产25阳光，生产间隔缩短一半。僵尸靠近时装死，经过后向后连发三颗豌豆。装死和反击时暂停生产，不能躲过碾压和巨人砸击。"},
@@ -22,7 +22,9 @@ inline constexpr std::array<Definition,17> Definitions{{
  {513,13,50,17,"嘴硬胆小菇","嘴硬","躲着攒话 · 安全后连喷","SCAREDY_SHROOM","平时照常远射，害怕时仍会缩起来。每躲一秒攒一发，最多六发，站起来后连续喷出。白天需要咖啡豆唤醒。"},
  {514,10,75,13,"打嗝大喷菇","打嗝","憋三秒 · 连打三个嗝","FUME_SHROOM","遇敌憋气三秒，随后连喷三口穿透烟雾，每口20伤害。没有目标时保留憋气进度；白天仍需唤醒。"},
  {515,28,150,35,"左右互搏裂荚","互搏","两个头吵架 · 左右轮流喷","SPLIT_PEA","本路任一侧有敌人就开始互喷：左右交替六发，每侧三发，随后休息2.5秒。使用普通豌豆，不推退敌人。"},
- {516,21,125,27,"烫脚地刺","烫脚","踩上来 · 烫得跳脚","SPIKEWEED","保留地刺攻击。每两秒把踩在上面的普通步行僵尸烫起一个小跳，额外造成20伤害，不横向推退。不能弹起巨人、车辆或水里的僵尸。"}
+ {516,21,125,27,"烫脚地刺","烫脚","踩上来 · 烫得跳脚","SPIKEWEED","保留地刺攻击。每两秒把踩在上面的普通步行僵尸烫起一个小跳，额外造成20伤害，不横向推退。不能弹起巨人、车辆或水里的僵尸。"},
+ {517,18,325,23,"回旋镖三线","回旋镖","没打中就回来 · 三路回旋","THREEPEATER","向三路发射普通豌豆。没打中敌人的豌豆飞到草地右边后会掉头，返回时仍能伤害敌人。命中就消失，不重复穿透，不改变火炬转化。"},
+ {518,17,75,21,"仰卧起坐窝瓜","起坐","砸完跳回去 · 最多三次","SQUASH","发现近处敌人后跳起砸下，每次600伤害。前两次落地后会跳回原格，再找目标；第三次落地消失。不回血，水里落地仍会消失。"}
 }};
 constexpr const Definition* Find(int id){for(const auto& d:Definitions)if(d.id==id)return &d;return nullptr;}
 constexpr bool Is(int id){return Find(id)!=nullptr;}
@@ -52,6 +54,7 @@ bool RestoreShotStyle(const Projectile*,int);
 void ForgetShot(const Projectile*);
 void UpdateShot(Projectile*);
 bool RearmPotato(Plant*);
+bool ReturnSquash(Plant*);
 Zombie* PickTarget(Plant*,Zombie* nativeTarget);
 bool ButterReady(const Plant*);
 bool StarTarget(Plant*);

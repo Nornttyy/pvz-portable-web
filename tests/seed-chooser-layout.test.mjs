@@ -16,4 +16,7 @@ test('extra adventure card shares the native grid at every unlock stage',async()
  assert.doesNotMatch(source,/x\s*=\s*464;\s*y\s*=\s*132|IMITATERADDON,\s*459,\s*120/);
  assert.match(source,/GetSeedPositionInChooser\(theChosenSeed.mSeedType, theChosenSeed.mEndX, theChosenSeed.mEndY\)/);
  assert.match(source,/GetSeedPositionInChooser\(SEED_LEFTPEATER, x, y\)/);
+ const almanac=await readFile(join(root,'src/Lawn/Widget/AlmanacDialog.cpp'),'utf8');
+ assert.doesNotMatch(almanac,/x=82;y=15/);
+ assert.match(almanac,/AlmanacPlantLayout::Card/);assert.match(almanac,/aCard.SetScale/);
 });

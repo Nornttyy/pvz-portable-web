@@ -79,6 +79,7 @@ void ReanimatorCache::UpdateReanimationForVariation(Reanimation* theReanim, Draw
 	}
 }
 
+#include "AbstractRigVisuals.h"
 void ReanimatorCache::DrawReanimatorFrame(Graphics* g, float thePosX, float thePosY, ReanimationType theReanimationType, const char* theTrackName, DrawVariation theDrawVariation)
 {
 	Reanimation aReanim;
@@ -109,6 +110,7 @@ void ReanimatorCache::DrawReanimatorFrame(Graphics* g, float thePosX, float theP
 		UpdateReanimationForVariation(&aReanim, theDrawVariation);
 	}
 
+	AbstractRigVisuals::Scope memePose(&aReanim, theReanimationType == REANIM_SQUASH ? 17 : theReanimationType == REANIM_THREEPEATER ? 18 : -1);
 	aReanim.Draw(g);
 }
 
@@ -289,6 +291,7 @@ std::unique_ptr<MemoryImage> ReanimatorCache::MakeCachedZombieFrame(ZombieType t
 			aReanimFlag.SetFramesForLayer("Zombie_flag");
 			aReanimFlag.Draw(&aMemoryGraphics);
 		}
+		AbstractRigVisuals::Scope memePose(&aReanim, aUseZombieType == ZOMBIE_PAIL ? 1004 : -1);
 		aReanim.Draw(&aMemoryGraphics);
 	}
 	else if (aZombieDef.mReanimationType == ReanimationType::REANIM_BOSS)

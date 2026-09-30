@@ -36,6 +36,7 @@
 #include "../../PvzpLib/PvzpStringFile.h"
 #include "widget/WidgetManager.h"
 #include "../../MemeAdventure.h"
+#include "../../AlmanacPlantLayout.h"
 
 static int AbstractAlmanacCount(){return MemeAdventure::RosterEnabled()?NUM_SEED_TYPES:NUM_ALMANAC_SEEDS;}
 
@@ -296,9 +297,12 @@ void AlmanacDialog::DrawPlants(Graphics* g)
 			}
 			else
 			{
-				DrawSeedPacket(g, aPosX, aPosY, aSeedType, SeedType::SEED_NONE, 0, 255, true, false);
+				Graphics aCard(*g);
+				const float aScale = AlmanacPlantLayout::Scale(MemeAdventure::RosterEnabled() && mApp->HasSeedType(SEED_LEFTPEATER));
+				aCard.SetScale(aScale, aScale, aPosX, aPosY);
+				DrawSeedPacket(&aCard, aPosX, aPosY, aSeedType, SeedType::SEED_NONE, 0, 255, true, false);
 				if (aSeedType == aSeedMouseOn)
-					g->DrawImage(Sexy::IMAGE_SEEDPACKETFLASH, aPosX, aPosY);
+					PvzpDrawImageScaledF(&aCard, Sexy::IMAGE_SEEDPACKETFLASH, aPosX, aPosY, aScale, aScale);
 			}
 		}
 	}
@@ -525,14 +529,8 @@ void AlmanacDialog::Draw(Graphics* g)
 
 void AlmanacDialog::GetSeedPosition(SeedType theSeedType, int& x, int& y)
 {
-	if (theSeedType==SEED_LEFTPEATER) {x=82;y=15;return;}
-	if (theSeedType == SeedType::SEED_IMITATER)
-		x = 20, y = 23;
-	else
-	{
-		x = theSeedType % 8 * 52 + 26;
-		y = theSeedType / 8 * 78 + 92;
-	}
+	const auto aBox = AlmanacPlantLayout::Card(theSeedType, MemeAdventure::RosterEnabled() && mApp->HasSeedType(SEED_LEFTPEATER));
+	x = aBox.x; y = aBox.y;
 }
 
 SeedType AlmanacDialog::SeedHitTest(int x, int y)
@@ -545,7 +543,8 @@ SeedType AlmanacDialog::SeedHitTest(int x, int y)
 			{
 				int aSeedX, aSeedY;
 				GetSeedPosition(aSeedType, aSeedX, aSeedY);
-				Rect aSeedRect = aSeedType == SeedType::SEED_IMITATER ? Rect(aSeedX, aSeedY, 34, 46) : Rect(aSeedX, aSeedY, SEED_PACKET_WIDTH, SEED_PACKET_HEIGHT);
+				const auto aBox = AlmanacPlantLayout::Card(aSeedType, MemeAdventure::RosterEnabled() && mApp->HasSeedType(SEED_LEFTPEATER));
+				Rect aSeedRect(aSeedX, aSeedY, aBox.w, aBox.h);
 				if (aSeedRect.Contains(x, y)) return aSeedType;
 			}
 		}

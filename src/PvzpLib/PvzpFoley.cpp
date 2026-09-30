@@ -25,6 +25,7 @@
 #include "sound/SoundManager.h"
 
 int gFoleyParamArraySize;
+intptr_t gRageScreamSound = -1;
 const FoleyParams* gFoleyParamArray;
 
 constinit const FoleyParams gLawnFoleyParamArray[FoleyType::NUM_FOLEY] = {
@@ -132,7 +133,7 @@ constinit const FoleyParams gLawnFoleyParamArray[FoleyType::NUM_FOLEY] = {
 	{ .mFoleyType = FoleyType::FOLEY_FINAL_FANFARE, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_FINALFANFARE}, .mFoleyFlags = 0U },
 	{ .mFoleyType = FoleyType::FOLEY_CRAZY_DAVE_SCREAM, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVESCREAM}, .mFoleyFlags = 0U },
 	{ .mFoleyType = FoleyType::FOLEY_CRAZY_DAVE_SCREAM_2, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVESCREAM2}, .mFoleyFlags = 0U },
-	{ .mFoleyType = FoleyType::FOLEY_RAGE_RELEASE, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVECRAZY}, .mFoleyFlags = 0U },
+	{ .mFoleyType = FoleyType::FOLEY_RAGE_RELEASE, .mPitchRange = 0.0f, .mSfxID = { &gRageScreamSound}, .mFoleyFlags = 0U },
 	{ .mFoleyType = FoleyType::FOLEY_MEME_HICCUP, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_GULP}, .mFoleyFlags = 0U },
 	{ .mFoleyType = FoleyType::FOLEY_MEME_ARGUMENT, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_CRAZYDAVESHORT1}, .mFoleyFlags = 0U },
 	{ .mFoleyType = FoleyType::FOLEY_MEME_BOING, .mPitchRange = 0.0f, .mSfxID = { &Sexy::SOUND_BOING}, .mFoleyFlags = 0U },

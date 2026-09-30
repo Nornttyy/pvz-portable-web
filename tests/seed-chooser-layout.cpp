@@ -1,4 +1,5 @@
 #include "SeedChooserLayout.h"
+#include "AlmanacPlantLayout.h"
 #include <cassert>
 #include <iostream>
 #include <vector>
@@ -34,5 +35,13 @@ int main() {
             assert(cards[8].x == 22 && cards[8].y > cards[0].y);
         }
     }
-    std::cout << "Native chooser: 49 full-size cards fit, unique slots, legacy layout unchanged\n";
+    for(bool expanded:{false,true}){
+        std::vector<AlmanacPlantLayout::Box> cards;
+        for(int seed=0;seed<48;++seed)cards.push_back(AlmanacPlantLayout::Card(seed,expanded));
+        if(expanded)cards.push_back(AlmanacPlantLayout::Card(52,true));
+        for(unsigned i=0;i<cards.size();++i){const auto a=cards[i];assert(a.x>=26&&a.x+a.w<=442&&a.y>=92&&a.y+a.h<=552);
+            for(unsigned j=0;j<i;++j){const auto b=cards[j];assert(!(a.x<b.x+b.w&&b.x<a.x+a.w&&a.y<b.y+b.h&&b.y<a.y+a.h));}}
+        if(expanded){const auto extra=cards.back();assert(extra.y==cards.front().y&&extra.x==cards[7].x+46);}
+    }
+    std::cout << "Native chooser: 49 full-size cards fit, unique slots, legacy layout unchanged; almanac extra card inside grid\n";
 }

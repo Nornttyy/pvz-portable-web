@@ -45,7 +45,7 @@ try{
  assert.deepEqual(await page.evaluate(()=>[0,1,2].map(f=>Module._pvz_rage_audio_data(f))),[1,1,600]);results.releaseAudio=true;
  await page.waitForTimeout(600);await api(4,1);const fan=await shots(),spread=fan.filter(s=>s[0]===9);
  assert.ok(spread.length>=7&&spread.some(s=>s[4]<0)&&spread.some(s=>s[4]>0));
- const speeds=spread.map(s=>Math.hypot(s[3],s[4])/1000);assert.ok(Math.max(...speeds)-Math.min(...speeds)>1.8);results.irregularSpread=true;
+ const speeds=spread.map(s=>Math.hypot(s[3],s[4])/1000);assert.ok(Math.max(...speeds)-Math.min(...speeds)>1.0);assert.ok(speeds.every(v=>v>=3.448&&v<=5.702));results.irregularSpread=true;results.slowerBurstPeas=true;
  assert.equal(await pd(3),300);await shot('automatic-50-random-burst');results.automaticBurst=true;
  await page.waitForTimeout(300);assert.deepEqual(await shots(),fan);results.pauseSafe=true;
  await api(4,0);await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,4)===0,{},{timeout:4000});await api(4,1);await shot('original-colour-restored');assert.equal(await pd(3),300);

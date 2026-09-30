@@ -199,12 +199,16 @@ endif()
 if(EMSCRIPTEN)
 	set_property(TARGET pvz-portable APPEND PROPERTY LINK_DEPENDS
 		"${CMAKE_CURRENT_SOURCE_DIR}/wasm/shell.html"
+		"${CMAKE_CURRENT_SOURCE_DIR}/addons/audio/rage-scream.wav"
+		"${CMAKE_CURRENT_SOURCE_DIR}/addons/art/squash-exercise.png"
+		"${CMAKE_CURRENT_SOURCE_DIR}/addons/art/bucket-glove.png"
 	)
 	target_link_libraries(pvz-portable PRIVATE
 		SDL2_mixer_ext_Static
 		${OPENMPT_LIB}
 	)
 	target_link_options(pvz-portable PRIVATE
+		"SHELL:--embed-file ${CMAKE_CURRENT_SOURCE_DIR}/addons@/addons"
 		"SHELL:-sUSE_SDL=2"
 		"SHELL:-sUSE_ZLIB=1"
 		"SHELL:-sUSE_LIBPNG=1"

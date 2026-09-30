@@ -22,8 +22,9 @@ bool IsFeigning(Zombie* z){return Enabled()&&Walker(z)&&int(z->mZombieType)==2&&
 bool IsResting(Zombie* z){
  if(!Enabled()||!Walker(z))return false;
  const int age=z->mZombieAge%800,type=int(z->mZombieType);
- return (type==0&&age>=600)||(type==7&&age>=200&&age<350);
+ return (type==0&&age>=600)||(type==7&&age>=200&&age<350)||(type==4&&z->mPhaseCounter>0&&z->mPhaseCounter<=40);
 }
+void PoleLanded(Zombie* z){if(Enabled()&&z&&int(z->mZombieType)==3)z->mPhaseCounter=800;}
 void ArmorBroken(Zombie* z){
  if(!Enabled()||!Walker(z)||int(z->mZombieType)!=2||z->mHelmHealth!=0)return;
  z->mPhaseCounter=300;z->StopEating();
@@ -38,6 +39,8 @@ void AdjustPose(Zombie* z,Reanimation* body){
  }else if(IsFeigning(z)){
   const float t=z->mPhaseCounter>275?(300-z->mPhaseCounter)/25.0f:z->mPhaseCounter<40?z->mPhaseCounter/40.0f:1.0f;
   angle=-1.36f*t*t*(3-2*t);
+ }else if(Walker(z)&&int(z->mZombieType)==4&&z->mPhaseCounter>0&&z->mPhaseCounter<=40){
+  angle=-0.22f*std::sin(z->mPhaseCounter*3.14159265f/40);
  }else if(IsResting(z)){
   const int start=int(z->mZombieType)==0?600:200,end=int(z->mZombieType)==0?800:350,age=z->mZombieAge%800;
   const float fade=std::clamp(std::min(age-start,end-age)/20.0f,0.0f,1.0f);
@@ -66,6 +69,16 @@ void Tick(Board* b){
  if(!Enabled()||b->mPaused)return;
  struct Delivery{float x;int row,wave;};std::vector<Delivery> pending;
  for(auto* z:b->mZombies){
+  if(Walker(z)&&int(z->mZombieType)==4&&z->mHasArm&&z->mHelmHealth>0&&!z->mIceTrapCounter&&!z->mButteredCounter&&((z->mZombieAge>0&&z->mZombieAge%600==0)||z->mPhaseCounter==20)){
+   Zombie* victim=nullptr;
+   for(auto* other:b->mZombies)if(other!=z&&Walker(other)&&(int(other->mZombieType)==0||int(other->mZombieType)==1||int(other->mZombieType)==2||int(other->mZombieType)==4||int(other->mZombieType)==6||int(other->mZombieType)==7||int(other->mZombieType)==24)&&other->mRow==z->mRow&&other->mPosX<z->mPosX&&other->mPosX>z->mPosX-100&&(!victim||other->mPosX>victim->mPosX))victim=other;
+   if(victim){if(z->mPhaseCounter==20){victim->TakeDamage(40,0);gLawnApp->PlayMemeCue(1,-7);}else{z->mPhaseCounter=40;z->StopEating();}}
+  }
+  if(int(z->mZombieType)==3&&!z->mDead&&z->IsOnBoard()&&!z->IsDeadOrDying()&&z->mHasHead&&z->mHasArm&&!z->mMindControlled&&!z->mInPool&&z->mZombieHeight==HEIGHT_ZOMBIE_NORMAL&&z->mZombiePhase==PHASE_POLEVAULTER_POST_VAULT&&z->mPhaseCounter==0&&!z->mIceTrapCounter&&!z->mButteredCounter&&z->mPosX>100){
+   z->StopEating();z->mHasObject=true;z->mZombiePhase=PHASE_POLEVAULTER_PRE_VAULT;z->mZombieAttackRect=Sexy::Rect(-29,0,70,115);
+   for(const auto* part:{"Zombie_polevaulter_pole","Zombie_polevaulter_innerarm","Zombie_polevaulter_innerhand"})z->ReanimShowPrefix(part,RENDER_GROUP_NORMAL);
+   z->PickRandomSpeed();z->PlayZombieReanim("anim_run",REANIM_LOOP,10,0);gLawnApp->PlayMemeCue(3,-6);
+  }
   if(IsResting(z))z->StopEating();
   if(IsRetreating(z)){
    z->StopEating();if(z->mZombieAge%600==400&&!z->mIceTrapCounter&&!z->mButteredCounter)gLawnApp->PlayMemeCue(3,6);

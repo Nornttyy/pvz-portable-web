@@ -72,6 +72,7 @@
 #include "Lawn/Widget/SeedChooserScreen.h"
 #include "widget/WidgetManager.h"
 #include "misc/ResourceManager.h"
+#include "sound/SoundManager.h"
 #include <algorithm>
 
 #include "widget/Checkbox.h"
@@ -1978,11 +1979,13 @@ void LawnApp::PlayFoleyPitch(FoleyType theFoleyType, float thePitch)
 
 void LawnApp::PlayRageRelease()
 {
-	// A short, raised-pitch nonsense vocal over the native pea-fire rhythm.
+	// A dedicated three-second CC0 human scream, independent of Dave's dialogue.
 	// A dedicated channel avoids affecting Dave's dialogue and prevents a lawn
 	// full of simultaneous releases from stacking the same loud voice.
 	if (mMuteSoundsForCutscene || !mSoundSystem || mSoundSystem->IsFoleyPlaying(FOLEY_RAGE_RELEASE)) return;
-	mSoundSystem->PlayFoleyPitch(FOLEY_RAGE_RELEASE, 7.0f);
+	if (gRageScreamSound < 0 && mSoundManager)
+		gRageScreamSound = mSoundManager->LoadSound("/addons/audio/rage-scream");
+	if (gRageScreamSound >= 0) mSoundSystem->PlayFoleyPitch(FOLEY_RAGE_RELEASE, 0.0f);
 }
 
 void LawnApp::PlayMemeCue(int cue, float pitch)

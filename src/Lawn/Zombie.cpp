@@ -1785,6 +1785,7 @@ void Zombie::UpdateZombiePolevaulter()
 			mX = static_cast<int>(mPosX);
 			mZombiePhase = ZombiePhase::PHASE_POLEVAULTER_POST_VAULT;
 			mZombieAttackRect = Rect(50, 0, 20, 115);
+			SandboxZombies::PoleLanded(this);
 
 			StartWalkAnim(0);
 		}
@@ -5656,8 +5657,10 @@ void Zombie::DrawDancerReanim(Graphics* g)
 	}
 }
 
+#include "AbstractRigVisuals.h"
 void Zombie::DrawReanim(Graphics* g, const ZombieDrawPosition& theDrawPos, int theBaseRenderGroup)
 {
+	AbstractRigVisuals::Scope memePose(this);
 	Reanimation* aBodyReanim = mApp->ReanimationGet(mBodyReanimID);
 	if (aBodyReanim == nullptr)
 	{

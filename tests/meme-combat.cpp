@@ -30,6 +30,22 @@ struct World:Board {
 int main(){
  using namespace SandboxMemeRules;
  static_assert(MemeShooterRules::BurstCount==50&&MemeShooterRules::MaxRage==300&&MemeShooterRules::PerShot==20&&MemeShooterRules::BurstTicks==300);
+ static_assert(MemeShooterRules::RecoveryDelay==300);
+ for(int roll=0;roll<=60;++roll)assert(std::abs(MemeShooterRules::BurstSpeed(roll)-(4.6f+roll*0.05f)*0.75f)<0.0001f);
+ {World w;auto* p=w.add(500);w.enemy();w.step(2450);const int shots=w.mProjectiles.mSize;assert(shots==65);w.step(299);assert(w.mProjectiles.mSize==shots);w.step();assert(w.mProjectiles.mSize==shots+1&&MemeCharacters::Data(p,1)==20);}
+ {World w;auto* p=w.add(517);p->Fire(nullptr,2,WEAPON_PRIMARY);auto* s=w.mProjectiles.values.back();assert(MemeCharacters::ShotStyle(s)==290);s->mPosX=741;s->mVelY=0.02f;s->mMotionType=MOTION_THREEPEATER;
+  w.mPaused=true;SandboxPlants::UpdateShot(s);assert(s->mMotionType==MOTION_THREEPEATER);w.mPaused=false;SandboxPlants::UpdateShot(s);assert(s->mMotionType==MOTION_STAR&&s->mVelX==-3.33f&&s->mVelY==0);
+  s->mProjectileType=PROJECTILE_FIREBALL;const int saved=SandboxPlants::SaveShot(s);SandboxPlants::ForgetShot(s);SandboxPlants::RestoreShot(s,saved);assert(MemeCharacters::ShotStyle(s)==290&&MemeCharacters::CanHit(s)&&s->mVelX<0);
+  SandboxPlants::UpdateShot(s);assert(s->mVelX==-3.33f);}
+ {World w;auto* p=w.add(518);p->mPlantHealth=123;const int x=p->mX,y=p->mY;
+  for(int jump=0;jump<2;++jump){p->mState=STATE_SQUASH_DONE_FALLING;p->mTargetX=x+100;p->mX=x+100;p->mY=y+8;
+   for(int count=100;count>=0;--count){p->mStateCountdown=count;assert(MemeCharacters::ReturnSquash(p));if(count==35){assert(p->mX==x+50&&p->mY<y-80);const auto saved=SandboxPlants::SavePower(p);SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved));}}
+   assert(p->mX==x&&p->mY==y&&p->mState==STATE_NOTREADY&&p->mPlantHealth==123&&MemeCharacters::Data(p,4)==2-jump);}
+  p->mState=STATE_SQUASH_DONE_FALLING;p->mStateCountdown=0;assert(!MemeCharacters::ReturnSquash(p));}
+ {World w;auto* bucket=w.enemy(500,2,static_cast<ZombieType>(4));auto* victim=w.enemy(450);bucket->mHelmHealth=100;bucket->mZombieAge=600;w.step();assert(victim->mBodyHealth==1000&&SandboxZombies::IsResting(bucket)&&SandboxZombies::Speed(bucket)==0);bucket->mZombieAge=620;bucket->mPhaseCounter=20;w.step();assert(victim->mBodyHealth==960);
+  bucket->mPhaseCounter=0;bucket->mZombieAge=1200;bucket->mHelmHealth=0;w.step();assert(victim->mBodyHealth==960);}
+ {World w;auto* z=w.enemy(500,2,static_cast<ZombieType>(3));z->mZombiePhase=PHASE_POLEVAULTER_POST_VAULT;SandboxZombies::PoleLanded(z);assert(z->mPhaseCounter==800);w.step();assert(z->mZombiePhase==PHASE_POLEVAULTER_POST_VAULT);
+  z->mPhaseCounter=0;z->mButteredCounter=100;w.step();assert(!z->mHasObject);z->mButteredCounter=0;w.step();assert(z->mHasObject&&z->mZombiePhase==PHASE_POLEVAULTER_PRE_VAULT&&z->mZombieAttackRect.mX==-29);}
  {int ticks=0;for(int fired=0;fired<50;++fired){const int delay=MemeShooterRules::BurstInterval(fired);assert(delay==6);ticks+=delay;assert(ticks==(fired+1)*6);}assert(ticks==300);}
  {World w;auto* p=w.add(500);assert(SandboxPlants::RestorePower(p,{500,300,0,100,0,50,40,0,0,2}));
   const auto state=SandboxPlants::SavePower(p);w.mPaused=true;w.step(100);

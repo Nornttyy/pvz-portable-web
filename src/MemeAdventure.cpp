@@ -54,6 +54,10 @@ void Draw(Board* b,Sexy::Graphics*){
 }
 std::string_view Translate(std::string_view key,std::string_view original){
  if(gSandboxEnabled||RosterEnabled()){
+  if(key=="BUCKETHEAD_ZOMBIE")return "急眼铁桶";
+  if(key=="BUCKETHEAD_ZOMBIE_DESCRIPTION")return "戴着桶时，每六秒急眼一次：前面一格内有同伴就揍它一下，造成40伤害，自己停手0.4秒。没有同伴就正常走，不回血。";
+  if(key=="POLE_VAULTING_ZOMBIE")return "续杯撑杆";
+  if(key=="POLE_VAULTING_ZOMBIE_DESCRIPTION")return "跳完八秒又掏出一根撑杆，还能再跳。用的是同一套起跳和落地动作，高坚果仍能拦住它。丢头、断臂或被魅惑后不再续杆。";
   if(key=="IMP")return "倒车小鬼";
   if(key=="IMP_DESCRIPTION")return "每六秒有一秒突然倒着走，倒车时不啃植物。巨人扔出的小鬼落地后也会倒车，不改变原来的血量。";
   if(key=="LADDER_ZOMBIE")return "插队梯子";

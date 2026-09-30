@@ -2,7 +2,7 @@
 #include <cmath>
 #include <cstdint>
 namespace MemeShooterRules {
-inline constexpr int PerShot=20,MaxRage=300,BurstCount=50,NormalDelay=150,BurstTicks=300;
+inline constexpr int PerShot=20,MaxRage=300,BurstCount=50,NormalDelay=150,BurstTicks=300,RecoveryDelay=300;
 // Native simulation runs at 100 ticks/sec. Distribute all 50 shots over exactly
 // 300 ticks: one pea every 6 ticks, retaining the three-second release.
 // Derive the interval from the saved remaining count; reload needs no new clock.
@@ -47,6 +47,6 @@ inline float MissStep(int style,int age){
  return WobbleStep(variant,age)*1.8f+(variant%2?1.6f:-1.6f);
 }
 inline float SpreadAngle(int roll){return -0.34f+(roll%1001)*0.68f/1000;}
-inline float BurstSpeed(int roll){return 4.6f+(roll%61)*0.05f;}
+inline float BurstSpeed(int roll){return (4.6f+(roll%61)*0.05f)*0.75f;}
 inline bool OverlapsY(float y,float height,float otherY,float otherHeight){return y+height>=otherY&&y<=otherY+otherHeight;}
 }

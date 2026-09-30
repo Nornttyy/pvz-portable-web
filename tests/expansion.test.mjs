@@ -33,8 +33,12 @@ test('power token is not a plant or a save entry; only results round-trip',()=>{
 test('release vocal is a dedicated non-looping native SFX, with overlap and volume guards',async()=>{
  const app=(await read('src/LawnApp.cpp')).toString(),foley=(await read('src/PvzpLib/PvzpFoley.cpp')).toString();
  const start=app.indexOf('void LawnApp::PlayRageRelease()'),body=app.slice(start,app.indexOf('std::string LawnApp::GetStageString',start));
- assert.match(body,/mMuteSoundsForCutscene/);assert.match(body,/IsFoleyPlaying\(FOLEY_RAGE_RELEASE\)/);assert.match(body,/PlayFoleyPitch\(FOLEY_RAGE_RELEASE, 7\.0f\)/);
- assert.match(foley,/FOLEY_RAGE_RELEASE,.*SOUND_CRAZYDAVECRAZY.*mFoleyFlags = 0U/);
+ assert.match(body,/mMuteSoundsForCutscene/);assert.match(body,/IsFoleyPlaying\(FOLEY_RAGE_RELEASE\)/);assert.match(body,/PlayFoleyPitch\(FOLEY_RAGE_RELEASE, 0\.0f\)/);
+ assert.match(foley,/FOLEY_RAGE_RELEASE,.*gRageScreamSound.*mFoleyFlags = 0U/);
+ const wav=await read('addons/audio/rage-scream.wav');assert.equal(wav.toString('ascii',0,4),'RIFF');assert.equal(wav.readUInt32LE(40)/wav.readUInt32LE(28),3);
+ const samples=(wav.length-44)/2;let peak=0;
+ for(let block=0;block<30;block++){let energy=0;for(let i=block*samples/30;i<(block+1)*samples/30;i++){const v=wav.readInt16LE(44+i*2)/32768;energy+=v*v;peak=Math.max(peak,Math.abs(v));}assert.ok(Math.sqrt(energy/(samples/30))>.01,'vocal must start immediately and fill the three-second release');}assert.ok(peak<=.801,'no clipping');
+ assert.match(body,/LoadSound\("\/addons\/audio\/rage-scream"\)/);
  assert.match(foley,/if \(theFoleyType == FOLEY_RAGE_RELEASE\)\s*aSoundInstance->SetVolume\(0\.60\)/);
  const mixer=(await read('src/SexyAppFramework/sound/SDLSoundInstance.cpp')).toString();assert.match(mixer,/mBaseVolume \* mVolume \* mSoundManagerP->mMasterVolume/);
  const board=(await read('src/Lawn/Board.cpp')).toString(),dispose=board.slice(board.indexOf('void Board::DisposeBoard()'),board.indexOf('bool Board::AreEnemyZombiesOnScreen()'));
@@ -68,8 +72,8 @@ test('native projectile integration retains splats, centered scaling and fire at
  const plant=source.slice(source.indexOf('void Plant::Fire('),source.indexOf('Zombie* Plant::FindTargetZombie('));
  assert.ok(plant.indexOf('aProjectile->ConvertToFireball(mPlantCol)')>plant.indexOf('SandboxPlants::OnFired(this,aProjectile,theTargetZombie)'),'fire attaches only after muzzle correction');
 });
-test('seventeen mechanic characters replace infusion; old results migrate without losing plants',async()=>{
- assert.equal(ORIGINAL_PLANTS.length,17);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),Array.from({length:17},(_,i)=>500+i));assert.deepEqual(ORIGINAL_ZOMBIES,[]);assert.equal(ZOMBIES.length,23);
+test('nineteen mechanic characters replace infusion; old results migrate without losing plants',async()=>{
+ assert.equal(ORIGINAL_PLANTS.length,19);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),Array.from({length:19},(_,i)=>500+i));assert.deepEqual(ORIGINAL_ZOMBIES,[]);assert.equal(ZOMBIES.length,23);
  const bases=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
  for(let id=100;id<120;++id)assert.equal(validateLayout({schema:1,map:0,plants:[{type:id,col:0,row:0}]}).plants[0].type,bases[id-100]);
  for(const p of RETIRED_PLANTS){

@@ -1439,7 +1439,7 @@ void Plant::DoSquashDamage()
 			Rect aZombieRect = aZombie->GetZombieRect();
 			if (GetRectOverlap(aAttackRect, aZombieRect) > (aZombie->mZombieType == ZombieType::ZOMBIE_FOOTBALL ? -20 : 0))
 			{
-				aZombie->TakeDamage(1800, 18U);
+				aZombie->TakeDamage(MemeCharacters::Type(this) == 518 ? 600 : 1800, 18U);
 			}
 		}
 	}
@@ -1597,6 +1597,7 @@ void Plant::UpdateSquash()
 		}
 		else if (mState == PlantState::STATE_SQUASH_DONE_FALLING)
 		{
+			if (MemeCharacters::ReturnSquash(this)) return;
 			if (mStateCountdown == 0)
 			{
 				Die();

@@ -24,7 +24,7 @@ namespace {
 struct State {int id=0,health=0,phase=0,heat=0,timer=0,delay=50,age=0,pulse=0,remaining=0,direction=1;};
 std::map<const Plant*,State> states;
 std::map<const Projectile*,int> shotStyles; // 1..8 legacy wobble; 9 burst; 10 hit; 11..18 legacy miss; 19 retreat ice; 20 legacy straight miss; 32..287 floating seeds.
-bool NativeSequence(int id){return (id>=508&&id<=513)||id==516;}
+bool NativeSequence(int id){return (id>=508&&id<=513)||(id>=516&&id<=518);}
 void Burst(State& s){
  s.phase=1;s.heat=0;s.remaining=MemeShooterRules::BurstCount;s.delay=MemeShooterRules::BurstInterval(0);s.timer=0;s.pulse=30;
  gLawnApp->PlayRageRelease(); // Once per release, never once per pea or save restore.
@@ -58,7 +58,7 @@ void Reset(){states.clear();laneCooldown.clear();shotStyles.clear();}
 void Forget(Plant* p){states.erase(p);}
 void Assign(Plant* p,int id){const auto* d=Find(id);if(!d||int(p->mSeedType)!=d->base)return;
  State s;s.id=id;s.health=p->mPlantHealth;s.timer=id==502?180:0;if(id==500)s.direction=2;states[p]=s;
- if(id==507)states[p].remaining=3;
+ if(id==507||id==518)states[p].remaining=3;
  if(!NativeSequence(id)){p->mLaunchCounter=id==503?std::clamp(p->mLaunchCounter,300,2500):9999;if(id!=514)p->mShootingCounter=0;}
  if(id==502)p->SetSleeping(false); // Keep the native short-range shot and add a daytime lure.
 }
@@ -72,7 +72,7 @@ bool Restore(Plant* p,const std::array<int,10>& a){
  if(a[0]==514&&(a[3]>300||a[2]>1))return false;
  if(a[0]==515&&a[2]>1)return false;
  if(newShooter&&((a[2]==1&&(a[8]==0||a[3]!=0))||(a[2]==0&&a[8]!=0)))return false;
- if(a[0]==507&&a[8]<1)return false;
+ if((a[0]==507||a[0]==518)&&(a[8]<1||a[8]>3))return false;
  State s{a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9]};
  // Direction was unused for this character: 2 versions the new burst state.
  // Migrate old overheating saves without healing or inventing a free volley.
@@ -88,6 +88,19 @@ bool Click(Board*,int,int){return false;}
 bool RearmPotato(Plant* p){
  auto it=states.find(p);if(it==states.end()||it->second.id!=507||p->mDead||p->mPlantHealth<=0||it->second.remaining<=1)return false;
  --it->second.remaining;it->second.timer=600;it->second.pulse=40;return true;
+}
+bool ReturnSquash(Plant* p){
+ auto it=states.find(p);if(it==states.end()||it->second.id!=518||p->mDead||it->second.remaining<=1||p->mState!=STATE_SQUASH_DONE_FALLING)return false;
+ const int count=p->mStateCountdown;
+ if(count>70)return true;
+ if(count==70){p->PlayBodyReanim("anim_jumpup",REANIM_PLAY_ONCE_AND_HOLD,5,24);gLawnApp->PlayMemeCue(2,it->second.remaining==3?5:-5);}
+ if(count==10)p->PlayBodyReanim("anim_jumpdown",REANIM_PLAY_ONCE_AND_HOLD,0,60);
+ const float t=std::clamp((70-count)/70.0f,0.0f,1.0f),ease=(1-std::cos(t*3.14159265f))*0.5f;
+ const int homeX=p->mBoard->GridToPixelX(p->mPlantCol,p->mRow),homeY=p->mBoard->GridToPixelY(p->mPlantCol,p->mRow);
+ const int landingY=p->mBoard->GridToPixelY(p->mBoard->PixelToGridXKeepOnBoard(p->mTargetX,p->mY),p->mRow)+8;
+ p->mX=int(p->mTargetX+(homeX-p->mTargetX)*ease);p->mY=int(landingY+(homeY-landingY)*ease-100*std::sin(t*3.14159265f));
+ if(count==0){--it->second.remaining;p->mX=homeX;p->mY=homeY;p->mState=STATE_NOTREADY;p->mRenderOrder=p->CalcRenderOrder();p->PlayBodyReanim("anim_idle",REANIM_LOOP,5,12);}
+ return true;
 }
 Zombie* PickTarget(Plant* p,Zombie* nativeTarget){
  if(Type(p)!=510||!nativeTarget)return nativeTarget;
@@ -118,7 +131,7 @@ void Tick(Board* b){
    if(s.phase==1){
     if(!s.delay&&room){
      Shoot(p,nullptr);--s.remaining;s.delay=MemeShooterRules::BurstInterval(MemeShooterRules::BurstCount-s.remaining);s.pulse=10;
-     if(!s.remaining){s.phase=0;s.heat=0;s.delay=MemeShooterRules::NormalDelay;}
+     if(!s.remaining){s.phase=0;s.heat=0;s.delay=MemeShooterRules::RecoveryDelay;}
     }
    }else if(!s.delay&&room){
     if(auto* target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY)){
@@ -309,6 +322,7 @@ void OnFired(Plant* p,Projectile* shot){
  // projectile, muzzle, hit rules and saved velocity. They never recursively
  // refill their own queue.
  const int id=Type(p);
+ if(id==517){shotStyles[shot]=290;states.at(p).pulse=50;} // Keep native launch curves; turn heads together after firing.
  for(auto* other:p->mBoard->mPlants)if(Type(other)==509&&other!=p&&!other->mDead&&!other->mIsAsleep&&!other->mSquished&&!other->NotOnGround()&&other->mPlantHealth>0&&other->mState==STATE_CHOMPER_DIGESTING&&std::abs(other->mPlantCol-p->mPlantCol)+std::abs(other->mRow-p->mRow)==1){
   auto& s=states.at(other);if(!s.timer){other->mStateCountdown=std::max(0,other->mStateCountdown-200);s.timer=50;s.pulse=20;}
  }
@@ -339,7 +353,11 @@ void OnImpact(Projectile* shot,Zombie* z){
  }
 }
 bool RestoreShotStyle(const Projectile* shot,int style){
- if(style<0||(style>20&&!MemeShooterRules::IsFloating(style))||shot->mDead)return false;
+ if(style<0||(style>20&&style!=290&&!MemeShooterRules::IsFloating(style))||shot->mDead)return false;
+ if(style==290){
+  if((shot->mMotionType!=MOTION_STRAIGHT&&shot->mMotionType!=MOTION_THREEPEATER&&shot->mMotionType!=MOTION_STAR)||(shot->mProjectileType!=PROJECTILE_PEA&&shot->mProjectileType!=PROJECTILE_FIREBALL))return false;
+  shotStyles[shot]=style;return true;
+ }
  if(style&&((style==19?shot->mMotionType!=MOTION_STRAIGHT:shot->mMotionType!=MOTION_STAR)||(shot->mProjectileType!=PROJECTILE_PEA&&shot->mProjectileType!=PROJECTILE_SNOWPEA&&shot->mProjectileType!=PROJECTILE_FIREBALL)))return false;
  if(style)shotStyles[shot]=style;else shotStyles.erase(shot);return true;
 }
@@ -347,6 +365,7 @@ void ForgetShot(const Projectile* shot){shotStyles.erase(shot);}
 void UpdateShot(Projectile* shot){
  const int style=ShotStyle(shot);if(!style||shot->mDead||shot->mBoard->mPaused)return;
  if(shot->mPosY+shot->mPosZ<-40||shot->mPosY+shot->mPosZ>640){shot->Die();return;}
+ if(style==290&&shot->mMotionType!=MOTION_STAR&&shot->mPosX>=740){shot->mMotionType=MOTION_STAR;shot->mVelX=-3.33f;shot->mVelY=0;gLawnApp->PlayMemeCue(2,7);}
  if(MemeShooterRules::IsFloating(style))shot->mVelY=MemeShooterRules::FloatingStep(style,shot->mProjectileAge);
  else if(style<9)shot->mVelY=MemeShooterRules::WobbleStep(style,shot->mProjectileAge);
  else if(style>=11&&style<=18)shot->mVelY=MemeShooterRules::MissStep(style,shot->mProjectileAge);
