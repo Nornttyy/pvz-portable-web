@@ -1,6 +1,7 @@
 // Runs actual production skin/projectile/effect draw code against a captured raster API.
 // It checks coordinate contracts, not a live browser/GPU screenshot.
 #include "Engine.h"
+#include "../src/AbstractRigVisuals.h"
 #include "SandboxArt.h"
 #include "SandboxPlants.h"
 #include "SandboxZombies.h"
@@ -64,6 +65,24 @@ int main(){
   }app.reanims.erase(80);
  }
 
+ {auto* p=board.plant(3,2);p->mSeedType=static_cast<SeedType>(52);SandboxPlants::Assign(p,519);
+  Reanimation head;Track tracks[]={{"anim_face"},{"idle_mouth"},{"idle_headleaf_nearest"},{"anim_blink"},{"stalk_top"}};TrackInstance instances[5];head.def.mTracks={5,tracks};head.mTrackInstances=instances;
+  app.reanims[81]=&head;p->mHeadReanimID=81;Sexy::Image pea;pea.mWidth=pea.mHeight=27;Sexy::IMAGE_PROJECTILEPEA=&pea;
+  ReanimatorTransform original;original.mTransX=19.2f;original.mTransY=17.8f;original.mScaleX=.555f;original.mScaleY=.5f;
+  {AbstractRigVisuals::Scope scope(p);auto t=original;AbstractRigVisuals::Transform(&head,0,t);
+   assert(t.mImage==&pea);near(t.mTransX+13.5f*t.mScaleX,19.2f+35*.555f);near(t.mTransY+13.5f*t.mScaleY,17.8f+32.5f*.5f);
+   near(t.mScaleX*27,84*.555f);near(t.mScaleY*27,93*.5f);
+   for(int track:{1,2,3}){auto hidden=original;AbstractRigVisuals::Transform(&head,track,hidden);assert(hidden.mAlpha==0);}
+   auto stem=original;AbstractRigVisuals::Transform(&head,4,stem);assert(stem.mAlpha==1&&stem.mScaleX==original.mScaleX);
+  }
+  auto native=original;AbstractRigVisuals::Transform(&head,0,native);assert(native.mImage==original.mImage&&native.mScaleX==original.mScaleX);
+  {AbstractRigVisuals::Scope scope(&head,519);auto t=original;AbstractRigVisuals::Transform(&head,0,t);assert(t.mImage==&pea);}
+  auto* projectile=board.AddProjectile(300,240,0,2,PROJECTILE_PEA);projectile->mMotionType=MOTION_STAR;assert(MemeCharacters::RestoreShotStyle(projectile,296));
+  projectile->mX=300;projectile->mY=240;testBlits.clear();g.mTransX=331;g.mTransY=257;assert(SandboxPlants::DrawShot(&g,projectile));assert(testBlits.size()==1);
+  near(testBlits[0].matrix.m02,343);near(testBlits[0].matrix.m12,266.2f);near(testBlits[0].matrix.m00,.56f);
+  projectile->mProjectileAge=20;testBlits.clear();assert(SandboxPlants::DrawShot(&g,projectile));assert(std::abs(testBlits[0].matrix.m10)>.5f);
+  Sexy::IMAGE_PROJECTILEPEA=nullptr;app.reanims.erase(81);
+ }
  for(int id=502;id<=518;++id){auto* p=board.plant(1,1);p->mSeedType=static_cast<SeedType>(MemeCharacters::RetiredBase(id));SandboxPlants::Assign(p,id);
   float x=17,y=23,sx=.8f,sy=1.2f;SandboxPlants::AdjustScale(p,x,y,sx,sy);
   near(x,17);near(y,23);near(sx,.8f);near(sy,1.2f);assert(!SandboxPlants::DrawBody(&g,p,0,0));

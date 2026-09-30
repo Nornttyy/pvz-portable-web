@@ -180,7 +180,16 @@ int main(){
  }
 
  // Removed originals cannot be assigned, restored or re-entered through legacy powers.
- static_assert(MemeCharacters::Definitions.size()==2&&SandboxPlants::Definitions.size()==2);
+ static_assert(MemeCharacters::Definitions.size()==3&&SandboxPlants::Definitions.size()==3);
+ {World w;auto* p=w.add(519);const int x=p->mX,y=p->mY;w.step(100);assert(w.mProjectiles.mSize==0);
+  auto* z=w.enemy();w.step();assert(w.mProjectiles.mSize==1);w.step(149);assert(w.mProjectiles.mSize==1);w.step();assert(w.mProjectiles.mSize==2);
+  auto* shot=w.mProjectiles.values[0];assert(shot->mVelX>0&&shot->mVelY==0&&shot->mMotionType==MOTION_STAR);
+  assert(MemeCharacters::ShotStyle(shot)==296&&MemeCharacters::CanHit(shot)&&SandboxPlants::ShotDamage(shot,20)==20);
+  assert(p->mX==x&&p->mY==y&&p->mPlantHealth==300&&w.mPlants.mSize==1&&!MemeCharacters::Hiding(p));
+  const auto saved=SandboxPlants::SavePower(p);const int packed=SandboxPlants::SaveShot(shot);
+  SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved));SandboxPlants::ForgetShot(shot);SandboxPlants::RestoreShot(shot,packed);assert(MemeCharacters::ShotStyle(shot)==296);
+  z->mDead=true;w.step(300);assert(w.mProjectiles.mSize==2);w.mPaused=true;const auto paused=SandboxPlants::SavePower(p);w.step(500);assert(SandboxPlants::SavePower(p)==paused);
+ }
  for(int id=502;id<=518;++id){World w;auto* p=w.plant(1,2);p->mSeedType=static_cast<SeedType>(MemeCharacters::RetiredBase(id));
   SandboxPlants::Assign(p,id);assert(!SandboxPlants::IsCustom(p)&&!SandboxPlants::Find(id)&&!MemeCharacters::Find(id));
   assert(!SandboxPlants::RestorePower(p,{id,300,0,0,0,50,0,0,0,1}));
@@ -198,7 +207,7 @@ int main(){
   if(id==504||id==518)assert(p->mX==80&&p->mY==200);
   if(id==502)assert(p->mIsAsleep==!night);
  }
- for(int id:{500,501}){World w;auto* p=w.add(id);w.step(100);const auto saved=SandboxPlants::SavePower(p);
+ for(int id:{500,501,519}){World w;auto* p=w.add(id);w.step(100);const auto saved=SandboxPlants::SavePower(p);
   for(int field=0;field<10;++field){auto bad=saved;bad[field]=-999;assert(!SandboxPlants::RestorePower(p,bad));assert(SandboxPlants::SavePower(p)==saved);}
   SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved)&&SandboxPlants::SavePower(p)==saved);
  }
@@ -222,5 +231,5 @@ int main(){
  }
  for(int style:{19,290,291,292,294,295,512,521}){World w;auto* shot=w.AddProjectile(100,250,0,2,PROJECTILE_PEA);
   assert(!MemeCharacters::RestoreShotStyle(shot,style));assert(!MemeCharacters::ShotStyle(shot));}
- std::cout<<"Meme powers: two retained characters, native roster and migration passed\\n";
+ std::cout<<"Meme powers: three characters, native roster and migration passed\\n";
 }

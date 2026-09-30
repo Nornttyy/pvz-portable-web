@@ -96,6 +96,10 @@ void Tick(Board* b){
      if(s.heat>=MemeShooterRules::MaxRage)Burst(s);
     }
    }
+  }else if(s.id==ShooterPea){
+   if(!s.delay&&b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8){
+    if(auto* target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY)){Shoot(p,target);s.delay=150;s.pulse=22;}
+   }
   }else if(s.id==501){
    if(!s.timer&&p->mRecentlyEatenCountdown>0){
     Zombie* target=nullptr;
@@ -142,6 +146,15 @@ void Card(Sexy::Graphics* g,int x,int y,int id){const auto* d=Find(id);if(!d)ret
  PvzpDrawString(g,std::to_string(d->cost),x+23,y+65,Sexy::FONT_BRIANNETOD12,Sexy::Color(75,51,20),DS_ALIGN_CENTER);
 }
 void OnFired(Plant* p,Projectile* shot){
+ if(Type(p)==ShooterPea){
+  AbstractRigVisuals::Scope pose(p);
+  float x=58,y=34;auto* pea=Sexy::IMAGE_PROJECTILEPEA;
+  if(pea)SandboxArt::TrackPoint(gLawnApp->ReanimationTryToGet(p->mHeadReanimID),"anim_face",pea->mWidth,pea->mHeight,pea->mWidth*.88f,pea->mHeight*.5f,x,y);
+  shot->mPosX=p->mX+x-12;shot->mPosY=p->mY+y-12-shot->mPosZ;
+  shot->mX=int(shot->mPosX);shot->mY=int(shot->mPosY+shot->mPosZ);
+  shot->mMotionType=MOTION_STAR;shot->mVelX=3.33f;shot->mVelY=0;
+  shotStyles[shot]=ShooterProjectile;return;
+ }
  if(Type(p)==500){
  AbstractRigVisuals::Scope pose(p); // The actual projectile exits the posed mouth.
  float x,y;if(SandboxArt::TrackPoint(gLawnApp->ReanimationTryToGet(p->mHeadReanimID),"idle_mouth",35,49,32,24.5f,x,y)){shot->mPosX=p->mX+x-12;shot->mPosY=p->mY+y-12-shot->mPosZ;shot->mX=int(shot->mPosX);shot->mY=int(shot->mPosY+shot->mPosZ);}
@@ -156,11 +169,11 @@ void OnFired(Plant* p,Projectile* shot){
  }
 }}
 int ShotStyle(const Projectile* shot){const auto it=shotStyles.find(shot);return it==shotStyles.end()?0:it->second;}
-bool CanHit(const Projectile* shot){return MemeShooterRules::CanHit(BaseShotStyle(ShotStyle(shot)));}
+bool CanHit(const Projectile* shot){return ShotStyle(shot)==ShooterProjectile||MemeShooterRules::CanHit(BaseShotStyle(ShotStyle(shot)));}
 void OnImpact(Projectile*,Zombie*){}
 bool RestoreShotStyle(const Projectile* shot,int style){
- // Preserve only rage projectiles, including older floating-shot records.
- if(style<0||(style>20&&!MemeShooterRules::IsFloating(style))||style==19||shot->mDead)return false;
+ // Keep the new projectile distinct from retired self-thrower save records.
+ if(style<0||(style>20&&style!=ShooterProjectile&&!MemeShooterRules::IsFloating(style))||style==19||shot->mDead)return false;
  if(style&&(shot->mMotionType!=MOTION_STAR||(shot->mProjectileType!=PROJECTILE_PEA&&shot->mProjectileType!=PROJECTILE_SNOWPEA&&shot->mProjectileType!=PROJECTILE_FIREBALL)))return false;
  if(style)shotStyles[shot]=style;else shotStyles.erase(shot);return true;
 }

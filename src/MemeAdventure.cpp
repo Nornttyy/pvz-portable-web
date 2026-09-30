@@ -9,6 +9,7 @@
 #include "Lawn/Board.h"
 #include "Lawn/Plant.h"
 #include "Lawn/Projectile.h"
+#include "Lawn/Zombie.h"
 #include "Lawn/CursorObject.h"
 #include "Lawn/SeedPacket.h"
 #include "PvzpLib/PvzpCommon.h"
@@ -72,7 +73,7 @@ std::string_view Translate(std::string_view key,std::string_view original){
  }
  return cache.emplace(std::string(key),std::move(text)).first->second;
 }
-Save Capture(Board* b){Save out;out.power=0;out.cooldown=0;
+Save Capture(Board* b){Save out;out.power=0;out.cooldown=RosterSaveVersion;
  for(auto* p:b->mPlants)if(!p->mDead&&MemeCharacters::Is(p))out.plants.push_back({b->mPlants.DataArrayGetID(p),SandboxPlants::SavePower(p)});
  for(auto* shot:b->mProjectiles)if(!shot->mDead&&SandboxPlants::SaveShot(shot)!=100)out.shots.push_back({b->mProjectiles.DataArrayGetID(shot),SandboxPlants::SaveShot(shot)});return out;
 }
@@ -85,10 +86,15 @@ void Restore(Board* b){
  }
  // Also migrate ordinary plants in pre-mod saves, keeping HP and positions.
  if(RosterEnabled()){
-  for(auto* p:b->mPlants)OnPlanted(p);
+  for(auto* p:b->mPlants){
+   if(pending.cooldown!=RosterSaveVersion&&int(p->mSeedType)==52&&!MemeCharacters::Is(p))SandboxPlants::RestoreRetired(p,{504,0,0,0,0,0,0,0,0,1});
+   OnPlanted(p);
+  }
   if(b->mSeedBank)for(int i=0;i<b->mSeedBank->mNumPackets;++i){auto& card=b->mSeedBank->mSeedPackets[i];
-   if(int(card.mPacketType)==52)card.mPacketType=SEED_PEASHOOTER;
-   if(int(card.mImitaterType)==52)card.mImitaterType=SEED_PEASHOOTER;
+   if(pending.cooldown!=RosterSaveVersion){
+    if(int(card.mPacketType)==52)card.mPacketType=SEED_PEASHOOTER;
+    if(int(card.mImitaterType)==52)card.mImitaterType=SEED_PEASHOOTER;
+   }
    if(Replacement(int(card.mPacketType),int(card.mImitaterType))&&card.mRefreshing&&card.mRefreshTime>300){
     const int left=std::clamp(card.mRefreshTime-card.mRefreshCounter,0,300);card.mRefreshTime=300;card.mRefreshCounter=300-left;
    }
@@ -104,6 +110,9 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_adventure_power_data(int index,int field
  auto* b=gLawnApp?gLawnApp->mBoard:nullptr;if(!b||gSandboxEnabled)return -1;const auto save=MemeAdventure::Capture(b);
  if(index==-1)return field==0?save.power:field==1?0:field==2?b->mSunMoney:field==3?b->mLevel:field==4?int(save.plants.size()):field==5?int(MemeAdventure::Visible(b)):field==6?int(b->mPaused):field==7?0:field==8?int(b->mTutorialState):field==9?int(b->mApp->mGameScene):-1;
  if(index>=0&&field>=10&&field<=13){int n=0;for(auto* c:b->mCoins)if(!c->mDead&&(field<12?c->IsSun():c->mType==COIN_FINAL_SEED_PACKET)&&!c->mIsBeingCollected){if(n++==index)return int(field%2==0?c->mPosX+30:c->mPosY+30);}return -1;}
+ // Read-only live-lane diagnostics let UI tests plant in an occupied lane;
+ // they must not inject enemies or rely on random adventure spawn rows.
+ if(index>=0&&(field==16||field==17)){int n=0;for(auto* z:b->mZombies)if(z->IsOnBoard()&&!z->IsDeadOrDying()&&!z->mMindControlled&&z->mPosX>350){if(n++==index)return field==16?z->mRow:int(z->mPosX);}return -1;}
  if(index<0||field<0||field>15)return -1;int n=0;for(auto* p:b->mPlants)if(!p->mDead){if(n++!=index)continue;return field==0?SandboxPlants::Type(p):field==1?p->mPlantCol:field==2?p->mRow:field==3?p->mPlantHealth:field==7?p->mLaunchCounter:field==8?int(p->mSeedType):field==9?int(p->mIsAsleep):field==14?MemeCharacters::Data(p,4):field==15?MemeCharacters::Data(p,5):SandboxPlants::HeatData(p,field-4);}return -1;
 }
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_adventure_seed_data(int index,int field){

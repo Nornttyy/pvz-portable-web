@@ -31,6 +31,7 @@
 #include "SeedPacket.h"
 #include "../LawnApp.h"
 #include "../SandboxPlants.h"
+#include "../Sandbox.h"
 #include "../SandboxZombies.h"
 #include "../MemeAdventure.h"
 #include "../SandboxMemeRules.h"
@@ -2824,7 +2825,7 @@ void Plant::UpdateReanim()
 
 	aBodyReanim->Update();
 
-	if (mSeedType == SeedType::SEED_LEFTPEATER)
+	if (mSeedType == SeedType::SEED_LEFTPEATER && MemeCharacters::Type(this) != MemeCharacters::ShooterPea)
 	{
 		aOffsetX += 80.0f * aScaleX;
 		aScaleX *= -1.0f;
@@ -4170,6 +4171,11 @@ void Plant::DrawSeedType(Graphics* g, SeedType theSeedType, SeedType theImitater
 		aOffsetX = -20.0f;
 		aOffsetY = -40.0f;
 	}
+	if (aSeedType == SeedType::SEED_LEFTPEATER && (gSandboxEnabled || MemeAdventure::RosterEnabled()))
+	{
+		SandboxPlants::DrawPeaHeadPreview(&aSeedG, thePosX, thePosY, aDrawVariation == VARIATION_IMITATER);
+		return;
+	}
 	if (aSeedType == SeedType::SEED_LEFTPEATER)
 	{
 		aOffsetX += aSeedG.mScaleX * 80.0f;
@@ -5235,6 +5241,7 @@ Rect Plant::GetPlantRect()
 
 Rect Plant::GetPlantAttackRect(PlantWeapon thePlantWeapon)
 {
+	if (MemeCharacters::Type(this) == MemeCharacters::ShooterPea) return Rect(mX + 60, mY, BOARD_WIDTH, mHeight);
 	Rect aRect;
 	if (mApp->IsWallnutBowlingLevel())
 	{

@@ -1,3 +1,3 @@
 #pragma once
-class Plant;
-namespace AbstractRigVisuals {struct Scope {explicit Scope(const Plant*){}};}
+class Plant;class Reanimation;
+namespace AbstractRigVisuals {struct Scope {explicit Scope(const Plant*){};Scope(Reanimation*,int){}};}

@@ -2298,7 +2298,8 @@ int LawnApp::GetSeedsAvailable()
 bool LawnApp::HasSeedType(SeedType theSeedType)
 {
 	// Existing unused left-facing shooter ID keeps old saves and enum values intact.
-	if (theSeedType == SEED_LEFTPEATER) return false; // Retired self-thrower; keep enum/save ABI intact.
+	if (theSeedType == SEED_LEFTPEATER) return MemeAdventure::RosterEnabled() && mPlayerInfo &&
+		(HasFinishedAdventure() || mPlayerInfo->GetLevel() >= MemeCharacters::Find(MemeCharacters::ShooterPea)->unlock);
 	if (IsTrialStageLocked() && theSeedType >= SeedType::SEED_JALAPENO)
 		return false;
 

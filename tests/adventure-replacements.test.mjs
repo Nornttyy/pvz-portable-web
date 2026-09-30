@@ -26,10 +26,10 @@ namespace MemeAdventure {${mapping}\n${translate}}
 int main(){using namespace MemeAdventure;
  for(const auto& d:MemeCharacters::Definitions){assert(Replacement(d.base,-1)->id==d.id);assert(Replacement(48,d.base)->id==d.id);assert(Translate(d.key,"old")==d.name);assert(Translate(std::string(d.key)+"_TOOLTIP","old")==d.hint);assert(Translate(std::string(d.key)+"_DESCRIPTION","old")==d.description);}
  assert(!Replacement(48,-1)&&!Replacement(2,-1)&&!Replacement(503,-1));
- assert(MemeCharacters::Definitions.size()==2);
+ assert(MemeCharacters::Definitions.size()==3);
  assert(Translate("ADVICE_QA","向日葵和双子向日葵") == "向日葵和双子向日葵");
  assert(Translate("SEED_CHOOSER_QA","豌豆射手、小喷菇、坚果墙") == "红温豌豆、小喷菇、反咬坚果");
- for(int seed=0;seed<53;++seed)if(seed!=0&&seed!=3)assert(!Replacement(seed,-1));
+ for(int seed=0;seed<53;++seed)if(seed!=0&&seed!=3&&seed!=52)assert(!Replacement(seed,-1));
  for(const char* key:{"FLAG_ZOMBIE","BUCKETHEAD_ZOMBIE","POLE_VAULTING_ZOMBIE","CONEHEAD_ZOMBIE","ZOMBIE","SCREEN_DOOR_ZOMBIE","FOOTBALL_ZOMBIE","BALLOON_ZOMBIE","NEWSPAPER_ZOMBIE","IMP","LADDER_ZOMBIE"})
   assert(Translate(key,"native")=="native"&&Translate(std::string(key)+"_DESCRIPTION","native")=="native");
  assert(Translate("GOLD_SUNFLOWER_TROPHY","金色向日葵奖杯") == "金色向日葵奖杯");

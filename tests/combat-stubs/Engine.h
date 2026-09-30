@@ -17,7 +17,8 @@ constexpr int PHASE_LADDER_CARRYING=4,PHASE_LADDER_PLACING=5;
 constexpr int PHASE_POLEVAULTER_PRE_VAULT=6,PHASE_POLEVAULTER_POST_VAULT=7;
 constexpr int PHASE_BALLOON_FLYING=8;
 constexpr int STATE_NOTREADY=0,STATE_SQUASH_DONE_FALLING=50;
-enum ReanimationType {REANIM_ZOMBIE,REANIM_FLAG};
+enum ReanimationType {REANIM_ZOMBIE,REANIM_FLAG,REANIM_REPEATER};
+enum DrawVariation {VARIATION_NORMAL,VARIATION_IMITATER};
 enum ProjectileType {PROJECTILE_PEA,PROJECTILE_SNOWPEA,PROJECTILE_FIREBALL,PROJECTILE_ZOMBIE_PEA,PROJECTILE_SPIKE,PROJECTILE_BUTTER,PROJECTILE_KERNEL,PROJECTILE_CABBAGE,PROJECTILE_STAR,PROJECTILE_PUFF};
 enum ProjectileMotion {MOTION_STRAIGHT,MOTION_STAR,MOTION_HOMING,MOTION_THREEPEATER,MOTION_BACKWARDS};
 constexpr int REANIM_PLAY_ONCE_AND_HOLD=0,REANIM_LOOP=1;
@@ -38,7 +39,7 @@ struct GLImage:MemoryImage{};
 struct RectDraw{Rect bounds;Color color;};
 inline std::vector<RectDraw> drawnRects;
 struct Graphics{
- float mTransX=0,mTransY=0;Rect mClipRect;int mDrawMode=0;
+ float mTransX=0,mTransY=0,mScaleX=1,mScaleY=1;Rect mClipRect;int mDrawMode=0;
  Color mColor;
  Graphics(MemoryImage*){};Graphics(const Graphics&)=default;
  void SetLinearBlend(bool){};void SetColor(Color c){mColor=c;};void DrawLine(int,int,int,int){};void FillRect(int x,int y,int w,int h){drawnRects.push_back({{x,y,w,h},mColor});};void SetClipRect(int,int,int,int){};
@@ -51,10 +52,10 @@ inline Image* IMAGE_PROJECTILEPEA=nullptr;
 struct Track{const char* mName="";};
 struct TrackGroup{int count=0;Track* tracks=nullptr;};
 struct Definition{TrackGroup mTracks;};
-struct TrackInstance{Sexy::Image* mImageOverride=nullptr;int mRenderGroup=0;};
-using ReanimatorTrackInstance=TrackInstance;
+struct ReanimatorTrackInstance{Sexy::Image* mImageOverride=nullptr;int mRenderGroup=0;};
+using TrackInstance=ReanimatorTrackInstance;
 inline std::vector<Sexy::Image*> drawnOverrides;
-struct ReanimatorTransform{float mFrame=0,mAlpha=1;};
+struct ReanimatorTransform{float mFrame=0,mAlpha=1,mTransX=0,mTransY=0,mScaleX=1,mScaleY=1,mSkewX=0,mSkewY=0;Sexy::Image* mImage=nullptr;};
 struct Reanimation{
  Definition def;Definition* mDefinition=&def;TrackInstance* mTrackInstances=nullptr;float mAnimTime=0;
  std::string track;Sexy::SexyTransform2D matrix;ReanimatorTransform pose;
@@ -64,7 +65,11 @@ struct Reanimation{
  int mFrameBasePose=0;Sexy::SexyTransform2D mOverlayMatrix;int FindTrackIndex(const char*){return 0;}void GetAttachmentOverlayMatrix(int,Sexy::SexyTransform2D&){};
  void GetTrackMatrix(int,Sexy::SexyTransform2D& out){out=matrix;}void GetCurrentTransform(int,ReanimatorTransform* out){*out=pose;}
 };
-struct ReanimatorCache{std::unique_ptr<Sexy::MemoryImage> MakeBlankMemoryImage(int,int){return std::make_unique<Sexy::MemoryImage>();}};
+struct ReanimatorCache{
+ std::unique_ptr<Sexy::MemoryImage> MakeBlankMemoryImage(int w,int h){auto im=std::make_unique<Sexy::MemoryImage>();im->Create(w,h);return im;}
+ std::unique_ptr<Sexy::MemoryImage> MakeCachedPlantFrame(SeedType,DrawVariation){return MakeBlankMemoryImage(120,120);}
+ void UpdateReanimationForVariation(Reanimation*,DrawVariation){}
+};
 struct LawnApp{std::vector<std::pair<int,float>> memeCues;void PlayMemeCue(int cue,float pitch=0){memeCues.push_back({cue,pitch});}int rageReleaseRequests=0;void PlayRageRelease(){++rageReleaseRequests;}bool adventure=true;bool IsAdventureMode(){return adventure;}ReanimatorCache cache;ReanimatorCache* mReanimatorCache=&cache;std::map<int,Reanimation*> reanims;Reanimation* ReanimationTryToGet(int id){return reanims.contains(id)?reanims.at(id):nullptr;}Sexy::GLImage* GetImage(std::string file){auto* im=new Sexy::GLImage;im->path=file;return im;}void PlayFoley(int){}};
 extern LawnApp* gLawnApp;
 class Board;
@@ -169,6 +174,7 @@ struct PlantDefinition{ReanimationType mReanimationType=REANIM_ZOMBIE;PlantSubCl
 inline PlantDefinition GetPlantDefinition(SeedType type){return {REANIM_ZOMBIE,int(type)==1||int(type)==3?SUBCLASS_NORMAL:SUBCLASS_SHOOTER};}
 inline void DrawSeedPacket(Sexy::Graphics*,int,int,SeedType,SeedType,int,int,bool,bool){}
 inline void PvzpDrawImageCelScaledF(Sexy::Graphics*,Sexy::Image*,int,int,int,int,int,int){}
+inline void PvzpDrawImageScaledF(Sexy::Graphics*,Sexy::Image*,float,float,float,float){}
 inline void PvzpDrawString(Sexy::Graphics*,const char*,int,int,int,Sexy::Color,int){}
 inline void PvzpDrawString(Sexy::Graphics*,const std::string&,int,int,int,Sexy::Color,int){}
 struct Blit{std::string path;Sexy::SexyTransform2D matrix;int alpha;};

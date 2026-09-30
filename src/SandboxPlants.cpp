@@ -1,4 +1,4 @@
-// Only rage pea and counterattack walnut extend native plant behavior.
+// Three independent characters; all other plants retain native behavior.
 #include "SandboxPlants.h"
 #include "SandboxArt.h"
 #include "SandboxMemeRules.h"
@@ -125,7 +125,36 @@ void Tick(Board* b){MemeCharacters::Tick(b);}
 void DrawEffects(Sexy::Graphics* graphics,Board* b,int row){
  Sexy::Graphics clipped(*graphics);clipped.ClipRect(0,82,800,518);MemeCharacters::Effects(&clipped,b,row);
 }
-bool DrawShot(Sexy::Graphics*,const Projectile*){return false;}
+bool DrawShot(Sexy::Graphics* g,const Projectile* shot){
+ if(MemeCharacters::ShotStyle(shot)!=MemeCharacters::ShooterProjectile)return false;
+ // A whole original peashooter, including its stem/leaves/mouth. This cache
+ // is intentionally the native seed 0, never the pea-headed preview.
+ static std::unique_ptr<Sexy::MemoryImage> shooter;
+ if(!shooter)shooter=gLawnApp->mReanimatorCache->MakeCachedPlantFrame(SEED_PEASHOOTER,VARIATION_NORMAL);
+ if(!shooter)return false;
+ const float angle=shot->mProjectileAge*.085f,c=std::cos(angle)*.56f,s=std::sin(angle)*.56f;
+ Sexy::SexyTransform2D m;m.LoadIdentity();m.m00=c;m.m01=-s;m.m10=s;m.m11=c;
+ // Projectile::Draw receives an object-local Graphics frame (already moved
+ // to mX/mY). Only add the fractional position, never world position twice.
+ m.m02=shot->mPosX-shot->mX+12+g->mTransX;m.m12=shot->mPosY+shot->mPosZ-shot->mY+12+g->mTransY;
+ // Original 120px cache: plant's visual centre is five pixels below centre.
+ m.m02+=5*s;m.m12-=5*c;
+ PvzpBltMatrix(g,shooter.get(),m,g->mClipRect,Sexy::Color(255,255,255),g->mDrawMode,Sexy::Rect(0,0,shooter->mWidth,shooter->mHeight));
+ return true;
+}
+void DrawPeaHeadPreview(Sexy::Graphics* g,float x,float y,bool imitater){
+ // Separate cache: never alter vanilla backward-shooter or projectile art.
+ static std::unique_ptr<Sexy::MemoryImage> previews[2];auto& cached=previews[imitater?1:0];
+ if(!cached){
+  cached=gLawnApp->mReanimatorCache->MakeBlankMemoryImage(120,120);Sexy::Graphics canvas(cached.get());canvas.SetLinearBlend(true);
+  for(const char* layer:{"anim_idle","anim_head_idle"}){
+   Reanimation anim;anim.ReanimationInitializeType(20,20,REANIM_REPEATER);anim.SetFramesForLayer(layer);
+   if(imitater)gLawnApp->mReanimatorCache->UpdateReanimationForVariation(&anim,VARIATION_IMITATER);
+   AbstractRigVisuals::Scope pose(&anim,MemeCharacters::ShooterPea);anim.Draw(&canvas);
+  }
+ }
+ PvzpDrawImageScaledF(g,cached.get(),x-20*g->mScaleX,y-20*g->mScaleY,g->mScaleX,g->mScaleY);
+}
 void DrawCard(Sexy::Graphics* g,int x,int y,int id){
  if(MemeCharacters::Is(id)){MemeCharacters::Card(g,x,y,id);return;}
  if(id>=0&&id<48)DrawSeedPacket(g,x,y,static_cast<SeedType>(id),SEED_NONE,0,255,false,false);

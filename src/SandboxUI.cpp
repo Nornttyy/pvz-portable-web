@@ -41,7 +41,7 @@ namespace {
 enum Tool { PlantTool, ZombieTool, EraseTool, InteractTool };
 int panel=0, plantPage=0, selectedPlant=0, selectedZombie=0, plantSlot=0, catalog=4, catalogPage=0;
 Tool tool=PlantTool;
-std::array<int,6> plants{0,1,500,501,2,5};
+std::array<int,6> plants{0,1,500,501,519,5};
 std::vector<int> DirectPlants(){std::vector<int> ids;for(const auto& d:SandboxPlants::Definitions)if(!SandboxMemeRules::IsResult(d.id))ids.push_back(d.id);return ids;}
 bool wasPaused=true, painting=false, dirty=false;
 int lastCell=-1, lastPlantCount=0, messageTicks=0;
@@ -181,7 +181,7 @@ void SandboxUIReset() {
     SandboxUIDetach();
     panel=0;plantPage=0;catalog=4;catalogPage=0;tool=PlantTool;painting=false;dirty=false;wasPaused=true;
     selectedPlant=0;selectedZombie=0;plantSlot=0;lastCell=-1;lastPlantCount=0;messageTicks=0;
-    plants={0,1,500,501,2,5};
+    plants={0,1,500,501,519,5};
     StopPainting();
     PvzpLoadResources("DelayLoad_Almanac");
     SandboxRepairFonts();

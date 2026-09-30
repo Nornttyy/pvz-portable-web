@@ -38,7 +38,7 @@
 #include "../../MemeAdventure.h"
 #include "../../AlmanacPlantLayout.h"
 
-static int AbstractAlmanacCount(){return NUM_ALMANAC_SEEDS;}
+static int AbstractAlmanacCount(){return gLawnApp->HasSeedType(SEED_LEFTPEATER)?NUM_SEED_TYPES:NUM_ALMANAC_SEEDS;}
 
 bool gZombieDefeated[NUM_ZOMBIE_TYPES] = { false };
 
@@ -156,6 +156,7 @@ void AlmanacDialog::SetupPlant()
 	mPlant->mBoard = nullptr;
 	mPlant->mIsOnBoard = false;
 	mPlant->PlantInitialize(0, 0, mSelectedSeed, SEED_NONE);
+	if (mSelectedSeed == SEED_LEFTPEATER && MemeAdventure::RosterEnabled()) SandboxPlants::Assign(mPlant.get(), MemeCharacters::ShooterPea);
 	mPlant->mX = aPosX;
 	mPlant->mY = aPosY;
 }

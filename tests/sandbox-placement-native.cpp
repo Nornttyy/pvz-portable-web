@@ -90,7 +90,7 @@ int main(){
  assert(PlacePlant(&b,999,0,0)==-2);assert(PlacePlant(&b,0,-1,0)==-2);
  // Fixed seed cards plant directly, cannot overwrite an existing plant or fuse.
  mapType=0;stackPlants=false;fusionEnabled=false;
- for(int id:{500,501}){
+ for(int id:{500,501,519}){
    Board world;assert(PlacePlant(&world,id,1,1)==1);
    assert(world.mPlants.back()->id==id&&int(world.mPlants.back()->mSeedType)==SandboxPlants::Base(id));
    world.mPlants.back()->mPlantHealth=1;

@@ -44,7 +44,7 @@
 #include "../../MemeAdventure.h"
 #include "../../SeedChooserLayout.h"
 
-static int AbstractChooserCount(){return NUM_SEEDS_IN_CHOOSER;}
+static int AbstractChooserCount(){return gLawnApp->HasSeedType(SEED_LEFTPEATER)?NUM_SEED_TYPES:NUM_SEEDS_IN_CHOOSER;}
 
 SeedChooserScreen::SeedChooserScreen()
 {

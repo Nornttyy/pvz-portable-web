@@ -1,10 +1,13 @@
 #include "AbstractRigVisuals.h"
 #include "LawnApp.h"
 #include "MemeCharacters.h"
+#include "Resources.h"
+#include "graphics/Image.h"
 #include "Lawn/Plant.h"
 #include "PvzpLib/Reanimator.h"
 #include <algorithm>
 #include <cmath>
+#include <string_view>
 namespace AbstractRigVisuals {
 namespace {
 struct Pose {Reanimation* anim;const Plant* plant;std::array<int,10> state;int part;};
@@ -18,7 +21,7 @@ void Warp(ReanimatorTransform& t,float x,float y,float sx,float sy,float angle=0
 }
 void Scope::Add(Reanimation*,int,int){}
 Scope::Scope(const Plant* p):mark(poses.size()){
- if(MemeCharacters::Type(p)!=500||p->mSquished)return;
+ if((MemeCharacters::Type(p)!=500&&MemeCharacters::Type(p)!=MemeCharacters::ShooterPea)||p->mSquished)return;
  const auto state=MemeCharacters::Save(p);int part=0;
  for(auto id:{p->mBodyReanimID,p->mHeadReanimID,p->mHeadReanimID2,p->mHeadReanimID3,p->mBlinkReanimID}){
   if(auto* a=gLawnApp->ReanimationTryToGet(id))poses.push_back({a,p,state,part});
@@ -27,11 +30,29 @@ Scope::Scope(const Plant* p):mark(poses.size()){
 }
 // Retired characters must not alter native zombies or cached/almanac previews.
 Scope::Scope(Zombie*):mark(poses.size()){}
-Scope::Scope(Reanimation*,int):mark(poses.size()){}
+Scope::Scope(Reanimation* a,int type):mark(poses.size()){
+ if(a&&type==MemeCharacters::ShooterPea){std::array<int,10> state{};state[0]=type;poses.push_back({a,nullptr,state,1});}
+}
 Scope::~Scope(){poses.resize(mark);}
-void Transform(Reanimation* a,int,ReanimatorTransform& t){
+void Transform(Reanimation* a,int track,ReanimatorTransform& t){
  const Pose* p=nullptr;for(auto i=poses.rbegin();i!=poses.rend();++i)if(i->anim==a){p=&*i;break;}
- if(!p||p->plant->mIsAsleep||(p->part!=1&&p->part!=4))return;
+ if(!p)return;
+ if(p->state[0]==MemeCharacters::ShooterPea){
+  const std::string_view name=a->mDefinition->mTracks.tracks[track].mName;
+  if(name=="idle_mouth"||name.starts_with("idle_headleaf")||name=="idle_shoot_blink"||name.starts_with("anim_blink")||name=="PeaShooter_eyebrow"){t.mAlpha=0;return;}
+  if(!name.starts_with("anim_face")||!Sexy::IMAGE_PROJECTILEPEA)return;
+  // Preserve the native head bone's centre, sway and recoil. Both the image
+  // AND its pivot become the original round pea, not a resized face texture.
+  auto* pea=Sexy::IMAGE_PROJECTILEPEA;
+  const float kx=t.mSkewX*3.14159265f/180,ky=t.mSkewY*3.14159265f/180;
+  const float cx=t.mTransX+35*t.mScaleX*std::cos(kx)-32.5f*t.mScaleY*std::sin(ky);
+  const float cy=t.mTransY+35*t.mScaleX*std::sin(kx)+32.5f*t.mScaleY*std::cos(ky);
+  t.mScaleX*=84.0f/pea->mWidth;t.mScaleY*=93.0f/pea->mHeight;t.mImage=pea;
+  t.mTransX=cx-pea->mWidth*.5f*t.mScaleX*std::cos(kx)+pea->mHeight*.5f*t.mScaleY*std::sin(ky);
+  t.mTransY=cy-pea->mWidth*.5f*t.mScaleX*std::sin(kx)-pea->mHeight*.5f*t.mScaleY*std::cos(ky);
+  return;
+ }
+ if(!p->plant||p->plant->mIsAsleep||(p->part!=1&&p->part!=4))return;
  const auto& s=p->state;
  const bool burst=s[2]==1;const float heat=burst?1:s[3]/300.0f;
  const float exhaustion=!burst&&s[3]==0&&s[5]>150?(s[5]-150)/150.0f:0;

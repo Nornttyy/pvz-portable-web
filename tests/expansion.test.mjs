@@ -42,8 +42,8 @@ test('persistent native sidebar fits both rosters and keeps the lawn in original
 });
 test('actual projectile/effect draw code preserves bone and world coordinate contracts',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'pvz-visual-contracts-')),binary=join(dir,'visual');
- for(const f of ['SandboxPlants.cpp','SandboxZombies.cpp','SandboxArt.cpp','MemeCharacters.cpp'])await copyFile(join(root,'src',f),join(dir,f));
- await run(process.env.CXX||'c++',['-std=c++20','-Itests/combat-stubs','-Isrc',...['SandboxPlants.cpp','SandboxZombies.cpp','SandboxArt.cpp','MemeCharacters.cpp'].map(f=>join(dir,f)),'tests/visual-coordinates.cpp','-o',binary],{cwd:root});
+ for(const f of ['SandboxPlants.cpp','SandboxZombies.cpp','SandboxArt.cpp','MemeCharacters.cpp','AbstractRigVisuals.cpp','AbstractRigVisuals.h'])await copyFile(join(root,'src',f),join(dir,f));
+ await run(process.env.CXX||'c++',['-std=c++20','-Itests/combat-stubs','-Isrc',...['SandboxPlants.cpp','SandboxZombies.cpp','SandboxArt.cpp','MemeCharacters.cpp','AbstractRigVisuals.cpp'].map(f=>join(dir,f)),'tests/visual-coordinates.cpp','-o',binary],{cwd:root});
  assert.match((await run(binary)).stdout,/Visual coordinate contracts passed/);
 });
 test('native projectile integration retains splats, centered scaling and fire attachments',async()=>{
@@ -62,8 +62,8 @@ test('native projectile integration retains splats, centered scaling and fire at
  const plant=source.slice(source.indexOf('void Plant::Fire('),source.indexOf('Zombie* Plant::FindTargetZombie('));
  assert.ok(plant.indexOf('aProjectile->ConvertToFireball(mPlantCol)')>plant.indexOf('SandboxPlants::OnFired(this,aProjectile,theTargetZombie)'),'fire attaches only after muzzle correction');
 });
-test('only two originals remain; retired formations migrate without losing native plants',async()=>{
- assert.equal(ORIGINAL_PLANTS.length,2);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501]);assert.deepEqual(ORIGINAL_ZOMBIES,[]);assert.equal(ZOMBIES.length,23);
+test('three originals remain; retired formations migrate without losing native plants',async()=>{
+ assert.equal(ORIGINAL_PLANTS.length,3);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,519]);assert.deepEqual(ORIGINAL_ZOMBIES,[]);assert.equal(ZOMBIES.length,23);
  const bases=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
  for(let id=100;id<120;++id)assert.equal(validateLayout({schema:1,map:0,plants:[{type:id,col:0,row:0}]}).plants[0].type,bases[id-100]);
  for(const p of [...RETIRED_PLANTS,...RETIRED_CHARACTERS]){
@@ -88,7 +88,7 @@ test('adventure replaces native cards, preserving optional saves and combat tick
  const plants=(await read('src/Lawn/Plant.cpp')).toString();
  assert.match(plants,/MemeAdventure::Replacement\(int\(theSeedType\), int\(theImitaterType\)\)\) return 300/);
  assert.match(plants,/MemeCharacters::Is\(this\) && !MemeCharacters::Producing\(this\)/);
- assert.match(adventure,/for\(auto\* p:b->mPlants\)OnPlanted\(p\)/);
+ assert.match(adventure,/OnPlanted\(p\)/);assert.match(adventure,/pending.cooldown!=RosterSaveVersion/);
  assert.doesNotMatch((await read('src/Lawn/SeedPacket.cpp')).toString(),/MemeAdventure::DrawCardName/);
  assert.doesNotMatch(adventure,/void DrawCardName/);
  const characters=(await read('src/MemeCharacters.cpp')).toString();
@@ -116,8 +116,9 @@ test('retired zombie art and extra seed cannot leak into native previews or menu
  const rig=(await read('src/AbstractRigVisuals.cpp')).toString(),ui=(await read('src/SandboxUI.cpp')).toString();
  assert.doesNotMatch(rig,/bucket-glove|squash-headband|Phone|case 50[2-9]:|case 51[0-8]:/);
  assert.doesNotMatch(ui,/SandboxArt::Phone|500,501,502,503/);
- assert.match(ui,/plants=\{0,1,500,501,2,5\}/);
- const app=(await read('src/LawnApp.cpp')).toString();assert.match(app,/if \(theSeedType == SEED_LEFTPEATER\) return false/);
+ assert.match(ui,/plants=\{0,1,500,501,519,5\}/);
+ const app=(await read('src/LawnApp.cpp')).toString();assert.match(app,/if \(theSeedType == SEED_LEFTPEATER\) return MemeAdventure::RosterEnabled\(\)/);
+ assert.match(app,/MemeCharacters::Find\(MemeCharacters::ShooterPea\)->unlock/);
  const z=(await read('src/SandboxZombies.cpp')).toString();assert.doesNotMatch(z,/AddZombieInRow|PlayMemeCue|TakeDamage|SetImageOverride/);
  const wasm=await read('site/sandbox-engine/pvz-portable.wasm');
  assert.equal(wasm.includes(await read('addons/art/bucket-glove.png')),false);

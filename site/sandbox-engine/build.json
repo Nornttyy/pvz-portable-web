@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Roster trim: only rage pea (500) and counterattack walnut (501) remain. Retired plant identities and all custom zombie behaviors, names and preview art removed; native plants/zombies restored in adventure, sandbox and almanac. Old formations and adventure plants migrate to native bases; saved zombie interaction phases release without changing health or progression. Retired accessories no longer embedded. Retained mechanics unchanged: 300 rage, 3-second 50-pea burst, 3-second recovery, slower burst peas and the same sharpened 100%-gain three-second vocal; walnut counters every 3 seconds for 80 damage without knockback. Existing sun-hover and ordinary-sized 25-value faster production retained.",
+  "mode": "Three abstract plants: rage pea (500), counterattack walnut (501), and independent shooter pea (519). Shooter pea has an original projectile-pea head on the native animated stem, firing tumbling whole native peashooters every 1.5 seconds for ordinary pea damage without moving itself or adding knockback. Adventure 1-8 unlock, 125 sun, 3-second card cooldown; integrated chooser, almanac, previews, sandbox and versioned save/resume. Old 502-518 identities remain retired, not reused. Other plants/zombies and the two retained characters keep their previous behavior.",
   "files": [
     {
       "name": "pvz-portable.js",
       "size": 277501,
-      "sha256": "6fc9ed3c031669bf67777d3a470db12891c5aa4a427ee02f331ead68e2f1208f"
+      "sha256": "26e8e2c7979723ef90a23404b3c4731fd3566a687ec0f1df6b4b41535ca91567"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7537511,
-      "sha256": "b8087cf700fd7de9b2c06db8c24bf194818d09feb6903e628c91a55c66ab7cf8"
+      "size": 7547132,
+      "sha256": "e65e4295b42e67c11d874b04fd1f51d5fc98205ae35a8678424d92bbdbac4569"
     }
   ]
 }

@@ -4,11 +4,13 @@ class Plant; class Board; class Zombie; class Projectile;
 namespace Sexy {class Graphics;class Color;}
 namespace MemeCharacters {
 inline constexpr int ReflectedShot=512;
+inline constexpr int ShooterPea=519, ShooterProjectile=296;
 constexpr int BaseShotStyle(int style){return style&(ReflectedShot-1);}
 struct Definition {int id,base,cost,unlock;const char* name;const char* shortName;const char* hint;const char* key;const char* description;};
-inline constexpr std::array<Definition,2> Definitions{{
+inline constexpr std::array<Definition,3> Definitions{{
  {500,0,100,1,"红温豌豆","红温","满300怒气 · 3秒乱射50发","PEASHOOTER","普通攻击只有10%命中判定，其余豌豆反复上下飘，每次摆幅随机，不击退。每发增加20怒气，逐渐变红；满300自动在3秒内乱射50发，不能手动释放。红温子弹减速25%，射完休息3秒，不消耗生命。"},
  {501,3,50,4,"反咬坚果","反咬","被啃后反击 · 冷却3秒","WALL_NUT","被啃后反击面前的僵尸，造成80伤害。每3秒一次，不击退僵尸。"},
+ {519,52,125,8,"射手豌豆","射手豌豆","头是豌豆 · 发射射手","SHOOTER_PEA","豌豆当脑袋，射手当子弹。向前发射完整的小豌豆射手，本体留在原地；每1.5秒一发，造成20伤害，不击退。冒险1-8解锁。"},
 }};
 // Retired IDs are migration-only, never playable definitions.
 inline constexpr std::array<int,17> RetiredBases{8,1,0,5,7,4,26,6,32,29,34,13,10,28,21,18,17};

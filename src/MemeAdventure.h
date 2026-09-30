@@ -5,6 +5,9 @@
 class Board;
 namespace Sexy {class Graphics;}
 namespace MemeAdventure {
+// Former power cooldown was unused after roster trim; marker keeps old seed 52
+// migration separate from new independent cards, even before one is planted.
+inline constexpr int RosterSaveVersion=51900;
 struct SavedPlant {unsigned int key=0;SandboxPlants::PowerSave state{};};
 struct SavedShot {unsigned int key=0;int percent=100;};
 struct Save {int power=0,cooldown=0;std::vector<SavedPlant> plants;std::vector<SavedShot> shots;};
