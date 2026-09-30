@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Seventeen mechanic plants and nine native zombie replacements: hiccup fume-shroom, alternating split-pea, hotfoot spikeweed, reversing imp and lane-cutting ladder. Four isolated pitch-shifted gag sounds share a single-voice budget. Native animations, particles, adventure unlocks and saves retained. Showoff 60-second lifetime, automatic 300-rage/80-pea burst and ordinary-size 50-value suns unchanged",
+  "mode": "Seventeen mechanic plants and nine native zombie replacements with four single-voice-budget gag sounds. The automatic 300-rage burst fires 80 randomly scattered peas over exactly 300 native ticks (3 seconds), retaining remaining shots and intervals on pause/resume. Sunflowers, including the adventure replacement, and mature sun-shrooms produce ordinary-size 25-value suns at double frequency (11.75-12.5 seconds); young shrooms, twin sunflowers and sky suns unchanged. Saved production countdowns, showoff 60-second lifetime, native animations and adventure unlocks preserved",
   "files": [
     {
       "name": "pvz-portable.js",
       "size": 277298,
-      "sha256": "0a707be127b48f3d25a7fb1303ea5580130bc57a9db03b51fd1b5056d09ba38f"
+      "sha256": "08a485e89f91b30217089e594cbfc58eda03d6a4581eab868448f588adbf7a3d"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7475469,
-      "sha256": "83c03ef10fb57e28a38a5d38830f8a61a8aab46a3ffe6a4bc62f766e32ddf27b"
+      "size": 7475639,
+      "sha256": "6629f3036108b4217d7f8a58f04add61026d76be6a64b076d5ce27a4a4b3cee4"
     }
   ]
 }

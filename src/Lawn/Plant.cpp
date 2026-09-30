@@ -1035,7 +1035,11 @@ void Plant::UpdateProductionPlant()
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_LAST_STAND && mBoard->mChallenge->mChallengeState != ChallengeState::STATECHALLENGE_LAST_STAND_ONSLAUGHT)
 		return;
 
-	mLaunchCounter--;
+	// Keep the native countdown units so existing saves retain their progress.
+	// Sunflowers and fully grown sun-shrooms now give 25 sun twice as often.
+	const bool aFastSun = mSeedType == SeedType::SEED_SUNFLOWER ||
+		(mSeedType == SeedType::SEED_SUNSHROOM && mState == PlantState::STATE_SUNSHROOM_BIG);
+	mLaunchCounter -= aFastSun ? 2 : 1;
 	if (mLaunchCounter <= 100)
 	{
 		int aFlashCountdown = PvzpAnimateCurve(100, 0, mLaunchCounter, 0, 100, PvzpCurves::CURVE_LINEAR);
@@ -1056,12 +1060,12 @@ void Plant::UpdateProductionPlant()
 			}
 			else
 			{
-				mBoard->AddCoin(mX, mY, CoinType::COIN_LARGESUN, CoinMotion::COIN_MOTION_FROM_PLANT);
+				mBoard->AddCoin(mX, mY, CoinType::COIN_SUN, CoinMotion::COIN_MOTION_FROM_PLANT);
 			}
 		}
 		else if (mSeedType == SeedType::SEED_SUNFLOWER)
 		{
-			mBoard->AddCoin(mX, mY, CoinType::COIN_LARGESUN, CoinMotion::COIN_MOTION_FROM_PLANT);
+			mBoard->AddCoin(mX, mY, CoinType::COIN_SUN, CoinMotion::COIN_MOTION_FROM_PLANT);
 		}
 		else if (mSeedType == SeedType::SEED_TWINSUNFLOWER)
 		{
@@ -1078,7 +1082,7 @@ void Plant::UpdateProductionPlant()
 		{
 			if (mSeedType == SeedType::SEED_SUNFLOWER)
 			{
-				mBoard->AddCoin(mX, mY, CoinType::COIN_LARGESUN, CoinMotion::COIN_MOTION_FROM_PLANT);
+				mBoard->AddCoin(mX, mY, CoinType::COIN_SUN, CoinMotion::COIN_MOTION_FROM_PLANT);
 			}
 			else if (mSeedType == SeedType::SEED_MARIGOLD)
 			{

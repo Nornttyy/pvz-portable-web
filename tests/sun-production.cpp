@@ -30,7 +30,8 @@ struct Plant {
 };
 namespace MemeCharacters {bool Is(Plant* p){return p->meme;}bool Producing(Plant* p){return p->producing;}}
 namespace SandboxPlants {int NativeProduction(Plant* p){return p->copies;}}
-int RandRangeInt(int low,int high){assert(low<=high);return high;}
+bool useLowRoll=false;
+int RandRangeInt(int low,int high){assert(low<=high);return useLowRoll?low:high;}
 float RandRangeFloat(float low,float high){assert(low<=high);return high;}
 int PvzpAnimateCurve(int,int,int,int,int,PvzpCurves){return 0;}
 namespace Sexy {int Rand(int){return 50;}}
@@ -38,25 +39,47 @@ namespace Sexy {int Rand(int){return 50;}}
 int main(){
  for(bool replacement:{false,true}){
   Plant p;p.meme=replacement;p.UpdateProductionPlant();assert(p.board.coins.size()==1);
-  assert(p.board.coins[0].GetSunValue()==50&&p.board.motions[0]==COIN_MOTION_FROM_PLANT);
+  assert(p.board.coins[0].GetSunValue()==25&&p.board.motions[0]==COIN_MOTION_FROM_PLANT);
   assert(p.board.coins[0].GetSunScale()==1.0f);
-  assert(p.mLaunchCounter==2500);p.UpdateProductionPlant();assert(p.board.coins.size()==1&&p.mLaunchCounter==2499);
+  assert(p.mLaunchCounter==2500);p.UpdateProductionPlant();assert(p.board.coins.size()==1&&p.mLaunchCounter==2498);
  }
  for(auto state:{STATE_SUNSHROOM_SMALL,STATE_SUNSHROOM_BIG}){
   Plant p;p.mSeedType=SEED_SUNSHROOM;p.mState=state;p.mStateCountdown=100;p.UpdateSunShroom();
-  assert(p.board.coins.size()==1&&p.board.coins[0].GetSunValue()==(state==STATE_SUNSHROOM_SMALL?15:50));
+  assert(p.board.coins.size()==1&&p.board.coins[0].GetSunValue()==(state==STATE_SUNSHROOM_SMALL?15:25));
   assert(p.board.coins[0].GetSunScale()==(state==STATE_SUNSHROOM_SMALL?0.5f:1.0f));
  }
  {Plant p;p.mSeedType=SEED_SUNSHROOM;p.mState=STATE_SUNSHROOM_GROWING;p.UpdateSunShroom();assert(p.board.coins.empty()&&p.mLaunchCounter==1);
   p.app.animation.mLoopCount=1;p.UpdateSunShroom();assert(p.mState==STATE_SUNSHROOM_BIG&&p.board.coins.empty());
-  p.UpdateSunShroom();assert(p.board.coins.size()==1&&p.board.coins[0].GetSunValue()==50);}
+  p.UpdateSunShroom();assert(p.board.coins.size()==1&&p.board.coins[0].GetSunValue()==25);}
  {Plant p;p.mSeedType=SEED_TWINSUNFLOWER;p.UpdateProductionPlant();assert(p.board.coins.size()==2);for(auto c:p.board.coins)assert(c.GetSunValue()==25);}
- {Plant p;p.app.mGameMode=GAMEMODE_CHALLENGE_BIG_TIME;p.UpdateProductionPlant();assert(p.board.coins.size()==2);for(auto c:p.board.coins)assert(c.GetSunValue()==50);}
+ {Plant p;p.app.mGameMode=GAMEMODE_CHALLENGE_BIG_TIME;p.UpdateProductionPlant();assert(p.board.coins.size()==2);for(auto c:p.board.coins)assert(c.GetSunValue()==25);}
+ // Test the actual reset/decrement loop at both native random bounds. Only
+ // sunflower (including 503) and mature shroom run at twice the old frequency.
+ for(bool low:{false,true})for(int kind=0;kind<6;++kind){
+  useLowRoll=low;Plant p;
+  if(kind==1)p.meme=true;
+  if(kind==2||kind==3){p.mSeedType=SEED_SUNSHROOM;p.mState=kind==2?STATE_SUNSHROOM_BIG:STATE_SUNSHROOM_SMALL;}
+  if(kind==4)p.mSeedType=SEED_TWINSUNFLOWER;
+  if(kind==5)p.mSeedType=SEED_MARIGOLD;
+  p.UpdateProductionPlant();const auto initial=p.board.coins.size();
+  const int ticks=(low?2350:2500)/(kind<3?2:1);
+  for(int i=1;i<ticks;++i){p.UpdateProductionPlant();assert(p.board.coins.size()==initial);}
+  p.UpdateProductionPlant();assert(p.board.coins.size()==initial*2);
+ }
+ useLowRoll=false;
+ // Old saved countdowns need no migration, and odd counters still emit once.
+ for(int remaining:{1,2,3,99,100,101,1201,2500}){
+  Plant p;p.mLaunchCounter=remaining;
+  for(int i=1;i<(remaining+1)/2;++i){p.UpdateProductionPlant();assert(p.board.coins.empty());}
+  p.UpdateProductionPlant();assert(p.board.coins.size()==1&&p.mLaunchCounter==2500);
+ }
+ {Plant p;p.meme=true;p.producing=false;p.mLaunchCounter=1200;p.UpdateProductionPlant();assert(p.mLaunchCounter==1200);
+  p.producing=true;p.UpdateProductionPlant();assert(p.mLaunchCounter==1198);}
  for(int guard=0;guard<5;++guard){Plant p;switch(guard){case 0:p.meme=true;p.producing=false;break;case 1:p.inPlay=false;break;case 2:p.app.izombie=true;break;case 3:p.board.award=true;break;case 4:p.board.mCoins.mSize=992;break;}p.UpdateProductionPlant();assert(p.board.coins.empty());}
  {Coin sky{COIN_SUN};assert(sky.GetSunValue()==25);}
  for(auto motion:{COIN_MOTION_FROM_SKY,COIN_MOTION_FROM_SKY_SLOW,COIN_MOTION_FROM_PLANT,COIN_MOTION_COIN,COIN_MOTION_FROM_PRESENT}){
   Coin sun{COIN_LARGESUN,motion};assert(sun.GetSunValue()==50);
   assert(sun.GetSunScale()==(motion==COIN_MOTION_FROM_PLANT?1.0f:2.0f));
  }
- std::cout<<"Native sun production: sunflower 50, mature shroom 50, young 15; timing, guards and sky unchanged\n";
+ std::cout<<"Native sun production: sunflower 25, mature shroom 25 at double frequency; young 15, twin, guards and sky unchanged\n";
 }

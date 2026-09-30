@@ -15,6 +15,24 @@ function checkSizes(list){for(const sun of list)if(sun[3]===2){const expected=su
 async function ad(i,f){return page.evaluate(([i,f])=>Module._pvz_adventure_power_data(i,f),[i,f]);}
 async function waitSun(value){await page.waitForFunction(value=>{for(let i=0;i<1000&&Module._pvz_sun_data(i,0)>=0;++i)if(Module._pvz_sun_data(i,0)===value&&Module._pvz_sun_data(i,3)===2)return true;return false;},value,{timeout:18000});return(await suns()).find(s=>s[0]===value&&s[3]===2);}
 async function collect(s){const before=await ad(-1,2);await page.mouse.move(...await point(s[1],s[2]));await page.waitForFunction(n=>Module._pvz_adventure_power_data(-1,2)===n,before+s[0],{timeout:4000});return before+s[0];}
+// Use a young shroom's native growth countdown as a tick clock. Subtracting
+// each sun's age gives an exact birth tick, independent of browser frame rate.
+async function productionIntervals(clockPlant,regions){
+ await page.evaluate(n=>window.qaSunBirths=Array.from({length:n},()=>[]),regions.length);
+ await page.waitForFunction(({clockPlant,regions})=>{
+  const tick=-Module._pvz_sandbox_plant_data(clockPlant,9);
+  for(let i=0;i<1000&&Module._pvz_sun_data(i,0)>=0;++i){
+   if(Module._pvz_sun_data(i,0)!==25||Module._pvz_sun_data(i,3)!==2)continue;
+   const x=Module._pvz_sun_data(i,1),g=regions.findIndex(([min,max])=>x>min&&x<max);
+   if(g<0)continue;const birth=tick-Module._pvz_sun_data(i,4),a=window.qaSunBirths[g];if(!a.includes(birth))a.push(birth);
+  }
+  return window.qaSunBirths.every(a=>a.length>=3);
+ },{clockPlant,regions},{timeout:14000});
+ const births=await page.evaluate(()=>window.qaSunBirths.map(a=>a.sort((x,y)=>x-y)));
+ const intervals=births.map(a=>a.slice(1).map((v,i)=>v-a[i]));
+ for(const group of intervals)for(const ticks of group)assert.ok(ticks>=1175&&ticks<=1250,`production interval ${ticks} must be 11.75–12.5 seconds`);
+ return intervals;
+}
 try{
  await page.goto(process.env.PVZ_QA_URL||'http://127.0.0.1:8097/');await page.waitForFunction(()=>!document.getElementById('start').disabled,undefined,{timeout:90000});
  await page.evaluate(async()=>{
@@ -25,18 +43,20 @@ try{
  });
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);await click(260,348);await page.waitForFunction(()=>Module.canvas.width===1024,undefined,{timeout:20000});
  await api(7);await api(1,1,0,2);await api(1,503,3,2);await api(1,9,6,2);await api(5,4);await page.mouse.move(0,0);await api(4,0);
- await page.waitForFunction(()=>{const types=new Set();for(let i=0;i<1000&&Module._pvz_sun_data(i,0)>=0;++i){if(Module._pvz_sun_data(i,3)!==2)continue;const x=Module._pvz_sun_data(i,1),v=Module._pvz_sun_data(i,0);if(x<150&&v===50)types.add(1);if(x>230&&x<390&&v===50)types.add(503);if(x>470&&v===15)types.add(9);}return types.size===3;},undefined,{timeout:10000});
- await page.waitForTimeout(300);await api(4,1);results.initial=await suns();checkSizes(results.initial);await shot('native-and-replacement-50-young-shroom-15');
+ await page.waitForFunction(()=>{const types=new Set();for(let i=0;i<1000&&Module._pvz_sun_data(i,0)>=0;++i){if(Module._pvz_sun_data(i,3)!==2)continue;const x=Module._pvz_sun_data(i,1),v=Module._pvz_sun_data(i,0);if(x<150&&v===25)types.add(1);if(x>230&&x<390&&v===25)types.add(503);if(x>470&&v===15)types.add(9);}return types.size===3;},undefined,{timeout:10000});
+ await page.waitForTimeout(300);await api(4,1);results.initial=await suns();checkSizes(results.initial);await shot('native-and-replacement-25-young-shroom-15');
+ await api(4,0);results.flowerIntervals=await productionIntervals(2,[[0,150],[230,390]]);
  await api(4,0);await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(2,8)===25,undefined,{timeout:40000});
- await page.waitForFunction(()=>{for(let i=0;i<1000&&Module._pvz_sun_data(i,0)>=0;++i)if(Module._pvz_sun_data(i,0)===50&&Module._pvz_sun_data(i,1)>470&&Module._pvz_sun_data(i,3)===2)return true;return false;},undefined,{timeout:9000});
- await page.waitForTimeout(300);await api(4,1);results.mature=await suns();checkSizes(results.mature);assert.equal(await page.evaluate(()=>Module._pvz_sandbox_plant_data(2,8)),25);await shot('grown-shroom-produces-50');
+ await page.waitForFunction(()=>{for(let i=0;i<1000&&Module._pvz_sun_data(i,0)>=0;++i)if(Module._pvz_sun_data(i,0)===25&&Module._pvz_sun_data(i,1)>470&&Module._pvz_sun_data(i,3)===2)return true;return false;},undefined,{timeout:9000});
+ await page.waitForTimeout(300);await api(4,1);results.mature=await suns();checkSizes(results.mature);assert.equal(await page.evaluate(()=>Module._pvz_sandbox_plant_data(2,8)),25);await shot('grown-shroom-produces-25');
+ await api(1,9,8,2);await api(4,0);results.matureIntervals=await productionIntervals(3,[[470,650]]);await api(4,1);
  await api(15);await page.waitForTimeout(900);await click(560,135);await page.waitForTimeout(15000);
  for(const id of [1,9,8,3,0,2]){const slot=id>=8?id+1:id;await click(47+slot%9*53,163+Math.floor(slot/9)*73);}await click(258,566);
  await page.waitForFunction(()=>Module._pvz_adventure_power_data(-1,5)===1,undefined,{timeout:25000});
  const bank=await page.evaluate(()=>Array.from({length:6},(_,i)=>Module._pvz_adventure_seed_data(i,0)));assert.deepEqual(bank,[503,9,502,501,500,2]);
  await click(110,43);await click(80,330);assert.equal(await ad(-1,2),0);await page.mouse.move(0,0);
- const flowerSun=await waitSun(50);checkSizes([flowerSun]);results.adventureFlower=await collect(flowerSun);assert.equal(results.adventureFlower,50);
- await click(160,43);await click(240,330);assert.equal(await ad(-1,2),25);await page.mouse.move(0,0);
- results.adventureYoungShroom=await collect(await waitSun(15));assert.equal(results.adventureYoungShroom,40);await shot('adventure-collected-actual-values');
+ const flowerSun=await waitSun(25);checkSizes([flowerSun]);results.adventureFlower=await collect(flowerSun);assert.equal(results.adventureFlower,25);
+ await click(160,43);await click(240,330);assert.equal(await ad(-1,2),0);await page.mouse.move(0,0);
+ results.adventureYoungShroom=await collect(await waitSun(15));assert.equal(results.adventureYoungShroom,15);await shot('adventure-collected-actual-values');
  assert.deepEqual(errors,[]);await writeFile(join(out,'report.json'),JSON.stringify({results,errors},null,2));console.log('Native sun production and adventure collection passed',results);
 }catch(e){await shot('failure');await writeFile(join(out,'failure.json'),JSON.stringify({error:String(e),results,suns:await suns(),errors},null,2));throw e;}finally{await browser.close();}

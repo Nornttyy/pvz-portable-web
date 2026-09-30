@@ -1278,7 +1278,7 @@ void Coin::Collect()
 
 float Coin::GetSunScale()
 {
-	// Plant income is 50, but its sun should retain the ordinary visual size.
+	// Legacy 50-value plant suns also retain the ordinary visual size.
 	// Native large sky/reward suns (e.g. Sunny Day) keep their original scale.
 	if (mType == CoinType::COIN_SMALLSUN) return 0.5f;
 	if (mType == CoinType::COIN_LARGESUN && mCoinMotion != CoinMotion::COIN_MOTION_FROM_PLANT) return 2.0f;

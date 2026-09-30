@@ -26,7 +26,7 @@ std::map<const Plant*,State> states;
 std::map<const Projectile*,int> shotStyles; // 1..8 legacy wobble; 9 burst; 10 hit; 11..18 legacy miss; 19 retreat ice; 20 legacy straight miss; 32..287 floating seeds.
 bool NativeSequence(int id){return (id>=508&&id<=513)||id==516;}
 void Burst(State& s){
- s.phase=1;s.heat=0;s.remaining=MemeShooterRules::BurstCount;s.delay=0;s.timer=0;s.pulse=30;
+ s.phase=1;s.heat=0;s.remaining=MemeShooterRules::BurstCount;s.delay=MemeShooterRules::BurstInterval(0);s.timer=0;s.pulse=30;
  gLawnApp->PlayRageRelease(); // Once per release, never once per pea or save restore.
 }
 // Native zombie IDs are stable through DataArray recycling; never retain pointers.
@@ -117,7 +117,7 @@ void Tick(Board* b){
    const bool room=b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8;
    if(s.phase==1){
     if(!s.delay&&room){
-     Shoot(p,nullptr);--s.remaining;s.delay=MemeShooterRules::BurstDelay;s.pulse=10;
+     Shoot(p,nullptr);--s.remaining;s.delay=MemeShooterRules::BurstInterval(MemeShooterRules::BurstCount-s.remaining);s.pulse=10;
      if(!s.remaining){s.phase=0;s.heat=0;s.delay=MemeShooterRules::NormalDelay;}
     }
    }else if(!s.delay&&room){

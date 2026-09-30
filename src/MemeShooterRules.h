@@ -2,7 +2,13 @@
 #include <cmath>
 #include <cstdint>
 namespace MemeShooterRules {
-inline constexpr int PerShot=20,MaxRage=300,BurstCount=80,NormalDelay=150,BurstDelay=1;
+inline constexpr int PerShot=20,MaxRage=300,BurstCount=80,NormalDelay=150,BurstTicks=300;
+// Native simulation runs at 100 ticks/sec. Distribute all 80 shots over exactly
+// 300 ticks (4, 4, 4, 3 tick intervals), rather than rounding to a 3.2s volley.
+// Derive the interval from the saved remaining count; reload needs no new clock.
+inline constexpr int BurstInterval(int fired){
+ return ((fired+1)*BurstTicks+BurstCount-1)/BurstCount-(fired*BurstTicks+BurstCount-1)/BurstCount;
+}
 inline constexpr int FloatingFirst=32,FloatingLast=287,FloatingTurnTicks=36;
 inline constexpr bool IsFloating(int style){return style>=FloatingFirst&&style<=FloatingLast;}
 // Roll once when firing, not every collision/frame. The saved projectile style
