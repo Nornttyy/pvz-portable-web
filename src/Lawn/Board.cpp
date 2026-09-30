@@ -255,6 +255,7 @@ void Board::DisposeBoard()
 		mChallenge->TreeOfWisdomLeave();
 
 	mApp->mSoundSystem->StopFoley(FoleyType::FOLEY_RAIN);
+	mApp->mSoundSystem->StopFoley(FoleyType::FOLEY_RAGE_RELEASE);
 	mApp->mZenGarden->mBoard = nullptr;
 	mApp->CrazyDaveDie();
 	mApp->mEffectSystem->EffectSystemFreeAll();

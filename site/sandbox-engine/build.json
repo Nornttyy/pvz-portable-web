@@ -2,7 +2,7 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Rage peashooter: one-shot comic pitched release vocal, wavy peas and 50-shot scatter without self-damage; sun hover and sunflower recovery",
+  "mode": "Rage peashooter: subtle ready indicator, save-resume scatter verification and scoped release-vocal cleanup; native wavy peas without self-damage",
   "files": [
     {
       "name": "pvz-portable.js",
@@ -11,8 +11,8 @@
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7451434,
-      "sha256": "26552f4807b16ee591f1dad6317502214ffb4d7c05f900495984866edb4a72db"
+      "size": 7451889,
+      "sha256": "0b5ebdce6a846d6935ac85ce738143f643578dd5bbf541ed68b271d154183b01"
     }
   ]
 }

@@ -29,6 +29,16 @@ struct World:Board {
 };
 int main(){
  using namespace SandboxMemeRules;
+ for(int age=0;age<320;++age){
+  assert(MemeShooterRules::ReadyGlow(99,0,age)==0&&MemeShooterRules::ReadyGlow(300,1,age)==0);
+  const int glow=MemeShooterRules::ReadyGlow(100,0,age);
+  assert(glow>=112&&glow<=160&&glow==MemeShooterRules::ReadyGlow(299,0,age+160));
+  assert(std::abs(glow-MemeShooterRules::ReadyGlow(100,0,age+1))<=1);
+ }
+ {World w;auto* p=w.add(500);assert(SandboxPlants::RestorePower(p,{500,300,0,100,0,50,40,0,0,2}));
+  const auto state=SandboxPlants::SavePower(p);w.mPaused=true;w.step(100);
+  assert(SandboxPlants::SavePower(p)==state); // Includes the ready indicator's clock.
+ }
  // Playable characters have independent, observable mechanics.
  {World w;auto* p=w.add(500);auto* z=w.enemy();const int sounds=app.rageReleaseRequests;p->mPlantHealth=123;w.step(500);
   assert(MemeCharacters::Data(p,1)==80&&w.mProjectiles.mSize==4&&!MemeCharacters::Activate(p));

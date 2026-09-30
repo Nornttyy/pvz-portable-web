@@ -13,7 +13,7 @@ index c263ab4..e613ef3 100644
  enum ScaryPotType : int32_t
  {
 diff --git a/src/Lawn/Board.cpp b/src/Lawn/Board.cpp
-index 665fcca..d926145 100644
+index 665fcca..2ba9edc 100644
 --- a/src/Lawn/Board.cpp
 +++ b/src/Lawn/Board.cpp
 @@ -25,6 +25,11 @@
@@ -28,7 +28,15 @@ index 665fcca..d926145 100644
  #include "LawnCommon.h"
  #include "System/Music.h"
  #include "System/SaveGame.h"
-@@ -315,6 +320,7 @@ int Board::CountUntriggerLawnMowers()
+@@ -250,6 +255,7 @@ void Board::DisposeBoard()
+ 		mChallenge->TreeOfWisdomLeave();
+ 
+ 	mApp->mSoundSystem->StopFoley(FoleyType::FOLEY_RAIN);
++	mApp->mSoundSystem->StopFoley(FoleyType::FOLEY_RAGE_RELEASE);
+ 	mApp->mZenGarden->mBoard = nullptr;
+ 	mApp->CrazyDaveDie();
+ 	mApp->mEffectSystem->EffectSystemFreeAll();
+@@ -315,6 +321,7 @@ int Board::CountUntriggerLawnMowers()
  
  void Board::TryToSaveGame()
  {
@@ -36,7 +44,7 @@ index 665fcca..d926145 100644
  	std::string aFileName = GetSavedGameName(mApp->mGameMode, mApp->mPlayerInfo->mId);
  
  	if (NeedSaveGame())
-@@ -346,6 +352,7 @@ bool Board::NeedSaveGame()
+@@ -346,6 +353,7 @@ bool Board::NeedSaveGame()
  
  void Board::SaveGame(const std::string& theFileName)
  {
@@ -44,7 +52,7 @@ index 665fcca..d926145 100644
  	LawnSaveGame(this, theFileName);
  }
  
-@@ -2021,6 +2028,7 @@ Plant* Board::NewPlant(int theGridX, int theGridY, SeedType theSeedType, SeedTyp
+@@ -2021,6 +2029,7 @@ Plant* Board::NewPlant(int theGridX, int theGridY, SeedType theSeedType, SeedTyp
  	Plant* aPlant = mPlants.DataArrayAlloc();
  	aPlant->mIsOnBoard = true;
  	aPlant->PlantInitialize(theGridX, theGridY, theSeedType, theImitaterType);
@@ -52,7 +60,7 @@ index 665fcca..d926145 100644
  	return aPlant;
  }
  
-@@ -2184,22 +2192,22 @@ void Board::GetPlantsOnLawn(int theGridX, int theGridY, PlantsOnLawn* thePlantOn
+@@ -2184,22 +2193,22 @@ void Board::GetPlantsOnLawn(int theGridX, int theGridY, PlantsOnLawn* thePlantOn
  
  		if (Plant::IsFlying(aSeedType))
  		{
@@ -79,7 +87,7 @@ index 665fcca..d926145 100644
  			thePlantOnLawn->mNormalPlant = aPlant;
  		}
  	}
-@@ -3004,12 +3012,34 @@ void Board::MouseMove(int x, int y)
+@@ -3004,12 +3013,34 @@ void Board::MouseMove(int x, int y)
  {
  	Widget::MouseMove(x, y);
  	mChallenge->MouseMove(x, y);
@@ -114,7 +122,7 @@ index 665fcca..d926145 100644
  }
  
  Zombie* Board::ZombieHitTest(int theMouseX, int theMouseY)
-@@ -4362,6 +4392,8 @@ void Board::PickUpTool(GameObjectType theObjectType)
+@@ -4362,6 +4393,8 @@ void Board::PickUpTool(GameObjectType theObjectType)
  
  void Board::MouseDown(int x, int y, int theClickCount)
  {
@@ -123,7 +131,7 @@ index 665fcca..d926145 100644
  	UpdateMousePosition();
  	Widget::MouseDown(x, y, theClickCount);
  	mIgnoreMouseUp = !CanInteractWithBoardButtons();
-@@ -4580,6 +4612,7 @@ bool Board::CanInteractWithBoardButtons()
+@@ -4580,6 +4613,7 @@ bool Board::CanInteractWithBoardButtons()
  
  void Board::MouseUp(int x, int y, int theClickCount)
  {
@@ -131,7 +139,7 @@ index 665fcca..d926145 100644
  	Widget::MouseUp(x, y, theClickCount);
  	if (mIgnoreMouseUp)
  	{
-@@ -5048,6 +5081,7 @@ void Board::PuzzleSaveStreak()
+@@ -5048,6 +5082,7 @@ void Board::PuzzleSaveStreak()
  
  void Board::ZombiesWon(Zombie* theZombie)
  {
@@ -139,7 +147,7 @@ index 665fcca..d926145 100644
  	if (mApp->mGameScene == GameScenes::SCENE_ZOMBIES_WON)
  		return;
  
-@@ -5176,6 +5210,7 @@ bool Board::HasLevelAwardDropped()
+@@ -5176,6 +5211,7 @@ bool Board::HasLevelAwardDropped()
  
  void Board::UpdateSunSpawning()
  {
@@ -147,7 +155,7 @@ index 665fcca..d926145 100644
  	if (StageIsNight() ||
  		HasLevelAwardDropped() ||
  		mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_RAINING_SEEDS ||
-@@ -5234,6 +5269,7 @@ void Board::NextWaveComing()
+@@ -5234,6 +5270,7 @@ void Board::NextWaveComing()
  
  void Board::UpdateZombieSpawning()
  {
@@ -155,7 +163,7 @@ index 665fcca..d926145 100644
  	if (mApp->mGameMode == GameMode::GAMEMODE_UPSELL || mApp->mGameMode == GameMode::GAMEMODE_INTRO)
  		return;
  
-@@ -5418,6 +5454,7 @@ void Board::UpdateIce()
+@@ -5418,6 +5455,7 @@ void Board::UpdateIce()
  
  void Board::UpdateProgressMeter()
  {
@@ -163,7 +171,7 @@ index 665fcca..d926145 100644
  	if (mApp->IsFinalBossLevel())
  	{
  		Zombie* aBoss = GetBossZombie();
-@@ -5692,6 +5729,7 @@ void Board::UpdateGame()
+@@ -5692,6 +5730,7 @@ void Board::UpdateGame()
  
  void Board::Update()
  {
@@ -171,7 +179,7 @@ index 665fcca..d926145 100644
  	PvzpHesitationBracket aHesitation("Board::Update");
  
  	Widget::Update();
-@@ -5746,7 +5784,7 @@ void Board::Update()
+@@ -5746,7 +5785,7 @@ void Board::Update()
  		mShakeCounter--;
  		if (mShakeCounter == 0)
  		{
@@ -180,7 +188,7 @@ index 665fcca..d926145 100644
  			mY = 0;
  		}
  		else
-@@ -5755,7 +5793,7 @@ void Board::Update()
+@@ -5755,7 +5794,7 @@ void Board::Update()
  			{
  				mShakeAmountX = -mShakeAmountX;
  			}
@@ -189,7 +197,7 @@ index 665fcca..d926145 100644
  			mY = PvzpAnimateCurve(12, 0, mShakeCounter, 0, mShakeAmountY, PvzpCurves::CURVE_BOUNCE);
  		}
  	}
-@@ -6282,6 +6320,13 @@ void Board::DrawGameObjects(Graphics* g)
+@@ -6282,6 +6321,13 @@ void Board::DrawGameObjects(Graphics* g)
  	}
  	AddGameObjectRenderItemCursorPreview(aRenderList, aRenderItemCount, RenderObjectType::RENDER_ITEM_CURSOR_PREVIEW, mCursorPreview.get());
  
@@ -203,7 +211,7 @@ index 665fcca..d926145 100644
  	std::sort(aRenderList, aRenderList + aRenderItemCount, RenderItemSortFunc);
  
  	for (int i = 0; i < aRenderItemCount; i++)
-@@ -6289,6 +6334,10 @@ void Board::DrawGameObjects(Graphics* g)
+@@ -6289,6 +6335,10 @@ void Board::DrawGameObjects(Graphics* g)
  		RenderItem& aRenderItem = aRenderList[i];
  		switch (aRenderItem.mRenderObjectType)
  		{
@@ -214,7 +222,7 @@ index 665fcca..d926145 100644
  		case RenderObjectType::RENDER_ITEM_PLANT:
  		{
  			Plant* aPlant = aRenderItem.mPlant;
-@@ -7175,7 +7224,7 @@ void Board::DrawUIBottom(Graphics* g)
+@@ -7175,7 +7225,7 @@ void Board::DrawUIBottom(Graphics* g)
  
  	if (mApp->mGameScene != GameScenes::SCENE_ZOMBIES_WON)
  	{
@@ -223,7 +231,7 @@ index 665fcca..d926145 100644
  		{
  			mSeedBank->Draw(g);
  			mSeedBank->EndDraw(g);
-@@ -7372,6 +7421,7 @@ bool Board::IsScaryPotterDaveTalking()
+@@ -7372,6 +7422,7 @@ bool Board::IsScaryPotterDaveTalking()
  
  void Board::DrawUITop(Graphics* g)
  {
@@ -231,7 +239,7 @@ index 665fcca..d926145 100644
  	if (StageHasFog())
  	{
  		DrawTopRightUI(g);
-@@ -7431,6 +7481,7 @@ void Board::DrawUITop(Graphics* g)
+@@ -7431,6 +7482,7 @@ void Board::DrawUITop(Graphics* g)
  	}
  
  	mToolTip->Draw(g);
@@ -239,7 +247,7 @@ index 665fcca..d926145 100644
  	DrawDebugText(g);
  	DrawDebugObjectRects(g);
  }
-@@ -7627,6 +7678,8 @@ void Board::DoTypingCheck(KeyCode theKey)
+@@ -7627,6 +7679,8 @@ void Board::DoTypingCheck(KeyCode theKey)
  
  void Board::KeyDown(KeyCode theKey)
  {

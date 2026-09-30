@@ -27,6 +27,8 @@ test('release vocal is a dedicated non-looping native SFX, with overlap and volu
  assert.match(foley,/FOLEY_RAGE_RELEASE,.*SOUND_CRAZYDAVECRAZY.*mFoleyFlags = 0U/);
  assert.match(foley,/if \(theFoleyType == FOLEY_RAGE_RELEASE\)\s*aSoundInstance->SetVolume\(0\.60\)/);
  const mixer=(await read('src/SexyAppFramework/sound/SDLSoundInstance.cpp')).toString();assert.match(mixer,/mBaseVolume \* mVolume \* mSoundManagerP->mMasterVolume/);
+ const board=(await read('src/Lawn/Board.cpp')).toString(),dispose=board.slice(board.indexOf('void Board::DisposeBoard()'),board.indexOf('bool Board::AreEnemyZombiesOnScreen()'));
+ assert.match(dispose,/StopFoley\(FoleyType::FOLEY_RAGE_RELEASE\)/);
 });
 test('persistent native sidebar fits both rosters and keeps the lawn in original units',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'pvz-sidebar-')),binary=join(dir,'sidebar');

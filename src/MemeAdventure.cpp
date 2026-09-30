@@ -107,7 +107,7 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_adventure_power_data(int index,int field
  auto* b=gLawnApp?gLawnApp->mBoard:nullptr;if(!b||gSandboxEnabled)return -1;const auto save=MemeAdventure::Capture(b);
  if(index==-1)return field==0?save.power:field==1?0:field==2?b->mSunMoney:field==3?b->mLevel:field==4?int(save.plants.size()):field==5?int(MemeAdventure::Visible(b)):field==6?int(b->mPaused):field==7?0:field==8?int(b->mTutorialState):field==9?int(b->mApp->mGameScene):-1;
  if(index>=0&&field>=10&&field<=13){int n=0;for(auto* c:b->mCoins)if(!c->mDead&&(field<12?c->IsSun():c->mType==COIN_FINAL_SEED_PACKET)&&!c->mIsBeingCollected){if(n++==index)return int(field%2==0?c->mPosX+30:c->mPosY+30);}return -1;}
- if(index<0||field<0||field>9)return -1;int n=0;for(auto* p:b->mPlants)if(!p->mDead){if(n++!=index)continue;return field==0?SandboxPlants::Type(p):field==1?p->mPlantCol:field==2?p->mRow:field==3?p->mPlantHealth:field==7?p->mLaunchCounter:field==8?int(p->mSeedType):field==9?int(p->mIsAsleep):SandboxPlants::HeatData(p,field-4);}return -1;
+ if(index<0||field<0||field>14)return -1;int n=0;for(auto* p:b->mPlants)if(!p->mDead){if(n++!=index)continue;return field==0?SandboxPlants::Type(p):field==1?p->mPlantCol:field==2?p->mRow:field==3?p->mPlantHealth:field==7?p->mLaunchCounter:field==8?int(p->mSeedType):field==9?int(p->mIsAsleep):field==14?MemeCharacters::Data(p,4):SandboxPlants::HeatData(p,field-4);}return -1;
 }
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_adventure_seed_data(int index,int field){
  auto* b=gLawnApp?gLawnApp->mBoard:nullptr;if(!b||gSandboxEnabled||!b->mSeedBank||index<0||index>=b->mSeedBank->mNumPackets)return -1;

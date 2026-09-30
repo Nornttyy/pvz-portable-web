@@ -28,10 +28,13 @@ struct Rect{int mX,mY,mWidth,mHeight;Rect(int x=0,int y=0,int w=0,int h=0):mX(x)
 struct Image{int mWidth=80,mHeight=80;std::string path;virtual~Image()=default;};
 struct MemoryImage:Image{std::vector<uint32_t> bits=std::vector<uint32_t>(6400,0xffffffff);uint32_t* GetBits(){return bits.data();}void Create(int w,int h){mWidth=w;mHeight=h;bits.resize(w*h);}void BitsChanged(){}};
 struct GLImage:MemoryImage{};
+struct RectDraw{Rect bounds;Color color;};
+inline std::vector<RectDraw> drawnRects;
 struct Graphics{
  float mTransX=0,mTransY=0;Rect mClipRect;int mDrawMode=0;
+ Color mColor;
  Graphics(MemoryImage*){};Graphics(const Graphics&)=default;
- void SetLinearBlend(bool){};void SetColor(Color){};void DrawLine(int,int,int,int){};void FillRect(int,int,int,int){};void SetClipRect(int,int,int,int){};
+ void SetLinearBlend(bool){};void SetColor(Color c){mColor=c;};void DrawLine(int,int,int,int){};void FillRect(int x,int y,int w,int h){drawnRects.push_back({{x,y,w,h},mColor});};void SetClipRect(int,int,int,int){};
  void ClipRect(int,int,int,int){};
  void DrawImage(Image*,Rect,Rect){};
 };

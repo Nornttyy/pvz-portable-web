@@ -194,6 +194,12 @@ void Effects(Sexy::Graphics* g,Board* b,int row){
  for(const auto& [p,s]:states)if(!p->mDead&&p->mRow==row&&!p->mSquished){
   const int x=p->mX,y=p->mY;
   if(s.id==500){
+   const int glow=p->mIsAsleep?0:MemeShooterRules::ReadyGlow(s.heat,s.phase,s.age);
+   if(glow){
+    g->SetColor(Sexy::Color(210,164,77,glow));
+    g->FillRect(x+11,y+76,58,1);g->FillRect(x+11,y+83,58,1);
+    g->FillRect(x+11,y+77,1,6);g->FillRect(x+68,y+77,1,6);
+   }
    g->SetColor(Sexy::Color(57,37,18));g->FillRect(x+12,y+77,56,6);
    g->SetColor(s.phase==1?Sexy::Color(210,72,43):Sexy::Color(226,167,64));g->FillRect(x+13,y+78,s.phase==1?s.remaining*54/50:s.heat*54/300,4);
    g->SetColor(Sexy::Color(85,57,27));g->FillRect(x+31,y+78,1,4); // 100-rage click threshold, no extra text.
