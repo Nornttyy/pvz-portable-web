@@ -3,17 +3,24 @@
 class Board; class Zombie; class Reanimation; class Plant; class Projectile;
 namespace Sexy { class Graphics; class Image; }
 namespace SandboxZombies {
-struct Definition {int id,base;const char* name;const char* note;const char* art;int health,armor;};
+struct Definition {int id,base;const char* name;const char* note;const char* art;int health,armor,unlock;};
 // IDs 200..211 remain retired. Never reinterpret old characters as Louis.
-inline constexpr int Louis=212, LouisUnlock=3;
-inline constexpr std::array<Definition,1> Definitions{{
- {Louis,0,"路易十六","天生无头，照常走路啃咬。",nullptr,270,0}
+inline constexpr int Louis=212, LouisUnlock=3, Runner=213, RunnerUnlock=6;
+inline constexpr int RunIn=1040,RunBrake=1041,RunOut=1042,BrakeTicks=24;
+inline constexpr float RunInSpeed=2.8f,RunOutSpeed=3.6f;
+inline constexpr std::array<Definition,2> Definitions{{
+ {Louis,0,"路易十六","天生无头，照常走路啃咬。",nullptr,270,0,LouisUnlock},
+ {Runner,0,"跑路僵尸","冲到后排，转身就跑。",nullptr,270,0,RunnerUnlock}
 }};
 constexpr const Definition* Find(int id){for(const auto& d:Definitions)if(d.id==id)return &d;return nullptr;}
 constexpr int Base(int id){auto* d=Find(id);return d?d->base:id;}
 constexpr bool LouisWave(int level,int base,int wave){return level>=LouisUnlock&&base==0&&wave>=0&&wave%3==0;}
+constexpr bool RunnerWave(int level,int base,int wave){return level>=RunnerUnlock&&base==0&&wave>=0&&wave%4==1;}
 int Type(const Zombie*);
 bool IsLouis(const Zombie*);
+bool IsRunner(const Zombie*);
+bool IsRunning(const Zombie*);
+bool UpdateRunner(Zombie*);
 bool Restore(Zombie*,int id);
 void RestoreNative(Board* board);
 void Reset();void Forget(Zombie* zombie);void Assign(Zombie* zombie,int id);

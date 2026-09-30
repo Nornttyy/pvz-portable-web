@@ -161,7 +161,7 @@ export const ORIGINAL_PLANTS = [
 export const nativeBase = id => ORIGINAL_PLANTS.find(p=>p.id===id)?.base ?? RETIRED_CHARACTERS.find(p=>p.id===id)?.base ?? RETIRED_PLANTS.find(p=>p.id===id)?.base ?? id;
 export const PLANTS = [...plantNames.map((name,id) => ({id,name,note:notes[id] ?? '免费 · 无冷却'})),...ORIGINAL_PLANTS];
 const validPlant = id => (id>=0&&id<48)||ORIGINAL_PLANTS.some(p=>p.id===id);
-export const ORIGINAL_ZOMBIES = [{id:212,base:0,name:'路易十六',note:'出场无头 · 普通僵尸血量和移速'}];
+export const ORIGINAL_ZOMBIES = [{id:212,base:0,name:'路易十六',note:'出场无头 · 普通僵尸血量和移速'}, {id:213,base:0,name:'跑路僵尸',note:'冲到后排 · 转身逃跑'}];
 export const ZOMBIES = [[0,'普通僵尸'],[1,'旗帜僵尸'],[2,'路障僵尸'],[3,'撑杆僵尸'],[4,'铁桶僵尸'],[5,'读报僵尸'],[6,'铁门僵尸'],[7,'橄榄球僵尸'],[8,'舞王僵尸'],[10,'鸭子救生圈'],[11,'潜水僵尸'],[12,'冰车僵尸'],[14,'海豚骑士'],[15,'玩偶匣僵尸'],[16,'气球僵尸'],[17,'矿工僵尸'],[18,'跳跳僵尸'],[19,'雪人僵尸'],[21,'梯子僵尸'],[22,'投石车僵尸'],[23,'巨人僵尸'],[24,'小鬼僵尸'],[32,'红眼巨人']].map(([id,name])=>({id,name,note:[10,11,14].includes(id)?'仅限水路':'手动放置'}));
 ZOMBIES.push(...ORIGINAL_ZOMBIES);
 export function plantsFor(category) { return category === 'original' ? ORIGINAL_PLANTS : category === 'all' ? PLANTS : (groups[category] ?? groups.common).map(id=>PLANTS[id]); }

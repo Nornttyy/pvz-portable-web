@@ -4111,6 +4111,7 @@ void Zombie::UpdateLadder()
 
 void Zombie::UpdateZombieWalking()
 {
+	if (SandboxZombies::UpdateRunner(this)) return;
 	if (ZombieNotWalking())
 		return;
 
@@ -5084,6 +5085,7 @@ void Zombie::DrawZombie(Graphics* g, const ZombieDrawPosition& theDrawPos)
 
 bool Zombie::IsWalkingBackwards()
 {
+	if (SandboxZombies::IsRetreating(this)) return true;
 	if (mMindControlled)
 		return true;
 
@@ -6678,6 +6680,11 @@ void Zombie::UpdateAnimSpeed()
 		ApplyAnimRate(mOriginalAnimRate);
 		return;
 	}
+	if (SandboxZombies::IsRunning(this))
+	{
+		ApplyAnimRate(int(mZombiePhase) == SandboxZombies::RunBrake ? 0.0f : 34.0f);
+		return;
+	}
 
 	if (mIsEating)
 	{
@@ -6835,6 +6842,7 @@ void Zombie::StopEating()
 
 void Zombie::CheckIfPreyCaught()
 {
+	if (SandboxZombies::IsRunner(this)) { StopEating(); return; }
 	if (SandboxZombies::IsRetreating(this) || SandboxZombies::IsFeigning(this) || SandboxZombies::IsResting(this)) { StopEating(); return; }
 	if (mZombieType == ZombieType::ZOMBIE_BUNGEE ||
 		mZombieType == ZombieType::ZOMBIE_GARGANTUAR ||

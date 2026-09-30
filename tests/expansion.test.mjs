@@ -63,7 +63,7 @@ test('native projectile integration retains splats, centered scaling and fire at
  assert.ok(plant.indexOf('aProjectile->ConvertToFireball(mPlantCol)')>plant.indexOf('SandboxPlants::OnFired(this,aProjectile,theTargetZombie)'),'fire attaches only after muzzle correction');
 });
 test('three originals remain; retired formations migrate without losing native plants',async()=>{
- assert.equal(ORIGINAL_PLANTS.length,3);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,519]);assert.deepEqual(ORIGINAL_ZOMBIES.map(z=>z.id),[212]);assert.equal(ZOMBIES.length,24);
+ assert.equal(ORIGINAL_PLANTS.length,3);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,519]);assert.deepEqual(ORIGINAL_ZOMBIES.map(z=>z.id),[212,213]);assert.equal(ZOMBIES.length,25);
  const bases=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
  for(let id=100;id<120;++id)assert.equal(validateLayout({schema:1,map:0,plants:[{type:id,col:0,row:0}]}).plants[0].type,bases[id-100]);
  for(const p of [...RETIRED_PLANTS,...RETIRED_CHARACTERS]){
@@ -126,6 +126,20 @@ test('Louis remains visually headless without entering native terminal head-loss
  const almanac=(await read('src/Lawn/Widget/AlmanacDialog.cpp')).toString();
  assert.match(almanac,/GetZombieDefinition\(static_cast<ZombieType>\(SandboxZombies::Base\(int\(mSelectedZombie\)\)\)\)/);
  assert.match((await read('src/SandboxUI.cpp')).toString(),/SandboxZombies::Definitions\[i-Zombies.size\(\)\].id/);
+});
+
+test('runner movement uses native status, terrain, mirroring and saved phase without skipping death logic',async()=>{
+ const z=(await read('src/Lawn/Zombie.cpp')).toString(),custom=(await read('src/SandboxZombies.cpp')).toString();
+ assert.match(z,/void Zombie::UpdateZombieWalking\(\)\s*\{\s*if \(SandboxZombies::UpdateRunner\(this\)\) return;/);
+ assert.match(z,/void Zombie::CheckIfPreyCaught\(\)\s*\{\s*if \(SandboxZombies::IsRunner\(this\)\) \{ StopEating\(\); return; \}/);
+ assert.match(z,/bool Zombie::IsWalkingBackwards\(\)\s*\{\s*if \(SandboxZombies::IsRetreating\(this\)\) return true;/);
+ const playing=z.slice(z.indexOf('void Zombie::UpdatePlaying()'),z.indexOf('bool Zombie::HasYuckyFaceImage()'));
+ for(const path of ['UpdateZombiePosition();','CheckForPool();','CheckForHighGround();','CheckForBoardEdge();','TakeDamage(aDamage, 9U)'])assert.ok(playing.includes(path));
+ assert.doesNotMatch(playing,/UpdateRunner/); // Do not skip damage decay/status timers.
+ const restore=custom.slice(custom.indexOf('bool Restore('),custom.indexOf('void Assign('));
+ assert.doesNotMatch(restore,/mZombiePhase\s*=|mPhaseCounter\s*=|mTargetCol\s*=|mHasObject\s*=/);
+ const save=(await read('src/Lawn/System/SaveGame.cpp')).toString();
+ for(const field of ['mZombiePhase','mPhaseCounter','mTargetCol','mHasObject'])assert.ok(save.includes('theZombie.'+field));
 });
 
 test('retired zombie art and extra seed cannot leak into native previews or menus',async()=>{

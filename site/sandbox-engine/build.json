@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Three retained abstract plants (500 rage pea, 501 counterattack walnut, 519 shooter pea) plus Louis XVI (212), a headless native normal zombie. Louis preserves normal health, movement and eating, with no phantom severed head; independent sandbox/almanac entry, adventure unlock from 1-3 in every third ordinary wave, and optional identity save chunk 23. Native zombies, original plant mechanics and old save state are preserved. Retired plant IDs 502-518 and zombie IDs 200-211 are not reused.",
+  "mode": "Three retained abstract plants (500,501,519), Louis XVI (212), and Runaway Zombie (213). Runner sprints to the rearmost plant in its lane, brakes for 0.24 seconds, turns and flees off the right edge without eating or breaching the house. Native damage, freezing, slowing, pool/roof motion and death remain active. Run phases 1040-1042, turn timer, target and facing round-trip in existing native save fields with identity chunk 23. Separate sandbox/almanac entry; adventure from 1-6, at most one runner in every fourth eligible wave. Retired characters remain removed; no new art pack, overlays or extra ability buffs.",
   "files": [
     {
       "name": "pvz-portable.js",
       "size": 277501,
-      "sha256": "510880ed0a8e5841d0585911448f2cda52e0b245e24768a0b28e2640636f7c69"
+      "sha256": "d4fce1c1ee69fd5ecf4c27bbee0b0de42a1ee5d42769bb83a3afa716d66d90ce"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7555814,
-      "sha256": "3ded37214fd47a71756f15c58c71c6e7752e5af5f3ca34f2417fd4d646e3fee5"
+      "size": 7559765,
+      "sha256": "ea397b9c93b1740245990e86ee5f7ddea096e95cec0ab0f7af6fefa081f09273"
     }
   ]
 }

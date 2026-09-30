@@ -52,7 +52,12 @@ void OnPlanted(Plant* p){
 void OnZombieSpawned(Zombie* z){
  // Replace only regular walkers in every third wave. Roadside previews,
  // flag/armored zombies, special modes and the opening tutorial stay native.
- if(RosterEnabled()&&z&&z->mBoard&&z->IsOnBoard()&&SandboxZombies::LouisWave(z->mBoard->mLevel,int(z->mZombieType),z->mFromWave))SandboxZombies::Assign(z,SandboxZombies::Louis);
+ if(!RosterEnabled()||!z||!z->mBoard||!z->IsOnBoard())return;
+ if(SandboxZombies::RunnerWave(z->mBoard->mLevel,int(z->mZombieType),z->mFromWave)){
+  bool exists=false;for(auto* other:z->mBoard->mZombies)if(other!=z&&SandboxZombies::IsRunner(other)&&other->mFromWave==z->mFromWave)exists=true;
+  if(!exists){SandboxZombies::Assign(z,SandboxZombies::Runner);return;}
+ }
+ if(SandboxZombies::LouisWave(z->mBoard->mLevel,int(z->mZombieType),z->mFromWave))SandboxZombies::Assign(z,SandboxZombies::Louis);
 }
 void Draw(Board* b,Sexy::Graphics*){
  if(Visible(b)&&!fontsReady){SandboxRepairFonts();fontsReady=true;}

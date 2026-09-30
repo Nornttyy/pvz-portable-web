@@ -258,7 +258,7 @@ void AlmanacDialog::Update()
 
 ZombieType AlmanacDialog::GetZombieType(int theIndex)
 {
-	if (theIndex == NUM_ALMANAC_ZOMBIES && MemeAdventure::RosterEnabled()) return static_cast<ZombieType>(SandboxZombies::Louis);
+	if (MemeAdventure::RosterEnabled() && theIndex >= NUM_ALMANAC_ZOMBIES && theIndex < NUM_ALMANAC_ZOMBIES + int(SandboxZombies::Definitions.size())) return static_cast<ZombieType>(SandboxZombies::Definitions[theIndex-NUM_ALMANAC_ZOMBIES].id);
 	return theIndex < NUM_ZOMBIE_TYPES ? (ZombieType)theIndex : ZOMBIE_INVALID;
 }
 
@@ -371,7 +371,7 @@ void AlmanacDialog::DrawZombies(Graphics* g)
 	PvzpDrawString(g, "[SUBURBAN_ALMANAC_ZOMBIES]", BOARD_WIDTH / 2, 54, Sexy::FONT_DWARVENTODCRAFT24, Color(0, 196, 0), DS_ALIGN_CENTER);
 
 	ZombieType aZombieMouseOn = ZombieHitTest(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY);
-	for (int i = 0; i < NUM_ALMANAC_ZOMBIES + int(MemeAdventure::RosterEnabled()); i++)
+	for (int i = 0; i < NUM_ALMANAC_ZOMBIES + int(MemeAdventure::RosterEnabled())*int(SandboxZombies::Definitions.size()); i++)
 	{
 		ZombieType aZombieType = GetZombieType(i);
 		int aPosX, aPosY;
@@ -570,7 +570,7 @@ bool AlmanacDialog::ZombieHasSilhouette(ZombieType theZombieType)
 
 bool AlmanacDialog::ZombieIsShown(ZombieType theZombieType)
 {
-	if (SandboxZombies::Find(int(theZombieType))) return MemeAdventure::RosterEnabled() && (mApp->HasFinishedAdventure() || mApp->mPlayerInfo->GetLevel() >= SandboxZombies::LouisUnlock);
+	if (const auto* custom = SandboxZombies::Find(int(theZombieType))) return MemeAdventure::RosterEnabled() && (mApp->HasFinishedAdventure() || mApp->mPlayerInfo->GetLevel() >= custom->unlock);
 	// trial mode only shows zombies up to the Snorkel Zombie
 	if (mApp->IsTrialStageLocked() && theZombieType > ZombieType::ZOMBIE_SNORKEL)
 		return false;
@@ -621,6 +621,7 @@ bool AlmanacDialog::ZombieHasDescription(ZombieType theZombieType)
 void AlmanacDialog::GetZombiePosition(ZombieType theZombieType, int& x, int& y)
 {
 	if (int(theZombieType) == SandboxZombies::Louis) {x=277;y=486;return;} // Existing free last-row cell, beside the boss.
+	if (int(theZombieType) == SandboxZombies::Runner) {x=362;y=486;return;}
 	if (theZombieType == ZombieType::ZOMBIE_BOSS)
 		x = 192, y = 486;
 	else
@@ -634,7 +635,7 @@ ZombieType AlmanacDialog::ZombieHitTest(int x, int y)
 {
 	if (mMouseVisible && mOpenPage == AlmanacPage::ALMANAC_PAGE_ZOMBIES)
 	{
-		for (int i = 0; i < NUM_ALMANAC_ZOMBIES + int(MemeAdventure::RosterEnabled()); i++)
+		for (int i = 0; i < NUM_ALMANAC_ZOMBIES + int(MemeAdventure::RosterEnabled())*int(SandboxZombies::Definitions.size()); i++)
 		{
 			ZombieType aZombieType = GetZombieType(i);
 			if (aZombieType != ZombieType::ZOMBIE_INVALID && ZombieIsShown(aZombieType))

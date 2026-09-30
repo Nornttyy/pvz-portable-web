@@ -212,10 +212,11 @@ int main(){
   SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved)&&SandboxPlants::SavePower(p)==saved);
  }
  // Every formerly modified native zombie retains its armor, position and phase.
- static_assert(SandboxZombies::Definitions.size()==1&&SandboxZombies::Find(212)->base==0);
+ static_assert(SandboxZombies::Definitions.size()==2&&SandboxZombies::Find(212)->base==0&&SandboxZombies::Find(213)->base==0);
  for(int id=200;id<212;++id)assert(!SandboxZombies::Find(id));
  for(int level:{1,2,3,8,20,50})for(int base:{0,1,2,4,23})for(int wave=-3;wave<30;++wave){
   assert(SandboxZombies::LouisWave(level,base,wave)==(level>=3&&base==0&&wave>=0&&wave%3==0));
+  assert(SandboxZombies::RunnerWave(level,base,wave)==(level>=6&&base==0&&wave>=0&&wave%4==1));
  }
  {World w;auto* z=w.enemy();z->mBodyHealth=z->mBodyMaxHealth=270;
   Reanimation rig;Track tracks[]={{"anim_head1"},{"anim_head2"},{"anim_hair"},{"anim_tongue"},{"anim_body"},{"anim_hand"},{"anim_foot"}};TrackInstance instances[7];
@@ -231,6 +232,34 @@ int main(){
   z->mZombieType=static_cast<ZombieType>(4);assert(!SandboxZombies::Restore(z,212));
   z->mZombieType=ZOMBIE_NORMAL;z->mDead=true;assert(!SandboxZombies::Restore(z,212));
   gLawnApp->reanims.erase(91);
+ }
+ // The fake breach is positional, not a damage/speed reskin. Native serialized
+ // phase/target/facing survive Restore without a second inward charge.
+ for(int lastCol:{0,1,3,6}){World w;auto* p=w.plant(lastCol,2);w.plant(8,2);w.plant(0,1);
+  auto* z=w.enemy(780);z->mBodyHealth=z->mBodyMaxHealth=270;SandboxZombies::Assign(z,213);
+  assert(z->mHasHead&&z->headHides==0&&SandboxZombies::IsRunning(z)&&z->mTargetCol==-1);
+  int ticks=0;while(z->mZombiePhase==SandboxZombies::RunIn){const float before=z->mPosX;assert(SandboxZombies::UpdateRunner(z));assert(z->mPosX<=before&&z->mPosX>=40&&++ticks<400);}
+  assert(z->mTargetCol==lastCol&&z->mPosX==std::max(40,lastCol*80-25)&&z->mPhaseCounter==24);
+  const float turn=z->mPosX;z->mIceTrapCounter=100;for(int i=0;i<70;++i)assert(SandboxZombies::UpdateRunner(z));
+  assert(z->mPhaseCounter==24&&z->mPosX==turn);z->mIceTrapCounter=0;
+  for(int i=0;i<24;++i){SandboxZombies::UpdateRunner(z);assert(z->mPosX==turn);}
+  assert(z->mZombiePhase==SandboxZombies::RunOut&&SandboxZombies::IsRetreating(z));
+  z->mBodyHealth=123;SandboxZombies::Forget(z);assert(SandboxZombies::Restore(z,213));
+  assert(z->mBodyHealth==123&&z->mZombiePhase==SandboxZombies::RunOut&&z->mTargetCol==lastCol&&z->mHasObject);
+  SandboxZombies::RestoreNative(&w);assert(z->mZombiePhase==SandboxZombies::RunOut);
+  ticks=0;while(z->mPosX<=850){const float before=z->mPosX;assert(SandboxZombies::UpdateRunner(z));assert(z->mPosX>before&&++ticks<300);}
+  assert(p->mPlantHealth==300&&z->mBodyHealth==123&&!z->mIsEating);
+ }
+ {World w;auto* z=w.enemy(700);SandboxZombies::Assign(z,213);z->chill=100;
+  SandboxZombies::UpdateRunner(z);assert(std::abs(z->mPosX-698.6f)<0.01f);
+  z->mButteredCounter=100;for(int i=0;i<100;++i)SandboxZombies::UpdateRunner(z);assert(std::abs(z->mPosX-698.6f)<0.01f);
+  z->mButteredCounter=0;z->chill=0;SandboxZombies::UpdateRunner(z);assert(std::abs(z->mPosX-695.8f)<0.01f);
+  z->mHasHead=false;assert(!SandboxZombies::UpdateRunner(z)&&z->mZombiePhase==PHASE_ZOMBIE_NORMAL);
+  z->mDead=true;assert(!SandboxZombies::UpdateRunner(z));
+ }
+ {World w;w.plant(8,2);auto* z=w.enemy(50);SandboxZombies::Assign(z,213);SandboxZombies::UpdateRunner(z);assert(z->mPosX==50&&z->mZombiePhase==SandboxZombies::RunBrake);}
+ {World w;auto* z=w.enemy(700);SandboxZombies::Assign(z,213);Reanimation body;SandboxZombies::AdjustPose(z,&body);assert(body.mOverlayMatrix.m01>0&&body.mOverlayMatrix.m02<0);
+  z->mZombiePhase=SandboxZombies::RunOut;z->mHasObject=true;body.mOverlayMatrix={};SandboxZombies::AdjustPose(z,&body);assert(body.mOverlayMatrix.m01<0&&body.mOverlayMatrix.m02>0);
  }
  for(int type:{0,1,2,3,4,5,6,7,16,21,24}){World w;auto* z=w.enemy(500,2,static_cast<ZombieType>(type));auto* buddy=w.enemy(450);
   z->mBodyHealth=321;z->mHelmHealth=75;z->mShieldHealth=80;z->mIsEating=true;

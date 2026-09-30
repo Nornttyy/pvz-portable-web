@@ -92,6 +92,9 @@ public:
  int headHides=0;
  void SetupReanimForLostHead(){++headHides;if(auto* anim=gLawnApp->ReanimationTryToGet(mBodyReanimID))for(const char* prefix:{"anim_head","anim_hair","anim_tongue"})anim->AssignRenderGroupToPrefix(prefix,RENDER_GROUP_HIDDEN);}
  void PlayZombieReanim(const char*,int,int,float){}
+ bool IsImmobilizied(){return mIceTrapCounter>0||mButteredCounter>0;}
+ bool IsMovingAtChilledSpeed(){return chill>0;}
+ void UpdateAnimSpeed(){}
  void ReanimShowPrefix(const char*,int){}
  int mSpecialHeadReanimID=0;
  unsigned mTargetPlantID=0;
