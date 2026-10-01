@@ -19,6 +19,14 @@ std::string_view plant(int id){return MemeCharacters::Find(id)->description;}
 int main(){
  using namespace MemeCharacters;
  using namespace MemeShooterRules;
+ includes(plant(EverythingShooter),"每"+number(EverythingShooterRules::Interval/100.0)+"秒");
+ includes(plant(EverythingShooter),number(EverythingShooterRules::Cost)+"阳光");
+ includes(plant(EverythingShooter),"冷却"+number(PlantingCooldown(EverythingShooter)/100.0)+"秒");
+ includes(plant(EverythingShooter),number(EverythingShooterRules::NativeCount)+"种原版子弹");
+ includes(plant(EverythingShooter),number(EverythingShooterRules::DoomPercent)+"%毁灭菇弹");
+ includes(plant(EverythingShooter),number(EverythingShooterRules::CherryPercent)+"%樱桃弹");
+ includes(plant(EverythingShooter),number(100-EverythingShooterRules::DoomPercent-EverythingShooterRules::CherryPercent-EverythingShooterRules::PoopPercent)+"%随机");
+ includes(plant(EverythingShooter),number(EverythingShooterRules::PoopPercent)+"%大粪：伤害"+number(EverythingShooterRules::PoopDamage));
  includes(plant(IceChili),"整行伤害"+number(IceChiliRules::Damage));
  includes(plant(IceChili),"种下"+number(IceChiliRules::Windup/100.0)+"秒");
  includes(plant(IceChili),"冻结"+number(IceChiliRules::Freeze/100.0)+"秒");

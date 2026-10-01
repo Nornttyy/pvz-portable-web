@@ -28,7 +28,7 @@ class Board {public:App app;App* mApp=&app;bool pool=false,mPaused=false;int sha
 void step(Board& b,int count=1){while(count--)for(auto* item:b.mGridItems)NukeShroom::UpdateCrater(item);}
 int main(){
  using namespace NukeShroomRules;
- static_assert(Size==3&&Cost==250&&Recharge==3000&&Pulses==5&&CraterLife==18000);
+ static_assert(Size==3&&Cost==325&&Recharge==3000&&Pulses==5&&CraterLife==18000);
  for(int rows:{5,6})for(int r=0;r<rows;++r)for(int c=0;c<9;++c){
   Board b;b.pool=rows==6;Plant nuke{&b};nuke.mPlantCol=c;nuke.mRow=r;
   const auto area=Footprint(c,r,rows);assert(area.Contains(c,r));

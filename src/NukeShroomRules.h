@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <cmath>
 namespace NukeShroomRules {
-inline constexpr int Id=526, Cost=250, Recharge=3000, Pulses=5, Interval=80;
+inline constexpr int Id=526, Cost=325, Recharge=3000, Pulses=5, Interval=80;
 inline constexpr int CraterLife=18000, CraterMarker=52600, Size=3;
 struct Area {int col,row;constexpr bool Contains(int c,int r)const{return c>=col&&c<col+Size&&r>=row&&r<row+Size;}};
 constexpr Area Footprint(int col,int row,int rows){return {std::clamp(col-1,0,9-Size),std::clamp(row-1,0,rows-Size)};}

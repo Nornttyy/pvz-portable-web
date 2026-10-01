@@ -48,7 +48,7 @@ try{
  await click(560,135);await page.waitForTimeout(15000);
  for(const base of [51,20,1,16,3,4]){const slot=base===51?42:base>=8?base+2:base;await click(47+slot%9*53,163+Math.floor(slot/9)*73);}
  await snap('adventure-chooser');await click(258,566);await wait(()=>Module._pvz_adventure_power_data(-1,5)===1);
- assert.deepEqual(await page.evaluate(()=>[0,1,2].map(f=>Module._pvz_adventure_seed_data(0,f))),[528,150,5000]);
+ assert.deepEqual(await page.evaluate(()=>[0,1,2].map(f=>Module._pvz_adventure_seed_data(0,f))),[528,125,5000]);
  assert.deepEqual(await page.evaluate(()=>[0,1].map(f=>Module._pvz_adventure_seed_data(1,f))),[20,125]);
  await placeCard(2,120,130);const deadline=Date.now()+100000;let secondSun=false;
  while(Date.now()<deadline){

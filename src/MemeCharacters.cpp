@@ -73,7 +73,7 @@ void Assign(Plant* p,int id){const auto* d=Find(id);if(!d||int(p->mSeedType)!=d-
   if(p->mBoard){p->mX=p->mBoard->GridToPixelX(p->mPlantCol,p->mRow);p->mY=p->mBoard->GridToPixelY(p->mPlantCol,p->mRow);}
   return; // Native short-range shooting, sleep and attack countdown stay intact.
  }
- State s;s.id=id;s.health=p->mPlantHealth;s.timer=0;if(id==500)s.direction=2;if(id==GatlingShooter)s.delay=GatlingInterval;if(id==CactusPalm)s.delay=PalmInterval;states[p]=s;
+ State s;s.id=id;s.health=p->mPlantHealth;s.timer=0;if(id==500)s.direction=2;if(id==GatlingShooter)s.delay=GatlingInterval;if(id==CactusPalm)s.delay=PalmInterval;if(id==EverythingShooter)s.delay=EverythingShooterRules::Interval;states[p]=s;
  if(id==TuckingSunflower){states[p].delay=0;states[p].direction=3;return;}
  p->mLaunchCounter=9999;p->mShootingCounter=0;
 }
@@ -216,7 +216,7 @@ void Tick(Board* b){
     --s.remaining;s.delay=RepeaterInterval;
     if(!s.remaining){s.phase=0;s.delay=RepeaterRest;}
    }
-  }else if(s.id==ShooterPea){
+  }else if(s.id==ShooterPea||s.id==EverythingShooter){
    if(!s.delay&&b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8){
     if(auto* target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY)){Shoot(p,target);s.delay=150;s.pulse=22;}
    }
@@ -311,6 +311,10 @@ bool CanHit(const Projectile* shot){return IsStraightShot(ShotStyle(shot))||Shot
 bool CanHitRow(const Projectile* shot,int row){return MemeShooterRules::CanHitRow(BaseShotStyle(ShotStyle(shot)),row);}
 void OnImpact(Projectile*,Zombie*){}
 bool RestoreShotStyle(const Projectile* shot,int style){
+ if(EverythingShooterRules::Own(style)){
+  if(shot->mDead||!EverythingShooterRules::Valid(style,int(shot->mProjectileType),int(shot->mMotionType)))return false;
+  shotStyles[shot]=style;return true;
+ }
  if(style==TinyPuffProjectile){if(shot->mDead||shot->mProjectileType!=PROJECTILE_PUFF||shot->mMotionType!=MOTION_PUFF)return false;shotStyles[shot]=style;return true;}
  // Keep the new projectile distinct from retired self-thrower save records.
  if(style<0||(style>20&&style!=ShooterProjectile&&!IsStraightShot(style)&&!MemeShooterRules::IsFloating(style)&&!MemeShooterRules::IsBoundedBurst(style))||style==19||shot->mDead)return false;
@@ -322,6 +326,7 @@ bool RestoreShotStyle(const Projectile* shot,int style){
 void ForgetShot(const Projectile* shot){shotStyles.erase(shot);}
 void UpdateShot(Projectile* shot){
  const int style=BaseShotStyle(ShotStyle(shot));if(!style||shot->mDead||shot->mBoard->mPaused)return;
+ if(EverythingShooterRules::Own(style))return; // Native lob/cob paths may go above the screen.
  if(shot->mPosY+shot->mPosZ<-40||shot->mPosY+shot->mPosZ>640){shot->Die();return;}
  if(MemeShooterRules::IsBoundedBurst(style)){
   const int nextRow=shot->mBoard->PixelToGridYKeepOnBoard(int(shot->mPosX+shot->mVelX),int(shot->mPosY+shot->mVelY));

@@ -36,6 +36,16 @@ struct World:Board {
  void step(int count=1){while(count--){SandboxPlants::Tick(this);SandboxZombies::Tick(this);if(!mPaused)++mMainCounter;}}
 };
 int main(){
+ // Every random ammunition type retains its native type/motion and identity
+ // through real save/load code, including a cob while above the screen.
+ for(int style=EverythingShooterRules::First;style<=EverythingShooterRules::Poop;++style){
+  World w;const int type=EverythingShooterRules::NativeType(style);auto* shot=w.AddProjectile(100,250,0,2,ProjectileType(type));
+  shot->mMotionType=ProjectileMotion(EverythingShooterRules::Lob(style)?1:type==4?5:0);
+  assert(MemeCharacters::RestoreShotStyle(shot,style)&&MemeCharacters::CanHit(shot));
+  const int record=SandboxPlants::SaveShot(shot);SandboxPlants::ForgetShot(shot);SandboxPlants::RestoreShot(shot,record);
+  assert(MemeCharacters::ShotStyle(shot)==style&&SandboxPlants::ShotDamage(shot,123)==123);
+  shot->mPosZ=-800;MemeCharacters::UpdateShot(shot);assert(!shot->mDead);
+ }
  {World w;auto* p=w.add(MemeCharacters::StinkShroom);assert(p->mLaunchCounter==200&&p->mLaunchRate==200);
   p->mLaunchCounter=83;p->mShootingCounter=18;w.step(30);const auto record=SandboxPlants::SavePower(p);
   SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,record));assert(p->mLaunchCounter==83&&p->mShootingCounter==18&&p->mLaunchRate==200);
@@ -488,7 +498,7 @@ int main(){
  }
 
  // Removed originals cannot be assigned, restored or re-entered through legacy powers.
- static_assert(MemeCharacters::Definitions.size()==12&&SandboxPlants::Definitions.size()==12);
+ static_assert(MemeCharacters::Definitions.size()==13&&SandboxPlants::Definitions.size()==13);
  {World w;auto* p=w.add(519);const int x=p->mX,y=p->mY;w.step(100);assert(w.mProjectiles.mSize==0);
   auto* z=w.enemy();w.step();assert(w.mProjectiles.mSize==1);w.step(149);assert(w.mProjectiles.mSize==1);w.step();assert(w.mProjectiles.mSize==2);
   auto* shot=w.mProjectiles.values[0];assert(shot->mVelX>0&&shot->mVelY==0&&shot->mMotionType==MOTION_STAR);

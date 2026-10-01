@@ -31,7 +31,7 @@ struct Plant {Board* mBoard=nullptr;bool mDead=false;int mRow=2,id=528;void Die(
 namespace MemeCharacters {int Type(const Plant* p){return p?p->id:0;}}
 #include "ice-production.inc"
 int main(){
- static_assert(IceChiliRules::Cost==150&&IceChiliRules::Recharge==5000&&IceChiliRules::Windup==100&&IceChiliRules::Unlock==26);
+ static_assert(IceChiliRules::Cost==125&&IceChiliRules::Recharge==5000&&IceChiliRules::Windup==100&&IceChiliRules::Unlock==26);
  for(int map=0;map<3;++map)for(int row=0;row<(map==1?6:5);++row){
   Board b;b.map=map;Plant p{&b,false,row};std::array<Zombie,12> zs;
   for(auto& z:zs){z.mRow=row;b.mZombies.push_back(&z);}

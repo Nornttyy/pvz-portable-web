@@ -1,0 +1,5 @@
+{
+  "asset": "../../addons/images/everything-poop.png",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: stylized-concept. Asset type: finished transparent 2D game projectile sprite for a classic 2009 Plants vs Zombies-style fan game, NOT concept art. Create exactly one comical dung pile: squat three-tier lumpy brown coil with a small bent tip, wide base, no face, no eyes, no text. Thick irregular dark-brown ink outline, muted cocoa/ochre flat cel colours, only two simple painted shading tones and one small dull highlight, slightly wonky hand-drawn silhouette. Side/front three-quarter orthographic sprite, centered, all edges in frame, generous transparent padding. Must read clearly when rendered at 32 by 28 game pixels. Absolutely no realistic texture, no wet gloss, no grain, no 3D, no emoji styling, no background, no cast shadow, no flies, no odor trails, no labels or additional objects. Output a genuinely transparent RGBA background."
+}

@@ -2,12 +2,34 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Twelve abstract plants and eight independent zombies (212..219). Ice Chili adds an independent row-damage and freeze card alongside the unchanged native Jalapeno. Adventure and sandbox share replacements; other progression and saves are preserved.",
-  "almanacCopy": "All twelve original plants and eight original zombies show explicit numeric statistics separately from surreal character-specific flavour text. Native cost/recharge footer and full supplemental Chinese glyphs.",
+  "mode": "Thirteen abstract plants and eight independent zombies (212..219). Everything Shooter randomly fires all fourteen native projectiles plus three rare types; Ice Chili costs 125 sun. Adventure and sandbox share replacements; other progression and saves are preserved.",
+  "almanacCopy": "All thirteen original plants and eight original zombies show explicit numeric statistics separately from surreal character-specific flavour text. Native cost/recharge footer and full supplemental Chinese glyphs.",
+  "everythingShooter": {
+    "id": 529,
+    "nativeSlot": 49,
+    "cost": 250,
+    "rechargeTicks": 750,
+    "intervalTicks": 150,
+    "adventureUnlock": 27,
+    "roll": {
+      "nativeProjectilePool": 80,
+      "doom": 5,
+      "cherry": 5,
+      "poop": 10
+    },
+    "nativeProjectiles": 14,
+    "rareDamage": {
+      "doom": 1800,
+      "cherry": 1800,
+      "poop": 80
+    },
+    "boundaries": "Plant-owned basketballs and zombie peas hit zombies only. Native plant damage, lob paths, corn-cob drops, butter and chill retained. Rare bombs do not crater terrain or harm friendly plants; poop has no extra control. Saved projectile identity never rerolls.",
+    "art": "Original peashooter rig and native projectile/plant artwork reused. Ammunition follows the head bone. One generated transparent dung sprite, documented in art/everything-shooter/generation.json."
+  },
   "iceChili": {
     "id": 528,
     "nativeSlot": 51,
-    "cost": 150,
+    "cost": 125,
     "rechargeTicks": 5000,
     "windupTicks": 100,
     "rowDamage": 1200,
@@ -38,7 +60,7 @@
     "id": 526,
     "nativeSlot": 15,
     "name": "核爆菇",
-    "cost": 250,
+    "cost": 325,
     "rechargeTicks": 3000,
     "pulses": 5,
     "pulseIntervalTicks": 80,
@@ -194,13 +216,13 @@
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 279332,
-      "sha256": "48667972365b83cf34c20b17f5b5fc5e5e5a495425ca3790449f67916813a3dc"
+      "size": 279423,
+      "sha256": "bd2d30ada6e0fa98d7a5c4820a4d91fc3a81b91ac1665bf0ef11eb8f34de3330"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7947199,
-      "sha256": "38cdbce22b906e7bf99eec4154a28db5f4559663d7843cf8cdb79928419339ce"
+      "size": 8340377,
+      "sha256": "344144ca87419303ca3c9ac1957801a05d35042b85e103fc69327b0e1bea39b4"
     }
   ]
 }

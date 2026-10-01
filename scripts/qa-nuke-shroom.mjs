@@ -61,7 +61,7 @@ try{
  await click(560,135);await page.waitForTimeout(15000);
  for(const base of [15,1,8,16,3,0]){const slot=base>=8?base+2:base;await click(47+slot%9*53,163+Math.floor(slot/9)*73);}
  await snap('adventure-chooser');await click(258,566);await wait(()=>Module._pvz_adventure_power_data(-1,5)===1);
- results.card=await page.evaluate(()=>[0,1,2].map(f=>Module._pvz_adventure_seed_data(0,f)));assert.deepEqual(results.card,[526,250,3000]);
+ results.card=await page.evaluate(()=>[0,1,2].map(f=>Module._pvz_adventure_seed_data(0,f)));assert.deepEqual(results.card,[526,325,3000]);
  // Earn sun through normal controls; no health, money, clock or save cheats.
  let flowers=0,puffs=0;
  async function placeCard(i,x,y){await click(await seed(i,5)+25,await seed(i,6)+35);await click(x,y);}
@@ -71,10 +71,10 @@ try{
   const money=await page.evaluate(()=>Module._pvz_adventure_power_data(-1,2));
   if(flowers<3&&money>=50&&await seed(1,4)){await placeCard(1,120,flowers===0?130:flowers===1?215:470);++flowers;}
   if(puffs<4&&await seed(2,4)){await placeCard(2,200,[130,215,470,555][puffs]);++puffs;}
-  if(flowers===3&&money>=250&&await seed(0,4))break;
+  if(flowers===3&&money>=325&&await seed(0,4))break;
   await page.waitForTimeout(350);
  }
- assert.ok(await page.evaluate(()=>Module._pvz_adventure_power_data(-1,2)>=250),'normal production earned enough sun');
+ assert.ok(await page.evaluate(()=>Module._pvz_adventure_power_data(-1,2)>=325),'normal production earned enough sun');
  await page.mouse.click(500,300,{button:'right'});await placeCard(0,320,215);
  results.afterPlant={card:await page.evaluate(()=>Array.from({length:7},(_,f)=>Module._pvz_adventure_seed_data(0,f))),money:await page.evaluate(()=>Module._pvz_adventure_power_data(-1,2))};
  await snap('adventure-nuke-planted');assert.ok(await seed(0,3)>2800);await wait(()=>Module._pvz_nuke_data(-1,0)===9);

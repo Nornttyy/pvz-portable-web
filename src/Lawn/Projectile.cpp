@@ -26,6 +26,7 @@
 #include "Projectile.h"
 #include "../LawnApp.h"
 #include "../SandboxPlants.h"
+#include "../EverythingShooter.h"
 #include "../MemeShooterRules.h"
 #include "../SandboxVisualRules.h"
 #include "../SandboxZombies.h"
@@ -315,7 +316,7 @@ void Projectile::CheckForCollision()
 		return;
 	}
 
-	if (mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_PEA)
+	if (mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_PEA && !EverythingShooterRules::Own(MemeCharacters::ShotStyle(this)))
 	{
 		Plant* aPlant = FindCollisionTargetPlant();
 		if (aPlant)
@@ -556,7 +557,7 @@ void Projectile::UpdateLobMotion()
 		{
 			aMinCollisionZ = -32.0f;
 		}
-		else if (mProjectileType == ProjectileType::PROJECTILE_BASKETBALL)
+		else if (mProjectileType == ProjectileType::PROJECTILE_BASKETBALL && !EverythingShooterRules::Own(MemeCharacters::ShotStyle(this)))
 		{
 			aMinCollisionZ = 60.0f;
 		}
@@ -585,7 +586,7 @@ void Projectile::UpdateLobMotion()
 
 	Plant* aPlant = nullptr;
 	Zombie* aZombie = nullptr;
-	if (mProjectileType == ProjectileType::PROJECTILE_BASKETBALL || mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_PEA)
+	if ((mProjectileType == ProjectileType::PROJECTILE_BASKETBALL || mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_PEA) && !EverythingShooterRules::Own(MemeCharacters::ShotStyle(this)))
 	{
 		aPlant = FindCollisionTargetPlant();
 	}
@@ -839,6 +840,7 @@ void Projectile::PlayImpactSound(Zombie* theZombie)
 void Projectile::DoImpact(Zombie* theZombie)
 {
 	if (SandboxZombies::DodgeProjectile(this,theZombie)) return;
+	if (EverythingShooter::Impact(this,theZombie)) return;
 	PlayImpactSound(theZombie);
 
     const bool sandboxImpact=SandboxPlants::Impact(this,theZombie);
@@ -999,6 +1001,7 @@ void Projectile::Update()
 
 void Projectile::Draw(Graphics* g)
 {
+	if (EverythingShooter::DrawShot(g,this)) return;
     if (SandboxZombies::DrawShot(g,this)) return;
     if (SandboxPlants::DrawShot(g,this)) return;
 	const ProjectileDefinition& aProjectileDef = GetProjectileDef();

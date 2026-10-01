@@ -33,10 +33,12 @@ test('production plant definition and unlock gate preserve native sprout outside
  const dir=await mkdtemp(join(tmpdir(),'pvz-ice-mode-')),cpp=join(dir,'test.cpp'),binary=join(dir,'mode');
  await writeFile(cpp,`#include "ConstEnums.h"
 #include "IceChiliRules.h"
+#include "EverythingShooterRules.h"
 #include <cassert>
 #define PVZP_ASSERT assert
 namespace MemeAdventure {bool enabled=false;bool RosterEnabled(){return enabled;}}
 bool gSandboxEnabled=false;
+namespace EverythingShooter {bool IsSlot(int){return false;}}
 enum PlantSubClass {SUBCLASS_NORMAL,SUBCLASS_SHOOTER};
 struct PlantDefinition {SeedType mSeedType=SEED_NONE;void* mPlantImage=nullptr;ReanimationType mReanimationType=REANIM_NONE;int mPacketIndex=0,mSeedCost=0,mRefreshTime=0;PlantSubClass mSubClass=SUBCLASS_NORMAL;int mLaunchRate=0;const char* mPlantName="";};
 PlantDefinition gPlantDefs[NUM_SEED_TYPES];
@@ -48,7 +50,7 @@ int main(){
  gPlantDefs[SEED_JALAPENO].mSeedType=SEED_JALAPENO;
  for(bool mode:{false,true})for(bool sandbox:{false,true}){
   MemeAdventure::enabled=mode;gSandboxEnabled=sandbox;const auto& d=GetPlantDefinition(SEED_SPROUT);
-  if(mode||sandbox){assert(d.mReanimationType==REANIM_JALAPENO&&d.mSeedCost==150&&d.mRefreshTime==5000);assert(&d!=&gPlantDefs[SEED_SPROUT]);}
+  if(mode||sandbox){assert(d.mReanimationType==REANIM_JALAPENO&&d.mSeedCost==125&&d.mRefreshTime==5000);assert(&d!=&gPlantDefs[SEED_SPROUT]);}
   else assert(&d==&gPlantDefs[SEED_SPROUT]&&d.mReanimationType==REANIM_ZENGARDEN_SPROUT);
   assert(&GetPlantDefinition(SEED_JALAPENO)==&gPlantDefs[SEED_JALAPENO]);
   for(int level=1;level<=50;++level){a.player.level=level;assert(a.HasSeedType(SEED_SPROUT)==(mode&&level>=26));}

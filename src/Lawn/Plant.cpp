@@ -25,6 +25,7 @@
 #include "../StinkShroom.h"
 #include "../AbstractRigVisuals.h"
 #include "../IceChili.h"
+#include "../EverythingShooter.h"
 #include "Board.h"
 #include "Zombie.h"
 #include "Cutscene.h"
@@ -207,7 +208,7 @@ void Plant::PlantInitialize(int theGridX, int theGridY, SeedType theSeedType, Se
 	else
 		mLaunchCounter = 0;
 
-	switch (theSeedType)
+	switch (EverythingShooter::IsSlot(theSeedType) ? SEED_PEASHOOTER : theSeedType)
 	{
 	case SeedType::SEED_BLOVER:
 	{
@@ -2727,7 +2728,7 @@ void Plant::UpdateReanimColor()
 	{
 		aColorOverride = GetFlashingColor(mBoard->mMainCounter, 90);
 	}
-	else if (mSeedType == SeedType::SEED_EXPLODE_O_NUT)
+	else if (mSeedType == SeedType::SEED_EXPLODE_O_NUT && !EverythingShooter::IsSlot(mSeedType))
 	{
 		aColorOverride = Color(255, 64, 64);
 	}
@@ -2955,7 +2956,7 @@ Reanimation* Plant::AttachBlinkAnim(Reanimation* theReanimBody)
 	const char* aTrackToAttach = nullptr;
 
 	if (mSeedType == SeedType::SEED_WALLNUT || mSeedType == SeedType::SEED_SMALL_NUT || mSeedType == SeedType::SEED_TALLNUT ||
-		mSeedType == SeedType::SEED_EXPLODE_O_NUT || mSeedType == SeedType::SEED_GIANT_WALLNUT)
+		(mSeedType == SeedType::SEED_EXPLODE_O_NUT && !EverythingShooter::IsSlot(mSeedType)) || mSeedType == SeedType::SEED_GIANT_WALLNUT)
 	{
 		int aHit = Rand(10);
 		if (aHit < 1 && theReanimBody->TrackExists("anim_blink_twitch"))
@@ -3020,7 +3021,7 @@ Reanimation* Plant::AttachBlinkAnim(Reanimation* theReanimBody)
 			aTrackToAttach = "anim_face2";
 		}
 	}
-	else if (mSeedType == SeedType::SEED_PEASHOOTER || mSeedType == SeedType::SEED_SNOWPEA || mSeedType == SeedType::SEED_REPEATER || mSeedType == SeedType::SEED_LEFTPEATER || mSeedType == SeedType::SEED_GATLINGPEA)
+	else if (EverythingShooter::IsSlot(mSeedType) || mSeedType == SeedType::SEED_PEASHOOTER || mSeedType == SeedType::SEED_SNOWPEA || mSeedType == SeedType::SEED_REPEATER || mSeedType == SeedType::SEED_LEFTPEATER || mSeedType == SeedType::SEED_GATLINGPEA)
 	{
 		if (theReanimBody->TrackExists("anim_stem"))
 		{
@@ -3094,7 +3095,7 @@ void Plant::DoBlink()
 		return;
 
 	if (mSeedType == SeedType::SEED_WALLNUT || mSeedType == SeedType::SEED_SMALL_NUT || mSeedType == SeedType::SEED_TALLNUT ||
-		mSeedType == SeedType::SEED_EXPLODE_O_NUT || mSeedType == SeedType::SEED_GIANT_WALLNUT)
+		(mSeedType == SeedType::SEED_EXPLODE_O_NUT && !EverythingShooter::IsSlot(mSeedType)) || mSeedType == SeedType::SEED_GIANT_WALLNUT)
 	{
 		mBlinkCountdown = 1000 + Rand(1000);
 	}
@@ -4158,6 +4159,7 @@ void Plant::Draw(Graphics* g)
 		}
 
 		SandboxPlants::DrawNausea(g,this);
+		EverythingShooter::DrawPlant(g,this);
 		if (mSeedType == SeedType::SEED_MAGNETSHROOM && !DrawMagnetItemsOnTop())
 		{
 			DrawMagnetItems(g);
@@ -4226,6 +4228,11 @@ void Plant::DrawSeedType(Graphics* g, SeedType theSeedType, SeedType theImitater
 	if (aSeedType == SeedType::SEED_SPROUT && (gSandboxEnabled || MemeAdventure::RosterEnabled()))
 	{
 		SandboxPlants::DrawIceChiliPreview(&aSeedG,thePosX,thePosY,aDrawVariation==VARIATION_IMITATER);
+		return;
+	}
+	if (EverythingShooter::IsSlot(aSeedType))
+	{
+		EverythingShooter::DrawPreview(&aSeedG,thePosX,thePosY,aDrawVariation==VARIATION_IMITATER);
 		return;
 	}
 	if (aSeedType == SeedType::SEED_LEFTPEATER)
@@ -4596,6 +4603,7 @@ void Plant::CobCannonFire(int theTargetX, int theTargetY)
 
 void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon)
 {
+	if (EverythingShooter::Fire(this,theTargetZombie)) return;
 	theTargetZombie = MemeCharacters::PickTarget(this, theTargetZombie);
 	if (mSeedType == SeedType::SEED_FUMESHROOM)
 	{
@@ -5108,6 +5116,13 @@ void Plant::Die()
 
 const PlantDefinition& GetPlantDefinition(SeedType theSeedType)
 {
+	if (EverythingShooter::IsSlot(theSeedType))
+	{
+		static const PlantDefinition everything{.mSeedType=SEED_EXPLODE_O_NUT,.mPlantImage=nullptr,.mReanimationType=REANIM_PEASHOOTER,
+			.mPacketIndex=0,.mSeedCost=EverythingShooterRules::Cost,.mRefreshTime=EverythingShooterRules::Recharge,
+			.mSubClass=SUBCLASS_NORMAL,.mLaunchRate=0,.mPlantName="EVERYTHING_SHOOTER"};
+		return everything;
+	}
 	if (theSeedType == SEED_SPROUT && (gSandboxEnabled || MemeAdventure::RosterEnabled()))
 	{
 		static const PlantDefinition ice{.mSeedType=SEED_SPROUT,.mPlantImage=nullptr,.mReanimationType=REANIM_JALAPENO,
@@ -5346,6 +5361,12 @@ Rect Plant::GetPlantAttackRect(PlantWeapon thePlantWeapon)
 
 void Plant::PreloadPlantResources(SeedType theSeedType)
 {
+	if (EverythingShooter::IsSlot(theSeedType))
+	{
+		for (SeedType ammo : {SEED_CABBAGEPULT, SEED_MELONPULT, SEED_WINTERMELON, SEED_KERNELPULT, SEED_COBCANNON, SEED_CHERRYBOMB, SEED_DOOMSHROOM, SEED_TORCHWOOD})
+			PreloadPlantResources(ammo);
+		Zombie::PreloadZombieResources(ZOMBIE_CATAPULT);
+	}
 	const PlantDefinition& aPlantDef = GetPlantDefinition(theSeedType);
 	if (aPlantDef.mReanimationType != ReanimationType::REANIM_NONE)
 	{
