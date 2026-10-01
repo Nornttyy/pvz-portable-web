@@ -10,7 +10,8 @@ const wait=(f,a,t=20000)=>page.waitForFunction(f,a,{timeout:t});
 const snap=n=>page.screenshot({path:join(out,n+'.png')});
 async function click(x,y){const b=await page.locator('#canvas').boundingBox(),s=await page.evaluate(()=>[Module.canvas.width,Module.canvas.height]);await page.mouse.click(b.x+x*b.width/s[0],b.y+y*b.height/s[1]);await page.waitForTimeout(100);}
 const api=(...a)=>page.evaluate(a=>Module._pvz_sandbox_command(...[...a,0,0,0,0].slice(0,4)),a);
-const plant=()=>page.evaluate(()=>Array.from({length:12},(_,f)=>Module._pvz_sandbox_plant_data(0,f)));
+let plantIndex=0;
+const plant=()=>page.evaluate(i=>Array.from({length:12},(_,f)=>Module._pvz_sandbox_plant_data(i,f)),plantIndex);
 const zombie=()=>page.evaluate(()=>Array.from({length:21},(_,f)=>Module._pvz_sandbox_zombie_data(0,f)));
 async function step(n=1){for(let i=0;i<n;++i){await api(13);await page.waitForTimeout(45);}}
 async function boot(level=9){
@@ -39,12 +40,18 @@ try{
  await api(7);await api(4,1);await api(5,1);assert.ok(await api(1,521,1,2)>0);
  // Catalogue slot 40 on page 2 is replaced, not appended as a new card.
  await click(222,571);await click(30,387);await click(384,330);assert.equal((await plant())[0],522);
+ // Both shooters must communicate heat through their native art, no bars.
+ await api(1,500,1,3);await api(2,32,8,3);
+ // Upgrade removal leaves a free native slot; the next plant can precede
+ // Gatling in iteration order, so identify the subject by type, not index 0.
+ plantIndex=await page.evaluate(()=>Array.from({length:16},(_,i)=>i).find(i=>Module._pvz_sandbox_plant_data(i,0)===522));assert.ok(Number.isInteger(plantIndex));await snap('unheated');
  await api(2,32,8,2);await api(4,0);
- await wait(()=>Module._pvz_sandbox_plant_data(0,5)>=60);await api(4,1);await snap('half-heat');
- await api(4,0);await wait(()=>Module._pvz_sandbox_plant_data(0,4)===1);await api(4,1);
+ await wait(i=>Module._pvz_sandbox_plant_data(i,5)>=60,plantIndex);await api(4,1);await snap('half-heat');
+ await api(4,0);await wait(i=>Module._pvz_sandbox_plant_data(i,4)===1,plantIndex);await api(4,1);
  const hot=await plant();assert.equal(hot[5],120);assert.ok(hot[6]>300&&hot[6]<=350);await snap('overheated');
  await page.waitForTimeout(500);assert.deepEqual(await plant(),hot);results.pauseFreezesCooldown=true;
- await step(hot[6]-1);assert.equal((await plant())[4],1);assert.equal((await plant())[6],1);assert.equal((await plant())[5],120);
+ await step(hot[6]-175);await snap('half-cooled');
+ await step(174);assert.equal((await plant())[4],1);assert.equal((await plant())[6],1);assert.equal((await plant())[5],120);
  await step();const ready=await plant();assert.equal(ready[4],0);assert.equal(ready[6],0);assert.equal(ready[5],1);results.resumesOnCooldownBoundary=true;await snap('cooled-and-firing');
  await page.setViewportSize({width:844,height:390});await snap('phone');await page.setViewportSize({width:1100,height:750});
  await api(15);await page.waitForTimeout(1800);await click(560,135);await page.waitForTimeout(15000);await snap('adventure-chooser');

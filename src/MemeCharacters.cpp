@@ -191,14 +191,9 @@ void Effects(Sexy::Graphics* g,Board* b,int row){
  for(const auto& [p,s]:states)if(!p->mDead&&p->mRow==row&&!p->mSquished&&!const_cast<Plant*>(p)->NotOnGround()){
   const int x=p->mX,y=VisualY(p);
   if(s.id==500){
-   g->SetColor(Sexy::Color(57,37,18));g->FillRect(x+12,y+77,56,6);
-   g->SetColor(s.phase==1?Sexy::Color(210,72,43):Sexy::Color(226,167,64));g->FillRect(x+13,y+78,s.phase==1?s.remaining*54/MemeShooterRules::BurstCount:s.heat*54/MemeShooterRules::MaxRage,4);
    if(s.phase==1){const int age=s.age%30;Puff(g,x+45,y+15-age,age,130);}
   }
   if(s.id==GatlingShooter){
-   g->SetColor(Sexy::Color(57,37,18));g->FillRect(x+12,y+77,56,6);
-   g->SetColor(s.phase?Sexy::Color(104,151,164):Sexy::Color(210,117,54));
-   g->FillRect(x+13,y+78,s.phase?s.timer*54/GatlingCooldown:s.heat*54/GatlingHeatLimit,4);
    if(s.phase){const int age=s.age%30;Puff(g,x+56,y+12-age,age,120);}
   }
  }

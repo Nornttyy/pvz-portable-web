@@ -31,13 +31,15 @@ std::map<const Projectile*,int> damageShots;
 // Temporary head/mouth/blink tint; never mutate the shared native reanimation.
 struct WarmSkin {
  std::vector<std::pair<ReanimatorTrackInstance*,Sexy::Image*>> previous;
- void Apply(Reanimation* anim,int,int level,int,int,bool blink=false){
+ void Apply(Reanimation* anim,int level,bool blink=false,bool gatling=false){
   if(!anim)return;
   for(int i=0;i<anim->mDefinition->mTracks.count;++i){
    const std::string_view name=anim->mDefinition->mTracks.tracks[i].mName;const char* file=nullptr;
-   if(!blink&&name.starts_with("anim_face"))file="PeaShooter_Head.png";
-   if(!blink&&name=="idle_mouth")file="PeaShooter_mouth.png";
-   if(name=="idle_shoot_blink"||name.starts_with("anim_blink"))file=anim->mAnimTime<.5f?"PeaShooter_blink1.png":"PeaShooter_blink2.png";
+   if(!blink&&name.starts_with("anim_face"))file=gatling?"GatlingPea_head.png":"PeaShooter_Head.png";
+   if(!blink&&!gatling&&name=="idle_mouth")file="PeaShooter_mouth.png";
+   if(!blink&&gatling&&name=="GatlingPea_mouth")file="GatlingPea_mouth.png";
+   if(!blink&&gatling&&name=="GatlingPea_mouth_overlay")file="GatlingPea_mouth_overlay.png";
+   if(name=="idle_shoot_blink"||name.starts_with("anim_blink"))file=gatling?(anim->mAnimTime<.5f?"GatlingPea_blink1.png":"GatlingPea_blink2.png"):(anim->mAnimTime<.5f?"PeaShooter_blink1.png":"PeaShooter_blink2.png");
    if(!file)continue;
    auto& track=anim->mTrackInstances[i];previous.emplace_back(&track,track.mImageOverride);
    track.mImageOverride=SandboxArt::WarmNative(file,level);
@@ -185,12 +187,16 @@ bool DrawBody(Sexy::Graphics* g,const Plant* p,float,float,bool squished){
   auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID);if(!body)return false;
   body->Draw(g);NutBrows(g,body,std::min(255,MemeCharacters::Save(p)[7]*32));return true;
  }
- if(MemeCharacters::Type(p)==500&&!squished){
+ const bool gatling=MemeCharacters::Type(p)==MemeCharacters::GatlingShooter;
+ if((MemeCharacters::Type(p)==500||gatling)&&!squished){
   auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID);if(!body)return false;
-  const int level=MemeCharacters::Data(p,0)==1?24:std::clamp(MemeCharacters::Data(p,1)*24/MemeShooterRules::MaxRage,0,24);
-  WarmSkin warm;for(auto id:{p->mBodyReanimID,p->mHeadReanimID})warm.Apply(gLawnApp->ReanimationTryToGet(id),120,level,p->mPlantHealth,p->mPlantMaxHealth);
-  warm.Apply(gLawnApp->ReanimationTryToGet(p->mBlinkReanimID),120,level,p->mPlantHealth,p->mPlantMaxHealth,true);
-  body->Draw(g);HeatBrow(g,gLawnApp->ReanimationTryToGet(p->mHeadReanimID),level,std::clamp((level-8)*15,0,230));return true;
+  const bool active=MemeCharacters::Data(p,0)==1;
+  // Colour is a visual readout only: cooling gradually restores green without
+  // modifying heat, attack clocks, native rig geometry or shared card art.
+  const int level=std::clamp(gatling?(active?MemeCharacters::Data(p,2)*24/MemeCharacters::GatlingCooldown:MemeCharacters::Data(p,1)*24/MemeCharacters::GatlingHeatLimit):(active?24:MemeCharacters::Data(p,1)*24/MemeShooterRules::MaxRage),0,24);
+  WarmSkin warm;for(auto id:{p->mBodyReanimID,p->mHeadReanimID})warm.Apply(gLawnApp->ReanimationTryToGet(id),level,false,gatling);
+  warm.Apply(gLawnApp->ReanimationTryToGet(p->mBlinkReanimID),level,true,gatling);
+  body->Draw(g);if(!gatling)HeatBrow(g,gLawnApp->ReanimationTryToGet(p->mHeadReanimID),level,std::clamp((level-8)*15,0,230));return true;
  }
  if(MemeCharacters::Is(p)&&!squished){if(auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID)){body->Draw(g);return true;}}
  return false;

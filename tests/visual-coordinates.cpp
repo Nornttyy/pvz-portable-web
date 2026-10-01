@@ -47,20 +47,19 @@ int main(){
   {AbstractRigVisuals::Scope scope(p);auto face=original;AbstractRigVisuals::Transform(&body,0,face);assert(face.mImage==original.mImage);near(face.mTransX,original.mTransX);}
   testBlits.clear();assert(SandboxPlants::DrawBody(&g,p,0,0));assert(testBlits.empty());app.reanims.clear();
  }
- // Automatic rage has only the existing bar: no manual-ready glow or notch.
+ // Rage never draws a heat/progress bar, regardless of phase or sleep.
  for(int heat:{80,100,280})for(int phase:{0,1})for(bool asleep:{false,true}){
   SandboxPlants::Reset();Board w;auto* p=w.plant(1,2);SandboxPlants::Assign(p,500);p->mIsAsleep=asleep;
   assert(SandboxPlants::RestorePower(p,{500,300,phase,phase?0:heat,0,50,40,0,phase?25:0,2}));
   Sexy::Graphics g(nullptr);Sexy::drawnRects.clear();MemeCharacters::Effects(&g,&w,2);
-  assert(Sexy::drawnRects.size()==2);
-  const auto& bar=Sexy::drawnRects[0];assert(bar.bounds.mX==p->mX+12&&bar.bounds.mY==p->mY+77&&bar.bounds.mWidth==56&&bar.bounds.mHeight==6);
+  assert(Sexy::drawnRects.empty());
  }
- // Native flowerpot lift and pool bobbing move indicators and steam together.
+ // Native flowerpot lift and pool bobbing still move steam, without a bar.
  for(int offset:{-5,-2,0,2})for(int phase:{0,1}){
   SandboxPlants::Reset();Board w;auto* p=w.plant(1,2);p->drawHeightOffset=offset;SandboxPlants::Assign(p,500);
   assert(SandboxPlants::RestorePower(p,{500,300,phase,phase?0:100,0,50,40,0,phase?25:0,2}));
   Sexy::Graphics g(nullptr);g.mTransX=224;g.mTransY=17;Sexy::drawnRects.clear();testBlits.clear();MemeCharacters::Effects(&g,&w,2);
-  const auto& bar=Sexy::drawnRects[0];assert(bar.bounds.mY==p->mY+offset+77);
+  assert(Sexy::drawnRects.empty());
   if(phase){assert(testBlits.size()==1);near(testBlits[0].matrix.m02,p->mX+45+224);near(testBlits[0].matrix.m12,p->mY+offset+15-10+17);}
   p->airborne=true;Sexy::drawnRects.clear();testBlits.clear();MemeCharacters::Effects(&g,&w,2);
   assert(Sexy::drawnRects.empty()&&testBlits.empty());
@@ -80,16 +79,34 @@ int main(){
   app.reanims.clear();
  }
  SandboxPlants::Reset();
- // Gatling heat/cooldown is a compact world-space bar; reuse native steam.
+ // Gatling keeps native steam but no heat or cooldown progress bar.
  {Board w;auto* p=w.plant(2,2);p->mSeedType=static_cast<SeedType>(40);SandboxPlants::Assign(p,522);
   Sexy::Graphics g(nullptr);
   for(const auto state:{std::array<int,10>{522,300,0,60,0,10,50,0,0,1},std::array<int,10>{522,300,1,120,175,0,50,0,0,1}}){
    assert(SandboxPlants::RestorePower(p,state));Sexy::drawnRects.clear();testBlits.clear();MemeCharacters::Effects(&g,&w,2);
-   assert(Sexy::drawnRects.size()==2);const auto bar=Sexy::drawnRects[1].bounds;
-   assert(bar.mX==p->mX+13&&bar.mY==p->mY+78&&bar.mWidth==27&&bar.mHeight==4);
+   assert(Sexy::drawnRects.empty());
    assert(testBlits.size()==(state[2]?1:0));
   }
   SandboxPlants::Forget(p);
+ }
+ // Gatling's head, mouth and blinks warm together; its helmet, barrels,
+ // native pivots, preview art and other instances never inherit the tint.
+ {SandboxPlants::Reset();Board w;auto* p=w.plant(2,2);p->mSeedType=static_cast<SeedType>(40);SandboxPlants::Assign(p,522);
+  Reanimation body;Track tracks[]={{"anim_face"},{"GatlingPea_mouth"},{"GatlingPea_mouth_overlay"},{"idle_shoot_blink"},{"anim_blink"},{"GatlingPea_helmet"},{"GatlingPea_barrel1"}};TrackInstance instances[7];body.def.mTracks={7,tracks};body.mTrackInstances=instances;app.reanims[83]=&body;p->mBodyReanimID=83;
+  const char* files[]={"GatlingPea_head.png","GatlingPea_mouth.png","GatlingPea_mouth_overlay.png","GatlingPea_blink1.png","GatlingPea_blink1.png","GatlingPea_helmet.png","GatlingPea_barrel.png"};
+  for(int i=0;i<7;++i)instances[i].mImageOverride=SandboxArt::NativeImage(files[i]);
+  Sexy::Graphics g(nullptr);
+  for(int cooling:{0,1})for(int level=0;level<=24;++level){
+   if(!cooling&&level==24)continue;
+   const int timer=cooling?std::max(1,(level*350+23)/24):0;
+   assert(SandboxPlants::RestorePower(p,{522,300,cooling,cooling?120:level*5,timer,cooling?0:10,50,0,0,1}));
+   const auto before=SandboxPlants::SavePower(p);drawnOverrides.clear();assert(SandboxPlants::DrawBody(&g,p,0,0));
+   assert(drawnOverrides.size()==7&&SandboxPlants::SavePower(p)==before);
+   for(int i=0;i<7;++i){assert(drawnOverrides[i]==(i<5?SandboxArt::WarmNative(files[i],level):SandboxArt::NativeImage(files[i])));assert(instances[i].mImageOverride==SandboxArt::NativeImage(files[i]));}
+  }
+  body.mAnimTime=.75f;assert(SandboxPlants::RestorePower(p,{522,300,0,60,0,10,50,0,0,1}));drawnOverrides.clear();assert(SandboxPlants::DrawBody(&g,p,0,0));
+  assert(drawnOverrides[3]==SandboxArt::WarmNative("GatlingPea_blink2.png",12)&&drawnOverrides[4]==drawnOverrides[3]);
+  drawnOverrides.clear();body.Draw(&g);assert(drawnOverrides[0]==SandboxArt::NativeImage(files[0]));app.reanims.clear();SandboxPlants::Reset();
  }
  Sexy::Graphics g(nullptr);Reanimation mouth;mouth.track="idle_mouth";mouth.matrix={0,-0.72f,60,0.72f,0,40};
  Board board;app.reanims[1]=&mouth;
