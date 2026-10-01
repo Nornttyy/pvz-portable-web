@@ -19,6 +19,10 @@ int main(){
  // Hidden hair/tongue bones are visible only inside this character's scope.
  {SandboxZombies::Reset();Board w;auto* z=w.AddZombieInRow(static_cast<ZombieType>(2),2,-1);SandboxZombies::Assign(z,214);
   static_assert(ConeBodyRules::Parts.size()==20&&SandboxZombies::ConeVisualCount==20);
+  for(const auto& fit:ConeBodyRules::Parts){assert(fit.width>=34&&fit.height>=33);assert(std::abs(fit.width/fit.height-59.f/57)<.025f);}
+  // Enlarging the feet must not push their bases below the old ground anchors.
+  near(ConeBodyRules::Parts[16].cy+ConeBodyRules::Parts[16].height*.5f,19.5f);
+  near(ConeBodyRules::Parts[19].cy+ConeBodyRules::Parts[19].height*.5f,24.f);
   Reanimation body;Track tracks[23];for(int i=0;i<20;++i)tracks[i].mName=ConeBodyRules::Parts[i].track.data();
   tracks[20].mName="Zombie_duckytube";tracks[21].mName="Zombie_mustache";tracks[22].mName="anim_bucket";
   TrackInstance instances[23];body.def.mTracks={23,tracks};body.mTrackInstances=instances;app.reanims[90]=&body;z->mBodyReanimID=90;
@@ -34,6 +38,11 @@ int main(){
      if(part<20){
       ++visible;assert(t.mAlpha==1&&instances[part].mImageOverride==nullptr&&instances[part].mRenderGroup==RENDER_GROUP_NORMAL);
       assert(t.mImage==SandboxArt::NativeImage(files[SandboxZombies::ConeDamageStage(SandboxZombies::ConeVisualHealth(health,part))]));
+      const auto& fit=ConeBodyRules::Parts[part];
+      near(t.mScaleX*t.mImage->mWidth,before.mScaleX*fit.width);near(t.mScaleY*t.mImage->mHeight,before.mScaleY*fit.height);
+      const float k=25*3.14159265f/180;
+      near(t.mTransX+t.mImage->mWidth*.5f*t.mScaleX*std::cos(k)-t.mImage->mHeight*.5f*t.mScaleY*std::sin(k),before.mTransX+fit.cx*before.mScaleX*std::cos(k)-fit.cy*before.mScaleY*std::sin(k));
+      near(t.mTransY+t.mImage->mWidth*.5f*t.mScaleX*std::sin(k)+t.mImage->mHeight*.5f*t.mScaleY*std::cos(k),before.mTransY+fit.cx*before.mScaleX*std::sin(k)+fit.cy*before.mScaleY*std::cos(k));
       near(t.mSkewX,25);near(t.mSkewY,25);assert(std::isfinite(t.mTransX)&&std::isfinite(t.mTransY)&&t.mScaleX>0&&t.mScaleY>0);
       auto moved=before;moved.mTransX+=147;moved.mTransY-=83;AbstractRigVisuals::Transform(&body,part,moved);near(moved.mTransX-t.mTransX,147);near(moved.mTransY-t.mTransY,-83);
      }else{assert(t.mAlpha==0&&instances[part].mRenderGroup==RENDER_GROUP_HIDDEN);}

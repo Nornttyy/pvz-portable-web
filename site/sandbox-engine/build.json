@@ -12,6 +12,10 @@
     "armor": 2590,
     "armorConeEquivalent": 7,
     "visualCones": 20,
+    "coneWidthRange": [
+      34,
+      72
+    ],
     "speedMultiplier": 0.6,
     "adventureUnlock": 16,
     "art": "Exactly twenty native cones form the entire character. All anatomical and clothing textures are replaced, including zero armor, portraits and burn/death. Original cone damage textures and draw-only bone scopes. No external art."
@@ -35,7 +39,7 @@
     {
       "name": "pvz-portable.wasm",
       "size": 7581887,
-      "sha256": "4bc610640c600802288a937437221eb60b3f4b5120e573ee09304c094a16b3a0"
+      "sha256": "a9538facd61956c15eca6d09e349b6ce82426de77b78b86f2fdc724c82e9fd16"
     }
   ]
 }

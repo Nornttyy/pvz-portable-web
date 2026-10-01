@@ -2,6 +2,7 @@
 
 - Logical ID 214, native Conehead base 2; no replacement of Louis or Runaway.
 - **Twenty road cones form the whole character**, replacing all head/face, neck, torso, waist, arm, hand, leg and foot textures. No visible zombie body under the cones, including the portrait, zero-armor state or burn/death. Uses unchanged `Zombie_cone1/2/3.png` textures and native interpolated bones. No generated sprite, extra labels or health bars.
+- Cones are enlarged individually (34–72 px wide in bone-local space, mostly about 1.5× the initial width), retaining the native cone aspect ratio. Head/arm centres are staggered; larger feet retain their original ground anchors. This changes only the drawing, not collision, attack range, health or movement.
 - Armor stays **7 × 370 = 2590**, plus the existing **270** core health. Twenty visual parts do not mean twenty cones of HP. Ordinary damage and overflow apply. All twenty parts progressively use the original damaged textures; broken parts remain cones, never exposing flesh/clothes.
 - Movement is **60%** of the native randomized walking speed, including walk animation. Ground-track motion is scaled once, not twice; native eating, chill/freeze, pool clipping and mind-control behavior remain in charge.
 - Sandbox: one new card in the existing zombie catalogue, with a matching twenty-cone portrait. Adventure: from **2-6 (level 16)**, replaces at most one conehead in waves 4, 8, 12, etc. Existing wave sizes and other enemy types are unchanged; tutorials and roadside previews are excluded.
