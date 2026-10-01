@@ -2333,3 +2333,141 @@ index 245f337..9138444 100644
  	int						Init(bool IsWindowed);
  	bool					Redraw(Rect* theClipRect = nullptr);
  	void					SetVideoOnlyDraw(bool videoOnly);
+diff --git a/src/SexyAppFramework/platform/default/Input.cpp b/src/SexyAppFramework/platform/default/Input.cpp
+index 1fdc40c..4b799cf 100644
+--- a/src/SexyAppFramework/platform/default/Input.cpp
++++ b/src/SexyAppFramework/platform/default/Input.cpp
+@@ -30,12 +30,14 @@
+ #include "graphics/GLInterface.h"
+ #include "graphics/GLImage.h"
+ #include "widget/WidgetManager.h"
++#include "widget/EditWidget.h"
+ #include "misc/KeyCodes.h"
+ 
+ #ifdef __EMSCRIPTEN__
+ #include <emscripten.h>
+ 
+ EM_JS(void, WasmStartSoftKeyboard, (), {
++	if (Module.pvzTextInput && Module.pvzTextInput.enabled) { Module.pvzTextInput.start(); return; }
+ 	var input = document.getElementById('pvz-soft-keyboard');
+ 	if (!input) return;
+ 
+@@ -136,6 +138,7 @@ EM_JS(void, WasmStartSoftKeyboard, (), {
+ });
+ 
+ EM_JS(void, WasmStopSoftKeyboard, (), {
++	if (Module.pvzTextInput && Module.pvzTextInput.enabled) { Module.pvzTextInput.stop(); return; }
+ 	var input = document.getElementById('pvz-soft-keyboard');
+ 	var state = Module.wasmSoftKeyboardState;
+ 	if (state) {
+@@ -162,16 +165,32 @@ EM_JS(int, WasmPopSoftKeyboardChar, (), {
+ });
+ 
+ EM_JS(int, WasmPopSoftKeyboardKey, (), {
++	if (Module.pvzTextInput && Module.pvzTextInput.enabled) return Module.pvzTextInput.popKey();
+ 	var state = Module.wasmSoftKeyboardState;
+ 	if (!state || state.pendingKeys.length === 0) return 0;
+ 	return state.pendingKeys.shift();
+ });
+ 
+ EM_JS(int, WasmHasSoftKeyboardEvents, (), {
++	if (Module.pvzTextInput && Module.pvzTextInput.enabled) return Module.pvzTextInput.hasEvents() ? 1 : 0;
+ 	var state = Module.wasmSoftKeyboardState;
+ 	if (!state) return 0;
+ 	return (state.pendingChars.length + state.pendingKeys.length) > 0 ? 1 : 0;
+ });
++
++EM_JS(int, WasmPendingTextSize, (), {
++	var bridge = Module.pvzTextInput;
++	return bridge && bridge.pending ? lengthBytesUTF8(bridge.pending.text) + 1 : 0;
++});
++EM_JS(void, WasmTakeTextEdit, (char* text, int size, int* positions), {
++	var bridge = Module.pvzTextInput, edit = bridge.pending;
++	stringToUTF8(edit.text, text, size);
++	HEAP32[positions >> 2] = edit.owner;
++	HEAP32[(positions >> 2) + 1] = lengthBytesUTF8(edit.text.slice(0, edit.start));
++	HEAP32[(positions >> 2) + 2] = lengthBytesUTF8(edit.text.slice(0, edit.end));
++	bridge.pending = null; bridge.applying = true;
++});
++EM_JS(void, WasmFinishTextEdit, (), { if (Module.pvzTextInput) Module.pvzTextInput.applying = false; });
+ #endif
+ 
+ using namespace Sexy;
+@@ -540,6 +559,36 @@ void SexyAppBase::SetTextInputRect(const Rect& theRect)
+ bool SexyAppBase::ProcessDeferredMessages(bool singleMessage)
+ {
+ #ifdef __EMSCRIPTEN__
++	if (const int size = WasmPendingTextSize(); size > 0)
++	{
++		std::string value(size, '\0');
++		int positions[3]{};
++		WasmTakeTextEdit(value.data(), size, positions);
++		value.resize(size - 1);
++		auto* edit = dynamic_cast<EditWidget*>(mWidgetManager->mFocusWidget);
++		if (!mPlayingDemoBuffer && edit && edit->mHasFocus && reinterpret_cast<uintptr_t>(edit) == static_cast<uint32_t>(positions[0]))
++		{
++			if (edit->mString != value)
++			{
++				edit->mCursorPos = edit->mString.size();
++				edit->mHilitePos = 0;
++				if (value.empty()) edit->KeyDown(KEYCODE_BACK);
++				else edit->KeyText(value); // Keep native character/width limits and undo.
++			}
++			auto boundary = [&](int offset) {
++				offset = std::clamp(offset, 0, static_cast<int>(edit->mString.size()));
++				while (offset > 0 && offset < static_cast<int>(edit->mString.size()) && (static_cast<unsigned char>(edit->mString[offset]) & 0xc0) == 0x80) --offset;
++				return offset;
++			};
++			edit->mCursorPos = boundary(positions[2]);
++			edit->mHilitePos = positions[1] == positions[2] ? -1 : boundary(positions[1]);
++			edit->FocusCursor(true);
++			edit->MarkDirty();
++			mLastUserInputTick = mLastTimerTime;
++		}
++		WasmFinishTextEdit();
++		return true; // Text must reach the native widget before OK/Enter is handled.
++	}
+ 	if (!mPlayingDemoBuffer)
+ 	{
+ 		int aPendingKey = WasmPopSoftKeyboardKey();
+diff --git a/src/SexyAppFramework/widget/EditWidget.cpp b/src/SexyAppFramework/widget/EditWidget.cpp
+index 904f6bb..af567a2 100644
+--- a/src/SexyAppFramework/widget/EditWidget.cpp
++++ b/src/SexyAppFramework/widget/EditWidget.cpp
+@@ -29,6 +29,16 @@
+ #include "WidgetManager.h"
+ #include "SexyAppBase.h"
+ #include "EditListener.h"
++#ifdef __EMSCRIPTEN__
++#include <emscripten.h>
++EM_JS(void, WasmSyncEditWidget, (const void* owner, const char* text, int cursor, int hilite, int x, int y, int width, int height, int gameWidth, int gameHeight), {
++	if (!Module.pvzTextInput || !Module.pvzTextInput.enabled) return;
++	var value = UTF8ToString(text);
++	var a = UTF8ToString(text, cursor).length;
++	var b = hilite < 0 ? a : UTF8ToString(text, hilite).length;
++	Module.pvzTextInput.sync({owner: owner, text: value, start: Math.min(a,b), end: Math.max(a,b), x: x, y: y, width: width, height: height, gameWidth: gameWidth, gameHeight: gameHeight});
++});
++#endif
+ 
+ using namespace Sexy;
+ 
+@@ -205,6 +215,9 @@ void EditWidget::UpdateTextInputArea()
+ 	Point anAbsPos = GetAbsPos();
+ 	int aTextY = anAbsPos.mY + (mHeight - mFont->GetHeight())/2; // match where the caret is drawn
+ 	mWidgetManager->mApp->SetTextInputRect(Rect(anAbsPos.mX + 4 + aCursorX, aTextY, 1, mFont->GetHeight()));
++#ifdef __EMSCRIPTEN__
++	WasmSyncEditWidget(this, mString.c_str(), mCursorPos, mHilitePos, anAbsPos.mX, anAbsPos.mY, mWidth, mHeight, mWidgetManager->mApp->mWidth, mWidgetManager->mApp->mHeight);
++#endif
+ }
+ 
+ void EditWidget::GotFocus()
+@@ -238,6 +251,9 @@ void EditWidget::Update()
+ 
+ 	if (mHasFocus)
+ 	{
++#ifdef __EMSCRIPTEN__
++		UpdateTextInputArea(); // Follow native rename text, selection and viewport changes.
++#endif
+ 		if (mWidgetManager->mApp->mTabletPC)
+ 		{
+ 			UpdateCaretPos();

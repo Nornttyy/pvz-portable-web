@@ -42,6 +42,7 @@ progress::-moz-progress-bar { background: #92b548; }
 #tool-panel button { padding: 8px 12px; }
 #save-status { max-width: 180px; line-height: 1.5; color: #c7c4a8; }
 #pvz-soft-keyboard { position: fixed; top: 0; left: 0; width: 1px; height: 1px; border: 0; padding: 0; opacity: 0; pointer-events: none; font-size: 16px; }
+#pvz-soft-keyboard[data-native-edit="true"] { z-index: 4; opacity: 1; pointer-events: auto; touch-action: manipulation; resize: none; overflow: hidden; padding: 0 4px; border: 1px solid #625037; border-radius: 0; background: #eee3c4; color: #382614; caret-color: #382614; font-family: sans-serif; line-height: 1.25; white-space: pre; outline: none; color-scheme: light; }
 #diagnostics { margin-top: 14px; text-align: left; font-size: 12px; }
 #error-detail { max-height: 160px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; color: #f9ba9c; }
 @media (max-height: 450px) { #loading-panel { padding: 14px 24px; } h1 { margin: 6px 0; } #loader-note { margin-top: 10px; } }

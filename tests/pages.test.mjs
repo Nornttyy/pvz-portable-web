@@ -10,6 +10,7 @@ import './sandbox-placement.test.mjs';
 import './sun-hover.test.mjs';
 import './sun-production.test.mjs';
 import './seed-chooser-layout.test.mjs';
+import './mobile-text-input.test.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile, readdir, stat } from 'node:fs/promises';

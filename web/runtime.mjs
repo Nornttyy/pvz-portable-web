@@ -132,6 +132,7 @@ function resizeCanvas() {
   canvas.style.width = size.width + 'px';
   canvas.style.height = size.height + 'px';
 }
+Module.pvzResizeCanvas = resizeCanvas;
 
 start.addEventListener('click', () => {
   if (phase !== 'ready') return;

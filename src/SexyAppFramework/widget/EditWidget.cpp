@@ -29,6 +29,16 @@
 #include "WidgetManager.h"
 #include "SexyAppBase.h"
 #include "EditListener.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+EM_JS(void, WasmSyncEditWidget, (const void* owner, const char* text, int cursor, int hilite, int x, int y, int width, int height, int gameWidth, int gameHeight), {
+	if (!Module.pvzTextInput || !Module.pvzTextInput.enabled) return;
+	var value = UTF8ToString(text);
+	var a = UTF8ToString(text, cursor).length;
+	var b = hilite < 0 ? a : UTF8ToString(text, hilite).length;
+	Module.pvzTextInput.sync({owner: owner, text: value, start: Math.min(a,b), end: Math.max(a,b), x: x, y: y, width: width, height: height, gameWidth: gameWidth, gameHeight: gameHeight});
+});
+#endif
 
 using namespace Sexy;
 
@@ -205,6 +215,9 @@ void EditWidget::UpdateTextInputArea()
 	Point anAbsPos = GetAbsPos();
 	int aTextY = anAbsPos.mY + (mHeight - mFont->GetHeight())/2; // match where the caret is drawn
 	mWidgetManager->mApp->SetTextInputRect(Rect(anAbsPos.mX + 4 + aCursorX, aTextY, 1, mFont->GetHeight()));
+#ifdef __EMSCRIPTEN__
+	WasmSyncEditWidget(this, mString.c_str(), mCursorPos, mHilitePos, anAbsPos.mX, anAbsPos.mY, mWidth, mHeight, mWidgetManager->mApp->mWidth, mWidgetManager->mApp->mHeight);
+#endif
 }
 
 void EditWidget::GotFocus()
@@ -238,6 +251,9 @@ void EditWidget::Update()
 
 	if (mHasFocus)
 	{
+#ifdef __EMSCRIPTEN__
+		UpdateTextInputArea(); // Follow native rename text, selection and viewport changes.
+#endif
 		if (mWidgetManager->mApp->mTabletPC)
 		{
 			UpdateCaretPos();

@@ -36,6 +36,7 @@
   <div id="canvas-container" hidden>
     <p id="orientation-hint">横屏可获得更大的游戏画面</p>
     <canvas id="canvas" width="800" height="600" tabindex="0" aria-label="植物大战僵尸游戏画面"></canvas>
+    <textarea id="pvz-soft-keyboard" rows="1" inputmode="text" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="游戏文字输入"></textarea>
   </div>
   <details id="tools" hidden>
     <summary aria-label="本地工具">工具</summary>
@@ -49,8 +50,8 @@
   </details>
   <input id="save-file" type="file" accept=".zip,application/zip" hidden>
   <input id="layout-file" type="file" accept=".json,application/json" hidden>
-  <textarea id="pvz-soft-keyboard" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="游戏文字输入"></textarea>
   <script src="bootstrap.js"></script>
+  <script src="text-input.js"></script>
   <script src="vendor/jszip-3.10.1.min.js"></script>
   <script async src="sandbox-engine/pvz-portable.js"></script>
   <script type="module" src="runtime.mjs"></script>
