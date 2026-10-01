@@ -36,8 +36,15 @@ int main(){
    assert(part.mImage==(track==0?SandboxArt::AwkwardFace():original.mImage));
   }}
   auto unscoped=original;AbstractRigVisuals::Transform(&body,0,unscoped);assert(unscoped.mImage==original.mImage);
-  Sexy::Graphics g(nullptr);g.mTransX=224;g.mTransY=50;testBlits.clear();assert(SandboxPlants::DrawBody(&g,p,0,0));assert(testBlits.size()==2);
-  for(const auto& blit:testBlits)assert(blit.path=="reanim/ScaredyShroom_sweat.png"&&blit.matrix.m02>224&&blit.matrix.m02<300&&blit.matrix.m12>65&&blit.matrix.m12<100);
+  Sexy::Graphics g(nullptr);g.mTransX=224;g.mTransY=50;
+  for(int remaining:{400,300,120,1}){
+   assert(MemeCharacters::Restore(p,{520,300,1,0,remaining,0,100,0,1,1}));
+   testBlits.clear();assert(SandboxPlants::DrawBody(&g,p,0,0));assert(testBlits.size()==1);
+   const auto& blit=testBlits[0];auto* drop=SandboxArt::AwkwardDrop();
+   assert(blit.path=="/addons/art/awkward-blue-drop.png"&&blit.alpha==255);
+   near(blit.matrix.m02,279.4f);near(blit.matrix.m12,78.45f);
+   near(blit.matrix.m00*drop->mWidth,19.2f);near(blit.matrix.m11*drop->mHeight,25.2f);
+  }
   assert(MemeCharacters::Restore(p,{520,300,0,0,0,0,500,0,0,1}));
   {AbstractRigVisuals::Scope scope(p);auto face=original;AbstractRigVisuals::Transform(&body,0,face);assert(face.mImage==original.mImage);near(face.mTransX,original.mTransX);}
   testBlits.clear();assert(SandboxPlants::DrawBody(&g,p,0,0));assert(testBlits.empty());app.reanims.clear();

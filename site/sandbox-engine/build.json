@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Four abstract plants (500,501,519,520), Louis XVI (212), and Runaway Zombie (213). Awkward Sunflower (520, native slot 53) is a separate 50-sun card unlocked from adventure 1-6. Produces native 25-value suns; adjacent same-species flowers turn toward a producer, which loses its smile, sweats and advances production at half speed for four seconds. Ordinary sunflower remains unchanged. Face-only generated PNG is embedded; original petals, stem, leaves, blink and sweat are reused. Native production countdown plus optional ten-int state preserve progress across saves. Chooser/almanac extra cards remain inside the grid; all original special-card IDs remain stable. Retired characters stay removed.",
+  "mode": "Four abstract plants (500,501,519,520), Louis XVI (212), and Runaway Zombie (213). Awkward Sunflower (520, native slot 53) is a separate 50-sun card unlocked from adventure 1-6. Produces native 25-value suns; adjacent same-species flowers turn toward a producer, which loses its smile, shows one large blue water drop and advances production at half speed for four seconds. Observers turn face and petals together without a transition; embarrassed producers do not observe others. Ordinary sunflower remains unchanged. Generated face and transparent blue drop PNGs are embedded; original petals, stem, leaves and blink are reused. Native production countdown plus optional ten-int state preserve progress across saves. Chooser/almanac extra cards remain inside the grid; all original special-card IDs remain stable. Retired characters stay removed.",
   "files": [
     {
       "name": "pvz-portable.js",
       "size": 277501,
-      "sha256": "e64f3894cceb839d54b4597d413256992a8277277e4e2e6ea66a3164d6900036"
+      "sha256": "592087711f23266119325f2b2d6d712cdcb7e38bf3b5360c644bba0d2d6eb66c"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7581019,
-      "sha256": "ee9df9c67cf2dad447de06f8493fe2cd26ab9a4f0508f0d1eba97af10b08d503"
+      "size": 7588065,
+      "sha256": "0f4816a65b087cb295b096d5c76bf24180d89be895e78ee97413df3b55ddac98"
     }
   ]
 }

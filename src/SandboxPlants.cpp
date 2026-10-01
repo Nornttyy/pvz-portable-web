@@ -75,19 +75,16 @@ void NutBrows(Sexy::Graphics* g,Reanimation* body,int alpha){
 }
 void AwkwardSweat(Sexy::Graphics* g,Reanimation* body,int time){
  if(!body||!time||!body->TrackExists("anim_idle"))return;
- auto* drop=SandboxArt::NativeImage("ScaredyShroom_sweat.png");if(!drop)return;
+ auto* drop=SandboxArt::AwkwardDrop();if(!drop)return;
  Sexy::SexyTransform2D face;body->GetTrackMatrix(body->FindTrackIndex("anim_idle"),face);
- // Local face coordinates: small native droplets follow the posed forehead.
- for(int i=0;i<2;++i){
-  const float progress=((MemeCharacters::AwkwardDuration-time+i*45)%120)/120.0f;
-  const float x=(i?7.0f:49.0f)-28.5f,y=(i?2.0f:0.0f)+progress*12-21.5f;
-  Sexy::SexyTransform2D m=face;
-  m.m02+=face.m00*x+face.m01*y+g->mTransX;m.m12+=face.m10*x+face.m11*y+g->mTransY;
-  const float sx=5.0f/drop->mWidth,sy=10.0f/drop->mHeight;
-  m.m00*=sx;m.m10*=sx;m.m01*=sy;m.m11*=sy;
-  const int alpha=std::min(255,time*12)*std::min(1.0f,(1-progress)*4);
-  PvzpBltMatrix(g,drop,m,g->mClipRect,Sexy::Color(255,255,255,alpha),g->mDrawMode,Sexy::Rect(0,0,drop->mWidth,drop->mHeight));
- }
+ // One large blue water drop beside the forehead, never a particle stream.
+ // Stay attached to the native face bone without a separate drift/fade cycle.
+ const float x=54.0f-28.5f,y=5.0f-21.5f;
+ Sexy::SexyTransform2D m=face;
+ m.m02+=face.m00*x+face.m01*y+g->mTransX;m.m12+=face.m10*x+face.m11*y+g->mTransY;
+ const float sx=24.0f/drop->mWidth,sy=36.0f/drop->mHeight;
+ m.m00*=sx;m.m10*=sx;m.m01*=sy;m.m11*=sy;
+ PvzpBltMatrix(g,drop,m,g->mClipRect,Sexy::Color(255,255,255),g->mDrawMode,Sexy::Rect(0,0,drop->mWidth,drop->mHeight));
 }
 
 }

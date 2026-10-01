@@ -201,6 +201,7 @@ if(EMSCRIPTEN)
 		"${CMAKE_CURRENT_SOURCE_DIR}/wasm/shell.html"
 		"${CMAKE_CURRENT_SOURCE_DIR}/addons/audio/rage-scream.wav"
 		"${CMAKE_CURRENT_SOURCE_DIR}/addons/art/awkward-sunflower-face.png"
+		"${CMAKE_CURRENT_SOURCE_DIR}/addons/art/awkward-blue-drop.png"
 	)
 	target_link_libraries(pvz-portable PRIVATE
 		SDL2_mixer_ext_Static
@@ -209,6 +210,7 @@ if(EMSCRIPTEN)
 	target_link_options(pvz-portable PRIVATE
 		"SHELL:--embed-file ${CMAKE_CURRENT_SOURCE_DIR}/addons/audio@/addons/audio"
 		"SHELL:--embed-file ${CMAKE_CURRENT_SOURCE_DIR}/addons/art/awkward-sunflower-face.png@/addons/art/awkward-sunflower-face.png"
+		"SHELL:--embed-file ${CMAKE_CURRENT_SOURCE_DIR}/addons/art/awkward-blue-drop.png@/addons/art/awkward-blue-drop.png"
 		"SHELL:-sUSE_SDL=2"
 		"SHELL:-sUSE_ZLIB=1"
 		"SHELL:-sUSE_LIBPNG=1"

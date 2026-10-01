@@ -156,4 +156,5 @@ test('retired zombie art and extra seed cannot leak into native previews or menu
  assert.equal(wasm.includes(await read('addons/art/squash-headband.png')),false);
  assert.equal(wasm.includes(await read('addons/audio/rage-scream.wav')),true);
  assert.equal(wasm.includes(await read('addons/art/awkward-sunflower-face.png')),true);
+ assert.equal(wasm.includes(await read('addons/art/awkward-blue-drop.png')),true);
 });
