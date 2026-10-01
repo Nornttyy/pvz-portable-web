@@ -16,11 +16,14 @@
     "coneArmor": 370,
     "walkMultiplier": 1.25,
     "escapeMultiplier": 3,
-    "dodgePercentWhenReady": 50,
+    "dodgePercentWhenReady": 70,
     "flipTicks": 90,
     "recoveryTicks": 120,
-    "laneChangePercent": 25,
-    "animation": "Native sunglasses, zombie rig and duck ring. Local slow-motion backflip; no global time scaling. Carries the stolen native plant frame. No bucket variant."
+    "laneChangePercent": 30,
+    "forwardFlightPercentPerFlip": 10,
+    "forwardFlightTiles": 2,
+    "jawPoseTicks": 110,
+    "animation": "Generated smug face without glasses; an angular jaw with prominent crease marks appears on flips, lane changes and steals. Shared skull registration on the native head bone; original body, cone and duck ring. Two-tile flight follows a continuous eased arc. No global time scaling. Carries the stolen native plant frame. No bucket variant."
   },
   "cactusPalm": {
     "id": 524,
@@ -106,12 +109,12 @@
     {
       "name": "pvz-portable.js",
       "size": 278906,
-      "sha256": "7d632bace37e45cd1a57af9dbc8202f297d93fc2ef87c3547ae92c6aa7720b5a"
+      "sha256": "b8011a2bd55fe6d6c8db11cc5e24929130afadae7c6cbc6420500cb563225271"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7616879,
-      "sha256": "9c8b68cd661002da4ddf071a6ee8c7cf89adcb4f2289611aa9bce8e2197305c5"
+      "size": 7638798,
+      "sha256": "25cd744cdfbb761b7452fbdae15b84d82123a05db2870e137fb60a7e29521474"
     }
   ]
 }

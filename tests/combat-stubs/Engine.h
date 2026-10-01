@@ -28,8 +28,8 @@ enum PlantWeapon {WEAPON_PRIMARY,WEAPON_SECONDARY};
 enum PlantSubClass {SUBCLASS_NORMAL,SUBCLASS_SHOOTER};
 constexpr int RENDER_GROUP_HIDDEN=-1,RENDER_GROUP_NORMAL=0,DS_ALIGN_CENTER=0;
 namespace Sexy {
-inline int forcedRoll=-1;inline uint32_t randomSeed=123;
-inline int Rand(int n){if(forcedRoll>=0)return forcedRoll%n;randomSeed=randomSeed*1664525u+1013904223u;return (randomSeed>>1)%n;}
+inline int forcedRoll=-1;inline uint32_t randomSeed=123;inline std::vector<int> queuedRolls;
+inline int Rand(int n){if(!queuedRolls.empty()){const int r=queuedRolls.front();queuedRolls.erase(queuedRolls.begin());return r%n;}if(forcedRoll>=0)return forcedRoll%n;randomSeed=randomSeed*1664525u+1013904223u;return (randomSeed>>1)%n;}
 struct Color{int mRed,mGreen,mBlue,mAlpha;Color(int r=0,int g=0,int b=0,int a=255):mRed(r),mGreen(g),mBlue(b),mAlpha(a){}};
 struct SexyTransform2D{float m00=1,m01=0,m02=0,m10=0,m11=1,m12=0;void LoadIdentity(){*this={};}};
 struct Rect{int mX,mY,mWidth,mHeight;Rect(int x=0,int y=0,int w=0,int h=0):mX(x),mY(y),mWidth(w),mHeight(h){}};
@@ -82,7 +82,7 @@ public:
  bool mDead=false,mMindControlled=false,mHasHead=true,mHasArm=true,mIsEating=false,mBlowingAway=false;int chill=0,mIceTrapCounter=0,mButteredCounter=0,mRenderOrder=0;
  bool mHasObject=false;Sexy::Rect mZombieAttackRect{50,0,20,115};int mTargetRow=-1,mSummonCounter=0;
  int mZombiePhase=0,mZombieHeight=0;bool mInPool=false;
- int mBossStompCounter=0,mBossHeadCounter=0,mBossBungeeCounter=0;
+ int mBossStompCounter=0,mBossHeadCounter=0,mBossBungeeCounter=0,mBossMode=0;
  void ReanimIgnoreClipRect(const char*,bool){}void SetupWaterTrack(const char*){}void CheckForBoardEdge(){if(mPosX>850)mDead=true;}
  int mPhaseCounter=0,mShieldHealth=0,mShieldMaxHealth=0,mShieldType=0,mZombieAge=0,mFromWave=0;float mAltitude=0;bool flying=false;
  bool IsFlying(){return flying;}

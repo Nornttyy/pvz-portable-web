@@ -14,6 +14,7 @@ Sexy::Image* Image(const char*,const char*){return nullptr;}
 Sexy::Image* NativeImage(const char*){return nullptr;}
 Sexy::Image* Phone(int){return nullptr;}
 Sexy::Image* Palm(){return nullptr;}
+Sexy::Image* CleverHead(bool){return nullptr;}
 bool PalmMatrix(Reanimation*,Sexy::SexyTransform2D&){return false;}
 void DrawPalm(Sexy::Graphics*,Reanimation*){}
 Sexy::Image* PhoneHands(const char*){return nullptr;}
@@ -31,31 +32,44 @@ struct World:Board {
  void step(int count=1){while(count--){SandboxPlants::Tick(this);SandboxZombies::Tick(this);if(!mPaused)++mMainCounter;}}
 };
 int main(){
- // Clever's 50% roll is per incoming hit, not per-frame damage immunity.
+ // Clever's 70% roll is per incoming hit, not per-frame damage immunity.
  {World w;int successes=0;
   for(int roll=0;roll<100;++roll){auto* z=w.enemy();SandboxZombies::Assign(z,216);
    auto* shot=w.AddProjectile(500,200,0,2,PROJECTILE_PEA);Sexy::forcedRoll=roll;
    const bool dodge=SandboxZombies::DodgeProjectile(shot,z);successes+=dodge;
-   assert(dodge==(roll<50)&&!shot->mDead&&z->mBodyHealth==1000);
+   assert(dodge==(roll<70)&&!shot->mDead&&z->mBodyHealth==1000);
    if(dodge){
     assert(SandboxZombies::IsDodging(z)&&z->mPhaseCounter==90);
     const int target=z->mTargetRow;assert(target>=0&&target<5&&std::abs(target-2)<=1);
-    assert((target!=2)==(roll<25));
+    assert((target!=2)==(roll<30));
+    const bool flying=roll<10;assert((z->mBossMode==SandboxZombies::ForwardFlightTag)==flying);
+    assert(SandboxZombies::ShowsCleverJaw(z)&&z->mSummonCounter==110);
     // Ice holds the actual flip clock; a new projectile can hit while frozen.
     z->mIceTrapCounter=20;auto* next=w.AddProjectile(500,200,0,2,PROJECTILE_PEA);
-    assert(!SandboxZombies::SkipsProjectile(next,z));SandboxZombies::UpdateClever(z);assert(z->mPhaseCounter==90);z->mIceTrapCounter=0;
+    assert(!SandboxZombies::SkipsProjectile(next,z));SandboxZombies::UpdateClever(z);assert(z->mPhaseCounter==90&&z->mSummonCounter==110);z->mIceTrapCounter=0;
     const float before=z->mPosX;
-    for(int i=0;i<90;++i)assert(SandboxZombies::UpdateClever(z));
+    for(int i=0;i<90;++i){const float x=z->mPosX;assert(SandboxZombies::UpdateClever(z));
+     const float step=z->mPosX-x;assert(std::abs(step)<2.67f);assert(flying?step<=0:step>=0);
+    }
     assert(!SandboxZombies::IsDodging(z)&&z->mRow==target&&z->mBossStompCounter==120);
-    assert(std::abs(z->mPosX-before-28)<.005&&z->mAltitude==0);
+    assert(std::abs(z->mPosX-before-(flying?-160:28))<.01&&z->mAltitude==0&&z->mBossMode==0);
+    assert(z->mSummonCounter==20);
     Sexy::forcedRoll=0;assert(!SandboxZombies::DodgeProjectile(next,z));
     assert(SandboxZombies::SkipsProjectile(shot,z)); // Old avoided homing shot never rerolls.
     for(int i=0;i<120;++i)SandboxZombies::UpdateClever(z);
+    assert(!SandboxZombies::ShowsCleverJaw(z));
     assert(SandboxZombies::DodgeProjectile(next,z));
     SandboxZombies::ForgetShot(shot);assert(!shot->mDead);
    }
   }
-  assert(successes==50);Sexy::forcedRoll=-1;
+  assert(successes==70);Sexy::forcedRoll=-1;
+ }
+ // Lane and flight rolls are independent, including all exact boundaries.
+ for(int id:{216,217})for(int lane:{29,30})for(int fly:{9,10}){World w;auto* z=w.enemy(500,2,static_cast<ZombieType>(SandboxZombies::Base(id)));SandboxZombies::Assign(z,id);
+  auto* shot=w.AddProjectile(500,200,0,2,PROJECTILE_PEA);
+  Sexy::queuedRolls=lane<30?std::vector<int>{69,lane,0,fly}:std::vector<int>{69,lane,fly};
+  assert(SandboxZombies::DodgeProjectile(shot,z)&&Sexy::queuedRolls.empty());
+  assert((z->mTargetRow!=2)==(lane<30));assert((z->mBossMode==SandboxZombies::ForwardFlightTag)==(fly<10));
  }
  for(int id:{216,217}){World w;w.pool=true;auto* z=w.enemy(400,1,id==217?static_cast<ZombieType>(2):ZOMBIE_NORMAL);SandboxZombies::Assign(z,id);
   assert(SandboxZombies::Speed(z)==1.25f);z->mHelmHealth=id==217?370:0;
@@ -63,17 +77,17 @@ int main(){
   assert(SandboxZombies::DodgeProjectile(shot,z));z->mTargetRow=2;
   for(int i=0;i<45;++i)SandboxZombies::UpdateClever(z);
   assert(z->mInPool&&z->mRow==2);const int counter=z->mPhaseCounter;const float y=z->mPosY;
-  SandboxZombies::Forget(z);assert(SandboxZombies::Restore(z,id));assert(z->mPhaseCounter==counter&&z->mPosY==y);
+  SandboxZombies::Forget(z);assert(SandboxZombies::Restore(z,id));assert(z->mPhaseCounter==counter&&z->mPosY==y&&z->mBossMode==SandboxZombies::ForwardFlightTag&&z->mSummonCounter==65);
   for(int i=0;i<45;++i)SandboxZombies::UpdateClever(z);
   assert(z->mAltitude==-40&&z->mInPool&&z->mRow==2);
   auto* pad=w.add(16);auto* nut=w.add(501);assert(SandboxZombies::StealPlant(z,nut));
-  assert(nut->mDead&&!pad->mDead&&z->mBossHeadCounter==502&&SandboxZombies::IsRetreating(z)&&SandboxZombies::Speed(z)==3);
+  assert(nut->mDead&&!pad->mDead&&z->mBossHeadCounter==502&&SandboxZombies::IsRetreating(z)&&SandboxZombies::Speed(z)==3&&SandboxZombies::ShowsCleverJaw(z)&&z->mSummonCounter==110);
   assert(!SandboxZombies::StealPlant(z,pad));SandboxZombies::Forget(z);assert(SandboxZombies::Restore(z,id));assert(z->mBossHeadCounter==502);
   auto* cob=w.AddProjectile(400,100,0,1,PROJECTILE_COBBIG);z->mBossStompCounter=0;assert(!SandboxZombies::DodgeProjectile(cob,z));
   auto* fresh=w.AddProjectile(400,200,0,2,PROJECTILE_PEA);const float fleeX=z->mPosX;
   assert(SandboxZombies::DodgeProjectile(fresh,z));for(int i=0;i<90;++i)SandboxZombies::UpdateClever(z);
-  assert(SandboxZombies::IsRetreating(z)&&std::abs(z->mPosX-fleeX+28)<.005f&&z->mBossHeadCounter==502);
-  z->mHasHead=false;SandboxZombies::UpdateClever(z);assert(z->mZombiePhase==PHASE_ZOMBIE_NORMAL&&!SandboxZombies::IsRetreating(z));
+  assert(SandboxZombies::IsRetreating(z)&&std::abs(z->mPosX-fleeX-160)<.01f&&z->mBossHeadCounter==502);
+  z->mHasHead=false;SandboxZombies::UpdateClever(z);assert(z->mZombiePhase==PHASE_ZOMBIE_NORMAL&&!SandboxZombies::IsRetreating(z)&&!SandboxZombies::ShowsCleverJaw(z));
   Sexy::forcedRoll=-1;
  }
  {World w;auto* z=w.enemy();auto* shot=w.AddProjectile(0,0,0,2,PROJECTILE_PEA);Sexy::forcedRoll=0;

@@ -44,6 +44,7 @@ bool IsConeWrap(const Zombie* z){return z&&Type(z)==ConeWrap;}
 bool IsGiantImp(const Zombie* z){return z&&Type(z)==GiantImp;}
 bool IsClever(const Zombie* z){return z&&(Type(z)==Clever||Type(z)==CleverCone);}
 bool IsDodging(const Zombie* z){return IsClever(z)&&int(z->mZombiePhase)==CleverFlip&&!z->mDead&&z->mHasHead;}
+bool ShowsCleverJaw(const Zombie* z){return IsClever(z)&&z->mHasHead&&!z->mDead&&(IsDodging(z)||z->mSummonCounter>0);}
 bool IsRunning(const Zombie* z){return IsRunner(z)&&!z->mDead&&z->mHasHead&&int(z->mZombiePhase)>=RunIn&&int(z->mZombiePhase)<=RunOut;}
 void Reset(){identities.clear();dodged.clear();}
 void Forget(Zombie* z){identities.erase(z);for(auto& [shot,targets]:dodged)targets.erase(z);}
@@ -65,8 +66,10 @@ void Assign(Zombie* z,int id){
  if(IsClever(z)){
   // These boss-only fields are unused on normal/cone rigs and already saved
   // by the native serializer. No Zombie struct/legacy-save ABI changes.
-  // Stomp = dodge recovery; Head = carried logical seed + 1; Bungee = source row.
+  // Stomp = dodge recovery; Head = carried logical seed + 1; Bungee = source row;
+  // Mode = forward-flight marker; Summon = temporary jawline expression timer.
   z->mBossStompCounter=0;z->mBossHeadCounter=0;z->mBossBungeeCounter=z->mRow;
+  z->mBossMode=0;z->mSummonCounter=0;
   z->mTargetRow=z->mRow;z->UpdateAnimSpeed();return;
  }
  if(id==ConeWrap){
@@ -126,21 +129,26 @@ bool DodgeProjectile(Projectile* shot,Zombie* z){
     (int(z->mZombiePhase)!=PHASE_ZOMBIE_NORMAL&&int(z->mZombiePhase)!=CleverFlee))return false;
  // Dodge plant projectiles, not explosions, mower/crush, or enemy shots.
  if(shot->mProjectileType==PROJECTILE_COBBIG||shot->mProjectileType==PROJECTILE_BASKETBALL||shot->mProjectileType==PROJECTILE_ZOMBIE_PEA)return false;
- if(Sexy::Rand(100)>=50)return false;
+ if(Sexy::Rand(100)>=DodgePercent)return false;
  dodged[shot].insert(z);z->StopEating();
  z->mZombiePhase=static_cast<decltype(z->mZombiePhase)>(CleverFlip);z->mPhaseCounter=FlipTicks;
  z->mBossBungeeCounter=z->mRow;z->mTargetRow=z->mRow;
- if(Sexy::Rand(100)<25){
+ if(Sexy::Rand(100)<LaneChangePercent){
   int choices[2],count=0;
   for(int row:{z->mRow-1,z->mRow+1})if(z->mBoard->RowCanHaveZombies(row))choices[count++]=row;
   if(count)z->mTargetRow=choices[Sexy::Rand(count)];
  }
+ // Independent roll once per accepted flip, serialized until landing.
+ z->mBossMode=Sexy::Rand(100)<ForwardFlightPercent?ForwardFlightTag:0;
+ z->mSummonCounter=JawPoseTicks;
  z->PlayZombieReanim("anim_walk2",REANIM_LOOP,0,0);z->UpdateReanim();return true;
 }
 void RefreshCleverRig(Zombie* z){
  if(!IsClever(z))return;
  auto* body=gLawnApp->ReanimationTryToGet(z->mBodyReanimID);if(!body)return;
- if(z->mHasHead&&body->TrackExists("anim_head1"))body->SetImageOverride("anim_head1",SandboxArt::NativeImage("Zombie_head_sunglasses1.png"));
+ // Expression artwork is applied through the scoped native head bone, not a
+ // global future-mode override. This also clears glasses in older saves.
+ if(body->TrackExists("anim_head1"))body->SetImageOverride("anim_head1",nullptr);
  const bool ring=z->mInPool;
  z->ReanimShowPrefix("Zombie_duckytube",ring?RENDER_GROUP_NORMAL:RENDER_GROUP_HIDDEN);
  if(ring){z->ReanimIgnoreClipRect("Zombie_duckytube",true);z->SetupWaterTrack("Zombie_whitewater");z->SetupWaterTrack("Zombie_whitewater2");}
@@ -149,12 +157,13 @@ bool UpdateClever(Zombie* z){
  if(!IsClever(z)||!z->IsOnBoard()||z->IsDeadOrDying())return false;
  if(!z->mHasHead||z->mMindControlled){
   if(int(z->mZombiePhase)==CleverFlip||int(z->mZombiePhase)==CleverFlee){
-   z->mZombiePhase=PHASE_ZOMBIE_NORMAL;z->mPhaseCounter=0;z->mBossHeadCounter=0;
+   z->mZombiePhase=PHASE_ZOMBIE_NORMAL;z->mPhaseCounter=0;z->mBossHeadCounter=0;z->mSummonCounter=0;z->mBossMode=0;
    z->mAltitude=z->mInPool?-40*z->mScaleZombie:0;z->StartWalkAnim(0);
   }
   return false;
  }
  if(z->IsImmobilizied())return IsDodging(z);
+ if(z->mSummonCounter>0)--z->mSummonCounter;
  if(!IsDodging(z)){if(z->mBossStompCounter>0)--z->mBossStompCounter;return false;}
  const float previous=1-float(z->mPhaseCounter)/FlipTicks;
  if(z->mPhaseCounter>0)--z->mPhaseCounter;
@@ -166,7 +175,9 @@ bool UpdateClever(Zombie* z){
   z->mPosY=z->GetPosYBasedOnRow(from)*(1-t)+z->GetPosYBasedOnRow(to)*t;
   if(t>=.5f&&z->mRow!=to)z->SetRow(to);
  }
- z->mPosX+=(IsRetreating(z)?-28:28)*(t-previous);z->mX=int(z->mPosX);z->mY=int(z->mPosY);
+ const float direction=IsRetreating(z)?1.0f:-1.0f;
+ const float distance=z->mBossMode==ForwardFlightTag?ForwardFlightDistance:-28.0f;
+ z->mPosX+=direction*distance*(FlipTravel(t)-FlipTravel(previous));z->mX=int(z->mPosX);z->mY=int(z->mPosY);
  const bool pool=z->mBoard->IsPoolSquare(z->mBoard->PixelToGridXKeepOnBoard(z->mX+60,z->mY),z->mRow)&&z->mPosX<680;
  z->mInPool=pool;
  const float fromDepth=z->mBoard->IsPoolSquare(0,from)&&z->mPosX<680?-40*z->mScaleZombie:0;
@@ -175,6 +186,7 @@ bool UpdateClever(Zombie* z){
  if(z->mPhaseCounter==0){
   z->mZombiePhase=static_cast<decltype(z->mZombiePhase)>(z->mBossHeadCounter>0?CleverFlee:int(PHASE_ZOMBIE_NORMAL));
   z->mBossStompCounter=DodgeRecovery;z->mAltitude=pool?-40*z->mScaleZombie:0;
+  z->mBossMode=0;
   z->mPosY=z->GetPosYBasedOnRow(z->mRow);z->mY=int(z->mPosY);z->StartWalkAnim(0);
  }
  RefreshCleverRig(z);z->CheckForBoardEdge();return true;
@@ -183,6 +195,7 @@ bool StealPlant(Zombie* z,Plant* p){
  if(!IsClever(z)||!p||p->mDead||p->NotOnGround()||IsDodging(z)||z->mBossHeadCounter>0||!z->mHasHead||z->mMindControlled)return false;
  // Steal exactly the native melee target; don't erase the whole stacked cell.
  z->mBossHeadCounter=SandboxPlants::Type(p)+1;
+ z->mSummonCounter=JawPoseTicks;
  p->Die();z->StopEating();z->mZombiePhase=static_cast<decltype(z->mZombiePhase)>(CleverFlee);
  z->mPhaseCounter=0;z->StartWalkAnim(0);return true;
 }
@@ -244,7 +257,6 @@ void DrawPortrait(Sexy::Graphics* g,int x,int y,int w,int h,int id){
   portrait=gLawnApp->mReanimatorCache->MakeBlankMemoryImage(200,210);Sexy::Graphics canvas(portrait.get());canvas.SetLinearBlend(true);
   Reanimation anim;anim.ReanimationInitializeType(40,40,id==GiantImp?REANIM_IMP:REANIM_ZOMBIE);anim.SetFramesForLayer(id==GiantImp?"anim_walk":id==Runner?"anim_walk2":"anim_idle");Zombie::SetupReanimLayers(&anim,static_cast<ZombieType>(Base(id)));
   if(id==Louis)for(const char* prefix:{"anim_head","anim_hair","anim_tongue"})anim.AssignRenderGroupToPrefix(prefix,RENDER_GROUP_HIDDEN);
-  if(id==Clever||id==CleverCone)anim.SetImageOverride("anim_head1",SandboxArt::NativeImage("Zombie_head_sunglasses1.png"));
   if(id==Runner){anim.mAnimTime=0.35f;anim.mOverlayMatrix.m01=0.13f;anim.mOverlayMatrix.m02-=15.6f;}
   AbstractRigVisuals::Scope pose(&anim,id);anim.Draw(&canvas);
  }

@@ -203,7 +203,8 @@ test('retired zombie art and extra seed cannot leak into native previews or menu
  const app=(await read('src/LawnApp.cpp')).toString();assert.match(app,/if \(theSeedType == SEED_LEFTPEATER\) return MemeAdventure::RosterEnabled\(\)/);
  assert.match(app,/MemeCharacters::Find\(MemeCharacters::ShooterPea\)->unlock/);
  const z=(await read('src/SandboxZombies.cpp')).toString();assert.doesNotMatch(z,/AddZombieInRow|PlayMemeCue|TakeDamage|bucket-glove|squash-headband/);
- for(const call of z.matchAll(/SetImageOverride\(([^;]+)\)/g))assert.match(call[1],/"anim_head1",SandboxArt::NativeImage\("Zombie_head_sunglasses1.png"\)/);
+ assert.doesNotMatch(z,/Zombie_head_sunglasses/);
+ for(const call of z.matchAll(/SetImageOverride\(([^;]+)\)/g))assert.match(call[1],/"anim_head1",nullptr/);
  const wasm=await read('site/sandbox-engine/pvz-portable.wasm');
  assert.equal(wasm.includes(await read('addons/art/bucket-glove.png')),false);
  assert.equal(wasm.includes(await read('addons/art/squash-headband.png')),false);

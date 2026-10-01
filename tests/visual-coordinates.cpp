@@ -15,6 +15,38 @@
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
+ // Both generated faces share one skull registration; body/hat/ring keep
+ // native transforms and all temporary overrides are restored after drawing.
+ for(int id:{216,217}){SandboxZombies::Reset();Board w;auto* z=w.AddZombieInRow(static_cast<ZombieType>(SandboxZombies::Base(id)),2,-1);SandboxZombies::Assign(z,id);
+  Reanimation body;Track tracks[]={{"anim_head1"},{"anim_head2"},{"anim_tongue"},{"anim_hair"},{"anim_cone"},{"Zombie_duckytube"}};
+  TrackInstance instances[6];body.def.mTracks={6,tracks};body.mTrackInstances=instances;
+  auto* original=SandboxArt::NativeImage("Zombie_head.png");body.pose.mImage=original;
+  for(auto& i:instances)i.mImageOverride=original;
+  app.reanims[94]=&body;z->mBodyReanimID=94;
+  auto* neutral=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::CleverHead(false));auto* jaw=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::CleverHead(true));
+  assert(neutral&&jaw&&neutral!=jaw&&neutral->mWidth==jaw->mWidth&&neutral->mHeight==jaw->mHeight);
+  int transparent=0,different=0;for(int i=0;i<neutral->mWidth*neutral->mHeight;++i){transparent+=(neutral->GetBits()[i]>>24)==0;different+=neutral->GetBits()[i]!=jaw->GetBits()[i];}
+  assert(transparent>100&&different>50);
+  for(int mode:{0,1,2})for(float angle:{0.f,90.f,210.f}){
+   z->mZombiePhase=mode==1?SandboxZombies::CleverFlip:PHASE_ZOMBIE_NORMAL;z->mSummonCounter=mode==2?110:0;
+   body.pose.mTransX=14;body.pose.mTransY=22;body.pose.mSkewX=body.pose.mSkewY=angle;body.pose.mScaleX=.8f;body.pose.mScaleY=.9f;
+   {AbstractRigVisuals::Scope scope(z);auto head=body.pose;AbstractRigVisuals::Transform(&body,0,head);
+    assert(head.mImage==(mode?jaw:neutral)&&instances[0].mImageOverride==nullptr);
+    const float a=angle*3.14159265f/180;
+    near(head.mTransX,14-.8f*std::cos(a)+4.5f*std::sin(a));near(head.mTransY,22-.8f*std::sin(a)-4.5f*std::cos(a));
+    near(head.mScaleX,.8f);near(head.mScaleY,.9f);
+    for(int i=1;i<4;++i)assert(instances[i].mRenderGroup==RENDER_GROUP_HIDDEN);
+    for(int i:{4,5}){auto part=body.pose;AbstractRigVisuals::Transform(&body,i,part);assert(part.mImage==original&&instances[i].mImageOverride==original);near(part.mTransX,14);near(part.mTransY,22);}
+    auto absent=body.pose;absent.mFrame=-1;AbstractRigVisuals::Transform(&body,0,absent);assert(absent.mFrame==-1&&absent.mImage==original);
+    auto hidden=body.pose;hidden.mAlpha=0;AbstractRigVisuals::Transform(&body,0,hidden);assert(hidden.mAlpha==0&&hidden.mImage==original);
+   }
+   for(auto& i:instances)assert(i.mImageOverride==original&&i.mRenderGroup==RENDER_GROUP_NORMAL);
+  }
+  {AbstractRigVisuals::Scope preview(&body,id);auto head=body.pose;AbstractRigVisuals::Transform(&body,0,head);assert(head.mImage==neutral);}
+  z->mHasHead=false;{AbstractRigVisuals::Scope dead(z);auto head=body.pose;AbstractRigVisuals::Transform(&body,0,head);assert(head.mImage==original);}
+  SandboxZombies::Forget(z);z->mHasHead=true;{AbstractRigVisuals::Scope native(z);auto head=body.pose;AbstractRigVisuals::Transform(&body,0,head);assert(head.mImage==original);}
+  app.reanims.clear();
+ }
  // Opaque wrist pixels sit INSIDE the opening, on top of its dark fill.
  // Original green connector/rim stay present throughout idle/rise/recoil.
  {SandboxPlants::Reset();Board w;auto* plant=w.plant(2,2);plant->mSeedType=static_cast<SeedType>(26);SandboxPlants::Assign(plant,524);

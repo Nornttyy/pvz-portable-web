@@ -17,6 +17,19 @@ namespace AbstractRigVisuals {
 namespace {
 struct Pose {Reanimation* anim;const Plant* plant;std::array<int,10> state;int part;ReanimatorTransform head;};
 std::vector<Pose> poses;
+void CleverPose(Scope& scope,Reanimation* a,bool jaw){
+ if(!a)return;
+ std::array<int,10> state{};state[0]=SandboxZombies::Clever;state[1]=jaw;poses.push_back({a,nullptr,state,0});
+ for(int i=0;i<a->mDefinition->mTracks.count;++i){
+  const std::string_view name=a->mDefinition->mTracks.tracks[i].mName;auto* track=&a->mTrackInstances[i];
+  if(name=="anim_head1"){scope.images.push_back({track,track->mImageOverride});track->mImageOverride=nullptr;}
+  // Complete face variants share the native upper-head bone. Never leave the
+  // original loose jaw/tongue/hair on top; the cone and body remain untouched.
+  if(name=="anim_head2"||name=="anim_tongue"||name=="anim_hair"){
+   scope.groups.push_back({track,track->mRenderGroup});track->mRenderGroup=RENDER_GROUP_HIDDEN;
+  }
+ }
+}
 void GiantImpPose(Scope& scope,Reanimation* a,int counter){
  if(!a)return;
  // Read the native head once, BEFORE installing our scoped transforms.
@@ -64,10 +77,12 @@ Scope::Scope(const Plant* p):mark(poses.size()){
 }
 // Identity gates keep ordinary coneheads and unrelated cached previews intact.
 Scope::Scope(Zombie* z):mark(poses.size()){
+ if(SandboxZombies::IsClever(z)&&z->mHasHead&&!z->mDead)CleverPose(*this,gLawnApp->ReanimationTryToGet(z->mBodyReanimID),SandboxZombies::ShowsCleverJaw(z));
  if(SandboxZombies::IsConeWrap(z))ConePose(*this,gLawnApp->ReanimationTryToGet(z->mBodyReanimID),z->mHelmHealth);
  if(SandboxZombies::IsGiantImp(z))GiantImpPose(*this,gLawnApp->ReanimationTryToGet(z->mBodyReanimID),int(z->mZombiePhase)==SandboxZombies::JawSmash?z->mPhaseCounter:0);
 }
 Scope::Scope(Reanimation* a,int type):mark(poses.size()){
+ if(type==SandboxZombies::Clever||type==SandboxZombies::CleverCone)CleverPose(*this,a,false);
  if(type==SandboxZombies::ConeWrap)ConePose(*this,a,SandboxZombies::ConeCount*SandboxZombies::ConeHealth);
  if(type==SandboxZombies::GiantImp)GiantImpPose(*this,a,0);
  if(a&&type==MemeCharacters::ShooterPea){std::array<int,10> state{};state[0]=type;poses.push_back({a,nullptr,state,1});}
@@ -77,6 +92,14 @@ Scope::~Scope(){for(auto& [track,image]:images)track->mImageOverride=image;for(a
 void Transform(Reanimation* a,int track,ReanimatorTransform& t){
  const Pose* p=nullptr;for(auto i=poses.rbegin();i!=poses.rend();++i)if(i->anim==a){p=&*i;break;}
  if(!p)return;
+ if(p->state[0]==SandboxZombies::Clever){
+  const std::string_view name=a->mDefinition->mTracks.tracks[track].mName;
+  if(name!="anim_head1"||t.mFrame<0||t.mAlpha<=0)return;
+  t.mImage=SandboxArt::CleverHead(p->state[1]!=0);
+  // Both images share one crop/scale: skull, native cone and neck stay fixed.
+  // The generated sparse hairs extend four native pixels above the skull.
+  OffsetLocal(t,-1,-5);return;
+ }
  if(p->state[0]==SandboxZombies::GiantImp){
   const std::string_view name=a->mDefinition->mTracks.tracks[track].mName;
   if((name!="anim_head1"&&name!="anim_head2")||t.mFrame<0)return;

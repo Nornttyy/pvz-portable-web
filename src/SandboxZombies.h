@@ -14,13 +14,17 @@ inline constexpr int RunIn=1040,RunBrake=1041,RunOut=1042,BrakeTicks=8;
 inline constexpr float RunInSpeed=5.6f,RunOutSpeed=7.2f,RunAnimRate=68.0f;
 inline constexpr int Clever=216,CleverCone=217,CleverUnlock=23,CleverConeUnlock=26;
 inline constexpr int CleverFlip=1044,CleverFlee=1045,FlipTicks=90,DodgeRecovery=120;
+inline constexpr int DodgePercent=70,LaneChangePercent=30,ForwardFlightPercent=10;
+inline constexpr int ForwardFlightTag=21610,JawPoseTicks=110;
+inline constexpr float ForwardFlightDistance=160.0f;
+constexpr float FlipTravel(float t){return t*t*(3.0f-2.0f*t);}
 inline constexpr float CleverSpeed=1.25f,CleverFleeSpeed=3.0f;
 inline constexpr std::array<Definition,6> Definitions{{
  {Louis,0,"路易十六","天生无头，照常走路啃咬。",nullptr,270,0,LouisUnlock},
  {Runner,0,"跑路僵尸","冲到后排，转身就跑。",nullptr,270,0,RunnerUnlock},
  {ConeWrap,2,"雪糕桶包裹我","20桶组成，7桶耐久。",nullptr,270,ConeCount*ConeHealth,ConeWrapUnlock},
  {GiantImp,24,"巨人小鬼","巨人头，小鬼身。一击秒杀植物。",nullptr,270,0,GiantImpUnlock},
- {Clever,0,"智斗僵尸","半数机会翻身闪弹，偶尔换路。偷到植物就跑。",nullptr,270,0,CleverUnlock},
+ {Clever,0,"智斗僵尸","70%翻身闪弹，30%换路。翻身时10%前飞两格，偷完就跑。",nullptr,270,0,CleverUnlock},
  {CleverCone,2,"路障智斗僵尸","戴路障的智斗僵尸。入水套泳圈，偷完就跑。",nullptr,270,ConeHealth,CleverConeUnlock}
 }};
 constexpr const Definition* Find(int id){for(const auto& d:Definitions)if(d.id==id)return &d;return nullptr;}
@@ -40,6 +44,7 @@ bool IsConeWrap(const Zombie*);
 bool IsGiantImp(const Zombie*);
 bool IsClever(const Zombie*);
 bool IsDodging(const Zombie*);
+bool ShowsCleverJaw(const Zombie*);
 bool SkipsProjectile(const Projectile*,const Zombie*);
 bool DodgeProjectile(Projectile*,Zombie*);
 bool StealPlant(Zombie*,Plant*);

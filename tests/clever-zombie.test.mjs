@@ -2,6 +2,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 const read=p=>readFile(new URL('../'+p,import.meta.url),'utf8');
+test('clever variants share the requested probabilities and registered action-only jaw art',async()=>{
+ const h=await read('src/SandboxZombies.h'),custom=await read('src/SandboxZombies.cpp'),rig=await read('src/AbstractRigVisuals.cpp');
+ assert.match(h,/DodgePercent=70,LaneChangePercent=30,ForwardFlightPercent=10/);
+ assert.match(h,/ForwardFlightDistance=160\.0f/);
+ assert.match(custom,/FlipTravel\(t\)-FlipTravel\(previous\)/);
+ assert.doesNotMatch(custom,/Zombie_head_sunglasses/);
+ assert.match(rig,/CleverHead\(p->state\[1\]!=0\)/);
+ const meta=JSON.parse(await read('site/sandbox-engine/build.json')).cleverZombies;
+ assert.equal(meta.dodgePercentWhenReady,70);assert.equal(meta.laneChangePercent,30);assert.equal(meta.forwardFlightPercentPerFlip,10);assert.equal(meta.forwardFlightTiles,2);
+});
 test('clever dodge intercepts a real projectile hit before effects, not general damage',async()=>{
  const shot=await read('src/Lawn/Projectile.cpp'),zombie=await read('src/Lawn/Zombie.cpp'),custom=await read('src/SandboxZombies.cpp');
  const impact=shot.slice(shot.indexOf('void Projectile::DoImpact('),shot.indexOf('void Projectile::Draw('));
@@ -16,7 +26,7 @@ test('clever dodge intercepts a real projectile hit before effects, not general 
 });
 test('flip, recovery, lane and stolen plant use native portable-save fields without healing on restore',async()=>{
  const save=await read('src/Lawn/System/SaveGame.cpp'),custom=await read('src/SandboxZombies.cpp');
- for(const field of ['mZombiePhase','mPhaseCounter','mBossStompCounter','mBossHeadCounter','mBossBungeeCounter','mTargetRow','mPosY','mAltitude','mInPool'])assert.ok(save.includes('theZombie.'+field),field);
+ for(const field of ['mZombiePhase','mPhaseCounter','mBossStompCounter','mBossHeadCounter','mBossBungeeCounter','mBossMode','mSummonCounter','mTargetRow','mPosY','mAltitude','mInPool'])assert.ok(save.includes('theZombie.'+field),field);
  assert.match(save,/SyncInt32\(theObject.mRow\)/); // Inherited GameObject TLV.
  assert.match(save,/SyncGameObjectPortable\(aContext, theObject\)/);
  const restore=custom.slice(custom.indexOf('bool Restore('),custom.indexOf('void Assign('));

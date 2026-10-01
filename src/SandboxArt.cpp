@@ -3,6 +3,7 @@
 #include "SandboxMemeRules.h"
 #include "AbstractPhonePixels.h"
 #include "CactusPalmPixels.h"
+#include "CleverHeadPixels.h"
 #include "LawnApp.h"
 #include "graphics/GLImage.h"
 #include "graphics/Graphics.h"
@@ -14,6 +15,12 @@
 #include <algorithm>
 #include <cmath>
 namespace SandboxArt {
+Sexy::Image* CleverHead(bool jawPose){
+ static std::unique_ptr<Sexy::MemoryImage> images[2];auto& image=images[jawPose?1:0];
+ if(!image){using namespace CleverHeadPixels;image=std::make_unique<Sexy::MemoryImage>();image->Create(Width,Height);
+  const auto* pixels=jawPose?Jaw:Neutral;std::copy(pixels,pixels+Width*Height,image->GetBits());image->BitsChanged();
+ }return image.get();
+}
 Sexy::Image* Palm(){
  static std::unique_ptr<Sexy::MemoryImage> image;if(!image){
   using namespace CactusPalmPixels;image=std::make_unique<Sexy::MemoryImage>();image->Create(Width,Height);
