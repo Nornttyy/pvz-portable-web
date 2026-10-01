@@ -154,7 +154,7 @@ export const RETIRED_PLANTS = [
 // Playable originals. Retired IDs exist solely for save migration.
 export const RETIRED_CHARACTERS = [8,1,0,5,7,4,26,6,32,29,34,13,10,28,21,18,17].map((base,i)=>({id:502+i,base}));
 export const ORIGINAL_PLANTS = [
-  [500,0,'红温豌豆','满300怒气 · 3秒乱射50发'],
+  [500,0,'红温豌豆','满300怒气 · 3秒乱射40发'],
   [501,3,'反咬坚果','被啃后反击 · 冷却3秒'],
   [519,52,'射手豌豆','头是豌豆 · 发射射手'],
   [520,1,'缩头乌葵','僵尸靠近 · 缩头让路'],

@@ -25,7 +25,7 @@ namespace {
 // Saved in the existing ten-integer optional plant record.
 struct State {int id=0,health=0,phase=0,heat=0,timer=0,delay=50,age=0,pulse=0,remaining=0,direction=1;};
 std::map<const Plant*,State> states;
-std::map<const Projectile*,int> shotStyles; // 1..8 legacy wobble; 9 burst; 10 hit; 11..18 legacy miss; 20 legacy straight miss; 32..287 floating seeds.
+std::map<const Projectile*,int> shotStyles; // 1..8 legacy wobble; 9 legacy burst; 10 hit; 11..18/20 legacy misses; 32..287 floating seeds; 304..309 row-bounded bursts.
 void Burst(State& s){
  s.phase=1;s.heat=0;s.remaining=MemeShooterRules::BurstCount;s.delay=MemeShooterRules::BurstInterval(0);s.timer=0;s.pulse=30;
  gLawnApp->PlayRageRelease(); // Once per release, never once per pea or save restore.
@@ -88,7 +88,7 @@ bool Restore(Plant* p,const std::array<int,10>& a){
  // Migrate old overheating saves without healing or inventing a free volley.
  if(shooter&&!newShooter){s.phase=0;s.heat=a[2]==0?a[3]*300/1000:0;s.timer=0;s.delay=std::min(a[5],150);s.remaining=0;s.pulse=0;s.direction=2;}
  if(shooter)s.heat=std::min(s.heat,MemeShooterRules::MaxRage); // Keep old 300-rage saves readable.
- if(shooter)s.remaining=std::min(s.remaining,MemeShooterRules::BurstCount); // Read old 80/150-pea saves without adding shots.
+ if(shooter)s.remaining=std::min(s.remaining,MemeShooterRules::BurstCount); // Cap old 50/80/150-pea saves, never refill a volley.
  states[p]=s;p->mLaunchCounter=9999;p->mShootingCounter=0;return true;
 }
 int Data(const Plant* p,int field){const auto it=states.find(p);if(it==states.end())return -1;const auto& s=it->second;if(field==5)return -1;return field==0?s.phase:field==1?s.heat:field==2?s.timer:field==3?s.direction:s.remaining;}
@@ -187,7 +187,7 @@ void Tick(Board* b){
 void Tint(const Plant*,Sexy::Color&){}
 void Scale(const Plant* p,float& x,float& y,float& sx,float& sy){auto it=states.find(p);if(it==states.end()||p->mSquished)return;const auto& s=it->second;
  float horizontal=1,vertical=1;
- if(s.id==500&&s.phase==1){const float recoil=std::sin(s.age*0.16f)*0.04f;horizontal+=0.10f+recoil;vertical-=0.07f+recoil;x-=sx*(4+6*(1-s.remaining/50.0f));}
+ if(s.id==500&&s.phase==1){const float recoil=std::sin(s.age*0.16f)*0.04f;horizontal+=0.10f+recoil;vertical-=0.07f+recoil;x-=sx*(4+6*(1-float(s.remaining)/MemeShooterRules::BurstCount));}
  if(s.id==501&&s.phase==1&&s.pulse){
   // Keep the original face, damage frames and grid anchor during the bump.
   const float age=50-s.pulse;float offset=0;
@@ -231,7 +231,7 @@ void OnFired(Plant* p,Projectile* shot){
  float x,y;if(SandboxArt::TrackPoint(gLawnApp->ReanimationTryToGet(p->mHeadReanimID),"idle_mouth",35,49,32,24.5f,x,y)){shot->mPosX=p->mX+x-12;shot->mPosY=p->mY+y-12-shot->mPosZ;shot->mX=int(shot->mPosX);shot->mY=int(shot->mPosY+shot->mPosZ);}
  const auto& s=states.at(p);shot->mMotionType=MOTION_STAR;
  if(s.phase==1){
-  shotStyles[shot]=9;const float angle=MemeShooterRules::SpreadAngle(Sexy::Rand(1001)),speed=MemeShooterRules::BurstSpeed(Sexy::Rand(61));
+  shotStyles[shot]=MemeShooterRules::BurstStyle(p->mRow);const float angle=MemeShooterRules::SpreadAngle(Sexy::Rand(1001)),speed=MemeShooterRules::BurstSpeed(Sexy::Rand(61));
   shot->mVelX=speed*std::cos(angle);shot->mVelY=speed*std::sin(angle);
  }else{
   const bool hit=MemeShooterRules::NormalStyle(Sexy::Rand(10))==10;
@@ -241,17 +241,24 @@ void OnFired(Plant* p,Projectile* shot){
 }}
 int ShotStyle(const Projectile* shot){const auto it=shotStyles.find(shot);return it==shotStyles.end()?0:it->second;}
 bool CanHit(const Projectile* shot){return IsStraightShot(ShotStyle(shot))||ShotStyle(shot)==ShooterProjectile||MemeShooterRules::CanHit(BaseShotStyle(ShotStyle(shot)));}
+bool CanHitRow(const Projectile* shot,int row){return MemeShooterRules::CanHitRow(BaseShotStyle(ShotStyle(shot)),row);}
 void OnImpact(Projectile*,Zombie*){}
 bool RestoreShotStyle(const Projectile* shot,int style){
  // Keep the new projectile distinct from retired self-thrower save records.
- if(style<0||(style>20&&style!=ShooterProjectile&&!IsStraightShot(style)&&!MemeShooterRules::IsFloating(style))||style==19||shot->mDead)return false;
+ if(style<0||(style>20&&style!=ShooterProjectile&&!IsStraightShot(style)&&!MemeShooterRules::IsFloating(style)&&!MemeShooterRules::IsBoundedBurst(style))||style==19||shot->mDead)return false;
  if(style&&(shot->mMotionType!=(IsStraightShot(style)?MOTION_STRAIGHT:MOTION_STAR)||(shot->mProjectileType!=PROJECTILE_PEA&&shot->mProjectileType!=PROJECTILE_SNOWPEA&&shot->mProjectileType!=PROJECTILE_FIREBALL)))return false;
+ // Legacy bursts did not save a firing row; anchor them to the loaded lane.
+ if(style==9)style=MemeShooterRules::BurstStyle(std::clamp(shot->mRow,0,5));
  if(style)shotStyles[shot]=style;else shotStyles.erase(shot);return true;
 }
 void ForgetShot(const Projectile* shot){shotStyles.erase(shot);}
 void UpdateShot(Projectile* shot){
  const int style=BaseShotStyle(ShotStyle(shot));if(!style||shot->mDead||shot->mBoard->mPaused)return;
  if(shot->mPosY+shot->mPosZ<-40||shot->mPosY+shot->mPosZ>640){shot->Die();return;}
+ if(MemeShooterRules::IsBoundedBurst(style)){
+  const int nextRow=shot->mBoard->PixelToGridYKeepOnBoard(int(shot->mPosX+shot->mVelX),int(shot->mPosY+shot->mVelY));
+  if(!MemeShooterRules::CanHitRow(style,nextRow)){shot->Die();return;}
+ }
  if(MemeShooterRules::IsFloating(style))shot->mVelY=MemeShooterRules::FloatingStep(style,shot->mProjectileAge);
  else if(style<9)shot->mVelY=MemeShooterRules::WobbleStep(style,shot->mProjectileAge);
  else if(style>=11&&style<=18)shot->mVelY=MemeShooterRules::MissStep(style,shot->mProjectileAge);

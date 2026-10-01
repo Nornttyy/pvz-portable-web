@@ -866,7 +866,7 @@ index c934659..e5463ad 100644
  	if (mApp->IsWallnutBowlingLevel())
  	{
 diff --git a/src/Lawn/Projectile.cpp b/src/Lawn/Projectile.cpp
-index 4500f46..bba333e 100644
+index 4500f46..a24b9f3 100644
 --- a/src/Lawn/Projectile.cpp
 +++ b/src/Lawn/Projectile.cpp
 @@ -25,6 +25,10 @@
@@ -897,9 +897,12 @@ index 4500f46..bba333e 100644
  	if (PeaAboutToHitTorchwood())  // a pea about to hit a torchwood skips zombie collision ("torchwood clip" trick)
  		return nullptr;
  
-@@ -234,7 +241,7 @@ Zombie* Projectile::FindCollisionTarget()
+@@ -232,9 +239,9 @@ Zombie* Projectile::FindCollisionTarget()
+ 
+ 	for (Zombie* aZombie : mBoard->mZombies)
  	{
- 		if (aZombie->mDead)
+-		if (aZombie->mDead)
++		if (aZombie->mDead || !MemeCharacters::CanHitRow(this, aZombie->mRow))
  			continue;
 -		if ((aZombie->mZombieType == ZombieType::ZOMBIE_BOSS || aZombie->mRow == mRow) && aZombie->EffectedByDamage(static_cast<unsigned int>(mDamageRangeFlags)))
 +		if ((aZombie->mZombieType == ZombieType::ZOMBIE_BOSS || aZombie->mRow == mRow || freeAim) && aZombie->EffectedByDamage(static_cast<unsigned int>(mDamageRangeFlags)))
@@ -923,7 +926,15 @@ index 4500f46..bba333e 100644
  			const ProjectileDefinition& aProjectileDef = GetProjectileDef();
  			aPlant->mPlantHealth -= aProjectileDef.mDamage;
  			aPlant->mEatenFlashCountdown = std::max(aPlant->mEatenFlashCountdown, 25);
-@@ -472,8 +482,8 @@ void Projectile::DoSplashDamage(Zombie* theZombie)
+@@ -425,6 +435,7 @@ unsigned int Projectile::GetDamageFlags(Zombie* theZombie)
+ 
+ bool Projectile::IsZombieHitBySplash(Zombie* theZombie)
+ {
++	if (!MemeCharacters::CanHitRow(this, theZombie->mRow)) return false;
+ 	Rect aProjectileRect = GetProjectileRect();
+ 	if (mProjectileType == ProjectileType::PROJECTILE_FIREBALL)
+ 	{
+@@ -472,8 +483,8 @@ void Projectile::DoSplashDamage(Zombie* theZombie)
  		}
  	}
  
@@ -934,7 +945,7 @@ index 4500f46..bba333e 100644
  	int aMaxSplashDamageAmount = aOriginalDamage * 7;
  	if (mProjectileType == ProjectileType::PROJECTILE_FIREBALL)
  	{
-@@ -623,7 +633,7 @@ void Projectile::UpdateLobMotion()
+@@ -623,7 +634,7 @@ void Projectile::UpdateLobMotion()
  	else if (mProjectileType == ProjectileType::PROJECTILE_COBBIG)
  	{
  		int aBeforeGargantuarCount = mBoard->GetLiveGargantuarCount();
@@ -943,7 +954,7 @@ index 4500f46..bba333e 100644
  		int aAfterGargantuarCount = mBoard->GetLiveGargantuarCount();
  		mBoard->mGargantuarsKillsByCornCob += aBeforeGargantuarCount - aAfterGargantuarCount;
  		if (mBoard->mGargantuarsKillsByCornCob >= 2)
-@@ -732,6 +742,11 @@ void Projectile::UpdateNormalMotion()
+@@ -732,6 +743,11 @@ void Projectile::UpdateNormalMotion()
  		mPosY += mVelZ;
  	}
  
@@ -955,7 +966,7 @@ index 4500f46..bba333e 100644
  	CheckForCollision();
  	CheckForHighGround();
  }
-@@ -824,7 +839,8 @@ void Projectile::DoImpact(Zombie* theZombie)
+@@ -824,7 +840,8 @@ void Projectile::DoImpact(Zombie* theZombie)
  {
  	PlayImpactSound(theZombie);
  
@@ -965,7 +976,7 @@ index 4500f46..bba333e 100644
  	{
  		if (mProjectileType == ProjectileType::PROJECTILE_FIREBALL && theZombie)
  		{
-@@ -833,12 +849,15 @@ void Projectile::DoImpact(Zombie* theZombie)
+@@ -833,12 +850,15 @@ void Projectile::DoImpact(Zombie* theZombie)
  
  		DoSplashDamage(theZombie);
  	}
@@ -983,7 +994,7 @@ index 4500f46..bba333e 100644
  	float aLastPosX = mPosX - mVelX;
  	float aLastPosY = mPosY + mPosZ - mVelY - mVelZ;
  	ParticleEffect aEffect = ParticleEffect::PARTICLE_NONE;
-@@ -939,6 +958,8 @@ void Projectile::DoImpact(Zombie* theZombie)
+@@ -939,6 +959,8 @@ void Projectile::DoImpact(Zombie* theZombie)
  
  void Projectile::Update()
  {
@@ -992,7 +1003,7 @@ index 4500f46..bba333e 100644
  	mProjectileAge++;
  	if (mApp->mGameScene != GameScenes::SCENE_PLAYING && !mBoard->mCutScene->ShouldRunUpsellBoard())
  		return;
-@@ -974,10 +995,16 @@ void Projectile::Update()
+@@ -974,10 +996,16 @@ void Projectile::Update()
  
  void Projectile::Draw(Graphics* g)
  {
@@ -1009,7 +1020,7 @@ index 4500f46..bba333e 100644
  	switch (mProjectileType)
  	{
  	case ProjectileType::PROJECTILE_COBBIG:
-@@ -1034,6 +1061,7 @@ void Projectile::Draw(Graphics* g)
+@@ -1034,6 +1062,7 @@ void Projectile::Draw(Graphics* g)
  	}
  
  	bool aMirror = false;
@@ -1017,7 +1028,7 @@ index 4500f46..bba333e 100644
  	if (mMotionType == ProjectileMotion::MOTION_BEE_BACKWARDS)
  	{
  		aMirror = true;
-@@ -1047,7 +1075,7 @@ void Projectile::Draw(Graphics* g)
+@@ -1047,7 +1076,7 @@ void Projectile::Draw(Graphics* g)
  		int aCelWidth = aImage->GetCelWidth();
  		int aCelHeight = aImage->GetCelHeight();
  		Rect aSrcRect(aCelWidth * mFrame, aCelHeight * aProjectileDef.mImageRow, aCelWidth, aCelHeight);
@@ -1026,7 +1037,7 @@ index 4500f46..bba333e 100644
  		{
  			Rect aDestRect(0, 0, aCelWidth, aCelHeight);
  			g->DrawImageMirror(aImage, aDestRect, aSrcRect, aMirror);
-@@ -1056,8 +1084,13 @@ void Projectile::Draw(Graphics* g)
+@@ -1056,8 +1085,13 @@ void Projectile::Draw(Graphics* g)
  		{
  			float aOffsetX = mPosX + aCelWidth * 0.5f;
  			float aOffsetY = mPosZ + mPosY + aCelHeight * 0.5f;
@@ -1041,7 +1052,7 @@ index 4500f46..bba333e 100644
  			PvzpBltMatrix(g, aImage, aTransform, g->mClipRect, Color::White, g->mDrawMode, aSrcRect);
  		}
  	}
-@@ -1146,11 +1179,18 @@ void Projectile::DrawShadow(Graphics* g)
+@@ -1146,11 +1180,18 @@ void Projectile::DrawShadow(Graphics* g)
  		aScale *= 200.0f / (aHeight + 200.0f);
  	}
  
@@ -1060,7 +1071,7 @@ index 4500f46..bba333e 100644
  	mDead = true;
  
  	if (mProjectileType == ProjectileType::PROJECTILE_PUFF || mProjectileType == ProjectileType::PROJECTILE_SNOWPEA)
-@@ -1166,6 +1206,10 @@ void Projectile::Die()
+@@ -1166,6 +1207,10 @@ void Projectile::Die()
  
  Rect Projectile::GetProjectileRect()
  {
@@ -1791,7 +1802,7 @@ index b284e6a..644c4b2 100644
  		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
  		if (aChosenSeed.mSeedState == SEED_IN_BANK)
 diff --git a/src/Lawn/Zombie.cpp b/src/Lawn/Zombie.cpp
-index c140a3d..a09b9fe 100644
+index c140a3d..b68c238 100644
 --- a/src/Lawn/Zombie.cpp
 +++ b/src/Lawn/Zombie.cpp
 @@ -32,6 +32,8 @@
@@ -1982,7 +1993,7 @@ index c140a3d..a09b9fe 100644
  	}
 +	if (SandboxZombies::IsRunning(this))
 +	{
-+		ApplyAnimRate(int(mZombiePhase) == SandboxZombies::RunBrake ? 0.0f : 34.0f);
++		ApplyAnimRate(int(mZombiePhase) == SandboxZombies::RunBrake ? 0.0f : SandboxZombies::RunAnimRate);
 +		return;
 +	}
  

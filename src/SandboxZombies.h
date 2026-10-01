@@ -9,8 +9,8 @@ inline constexpr int Louis=212, LouisUnlock=3, Runner=213, RunnerUnlock=6;
 inline constexpr int ConeWrap=214, ConeWrapUnlock=16, ConeHealth=370, ConeCount=7;
 inline constexpr int ConeVisualCount=20;
 inline constexpr float ConeWrapSpeed=0.60f;
-inline constexpr int RunIn=1040,RunBrake=1041,RunOut=1042,BrakeTicks=24;
-inline constexpr float RunInSpeed=2.8f,RunOutSpeed=3.6f;
+inline constexpr int RunIn=1040,RunBrake=1041,RunOut=1042,BrakeTicks=8;
+inline constexpr float RunInSpeed=5.6f,RunOutSpeed=7.2f,RunAnimRate=68.0f;
 inline constexpr std::array<Definition,3> Definitions{{
  {Louis,0,"路易十六","天生无头，照常走路啃咬。",nullptr,270,0,LouisUnlock},
  {Runner,0,"跑路僵尸","冲到后排，转身就跑。",nullptr,270,0,RunnerUnlock},

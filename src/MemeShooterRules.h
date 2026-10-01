@@ -2,20 +2,27 @@
 #include <cmath>
 #include <cstdint>
 namespace MemeShooterRules {
-inline constexpr int PerShot=20,MaxRage=300,BurstCount=50,NormalDelay=150,BurstTicks=300,RecoveryDelay=300;
-// Native simulation runs at 100 ticks/sec. Distribute all 50 shots over exactly
-// 300 ticks: one pea every 6 ticks, retaining the three-second release.
+inline constexpr int PerShot=20,MaxRage=300,BurstCount=40,NormalDelay=150,BurstTicks=300,RecoveryDelay=300;
+// Native simulation runs at 100 ticks/sec. Distribute all 40 shots over exactly
+// 300 ticks, alternating 8/7-tick intervals for the three-second release.
 // Derive the interval from the saved remaining count; reload needs no new clock.
 inline constexpr int BurstInterval(int fired){
  return ((fired+1)*BurstTicks+BurstCount-1)/BurstCount-(fired*BurstTicks+BurstCount-1)/BurstCount;
 }
 inline constexpr int FloatingFirst=32,FloatingLast=287,FloatingTurnTicks=36;
+// Save the firing row in the existing projectile-style record. Current mRow
+// follows the projectile; it must not become a new origin after crossing lanes.
+inline constexpr int BurstFirst=304,BurstLast=309;
+inline constexpr bool IsBoundedBurst(int style){return style>=BurstFirst&&style<=BurstLast;}
+inline constexpr int BurstStyle(int row){return BurstFirst+row;}
+inline constexpr int BurstRow(int style){return IsBoundedBurst(style)?style-BurstFirst:-1;}
+inline constexpr bool CanHitRow(int style,int row){const int origin=BurstRow(style);return origin<0||(row>=origin-1&&row<=origin+1);}
 inline constexpr bool IsFloating(int style){return style>=FloatingFirst&&style<=FloatingLast;}
 // Roll once when firing, not every collision/frame. The saved projectile style
 // preserves the result across targets, torchwood and save/reload.
 inline int NormalStyle(int roll){return roll==0?10:20;}
 inline bool CanHit(int style){return !(style>=11&&style<=18)&&style!=20&&!IsFloating(style);}
-inline bool UsesFreeAim(int style){return style>=1&&style<=9;}
+inline bool UsesFreeAim(int style){return (style>=1&&style<=9)||IsBoundedBurst(style);}
 // Legacy straight misses keep their saved velocity when loading an old game.
 inline float NormalMissAngle(int direction,int roll){return (direction?1.0f:-1.0f)*(0.10f+(roll%1001)*0.32f/1000);}
 // Each projectile gets a saved seed, then alternates upper/lower turning points.

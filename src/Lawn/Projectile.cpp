@@ -239,7 +239,7 @@ Zombie* Projectile::FindCollisionTarget()
 
 	for (Zombie* aZombie : mBoard->mZombies)
 	{
-		if (aZombie->mDead)
+		if (aZombie->mDead || !MemeCharacters::CanHitRow(this, aZombie->mRow))
 			continue;
 		if ((aZombie->mZombieType == ZombieType::ZOMBIE_BOSS || aZombie->mRow == mRow || freeAim) && aZombie->EffectedByDamage(static_cast<unsigned int>(mDamageRangeFlags)))
 		{
@@ -435,6 +435,7 @@ unsigned int Projectile::GetDamageFlags(Zombie* theZombie)
 
 bool Projectile::IsZombieHitBySplash(Zombie* theZombie)
 {
+	if (!MemeCharacters::CanHitRow(this, theZombie->mRow)) return false;
 	Rect aProjectileRect = GetProjectileRect();
 	if (mProjectileType == ProjectileType::PROJECTILE_FIREBALL)
 	{

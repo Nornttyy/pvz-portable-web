@@ -43,7 +43,12 @@ bool Restore(Zombie* z,int id){
  identities[z]=id;
  // mHasHead is also the native alive/targetable/eating gate. Do not set it
  // false at spawn, heal it on load, or change a wounded zombie's saved state.
- if(id==Louis)z->SetupReanimForLostHead();return true;
+ if(id==Louis)z->SetupReanimForLostHead();
+ if(id==Runner&&IsRunning(z)){
+  if(int(z->mZombiePhase)==RunBrake)z->mPhaseCounter=std::min(z->mPhaseCounter,BrakeTicks);
+  z->UpdateAnimSpeed();
+ }
+ return true;
 }
 void Assign(Zombie* z,int id){
  if(!Restore(z,id))return;
@@ -57,7 +62,7 @@ void Assign(Zombie* z,int id){
  // not reset them: a saved fleeing runner must never charge in a second time.
  z->mZombiePhase=static_cast<decltype(z->mZombiePhase)>(RunIn);
  z->mPhaseCounter=0;z->mTargetCol=-1;z->mHasObject=false;z->StopEating();
- z->PlayZombieReanim("anim_walk2",REANIM_LOOP,0,34.0f);
+ z->PlayZombieReanim("anim_walk2",REANIM_LOOP,0,RunAnimRate);
 }
 bool UpdateRunner(Zombie* z){
  if(!IsRunner(z)||!z->mBoard||!z->IsOnBoard()||z->IsDeadOrDying())return false;

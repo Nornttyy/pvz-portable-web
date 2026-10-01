@@ -146,11 +146,11 @@ int main(){
   corrupt=MemeCharacters::Save(p);corrupt[2]=2;assert(!MemeCharacters::Restore(p,corrupt));
  }
  using namespace SandboxMemeRules;
- static_assert(MemeShooterRules::BurstCount==50&&MemeShooterRules::MaxRage==300&&MemeShooterRules::PerShot==20&&MemeShooterRules::BurstTicks==300);
+ static_assert(MemeShooterRules::BurstCount==40&&MemeShooterRules::MaxRage==300&&MemeShooterRules::PerShot==20&&MemeShooterRules::BurstTicks==300);
  static_assert(MemeShooterRules::RecoveryDelay==300);
  for(int roll=0;roll<=60;++roll)assert(std::abs(MemeShooterRules::BurstSpeed(roll)-(4.6f+roll*0.05f)*0.75f)<0.0001f);
- {World w;auto* p=w.add(500);w.enemy();w.step(2450);const int shots=w.mProjectiles.mSize;assert(shots==65);w.step(299);assert(w.mProjectiles.mSize==shots);w.step();assert(w.mProjectiles.mSize==shots+1&&MemeCharacters::Data(p,1)==20);}
- {int ticks=0;for(int fired=0;fired<50;++fired){const int delay=MemeShooterRules::BurstInterval(fired);assert(delay==6);ticks+=delay;assert(ticks==(fired+1)*6);}assert(ticks==300);}
+ {World w;auto* p=w.add(500);w.enemy();w.step(2450);const int shots=w.mProjectiles.mSize;assert(shots==55);w.step(299);assert(w.mProjectiles.mSize==shots);w.step();assert(w.mProjectiles.mSize==shots+1&&MemeCharacters::Data(p,1)==20);}
+ {int ticks=0;for(int fired=0;fired<40;++fired){const int delay=MemeShooterRules::BurstInterval(fired);assert(delay==(fired%2?7:8));ticks+=delay;assert(ticks==((fired+1)*300+39)/40);}assert(ticks==300);}
  {World w;auto* p=w.add(500);assert(SandboxPlants::RestorePower(p,{500,300,0,100,0,50,40,0,0,2}));
   const auto state=SandboxPlants::SavePower(p);w.mPaused=true;w.step(100);
   assert(SandboxPlants::SavePower(p)==state);
@@ -180,27 +180,27 @@ int main(){
   w.step(150);assert(MemeCharacters::Data(p,1)==100&&w.mProjectiles.mSize==5);const float zx=z->mPosX;
   z->mDead=true;w.step(200);assert(MemeCharacters::Data(p,1)==100); // no passive rage loss
   assert(!MemeCharacters::Activate(p)&&!MemeCharacters::Click(&w,p->mX+40,p->mY+40));assert(MemeCharacters::Data(p,1)==100&&z->mPosX==zx);
-  z->mDead=false;w.step(1351);assert(MemeCharacters::Data(p,0)==1&&MemeCharacters::Data(p,4)==50&&w.mProjectiles.mSize==15);z->mDead=true;
+  z->mDead=false;w.step(1351);assert(MemeCharacters::Data(p,0)==1&&MemeCharacters::Data(p,4)==40&&w.mProjectiles.mSize==15);z->mDead=true;
   assert(app.rageReleaseRequests==sounds+1);
-  w.step(57);const auto save=SandboxPlants::SavePower(p);assert(save[8]==41);w.mPaused=true;w.step(300);assert(SandboxPlants::SavePower(p)==save);w.mPaused=false;
+  w.step(57);const auto save=SandboxPlants::SavePower(p);assert(save[8]==33);w.mPaused=true;w.step(300);assert(SandboxPlants::SavePower(p)==save);w.mPaused=false;
   SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,save));w.step(242);assert(MemeCharacters::Data(p,4)==1);w.step();
-  assert(w.mProjectiles.mSize==65&&MemeCharacters::Data(p,0)==0&&MemeCharacters::Data(p,1)==0&&p->mPlantHealth==123);
-  int spread=0;bool up=false,down=false;for(auto* shot:w.mProjectiles)if(MemeCharacters::ShotStyle(shot)==9){++spread;up|=shot->mVelY<0;down|=shot->mVelY>0;assert(SandboxPlants::ShotDamage(shot,20)==20);}
-  assert(spread==50&&up&&down);w.step(200);assert(w.mProjectiles.mSize==65);
+  assert(w.mProjectiles.mSize==55&&MemeCharacters::Data(p,0)==0&&MemeCharacters::Data(p,1)==0&&p->mPlantHealth==123);
+  int spread=0;bool up=false,down=false;for(auto* shot:w.mProjectiles)if(MemeShooterRules::IsBoundedBurst(MemeCharacters::ShotStyle(shot))){++spread;up|=shot->mVelY<0;down|=shot->mVelY>0;assert(SandboxPlants::ShotDamage(shot,20)==20);assert(MemeShooterRules::BurstRow(MemeCharacters::ShotStyle(shot))==p->mRow);}
+  assert(spread==40&&up&&down);w.step(200);assert(w.mProjectiles.mSize==55);
   assert(app.rageReleaseRequests==sounds+1); // no sound per pea/load
  }
  {World w;auto* p=w.add(500);const int sounds=app.rageReleaseRequests;w.enemy();
   w.step(1400);assert(MemeCharacters::Data(p,1)==200&&MemeCharacters::Data(p,0)==0&&app.rageReleaseRequests==sounds);
   w.step(749);assert(MemeCharacters::Data(p,1)==280&&MemeCharacters::Data(p,0)==0);w.step();assert(MemeCharacters::Data(p,0)==1&&w.mProjectiles.mSize==15);
   assert(app.rageReleaseRequests==sounds+1);
-  // All 50 native projectiles are paced across exactly three simulation seconds.
-  for(int tick=1;tick<=300;++tick){w.step();assert(w.mProjectiles.mSize==15+tick/6);assert(MemeCharacters::Data(p,4)==50-tick/6);assert(MemeCharacters::Data(p,0)==(tick<300?1:0));}
-  assert(w.mProjectiles.mSize==65&&p->mPlantHealth==300);
+  // All 40 native projectiles are paced across exactly three simulation seconds.
+  for(int tick=1;tick<=300;++tick){w.step();assert(w.mProjectiles.mSize==15+tick*40/300);assert(MemeCharacters::Data(p,4)==40-tick*40/300);assert(MemeCharacters::Data(p,0)==(tick<300?1:0));}
+  assert(w.mProjectiles.mSize==55&&p->mPlantHealth==300);
   assert(app.rageReleaseRequests==sounds+1);
  }
  {World w;auto* p=w.add(500);w.enemy();w.step(2150);assert(MemeCharacters::Data(p,0)==1);w.mProjectiles.mSize=w.mProjectiles.mMaxSize-8;
-  w.step(100);assert(SandboxPlants::SavePower(p)[8]==50);
-  w.mProjectiles.mSize=15;w.step(300);assert(w.mProjectiles.mSize==65&&p->mPlantHealth==300);
+  w.step(100);assert(SandboxPlants::SavePower(p)[8]==40);
+  w.mProjectiles.mSize=15;w.step(300);assert(w.mProjectiles.mSize==55&&p->mPlantHealth==300);
  }
  {World w;auto* p=w.add(500);p->mPlantHealth=99;assert(SandboxPlants::RestorePower(p,{500,99,2,700,350,0,10,0,0,1}));
   assert(MemeCharacters::Data(p,0)==0&&p->mPlantHealth==99&&MemeCharacters::Data(p,1)==0);
@@ -213,24 +213,41 @@ int main(){
   w.mPaused=true;w.step(100);assert(MemeCharacters::Data(p,0)==0);w.mPaused=false;
   w.step(100);assert(MemeCharacters::Data(p,1)==280&&w.mProjectiles.mSize==0);
   w.enemy();w.step();assert(MemeCharacters::Data(p,0)==1&&app.rageReleaseRequests==sounds+1);
-  w.step(300);assert(w.mProjectiles.mSize==51&&MemeCharacters::Data(p,0)==0);
+  w.step(300);assert(w.mProjectiles.mSize==41&&MemeCharacters::Data(p,0)==0);
  }
  {World w;auto* p=w.add(500);const int sounds=app.rageReleaseRequests;
   assert(SandboxPlants::RestorePower(p,{500,300,0,300,0,100,10,0,0,2}));
   w.mPaused=true;w.step(100);assert(MemeCharacters::Data(p,0)==0);w.mPaused=false;
-  w.step(300);assert(w.mProjectiles.mSize==49&&MemeCharacters::Data(p,0)==1);w.step();
-  assert(w.mProjectiles.mSize==50&&MemeCharacters::Data(p,0)==0&&app.rageReleaseRequests==sounds+1);
+  w.step(300);assert(w.mProjectiles.mSize==39&&MemeCharacters::Data(p,0)==1);w.step();
+  assert(w.mProjectiles.mSize==40&&MemeCharacters::Data(p,0)==0&&app.rageReleaseRequests==sounds+1);
  }
  {World w;auto* p=w.add(500);const int sounds=app.rageReleaseRequests;
-  // An unfinished volley resumes its remainder, never tops up to 50.
+  // An unfinished volley resumes its remainder, never tops up to 40.
   assert(SandboxPlants::RestorePower(p,{500,300,1,0,0,0,10,0,39,2}));
   w.step(300);assert(w.mProjectiles.mSize==39&&MemeCharacters::Data(p,0)==0&&app.rageReleaseRequests==sounds);
  }
- for(int oldRemaining:{75,80,107}){World w;auto* p=w.add(500);const int sounds=app.rageReleaseRequests;p->mPlantHealth=123;
-  // Old 80/150-pea saves still load; their remainder is capped, never refilled.
-  assert(SandboxPlants::RestorePower(p,{500,123,1,0,0,0,10,0,oldRemaining,2}));assert(MemeCharacters::Data(p,4)==50);
-  w.step(300);assert(w.mProjectiles.mSize==50&&MemeCharacters::Data(p,0)==0&&p->mPlantHealth==123&&app.rageReleaseRequests==sounds);
+ for(int oldRemaining:{41,50,75,80,107}){World w;auto* p=w.add(500);const int sounds=app.rageReleaseRequests;p->mPlantHealth=123;
+  // Old 50/80/150-pea saves still load; their remainder is capped, never refilled.
+  assert(SandboxPlants::RestorePower(p,{500,123,1,0,0,0,10,0,oldRemaining,2}));assert(MemeCharacters::Data(p,4)==40);
+  w.step(300);assert(w.mProjectiles.mSize==40&&MemeCharacters::Data(p,0)==0&&p->mPlantHealth==123&&app.rageReleaseRequests==sounds);
  }
+ // Origin stays fixed through row crossings, pause, torchwood and save/load.
+ for(bool pool:{false,true})for(int row=0;row<(pool?6:5);++row)for(int direction:{-1,1}){World w;w.pool=pool;
+  const int height=pool?85:100,style=MemeShooterRules::BurstStyle(row);
+  auto* shot=w.AddProjectile(100,row*height+30,0,row,PROJECTILE_PEA);shot->mMotionType=MOTION_STAR;shot->mVelX=4;shot->mVelY=direction*1.9f;
+  assert(MemeCharacters::RestoreShotStyle(shot,style)&&MemeShooterRules::UsesFreeAim(style));
+  for(int target=0;target<(pool?6:5);++target)assert(MemeCharacters::CanHitRow(shot,target)==(std::abs(target-row)<=1));
+  bool reachedNeighbor=false;
+  for(int tick=0;tick<400&&!shot->mDead;++tick){
+   const int saved=SandboxPlants::SaveShot(shot);if(tick==30){shot->mProjectileType=PROJECTILE_FIREBALL;SandboxPlants::ForgetShot(shot);SandboxPlants::RestoreShot(shot,saved);assert(MemeCharacters::ShotStyle(shot)==style);}
+   w.mPaused=true;SandboxPlants::UpdateShot(shot);assert(!shot->mDead);w.mPaused=false;
+   SandboxPlants::UpdateShot(shot);if(shot->mDead)break;
+   shot->mPosX+=shot->mVelX;shot->mPosY+=shot->mVelY;++shot->mProjectileAge;shot->mRow=w.PixelToGridYKeepOnBoard(int(shot->mPosX),int(shot->mPosY));
+   assert(std::abs(shot->mRow-row)<=1&&MemeCharacters::ShotStyle(shot)==style);reachedNeighbor|=shot->mRow!=row;
+  }
+  assert(shot->mDead);if(row+direction>=0&&row+direction<(pool?6:5))assert(reachedNeighbor);
+ }
+ {World w;auto* shot=w.AddProjectile(100,250,0,2,PROJECTILE_PEA);shot->mMotionType=MOTION_STAR;assert(MemeCharacters::RestoreShotStyle(shot,9));assert(MemeCharacters::ShotStyle(shot)==MemeShooterRules::BurstStyle(2));}
  for(int style=1;style<=9;++style){World w;auto* shot=w.AddProjectile(100,250,0,2,PROJECTILE_PEA);shot->mMotionType=MOTION_STAR;shot->mVelY=0.75f;
   assert(MemeCharacters::RestoreShotStyle(shot,style));SandboxPlants::RestoreShot(shot,(style<<16)|150);
   assert(SandboxPlants::ShotDamage(shot,20)==30&&SandboxPlants::ShotBlastRadius(shot,100)==100);
@@ -292,8 +309,8 @@ int main(){
  }
  {World w;auto* p=w.add(500);w.enemy();w.step(2150);w.step(300);
   float minSpeed=100,maxSpeed=0;int turns=0;float last=0;
-  for(auto* s:w.mProjectiles)if(MemeCharacters::ShotStyle(s)==9){float speed=std::hypot(s->mVelX,s->mVelY);minSpeed=std::min(minSpeed,speed);maxSpeed=std::max(maxSpeed,speed);turns+=(last*s->mVelY<0);last=s->mVelY;}
-  assert(maxSpeed-minSpeed>2.0f&&turns>15);
+  for(auto* s:w.mProjectiles)if(MemeShooterRules::IsBoundedBurst(MemeCharacters::ShotStyle(s))){float speed=std::hypot(s->mVelX,s->mVelY);minSpeed=std::min(minSpeed,speed);maxSpeed=std::max(maxSpeed,speed);turns+=(last*s->mVelY<0);last=s->mVelY;}
+  assert(maxSpeed-minSpeed>2.0f&&turns>10);
  }
 
  // Removed originals cannot be assigned, restored or re-entered through legacy powers.
@@ -371,25 +388,27 @@ int main(){
  }
  // The fake breach is positional, not a damage/speed reskin. Native serialized
  // phase/target/facing survive Restore without a second inward charge.
+ static_assert(SandboxZombies::BrakeTicks==8&&SandboxZombies::RunInSpeed==5.6f&&SandboxZombies::RunOutSpeed==7.2f);
+ {World w;auto* z=w.enemy(40);SandboxZombies::Assign(z,213);z->mZombiePhase=SandboxZombies::RunBrake;z->mPhaseCounter=24;assert(SandboxZombies::Restore(z,213));assert(z->mPhaseCounter==8);}
  for(int lastCol:{0,1,3,6}){World w;auto* p=w.plant(lastCol,2);w.plant(8,2);w.plant(0,1);
   auto* z=w.enemy(780);z->mBodyHealth=z->mBodyMaxHealth=270;SandboxZombies::Assign(z,213);
   assert(z->mHasHead&&z->headHides==0&&SandboxZombies::IsRunning(z)&&z->mTargetCol==-1);
-  int ticks=0;while(z->mZombiePhase==SandboxZombies::RunIn){const float before=z->mPosX;assert(SandboxZombies::UpdateRunner(z));assert(z->mPosX<=before&&z->mPosX>=40&&++ticks<400);}
-  assert(z->mTargetCol==lastCol&&z->mPosX==std::max(40,lastCol*80-25)&&z->mPhaseCounter==24);
+  int ticks=0;while(z->mZombiePhase==SandboxZombies::RunIn){const float before=z->mPosX;assert(SandboxZombies::UpdateRunner(z));assert(z->mPosX<=before&&z->mPosX>=40&&++ticks<150);}
+  assert(z->mTargetCol==lastCol&&z->mPosX==std::max(40,lastCol*80-25)&&z->mPhaseCounter==8);
   const float turn=z->mPosX;z->mIceTrapCounter=100;for(int i=0;i<70;++i)assert(SandboxZombies::UpdateRunner(z));
-  assert(z->mPhaseCounter==24&&z->mPosX==turn);z->mIceTrapCounter=0;
-  for(int i=0;i<24;++i){SandboxZombies::UpdateRunner(z);assert(z->mPosX==turn);}
+  assert(z->mPhaseCounter==8&&z->mPosX==turn);z->mIceTrapCounter=0;
+  for(int i=0;i<8;++i){SandboxZombies::UpdateRunner(z);assert(z->mPosX==turn);}
   assert(z->mZombiePhase==SandboxZombies::RunOut&&SandboxZombies::IsRetreating(z));
   z->mBodyHealth=123;SandboxZombies::Forget(z);assert(SandboxZombies::Restore(z,213));
   assert(z->mBodyHealth==123&&z->mZombiePhase==SandboxZombies::RunOut&&z->mTargetCol==lastCol&&z->mHasObject);
   SandboxZombies::RestoreNative(&w);assert(z->mZombiePhase==SandboxZombies::RunOut);
-  ticks=0;while(z->mPosX<=850){const float before=z->mPosX;assert(SandboxZombies::UpdateRunner(z));assert(z->mPosX>before&&++ticks<300);}
+  ticks=0;while(z->mPosX<=850){const float before=z->mPosX;assert(SandboxZombies::UpdateRunner(z));assert(z->mPosX>before&&++ticks<120);}
   assert(p->mPlantHealth==300&&z->mBodyHealth==123&&!z->mIsEating);
  }
  {World w;auto* z=w.enemy(700);SandboxZombies::Assign(z,213);z->chill=100;
-  SandboxZombies::UpdateRunner(z);assert(std::abs(z->mPosX-698.6f)<0.01f);
-  z->mButteredCounter=100;for(int i=0;i<100;++i)SandboxZombies::UpdateRunner(z);assert(std::abs(z->mPosX-698.6f)<0.01f);
-  z->mButteredCounter=0;z->chill=0;SandboxZombies::UpdateRunner(z);assert(std::abs(z->mPosX-695.8f)<0.01f);
+  SandboxZombies::UpdateRunner(z);assert(std::abs(z->mPosX-697.2f)<0.01f);
+  z->mButteredCounter=100;for(int i=0;i<100;++i)SandboxZombies::UpdateRunner(z);assert(std::abs(z->mPosX-697.2f)<0.01f);
+  z->mButteredCounter=0;z->chill=0;SandboxZombies::UpdateRunner(z);assert(std::abs(z->mPosX-691.6f)<0.01f);
   z->mHasHead=false;assert(!SandboxZombies::UpdateRunner(z)&&z->mZombiePhase==PHASE_ZOMBIE_NORMAL);
   z->mDead=true;assert(!SandboxZombies::UpdateRunner(z));
  }

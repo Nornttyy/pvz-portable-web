@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFile,mkdtemp,copyFile} from 'node:fs/promises';
+import {readFile,writeFile,mkdtemp,copyFile} from 'node:fs/promises';
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {join} from 'node:path';
@@ -10,6 +10,43 @@ import {createHash} from 'node:crypto';
 import {ORIGINAL_PLANTS,RETIRED_PLANTS,RETIRED_CHARACTERS,ORIGINAL_ZOMBIES,ZOMBIES,validateLayout} from '../web/sandbox-data.mjs';
 const run=promisify(execFile),root=fileURLToPath(new URL('../',import.meta.url));
 const read=name=>readFile(join(root,name));
+test('native direct and splash collision cannot hit outside the saved burst origin and adjacent rows',async()=>{
+ const source=(await read('src/Lawn/Projectile.cpp')).toString();
+ const direct=source.slice(source.indexOf('Zombie* Projectile::FindCollisionTarget()'),source.indexOf('void Projectile::CheckForCollision()'));
+ const splash=source.slice(source.indexOf('bool Projectile::IsZombieHitBySplash('),source.indexOf('void Projectile::DoSplashDamage('));
+ const dir=await mkdtemp(join(tmpdir(),'pvz-burst-rows-')),cpp=join(dir,'collision.cpp'),binary=join(dir,'collision');
+ await writeFile(cpp,`#include "MemeShooterRules.h"
+#include <vector>
+#include <cassert>
+#include <iostream>
+struct Rect {int mX=0,mY=0,mWidth=40,mHeight=500;};
+int GetRectOverlap(Rect a,Rect b){return a.mX<=b.mX+b.mWidth&&a.mX+a.mWidth>=b.mX?1:-1;}
+enum class ZombieType{ZOMBIE_NORMAL,ZOMBIE_BOSS,ZOMBIE_DIGGER};
+enum class ZombiePhase{NORMAL,PHASE_SNORKEL_WALKING_IN_POOL};
+enum class ProjectileType{PROJECTILE_PEA,PROJECTILE_FIREBALL,PROJECTILE_STAR};
+struct Zombie {bool mDead=false;int mRow=0,mX=0;ZombieType mZombieType=ZombieType::ZOMBIE_NORMAL;ZombiePhase mZombiePhase=ZombiePhase::NORMAL;Rect rect;
+ bool EffectedByDamage(unsigned){return true;}Rect GetZombieRect(){return rect;}bool IsFireResistant(){return false;}};
+struct Board {std::vector<Zombie*> mZombies;};
+struct Projectile {Board* mBoard;int style=0,mRow=0,mDamageRangeFlags=0,mProjectileAge=100;float mPosZ=0,mVelX=4;ProjectileType mProjectileType=ProjectileType::PROJECTILE_PEA;Rect rect;
+ bool PeaAboutToHitTorchwood(){return false;}Rect GetProjectileRect(){return rect;}Zombie* FindCollisionTarget();bool IsZombieHitBySplash(Zombie*);};
+namespace MemeCharacters {
+int ShotStyle(Projectile* p){return p->style;}int BaseShotStyle(int style){return style&511;}
+bool CanHit(Projectile* p){return MemeShooterRules::CanHit(p->style);}bool CanHitRow(Projectile* p,int row){return MemeShooterRules::CanHitRow(p->style,row);}}
+${direct}\n${splash}
+int main(){
+ for(int origin=0;origin<6;++origin)for(int row=0;row<6;++row)for(bool fire:{false,true}){
+  Board b;Zombie z;z.mRow=row;b.mZombies={&z};Projectile p{&b};p.style=MemeShooterRules::BurstStyle(origin);p.mRow=row;p.mProjectileType=fire?ProjectileType::PROJECTILE_FIREBALL:ProjectileType::PROJECTILE_PEA;
+  // Huge overlapping rectangles must still not bypass the firing-row limit.
+  const bool allowed=std::abs(row-origin)<=1;assert((p.FindCollisionTarget()==&z)==allowed);assert(p.IsZombieHitBySplash(&z)==allowed);
+  z.mZombieType=ZombieType::ZOMBIE_BOSS;assert((p.FindCollisionTarget()==&z)==allowed);assert(p.IsZombieHitBySplash(&z)==allowed);
+  z.mDead=true;assert(!p.FindCollisionTarget());
+ }
+ Board b;Zombie z;z.mRow=4;b.mZombies={&z};Projectile native{&b};native.mRow=4;assert(native.FindCollisionTarget()==&z);native.mRow=2;assert(!native.FindCollisionTarget());
+ std::cout<<"Native burst direct/splash row limits passed\\n";
+}`);
+ await run(process.env.CXX||'c++',['-std=c++20','-Isrc',cpp,'-o',binary],{cwd:root});
+ assert.match((await run(binary)).stdout,/Native burst direct\/splash row limits passed/);
+});
 test('meme powers exercise real production combat and preserve native pixel shading',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'pvz-meme-combat-')),binary=join(dir,'combat');
  for(const f of ['SandboxPlants.cpp','SandboxZombies.cpp','MemeCharacters.cpp'])await copyFile(join(root,'src',f),join(dir,f));
@@ -150,7 +187,8 @@ test('runner movement uses native status, terrain, mirroring and saved phase wit
  assert.doesNotMatch(playing,/UpdateRunner/); // Do not skip damage decay/status timers.
  assert.match(custom,/if\(z->ZombieNotWalking\(\)\)return true;/);
  const restore=custom.slice(custom.indexOf('bool Restore('),custom.indexOf('void Assign('));
- assert.doesNotMatch(restore,/mZombiePhase\s*=|mPhaseCounter\s*=|mTargetCol\s*=|mHasObject\s*=/);
+ assert.doesNotMatch(restore,/mZombiePhase\s*=[^=]|mTargetCol\s*=|mHasObject\s*=/);
+ assert.match(restore,/mPhaseCounter=std::min\(z->mPhaseCounter,BrakeTicks\)/);
  const save=(await read('src/Lawn/System/SaveGame.cpp')).toString();
  for(const field of ['mZombiePhase','mPhaseCounter','mTargetCol','mHasObject'])assert.ok(save.includes('theZombie.'+field));
 });

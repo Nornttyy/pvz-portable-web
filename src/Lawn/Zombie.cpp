@@ -6689,7 +6689,7 @@ void Zombie::UpdateAnimSpeed()
 	}
 	if (SandboxZombies::IsRunning(this))
 	{
-		ApplyAnimRate(int(mZombiePhase) == SandboxZombies::RunBrake ? 0.0f : 34.0f);
+		ApplyAnimRate(int(mZombiePhase) == SandboxZombies::RunBrake ? 0.0f : SandboxZombies::RunAnimRate);
 		return;
 	}
 

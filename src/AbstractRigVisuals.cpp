@@ -1,6 +1,7 @@
 #include "AbstractRigVisuals.h"
 #include "LawnApp.h"
 #include "MemeCharacters.h"
+#include "MemeShooterRules.h"
 #include "SandboxArt.h"
 #include "SandboxZombies.h"
 #include "ConeBodyRules.h"
@@ -102,7 +103,7 @@ void Transform(Reanimation* a,int track,ReanimatorTransform& t){
  const auto& s=p->state;
  const bool burst=s[2]==1;const float heat=burst?1:s[3]/300.0f;
  const float exhaustion=!burst&&s[3]==0&&s[5]>150?(s[5]-150)/150.0f:0;
- const float progress=burst?1-s[8]/50.0f:0;
+ const float progress=burst?1-float(s[8])/MemeShooterRules::BurstCount:0;
  Warp(t,38,53,1+.22f*heat,1+.13f*heat-.20f*exhaustion,burst?-.15f-.30f*progress+.04f*std::sin(s[6]*.16f):.18f*exhaustion);
 }
 }

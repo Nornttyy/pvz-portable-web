@@ -164,6 +164,7 @@ public:
  bool IsPoolSquare(int col,int row){return pool&&col>=0&&col<9&&(row==2||row==3);}
  int GridToPixelX(int col,int){return col*80;}int GridToPixelY(int,int row){return row*100;}
  int PixelToGridXKeepOnBoard(int x,int){return std::clamp(x/80,0,8);}
+ int PixelToGridYKeepOnBoard(int,int y){return std::clamp(y/(pool?85:100),0,pool?5:4);}
  bool RowCanHaveZombies(int row){return row>=0&&row<(pool?6:5);}
  ZombieID ZombieGetID(Zombie* z){return z?z->id:ZOMBIEID_NULL;}
  Zombie* ZombieTryToGet(ZombieID id){for(auto* z:mZombies)if(z->id==id)return z;return nullptr;}
