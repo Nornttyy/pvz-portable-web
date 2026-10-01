@@ -5,6 +5,7 @@ import './website-loading.test.mjs';
 import './automatic-resources.test.mjs';
 import './font-repair.test.mjs';
 import './almanac-copy.test.mjs';
+import './tiny-puff.test.mjs';
 import './expansion.test.mjs';
 import './adventure-replacements.test.mjs';
 import './giant-imp.test.mjs';

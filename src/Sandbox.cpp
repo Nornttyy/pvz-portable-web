@@ -224,6 +224,7 @@ static int PlacePlant(Board* board, int type, int col, int row) {
     if (board->mPlants.mSize >= board->mPlants.mMaxSize - 8) return -3;
     if (PlantCount(board) >= SandboxRules::MaxPlants) return -3;
     const auto seed = static_cast<SeedType>(SandboxPlants::Base(type));
+    if (int(seed) == 8 && MemeCharacters::PuffCount(board,col,row) >= TinyPuffRules::Limit) return -4;
     if (seed == SEED_COBCANNON && col >= 8) return -4;
     if (seed == SEED_CATTAIL && !board->IsPoolSquare(col, row)) return -4;
     if (stackPlants && seed != SEED_GRAVEBUSTER && seed != SEED_INSTANT_COFFEE) {
@@ -291,6 +292,12 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
     case 3: {
         if (!SandboxRules::ValidCell(col, row, mapType == 1)) return -2;
         Plant* top = nullptr;
+        // The five-mushroom cluster is natural stacking: shovel one member,
+        // not all five or their lily pad, even when global stacking is off.
+        if (!stackPlants) {
+            for (auto* plant : board->mPlants) if (!plant->mDead && plant->mRow==row && plant->mPlantCol==col && MemeCharacters::Type(plant)==MemeCharacters::TinyPuff) top=plant;
+            if (top) { top->Die(); board->ProcessDeleteQueue(); board->MarkAllDirty(); return 1; }
+        }
         for (auto* plant : board->mPlants) if (!plant->mDead && plant->mRow == row && (plant->mPlantCol == col || (plant->mSeedType == SEED_COBCANNON && plant->mPlantCol + 1 == col))) {
             if (stackPlants) top = plant;
             else plant->Die();

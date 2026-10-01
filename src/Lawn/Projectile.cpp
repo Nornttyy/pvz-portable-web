@@ -992,6 +992,8 @@ void Projectile::Update()
 	mRotation += mRotationSpeed;
 
 	UpdateMotion();
+	if (MemeCharacters::ShotStyle(this)==MemeCharacters::TinyPuffProjectile)
+		AttachmentOverrideScale(mAttachmentID,TinyPuffRules::Scale);
 	AttachmentUpdateAndMove(mAttachmentID, mPosX, mPosY + mPosZ);
 }
 
@@ -1063,7 +1065,7 @@ void Projectile::Draw(Graphics* g)
 	}
 
 	bool aMirror = false;
-	if (aNativeCustomPea) aScale *= SandboxPlants::ShotScale(this);
+	if (aNativeCustomPea || MemeCharacters::ShotStyle(this)==MemeCharacters::TinyPuffProjectile) aScale *= SandboxPlants::ShotScale(this);
 	if (mMotionType == ProjectileMotion::MOTION_BEE_BACKWARDS)
 	{
 		aMirror = true;

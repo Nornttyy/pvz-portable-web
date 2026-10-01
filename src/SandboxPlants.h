@@ -10,7 +10,7 @@ namespace Sexy { class Graphics; class Color; }
 namespace SandboxPlants {
 enum class Element { Fire, Ice, Alternating, Native };
 struct Definition { int id, base; Element element; const char* name; const char* note; const char* art=nullptr; int rate=0,damage=20; float scale=1.0f; };
-inline constexpr std::array<Definition,8> Definitions{{
+inline constexpr std::array<Definition,9> Definitions{{
     {500,0,Element::Native,"红温豌豆","满300怒气 · 3秒乱射40发"},
     {501,3,Element::Native,"反咬坚果","被啃后反击 · 冷却3秒"},
     {519,52,Element::Native,"射手豌豆","头是豌豆 · 发射射手"},
@@ -19,6 +19,7 @@ inline constexpr std::array<Definition,8> Definitions{{
     {522,40,Element::Native,"加特林射手","每0.1秒1发 · 过热休息3.5秒"},
     {523,53,Element::Native,"小·坚果","800生命 · 冷却6秒"},
     {524,26,Element::Native,"仙人的掌","5秒一掌 · 击退僵尸"},
+    {525,8,Element::Native,"真·小喷菇","同格最多5只 · 冷却2秒"},
 }};
 constexpr const Definition* Find(int id) {
     for(const auto& d:Definitions)if(d.id==id)return &d;

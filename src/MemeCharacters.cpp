@@ -48,15 +48,38 @@ bool Hiding(const Plant* p){auto it=states.find(p);return it!=states.end()&&it->
 // The native production guard runs before advancing the sun countdown.
 // Keep the remaining time while tucked, so standing up resumes, not restarts.
 bool Producing(const Plant* p){return Type(p)==TuckingSunflower&&!Hiding(p);}
+bool IsPuff(const Plant* p){return p&&(int(p->mSeedType)==8||(p->mSeedType==SEED_IMITATER&&int(p->mImitaterType)==8));}
+int PuffCount(Board* b,int col,int row){
+ int count=0;for(auto* p:b->mPlants)if(!p->mDead&&!p->NotOnGround()&&p->mPlantCol==col&&p->mRow==row&&IsPuff(p))++count;return count;
+}
+bool PuffMuzzle(const Plant* p,float& x,float& y){
+ if(Type(p)!=TinyPuff)return false;
+ AbstractRigVisuals::Scope pose(p);
+ auto* tip=SandboxArt::NativeImage("PuffShroom_tip.png");
+ return tip&&SandboxArt::TrackPoint(gLawnApp->ReanimationTryToGet(p->mBodyReanimID),"PuffShroom_tip",tip->mWidth,tip->mHeight,tip->mWidth*.92f,tip->mHeight*.5f,x,y);
+}
 void Reset(){states.clear();shotStyles.clear();}
 void Forget(Plant* p){states.erase(p);}
 void Assign(Plant* p,int id){const auto* d=Find(id);if(!d||int(p->mSeedType)!=d->base)return;
+ if(id==TinyPuff){
+  if(Type(p)==id)return;
+  std::array<bool,TinyPuffRules::Limit> used{};
+  if(p->mBoard)for(auto* other:p->mBoard->mPlants)if(other!=p&&!other->mDead&&other->mPlantCol==p->mPlantCol&&other->mRow==p->mRow&&Type(other)==id){const int slot=Data(other,3);if(slot>=0&&slot<TinyPuffRules::Limit)used[slot]=true;}
+  int slot=0;while(slot<TinyPuffRules::Limit-1&&used[slot])++slot;
+  State s;s.id=id;s.health=p->mPlantHealth;s.delay=0;s.direction=slot;states[p]=s;
+  if(p->mBoard){p->mX=p->mBoard->GridToPixelX(p->mPlantCol,p->mRow);p->mY=p->mBoard->GridToPixelY(p->mPlantCol,p->mRow);}
+  return; // Native short-range shooting, sleep and attack countdown stay intact.
+ }
  State s;s.id=id;s.health=p->mPlantHealth;s.timer=0;if(id==500)s.direction=2;if(id==GatlingShooter)s.delay=GatlingInterval;if(id==CactusPalm)s.delay=PalmInterval;states[p]=s;
  if(id==TuckingSunflower){states[p].delay=0;states[p].direction=3;return;}
  p->mLaunchCounter=9999;p->mShootingCounter=0;
 }
 std::array<int,10> Save(const Plant* p){auto it=states.find(p);if(it==states.end())return {};const auto& s=it->second;return {s.id,s.health,s.phase,s.heat,s.timer,s.delay,s.age,s.pulse,s.remaining,s.direction};}
 bool Restore(Plant* p,const std::array<int,10>& a){
+ if(a[0]==TinyPuff){
+  if(int(p->mSeedType)!=8||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]||a[3]||a[4]||a[5]||a[6]||a[7]||a[8]||a[9]<0||a[9]>=TinyPuffRules::Limit)return false;
+  states[p]={a[0],a[1],0,0,0,0,0,0,0,a[9]};return true;
+ }
  if(a[0]==CactusPalm){
   if(int(p->mSeedType)!=26||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]||a[3]||a[4]||a[5]<0||a[5]>PalmInterval||a[6]<0||a[6]>=1000000||a[7]||a[8]||a[9]!=1)return false;
   states[p]={a[0],a[1],0,0,0,a[5],a[6],0,0,1};p->mLaunchCounter=9999;
@@ -99,7 +122,7 @@ bool Restore(Plant* p,const std::array<int,10>& a){
  if(shooter)s.remaining=std::min(s.remaining,MemeShooterRules::BurstCount); // Cap old 50/80/150-pea saves, never refill a volley.
  states[p]=s;p->mLaunchCounter=9999;p->mShootingCounter=0;return true;
 }
-int Data(const Plant* p,int field){const auto it=states.find(p);if(it==states.end())return -1;const auto& s=it->second;if(field==5)return -1;return field==0?s.phase:field==1?s.heat:field==2?s.timer:field==3?s.direction:s.remaining;}
+int Data(const Plant* p,int field){const auto it=states.find(p);if(it==states.end())return -1;const auto& s=it->second;if(field==5)return s.id==TinyPuff?s.direction:-1;return field==0?s.phase:field==1?s.heat:field==2?s.timer:field==3?s.direction:s.remaining;}
 // Keep legacy input/ABI callers harmless; rage is automatic only.
 bool Activate(Plant*,int){return false;}
 bool Click(Board*,int,int){return false;}
@@ -115,7 +138,7 @@ void Tick(Board* b){
   auto it=states.find(p);if(it==states.end())continue;if(p->mDead){states.erase(it);continue;}auto& s=it->second;
   // Hiding lets zombies chew the pad underneath, but does not make the
   // sunflower aquatic. Also repair unsupported flowers restored from saves.
-  if(s.id==TuckingSunflower&&p->IsInPlay()&&!p->NotOnGround()&&b->IsPoolSquare(p->mPlantCol,p->mRow)){
+  if((s.id==TuckingSunflower||s.id==TinyPuff)&&p->IsInPlay()&&!p->NotOnGround()&&b->IsPoolSquare(p->mPlantCol,p->mRow)){
    bool supported=false;
    for(auto* pad:b->mPlants){
     if(pad->mDead||pad->NotOnGround()||pad->mPlantHealth<=0||pad->mPlantCol!=p->mPlantCol||pad->mRow!=p->mRow)continue;
@@ -124,6 +147,7 @@ void Tick(Board* b){
    }
    if(!supported){p->Die();continue;} // Die erases s via SandboxPlants::Forget.
   }
+  if(s.id==TinyPuff){s.health=p->mPlantHealth;continue;}
   if(s.id!=TuckingSunflower){p->mLaunchCounter=9999;if(s.id!=CactusPalm)p->mShootingCounter=0;}
   if(p->mIsAsleep||p->mSquished||p->NotOnGround()||p->mPlantHealth<=0){if(s.id==TuckingSunflower)s.phase=0;continue;}
   s.age=(s.age+1)%1000000;if(s.pulse)--s.pulse;if(s.delay)--s.delay;if(s.timer)--s.timer;
@@ -204,6 +228,7 @@ void Tick(Board* b){
 }
 void Tint(const Plant*,Sexy::Color&){}
 void Scale(const Plant* p,float& x,float& y,float& sx,float& sy){auto it=states.find(p);if(it==states.end()||p->mSquished)return;const auto& s=it->second;
+ if(s.id==TinyPuff){const auto pose=TinyPuffRules::At(s.direction);x+=sx*(pose.x-TinyPuffRules::AnchorX*TinyPuffRules::Scale);y+=sy*(pose.y-TinyPuffRules::AnchorY*TinyPuffRules::Scale);sx*=TinyPuffRules::Scale;sy*=TinyPuffRules::Scale;return;}
  float horizontal=1,vertical=1;
  if(s.id==500&&s.phase==1){const float recoil=std::sin(s.age*0.16f)*0.04f;horizontal+=0.10f+recoil;vertical-=0.07f+recoil;x-=sx*(4+6*(1-float(s.remaining)/MemeShooterRules::BurstCount));}
  if(s.id==501&&s.phase==1&&s.pulse){
@@ -233,6 +258,11 @@ void Card(Sexy::Graphics* g,int x,int y,int id){const auto* d=Find(id);if(!d)ret
  PvzpDrawString(g,std::to_string(d->cost),x+23,y+65,Sexy::FONT_BRIANNETOD12,Sexy::Color(75,51,20),DS_ALIGN_CENTER);
 }
 void OnFired(Plant* p,Projectile* shot){
+ if(Type(p)==TinyPuff){
+  shotStyles[shot]=TinyPuffProjectile;
+  float x,y;if(PuffMuzzle(p,x,y)){shot->mPosX=p->mX+x-12;shot->mPosY=p->mY+y-12-shot->mPosZ;shot->mX=int(shot->mPosX);shot->mY=int(shot->mPosY+shot->mPosZ);}
+  return;
+ }
  if(Type(p)==CactusPalm){
   shotStyles[shot]=Sexy::Rand(100)<20?CriticalPalmProjectile:PalmProjectile;
   Sexy::SexyTransform2D palm;
@@ -271,6 +301,7 @@ bool CanHit(const Projectile* shot){return IsStraightShot(ShotStyle(shot))||Shot
 bool CanHitRow(const Projectile* shot,int row){return MemeShooterRules::CanHitRow(BaseShotStyle(ShotStyle(shot)),row);}
 void OnImpact(Projectile*,Zombie*){}
 bool RestoreShotStyle(const Projectile* shot,int style){
+ if(style==TinyPuffProjectile){if(shot->mDead||shot->mProjectileType!=PROJECTILE_PUFF||shot->mMotionType!=MOTION_PUFF)return false;shotStyles[shot]=style;return true;}
  // Keep the new projectile distinct from retired self-thrower save records.
  if(style<0||(style>20&&style!=ShooterProjectile&&!IsStraightShot(style)&&!MemeShooterRules::IsFloating(style)&&!MemeShooterRules::IsBoundedBurst(style))||style==19||shot->mDead)return false;
  if(style&&(shot->mMotionType!=(IsStraightShot(style)?MOTION_STRAIGHT:MOTION_STAR)||(IsPalmShot(style)?shot->mProjectileType!=PROJECTILE_SPIKE:(shot->mProjectileType!=PROJECTILE_PEA&&shot->mProjectileType!=PROJECTILE_SNOWPEA&&shot->mProjectileType!=PROJECTILE_FIREBALL))))return false;

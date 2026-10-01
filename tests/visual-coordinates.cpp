@@ -15,6 +15,15 @@
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
+ {Board b;SandboxPlants::Reset();Reanimation body;Track tracks[]={{"anim_face"},{"PuffShroom_tip"},{"PuffShroom_head"}};TrackInstance instances[3];body.def.mTracks={3,tracks};body.mTrackInstances=instances;app.reanims[91]=&body;
+  for(int slot=0;slot<5;++slot){auto* p=b.plant(1,2);p->mSeedType=SeedType(8);p->mBodyReanimID=91;SandboxPlants::Assign(p,525);
+   const auto pose=TinyPuffRules::At(slot);ReanimatorTransform original;original.mTransX=40;original.mTransY=65;
+   {AbstractRigVisuals::Scope scoped(p);auto tip=original;AbstractRigVisuals::Transform(&body,1,tip);near(tip.mTransX,40);near(tip.mTransY,65);near(tip.mSkewX,pose.lean*180/3.14159265f);
+    auto cap=original;AbstractRigVisuals::Transform(&body,2,cap);near(cap.mSkewX,(pose.lean+pose.cap)*180/3.14159265f);near(cap.mScaleX,1);near(cap.mScaleY,1);
+   }
+   auto native=original;AbstractRigVisuals::Transform(&body,1,native);near(native.mSkewX,0);near(native.mTransX,40);near(native.mTransY,65);
+  }app.reanims.erase(91);SandboxPlants::Reset();
+ }
  // Recolour only native orange, across all damage images. Do not turn
  // white bands, black outlines or transparent padding green.
  for(int stage=0;stage<3;++stage){const char* files[]={"Zombie_cone1.png","Zombie_cone2.png","Zombie_cone3.png"};auto* source=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::NativeImage(files[stage]));assert(source);

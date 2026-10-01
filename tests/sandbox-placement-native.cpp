@@ -51,9 +51,11 @@ public:
 };
 bool stackPlants=false,awake=true,fusionEnabled=false;int mapType=0;
 int PlantCount(Board* b){int n=0;for(auto* p:b->mPlants)if(!p->mDead)++n;return n;}
+namespace MemeCharacters {int PuffCount(Board* b,int col,int row){int n=0;for(auto* p:b->mPlants)if(!p->mDead&&!p->NotOnGround()&&p->mPlantCol==col&&p->mRow==row&&int(p->mSeedType)==8)++n;return n;}}
 // Inserted verbatim from production Sandbox.cpp by the test runner.
 #include "placement-under-test.inc"
 int main(){
+ {Board world;stackPlants=true;for(int i=0;i<5;++i)assert(PlacePlant(&world,525,1,1)==1);assert(PlacePlant(&world,525,1,1)==-4);world.mPlants.front()->Die();assert(PlacePlant(&world,525,1,1)==1);stackPlants=false;}
  using SandboxUIRules::RepeatPlacement;
  RepeatPlacement repeat;
  assert(!repeat.Poll(0,0,true,true));repeat.Begin(0,0);

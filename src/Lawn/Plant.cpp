@@ -4756,7 +4756,14 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
 	else if (mSeedType == SeedType::SEED_PUFFSHROOM)
 	{
 		int aRenderPosition = Board::MakeRenderOrder(RenderLayer::RENDER_LAYER_LAWN_MOWER, mRow, 1);
-		mApp->AddPvzpParticle(aOriginX + 18, aOriginY + 13, aRenderPosition, ParticleEffect::PARTICLE_PUFFSHROOM_MUZZLE);
+		float x,y;
+		if (MemeCharacters::PuffMuzzle(this,x,y))
+		{
+			aOriginX=mX+x-13;aOriginY=mY+y-13;
+			if (auto* puff=mApp->AddPvzpParticle(mX+x,mY+y,aRenderPosition,ParticleEffect::PARTICLE_PUFFSHROOM_MUZZLE))
+				puff->OverrideScale(nullptr,TinyPuffRules::Scale);
+		}
+		else mApp->AddPvzpParticle(aOriginX + 18, aOriginY + 13, aRenderPosition, ParticleEffect::PARTICLE_PUFFSHROOM_MUZZLE);
 	}
 	else if (mSeedType == SeedType::SEED_SCAREDYSHROOM)
 	{
@@ -4857,6 +4864,10 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
 		aProjectile->mCobTargetRow = mBoard->PixelToGridYKeepOnBoard(mTargetX, mTargetY);
 	}
     SandboxPlants::OnFired(this,aProjectile,theTargetZombie);
+    if (MemeCharacters::Type(this)==MemeCharacters::TinyPuff) {
+        AttachmentOverrideScale(aProjectile->mAttachmentID,TinyPuffRules::Scale);
+        AttachmentUpdateAndMove(aProjectile->mAttachmentID,aProjectile->mPosX,aProjectile->mPosY+aProjectile->mPosZ);
+    }
     // Create the native fire attachment at the final animated muzzle position,
     // not at the pre-adjustment origin for the first visible frame.
     if (sandboxShot == 2) aProjectile->ConvertToFireball(mPlantCol);
@@ -5179,7 +5190,6 @@ int Plant::GetRefreshTime(SeedType theSeedType, SeedType theImitaterType)
 
 bool Plant::IsNocturnal(SeedType theSeedtype)
 {
-	if (theSeedtype == SEED_PUFFSHROOM && MemeAdventure::Replacement(int(theSeedtype))) return false;
 	return
 		theSeedtype == SeedType::SEED_PUFFSHROOM ||
 		theSeedtype == SeedType::SEED_SEASHROOM ||

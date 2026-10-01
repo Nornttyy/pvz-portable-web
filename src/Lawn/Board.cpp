@@ -2210,7 +2210,7 @@ void Board::GetPlantsOnLawn(int theGridX, int theGridY, PlantsOnLawn* thePlantOn
 		}
 		else
 		{
-			PVZP_ASSERT(gSandboxEnabled || !thePlantOnLawn->mNormalPlant);
+			PVZP_ASSERT(gSandboxEnabled || !thePlantOnLawn->mNormalPlant || (MemeCharacters::IsPuff(aPlant) && MemeCharacters::IsPuff(thePlantOnLawn->mNormalPlant)));
 			thePlantOnLawn->mNormalPlant = aPlant;
 		}
 	}
@@ -2873,6 +2873,14 @@ PlantingReason Board::CanPlantAt(int theGridX, int theGridY, SeedType theSeedTyp
 		}
 	}
 
+	// Natural five-mushroom clusters still pass all native terrain/support rules.
+	if (theSeedType == SEED_PUFFSHROOM && (gSandboxEnabled || MemeAdventure::Replacement(int(theSeedType))))
+	{
+		if (MemeCharacters::PuffCount(this, theGridX, theGridY) >= TinyPuffRules::Limit)
+			return PlantingReason::PLANTING_NOT_HERE;
+		if (aNormalPlant && MemeCharacters::IsPuff(aNormalPlant))
+			return aNormalPlant->mOnBungeeState == PlantOnBungeeState::GETTING_GRABBED_BY_BUNGEE ? PlantingReason::PLANTING_NOT_HERE : PlantingReason::PLANTING_OK;
+	}
 	if (aNormalPlant)
 	{
 		if (aNormalPlant->IsUpgradableTo(theSeedType) && aNormalPlant->mOnBungeeState != PlantOnBungeeState::GETTING_GRABBED_BY_BUNGEE)

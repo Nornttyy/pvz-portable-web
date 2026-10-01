@@ -12,9 +12,9 @@ async function entries(path,descriptionIndex){
   const strings=[...s.matchAll(/"(?:\\.|[^"\\])*"/g)].map(m=>JSON.parse(m[0]));return {name:strings[0],description:strings[descriptionIndex]};
  });
 }
-test('all sixteen originals separate explicit combat statistics from surreal flavour without renaming',async()=>{
+test('all seventeen originals separate explicit combat statistics from surreal flavour without renaming',async()=>{
  const plants=await entries('src/MemeCharacters.h',4),zombies=await entries('src/SandboxZombies.h',1);
- assert.deepEqual(plants.map(p=>p.name),['红温豌豆','反咬坚果','射手豌豆','缩头乌葵','双----------双发射手','加特林射手','小·坚果','仙人的掌']);
+ assert.deepEqual(plants.map(p=>p.name),['红温豌豆','反咬坚果','射手豌豆','缩头乌葵','双----------双发射手','加特林射手','小·坚果','仙人的掌','真·小喷菇']);
  assert.deepEqual(zombies.map(p=>p.name),['路易十六','跑路僵尸','雪糕桶包裹我','巨人小鬼','智斗僵尸','路障智斗僵尸','绿路障僵尸','路障叠叠高僵尸']);
  for(const entry of [...plants,...zombies]){
   const paragraphs=entry.description.split('\n\n');assert.equal(paragraphs.length,2,entry.name);

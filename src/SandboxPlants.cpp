@@ -108,13 +108,14 @@ void TorchPower(Plant*,Projectile*){}
 void NativeTint(const Plant* p,Sexy::Color& color){MemeCharacters::Tint(p,color);}
 int ShotDamage(const Projectile* shot,int damage){
  const int style=MemeCharacters::ShotStyle(shot);
+ if(style==MemeCharacters::TinyPuffProjectile)return TinyPuffRules::Damage;
  if(MemeCharacters::IsPalmShot(style))return MemeCharacters::PalmDamage(style);
  if(style==MemeCharacters::WeakProjectile)return std::max(1,damage/20);
  if(style==MemeCharacters::GatlingProjectile)return damage*15/20;
  auto it=damageShots.find(shot);return it==damageShots.end()?damage:damage*it->second/100;
 }
 int ShotBlastRadius(const Projectile* shot,int radius){return ShotDamage(shot,100)>=300?radius*14/10:radius;}
-int SaveShot(const Projectile* p){const int style=MemeCharacters::ShotStyle(p);return (MemeCharacters::IsStraightShot(style)?100:ShotDamage(p,100))|(style<<16);}
+int SaveShot(const Projectile* p){const int style=MemeCharacters::ShotStyle(p);return (MemeCharacters::IsStraightShot(style)||style==MemeCharacters::TinyPuffProjectile?100:ShotDamage(p,100))|(style<<16);}
 void RestoreShot(const Projectile* p,int record){
  if(record<0)return;const int percent=record&65535,style=record>>16;
  if(percent>=100&&percent<=300&&MemeCharacters::RestoreShotStyle(p,style)&&style!=0)damageShots[p]=percent;
@@ -126,8 +127,12 @@ void AdjustScale(const Plant* p,float& x,float& y,float& sx,float& sy){
  }
  MemeCharacters::Scale(p,x,y,sx,sy);
 }
-void AdjustShadow(const Plant* p,float&,float&,float& scale){if(p->mSeedType==SEED_SMALL_NUT)scale*=MemeCharacters::SmallNutScale;}
+void AdjustShadow(const Plant* p,float& x,float& y,float& scale){
+ if(p->mSeedType==SEED_SMALL_NUT)scale*=MemeCharacters::SmallNutScale;
+ if(MemeCharacters::Type(p)==MemeCharacters::TinyPuff){const auto pose=TinyPuffRules::At(MemeCharacters::Data(p,3));x+=pose.x-40;y+=pose.y-65;scale*=TinyPuffRules::Scale;}
+}
 float ShotScale(const Projectile* shot){
+ if(MemeCharacters::ShotStyle(shot)==MemeCharacters::TinyPuffProjectile)return TinyPuffRules::Scale;
  // Visual only: weak Repeater peas are smaller, not weaker or slower.
  // Torchwood's attached fire animation keeps its native size and shadow.
  return MemeCharacters::ShotStyle(shot)==MemeCharacters::WeakProjectile&&

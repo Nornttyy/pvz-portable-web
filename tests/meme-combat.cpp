@@ -34,6 +34,27 @@ struct World:Board {
  void step(int count=1){while(count--){SandboxPlants::Tick(this);SandboxZombies::Tick(this);if(!mPaused)++mMainCounter;}}
 };
 int main(){
+ // Tiny puffs keep their native clock/sleep, have stable five-position poses,
+ // independently saved health, and real 10-damage native puff projectiles.
+ {World w;std::array<Plant*,5> cluster{};
+  for(int i=0;i<5;++i){auto* p=w.add(MemeCharacters::TinyPuff);cluster[i]=p;assert(MemeCharacters::Data(p,3)==i);assert(p->mLaunchCounter==100);p->mLaunchCounter=17+i;p->mShootingCounter=9;}
+  assert(MemeCharacters::PuffCount(&w,1,2)==5);w.step(500);
+  for(int i=0;i<5;++i){auto* p=cluster[i];assert(p->mLaunchCounter==17+i&&p->mShootingCounter==9);float x=0,y=0,sx=1,sy=1;SandboxPlants::AdjustScale(p,x,y,sx,sy);const auto pose=TinyPuffRules::At(i);assert(std::abs(sx-1.0f/3)<.00001f&&sx==sy);assert(std::abs(x+40*sx-pose.x)<.001f&&std::abs(y+65*sy-pose.y)<.001f);
+   p->mPlantHealth=129;p->mIsAsleep=true;w.step();const auto saved=SandboxPlants::SavePower(p);SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved));assert(p->mPlantHealth==129&&p->mIsAsleep&&p->mLaunchCounter==17+i&&MemeCharacters::Data(p,3)==i);
+   auto* shot=w.AddProjectile(100,200,0,2,PROJECTILE_PUFF);shot->mMotionType=MOTION_PUFF;SandboxPlants::OnFired(p,shot,nullptr);assert(SandboxPlants::ShotDamage(shot,20)==10);assert(MemeCharacters::CanHit(shot));assert(SandboxPlants::ShotScale(shot)==TinyPuffRules::Scale);
+   const auto record=SandboxPlants::SaveShot(shot);SandboxPlants::ForgetShot(shot);SandboxPlants::RestoreShot(shot,record);assert(SandboxPlants::ShotDamage(shot,20)==10&&MemeCharacters::ShotStyle(shot)==MemeCharacters::TinyPuffProjectile);
+  }
+  cluster[2]->Die();assert(MemeCharacters::PuffCount(&w,1,2)==4);auto* replacement=w.add(525);assert(MemeCharacters::Data(replacement,3)==2);for(int i:{0,1,3,4})assert(MemeCharacters::Data(cluster[i],3)==i);
+  auto* imitation=w.plant(1,2);imitation->mSeedType=SEED_IMITATER;imitation->mImitaterType=SeedType(8);assert(MemeCharacters::PuffCount(&w,1,2)==6);
+  assert(MemeCharacters::PlantingCooldown(525)==200&&MemeCharacters::Find(525)->cost==0);
+  assert(TinyPuffRules::Poses[1].y>TinyPuffRules::Poses[0].y&&TinyPuffRules::Poses[2].y>TinyPuffRules::Poses[0].y);
+  assert(TinyPuffRules::Poses[3].x<TinyPuffRules::Poses[0].x&&TinyPuffRules::Poses[4].x>TinyPuffRules::Poses[0].x);
+  assert(TinyPuffRules::Poses[3].y==TinyPuffRules::Poses[0].y&&TinyPuffRules::Poses[4].y==TinyPuffRules::Poses[0].y);
+ }
+ {World w;w.pool=true;auto* pad=w.plant(1,2);pad->mSeedType=SEED_LILYPAD;
+  for(int i=0;i<5;++i)w.add(525);w.step();assert(MemeCharacters::PuffCount(&w,1,2)==5);pad->Die();w.step();assert(MemeCharacters::PuffCount(&w,1,2)==0);
+ }
+ {Plant preview;preview.mSeedType=SeedType(8);SandboxPlants::Assign(&preview,525);assert(MemeCharacters::Type(&preview)==525);SandboxPlants::Forget(&preview);}
  // Clever's 70% roll is per incoming hit, not per-frame damage immunity.
  {World w;int successes=0;
   for(int roll=0;roll<100;++roll){auto* z=w.enemy();SandboxZombies::Assign(z,216);
@@ -453,7 +474,7 @@ int main(){
  }
 
  // Removed originals cannot be assigned, restored or re-entered through legacy powers.
- static_assert(MemeCharacters::Definitions.size()==8&&SandboxPlants::Definitions.size()==8);
+ static_assert(MemeCharacters::Definitions.size()==9&&SandboxPlants::Definitions.size()==9);
  {World w;auto* p=w.add(519);const int x=p->mX,y=p->mY;w.step(100);assert(w.mProjectiles.mSize==0);
   auto* z=w.enemy();w.step();assert(w.mProjectiles.mSize==1);w.step(149);assert(w.mProjectiles.mSize==1);w.step();assert(w.mProjectiles.mSize==2);
   auto* shot=w.mProjectiles.values[0];assert(shot->mVelX>0&&shot->mVelY==0&&shot->mMotionType==MOTION_STAR);

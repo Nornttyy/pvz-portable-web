@@ -99,7 +99,7 @@ std::string_view Translate(std::string_view key,std::string_view original){
  static std::map<std::string,std::string,std::less<>> cache;
  if(auto found=cache.find(key);found!=cache.end())return found->second;
  std::string text(original);
- for(const auto& pair:{std::pair{"豌豆射手","红温豌豆"},std::pair{"坚果墙","反咬坚果"}}){
+ for(const auto& pair:{std::pair{"豌豆射手","红温豌豆"},std::pair{"坚果墙","反咬坚果"},std::pair{"小喷菇","真·小喷菇"}}){
   size_t pos=0;const std::string_view from=pair.first,to=pair.second;
   while((pos=text.find(from,pos))!=std::string::npos){
    text.replace(pos,from.size(),to);pos+=to.size();

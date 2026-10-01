@@ -162,6 +162,7 @@ export const ORIGINAL_PLANTS = [
   [522,40,'加特林射手','每0.1秒1发 · 过热休息3.5秒'],
   [523,53,'小·坚果','800生命 · 冷却6秒'],
   [524,26,'仙人的掌','5秒一掌 · 80伤害 · 20%暴击'],
+  [525,8,'真·小喷菇','同格最多5只 · 冷却2秒 · 伤害10'],
 ].map(([id,base,name,note])=>({id,base,name,note}));
 export const nativeBase = id => ORIGINAL_PLANTS.find(p=>p.id===id)?.base ?? RETIRED_CHARACTERS.find(p=>p.id===id)?.base ?? RETIRED_PLANTS.find(p=>p.id===id)?.base ?? id;
 export const PLANTS = [...plantNames.map((name,id) => ORIGINAL_PLANTS.find(p=>p.base===id) ?? ({id,name,note:notes[id] ?? '免费 · 无冷却'})),...ORIGINAL_PLANTS.filter(p=>p.base>=48)];
@@ -179,14 +180,14 @@ export function boardCell(x,y,pool=false) {
 export function cellRect(col,row,pool=false) { return {x:40+col*80,y:80+row*(pool?85:100),width:80,height:pool?85:100}; }
 export const LAYOUT_KEY = 'pvz.sandbox.formation.v1';
 export function requiresStacking(plants) {
-  const seen=new Set(),cells=new Map();
+  const seen=new Map(),cells=new Map();
   for(const original of plants){
     const p={...original,type:nativeBase(original.type)};
     const layer=[16,33].includes(p.type)?'base':p.type===30?'shell':p.type===35?'coffee':'normal';
     for(let col=p.col;col<=p.col+(p.type===47?1:0);col++){
       const key=`${col}:${p.row}:${layer}`;
-      if(seen.has(key))return true;
-      seen.add(key);
+      if(seen.has(key)&&!(p.type===8&&seen.get(key)===8))return true;
+      seen.set(key,p.type);
       const cellKey=`${col}:${p.row}`,types=cells.get(cellKey)??new Set();
       types.add(p.type);cells.set(cellKey,types);
       if(([16,33].some(id=>types.has(id))&&[19,24,43].some(id=>types.has(id)))||(types.has(47)&&types.has(30)))return true;
@@ -200,7 +201,7 @@ export function validateLayout(value) {
   if(value.fusion!==undefined&&typeof value.fusion!=='boolean')throw Error('融合设置无效');
   if(value.stacked&&value.fusion)throw Error('融合和同格种植不能同时开启');
   const stacked=value.stacked===true;
-  const seen = new Set();
+  const seen = new Set(),puffCounts=new Map();
   const plants = value.plants.map(p=>{
     // Retired originals safely become their native base in old formations.
     const retired=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
@@ -208,7 +209,8 @@ export function validateLayout(value) {
     if([...RETIRED_PLANTS,...RETIRED_CHARACTERS].some(old=>old.id===p?.type))p={...p,type:nativeBase(p.type)};
     if (!p || ![p.type,p.col,p.row].every(Number.isInteger) || !validPlant(p.type) || p.col<0 || p.col>=9 || p.row<0 || p.row >= (value.map===1?6:5)) throw Error('阵型中有无效的植物或位置');
     const key = `${p.type}:${p.col}:${p.row}`;
-    if (!stacked&&seen.has(key)) throw Error('阵型中有重复植物');
+    if(nativeBase(p.type)===8){const cell=`${p.col}:${p.row}`,count=(puffCounts.get(cell)??0)+1;if(count>5)throw Error('真·小喷菇每格最多5只');puffCounts.set(cell,count);}
+    if (!stacked&&seen.has(key)&&nativeBase(p.type)!==8) throw Error('阵型中有重复植物');
     seen.add(key);
     return {type:p.type,col:p.col,row:p.row};
   });
@@ -218,7 +220,7 @@ export function validateLayout(value) {
     const p={...original,type:nativeBase(original.type)};
     const key=`${p.col}:${p.row}`,kind=[16,33].includes(p.type)?'base':p.type===30?'shell':p.type===35?'coffee':'normal';
     const cell=occupied.get(key)??{};
-    if(!stacked&&cell[kind]!==undefined) throw Error('同一个格子的植物位置冲突');
+    if(!stacked&&cell[kind]!==undefined&&!(p.type===8&&cell[kind]===8)) throw Error('同一个格子的植物位置冲突');
     cell[kind]=p.type;
     (cell.types??=new Set()).add(p.type);occupied.set(key,cell);
   }

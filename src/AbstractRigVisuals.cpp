@@ -75,7 +75,7 @@ void OffsetLocal(ReanimatorTransform& t,float x,float y){
 }
 void Scope::Add(Reanimation*,int,int){}
 Scope::Scope(const Plant* p):mark(poses.size()){
- if((MemeCharacters::Type(p)!=500&&MemeCharacters::Type(p)!=MemeCharacters::ShooterPea&&MemeCharacters::Type(p)!=MemeCharacters::TuckingSunflower)||p->mSquished)return;
+ if((MemeCharacters::Type(p)!=500&&MemeCharacters::Type(p)!=MemeCharacters::ShooterPea&&MemeCharacters::Type(p)!=MemeCharacters::TuckingSunflower&&MemeCharacters::Type(p)!=MemeCharacters::TinyPuff)||p->mSquished)return;
  const auto state=MemeCharacters::Save(p);int part=0;
  for(auto id:{p->mBodyReanimID,p->mHeadReanimID,p->mHeadReanimID2,p->mHeadReanimID3,p->mBlinkReanimID}){
   if(auto* a=gLawnApp->ReanimationTryToGet(id))poses.push_back({a,p,state,part});
@@ -102,6 +102,12 @@ Scope::~Scope(){for(auto& [track,image]:images)track->mImageOverride=image;for(a
 void Transform(Reanimation* a,int track,ReanimatorTransform& t){
  const Pose* p=nullptr;for(auto i=poses.rbegin();i!=poses.rend();++i)if(i->anim==a){p=&*i;break;}
  if(!p)return;
+ if(p->state[0]==MemeCharacters::TinyPuff){
+  const auto pose=TinyPuffRules::At(p->state[9]);
+  const std::string_view name=a->mDefinition->mTracks.tracks[track].mName;
+  if(name=="PuffShroom_head")Rotate(t,40,45,pose.cap);
+  Rotate(t,TinyPuffRules::AnchorX,TinyPuffRules::AnchorY,pose.lean);return;
+ }
  if(p->state[0]==SandboxZombies::GreenCone||p->state[0]==SandboxZombies::ConeTower){
   if(std::string_view(a->mDefinition->mTracks.tracks[track].mName)!="anim_cone"||t.mFrame<0||t.mAlpha<=0)return;
   const int armor=p->state[1];if(armor<=0){t.mAlpha=0;return;}
