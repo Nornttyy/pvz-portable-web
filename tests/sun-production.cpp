@@ -84,6 +84,18 @@ int main(){
  }
  {Plant p;p.meme=true;p.producing=false;p.mLaunchCounter=1200;p.UpdateProductionPlant();assert(p.mLaunchCounter==1200);
   p.producing=true;p.UpdateProductionPlant();assert(p.mLaunchCounter==1198);}
+ // Tucking freezes even a nearly-due sun; no spawn, flash or reset while
+ // hidden. Repeated hide/recover transitions resume the exact native timer.
+ for(int remaining:{1,2,99,100,101,821,2500}){
+  Plant p;p.meme=true;p.producing=false;p.mLaunchCounter=remaining;
+  for(int tick=0;tick<5000;++tick)p.UpdateProductionPlant();
+  assert(p.mLaunchCounter==remaining&&p.board.coins.empty()&&p.mEatenFlashCountdown==0);
+  for(int tick=1;tick<(remaining+1)/2;++tick){
+   p.producing=true;p.UpdateProductionPlant();assert(p.board.coins.empty());
+   const int before=p.mLaunchCounter;p.producing=false;for(int hidden=0;hidden<3;++hidden)p.UpdateProductionPlant();assert(p.mLaunchCounter==before);
+  }
+  p.producing=true;p.UpdateProductionPlant();assert(p.board.coins.size()==1&&p.board.coins[0].GetSunValue()==25&&p.mLaunchCounter==2500);
+ }
  for(int guard=0;guard<5;++guard){Plant p;switch(guard){case 0:p.meme=true;p.producing=false;break;case 1:p.inPlay=false;break;case 2:p.app.izombie=true;break;case 3:p.board.award=true;break;case 4:p.board.mCoins.mSize=992;break;}p.UpdateProductionPlant();assert(p.board.coins.empty());}
  {Coin sky{COIN_SUN};assert(sky.GetSunValue()==25);}
  for(auto motion:{COIN_MOTION_FROM_SKY,COIN_MOTION_FROM_SKY_SLOW,COIN_MOTION_FROM_PLANT,COIN_MOTION_COIN,COIN_MOTION_FROM_PRESENT}){

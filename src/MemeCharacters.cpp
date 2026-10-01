@@ -45,7 +45,9 @@ void Puff(Sexy::Graphics* g,float x,float y,int age,int alpha){
 int Type(const Plant* p){auto it=states.find(p);return it==states.end()?0:it->second.id;}
 bool Is(const Plant* p){return states.contains(p);}
 bool Hiding(const Plant* p){auto it=states.find(p);return it!=states.end()&&it->second.id==TuckingSunflower&&it->second.phase==1&&!p->mDead&&!p->mSquished&&!p->mIsAsleep&&p->mPlantHealth>0&&!const_cast<Plant*>(p)->NotOnGround();}
-bool Producing(const Plant* p){return Type(p)==TuckingSunflower;}
+// The native production guard runs before advancing the sun countdown.
+// Keep the remaining time while tucked, so standing up resumes, not restarts.
+bool Producing(const Plant* p){return Type(p)==TuckingSunflower&&!Hiding(p);}
 void Reset(){states.clear();shotStyles.clear();}
 void Forget(Plant* p){states.erase(p);}
 void Assign(Plant* p,int id){const auto* d=Find(id);if(!d||int(p->mSeedType)!=d->base)return;

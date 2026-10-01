@@ -45,6 +45,7 @@
     "adventureUnlock": 16,
     "art": "Exactly twenty native cones form the entire character. All anatomical and clothing textures are replaced, including zero armor, portraits and burn/death. Original cone damage textures and draw-only bone scopes. No external art."
   },
+  "tuckingProduction": "Tucked sunflowers pause their native production countdown and cannot spawn suns. Standing resumes the exact remaining time, including save/resume; each sun stays worth 25 and the standing production rate is unchanged.",
   "tuckingPoolSupport": "Standing and tucked sunflowers in pool squares disappear after losing their last living lily pad, including unsupported flowers restored from old saves. Land and lifted plants are unchanged.",
   "mobileTextInput": "Tappable native-widget overlay inside the fullscreen canvas container, with IME composition, native text/width limits, selection, deletion and ordered submit. Desktop keyboard behavior is unchanged.",
   "gatling": {
@@ -63,8 +64,8 @@
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7583851,
-      "sha256": "bec8e9d4af748b49e666a837f9c6275e7637f3f98e95c576248ca23839094698"
+      "size": 7583987,
+      "sha256": "6ff58505c9b0713901f2d8abad8af523219752ffaa79cb6415450e80d34a7759"
     }
   ]
 }

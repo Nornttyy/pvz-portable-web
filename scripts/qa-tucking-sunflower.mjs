@@ -41,7 +41,7 @@ try{
  const hidden=await data(0);assert.equal(hidden[3],300);assert.equal(hidden[4],1);
  assert.equal((await data(2))[4],0);assert.equal((await data(3))[4],0);await snap('tucked-before-contact');
  await api(5,1);const normal=await data(1);for(let i=0;i<20;++i)await step();
- assert.equal(hidden[11]-(await data(0))[11],40);assert.equal(normal[11]-(await data(1))[11],40);results.productionUnchanged=true;
+ assert.equal(hidden[11],(await data(0))[11]);assert.equal(normal[11]-(await data(1))[11],40);results.hiddenProductionPaused=true;
  await api(5,4);await api(4,0);
  await wait(()=>Module._pvz_sandbox_zombie_data(0,2)<290,undefined,30000);
  await api(4,1);assert.equal((await data(0))[3],300);assert.equal((await zombie(0))[20],0);await snap('zombie-walked-through');results.walkedThrough=true;

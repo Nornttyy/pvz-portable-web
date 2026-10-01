@@ -96,14 +96,14 @@ int main(){
  {World w;auto* p=w.add(520);auto* ordinary=w.add(1);const int countdown=p->mLaunchCounter;
   assert(MemeCharacters::Producing(p));w.step(500);assert(p->mLaunchCounter==countdown&&!MemeCharacters::Hiding(p));
   auto* z=w.enemy(400);w.step();assert(!MemeCharacters::Hiding(p));
-  z->mPosX=160;w.step();assert(MemeCharacters::Hiding(p)&&!MemeCharacters::Hiding(ordinary));
+  z->mPosX=160;w.step();assert(MemeCharacters::Hiding(p)&&!MemeCharacters::Hiding(ordinary)&&!MemeCharacters::Producing(p));
   z->mPosX=170;w.step();assert(MemeCharacters::Hiding(p)); // release hysteresis
-  z->mPosX=200;w.step();assert(!MemeCharacters::Hiding(p));
+  z->mPosX=200;w.step();assert(!MemeCharacters::Hiding(p)&&MemeCharacters::Producing(p));
   z->mPosX=160;w.step();assert(MemeCharacters::Hiding(p));
   const auto saved=MemeCharacters::Save(p);w.mPaused=true;w.step(100);assert(MemeCharacters::Save(p)==saved);w.mPaused=false;
-  MemeCharacters::Forget(p);assert(MemeCharacters::Restore(p,saved)&&MemeCharacters::Hiding(p)&&p->mLaunchCounter==countdown);
-  for(int x=150;x>=-60;--x){z->mPosX=x;w.step();assert(MemeCharacters::Hiding(p)&&p->mPlantHealth==300);}
-  z->mPosX=-100;w.step();assert(!MemeCharacters::Hiding(p));
+  MemeCharacters::Forget(p);assert(MemeCharacters::Restore(p,saved)&&MemeCharacters::Hiding(p)&&!MemeCharacters::Producing(p)&&p->mLaunchCounter==countdown);
+  for(int x=150;x>=-60;--x){z->mPosX=x;w.step();assert(MemeCharacters::Hiding(p)&&!MemeCharacters::Producing(p)&&p->mPlantHealth==300);}
+  z->mPosX=-100;w.step();assert(!MemeCharacters::Hiding(p)&&MemeCharacters::Producing(p));
   for(int i=0;i<8;++i){z->mPosX=80;w.step();assert(MemeCharacters::Hiding(p));z->mDead=true;w.step();assert(!MemeCharacters::Hiding(p));z->mDead=false;}
  }
  // No global/multi-row fear, nor fear of friendly/flying/dead zombies.
