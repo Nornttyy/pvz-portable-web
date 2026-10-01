@@ -2,7 +2,29 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Eight abstract plants and six independent zombies (212..217). Clever zombies dodge, backflip, change lanes, swim and steal plants. Cactus Palm knockback reduced by 60%. Existing progression and saves are preserved.",
+  "mode": "Eight abstract plants and eight independent zombies (212..219). Added Green Cone and land-only Twenty-Cone Tower; native cone textures/rigs, gradual adventure unlocks and correct full Unicode glyphs. Existing clever slow motion, balance, progression and saves are preserved.",
+  "coneVariants": {
+    "green": {
+      "id": 218,
+      "name": "绿路障僵尸",
+      "bodyHealth": 270,
+      "armor": 740,
+      "speedMultiplier": 1,
+      "adventureUnlock": 27
+    },
+    "tower": {
+      "id": 219,
+      "name": "路障叠叠高僵尸",
+      "bodyHealth": 270,
+      "armor": 7400,
+      "visualCones": 20,
+      "speedMultiplier": 0.15,
+      "canSwim": false,
+      "adventureUnlock": 32
+    },
+    "art": "Original cone textures and native hat bone. Green preserves white bands, outlines and all damage stages. Tower nests twenty cones, losing one per 370 armor damage; bottom cone stays registered to the original head. Scoped visuals preserve ordinary zombies.",
+    "font": "雪糕桶包裹我 name unchanged. Missing 裹, 叠 and 绿 use complete CoreText STKaiti glyph outlines, rasterized to existing bitmap font ink bounds, advance, baseline and colour. No assembled radicals."
+  },
   "cleverZombies": {
     "ids": [
       216,
@@ -111,12 +133,12 @@
     {
       "name": "pvz-portable.js",
       "size": 278906,
-      "sha256": "b8011a2bd55fe6d6c8db11cc5e24929130afadae7c6cbc6420500cb563225271"
+      "sha256": "ba4ebe1ee3284b918598d0a784859ed5e53468b4d00ab0bdee0eca792823205f"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7640243,
-      "sha256": "8a12a46267413c3fed1965483466a0436eeb5722b9c655458477d6c1e83561b3"
+      "size": 7663464,
+      "sha256": "0f6293ca17212c1f1e35734c8ee0bf1e6b0b169edd9f80d37e767bd0e7216ba1"
     }
   ]
 }

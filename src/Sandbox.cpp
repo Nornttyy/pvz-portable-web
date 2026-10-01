@@ -264,6 +264,7 @@ static int Spawn(Board* board, int type, int col, int row) {
     if (ZombieCount(board) >= SandboxRules::MaxZombies || board->mZombies.mSize >= board->mZombies.mMaxSize - 8) return -3;
     const auto requestedType = static_cast<ZombieType>(SandboxZombies::Base(type));
     const bool water = board->IsPoolSquare(col, row);
+    if (water && !SandboxZombies::WaterAllowed(type)) return -5;
     if (!water && (requestedType == ZOMBIE_SNORKEL || requestedType == ZOMBIE_DOLPHIN_RIDER || requestedType == ZOMBIE_DUCKY_TUBE)) return -5;
     // Native swimming is the ordinary zombie plus its row-dependent duck rig.
     // The catalogue-only DUCKY_TUBE type is not accepted by native pool motion.

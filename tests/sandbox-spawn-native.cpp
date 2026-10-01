@@ -27,6 +27,8 @@ int main(){
  Board b;
  for(int id:{212,213})for(int row:{0,2,3,4}){Board custom;assert(Spawn(&custom,id,8,row)==1&&custom.type==ZOMBIE_NORMAL&&assignedZombie==id);}
  for(int row:{0,2,3,4}){Board custom;assert(Spawn(&custom,214,8,row)==1&&custom.type==2&&assignedZombie==214);}
+ for(int row:{0,2,3,4}){Board custom;assert(Spawn(&custom,218,8,row)==1&&custom.type==2&&assignedZombie==218);}
+ for(int row:{0,1,2,3,4,5}){Board custom;const bool water=row==2||row==3;assert(Spawn(&custom,219,8,row)==(water?-5:1));assert(custom.count==(water?0:1));}
  assert(Spawn(&b,10,8,2)==1&&b.type==ZOMBIE_NORMAL&&b.row==2);
  assert(b.zombie.mPosX==690&&b.zombie.mX==690&&b.zombie.updated&&b.marked);
  for(int waterOnly:{10,11,14}){Board land;assert(Spawn(&land,waterOnly,8,0)==-5&&land.count==0);}

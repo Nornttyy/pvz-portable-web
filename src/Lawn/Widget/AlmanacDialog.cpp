@@ -175,6 +175,9 @@ void AlmanacDialog::SetupZombie()
 	SandboxZombies::Assign(mZombie.get(),int(mSelectedZombie));
 	mZombie->mPosX = ALMANAC_ZOMBIE_POSITION_X;
 	mZombie->mPosY = ALMANAC_ZOMBIE_POSITION_Y;
+	// Fit the complete twenty-cone silhouette in the almanac window only.
+	// Native scaling pivots at the feet; live combat size stays untouched.
+	if (int(mSelectedZombie) == SandboxZombies::ConeTower) mZombie->mScaleZombie = 0.65f;
 }
 
 void AlmanacDialog::SetPage(AlmanacPage thePage)

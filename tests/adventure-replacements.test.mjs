@@ -145,18 +145,20 @@ test('native adventure introduces each independent zombie gradually and limits c
 #include <cassert>
 #include <iostream>
 class Zombie;
-class Board {public:int mLevel=1;std::vector<Zombie*> mZombies;};
-class Zombie {public:Board* mBoard=nullptr;int mZombieType=0,mFromWave=0,id=0;bool board=true;bool IsOnBoard(){return board;}};
+class Board {public:int mLevel=1;std::vector<Zombie*> mZombies;bool pool=false;bool IsPoolSquare(int,int row){return pool&&(row==2||row==3);}};
+class Zombie {public:Board* mBoard=nullptr;int mZombieType=0,mFromWave=0,id=0;bool board=true;int mRow=2;bool IsOnBoard(){return board;}};
 namespace SandboxZombies {int Type(const Zombie* z){return z->id;}bool IsRunner(const Zombie* z){return z&&z->id==Runner;}bool IsConeWrap(const Zombie* z){return z&&z->id==ConeWrap;}void Assign(Zombie* z,int id){z->id=id;}}
 namespace MemeAdventure {bool enabled=true;bool RosterEnabled(){return enabled;} ${hook}}
 int main(){
- for(int level:{1,2,3,5,6,8,15,16,17,20,22,23,25,26,27,50})for(int wave=-3;wave<25;++wave)for(int base:{0,1,2,3,4,23,24})for(bool onBoard:{false,true})for(bool enabled:{false,true}){
-  Board b;b.mLevel=level;Zombie a{&b,base,wave,0,onBoard},c{&b,base,wave,0,onBoard};b.mZombies={&a,&c};MemeAdventure::enabled=enabled;
+ for(int level:{1,2,3,5,6,8,15,16,17,20,22,23,25,26,27,31,32,33,50})for(int wave=-3;wave<25;++wave)for(int base:{0,1,2,3,4,23,24})for(bool onBoard:{false,true})for(bool enabled:{false,true})for(bool water:{false,true}){
+  Board b;b.mLevel=level;b.pool=water;Zombie a{&b,base,wave,0,onBoard},c{&b,base,wave,0,onBoard};b.mZombies={&a,&c};MemeAdventure::enabled=enabled;
   MemeAdventure::OnZombieSpawned(&a);MemeAdventure::OnZombieSpawned(&c);
   const bool eligible=enabled&&onBoard;const bool runner=eligible&&SandboxZombies::RunnerWave(level,base,wave),louis=eligible&&SandboxZombies::LouisWave(level,base,wave);
   const bool cone=eligible&&SandboxZombies::ConeWrapWave(level,base,wave);
   const int clever=eligible?SandboxZombies::CleverWave(level,base,wave):-1;
-  assert(a.id==(clever>=0?clever:cone?214:runner?213:louis?212:0));assert(c.id==(louis?212:0));
+  const int variant=eligible?SandboxZombies::ConeVariantWave(level,base,wave,water):-1;
+  assert(a.id==(variant>=0?variant:clever>=0?clever:cone?214:runner?213:louis?212:0));assert(c.id==(louis?212:0));
+  assert(a.id!=219||(!water&&level>=32&&wave%8==1));assert(a.id!=218||(level>=27&&wave%4==0));
   assert(base!=4||(a.id==0&&c.id==0)); // No clever bucket variant.
  }
  MemeAdventure::OnZombieSpawned(nullptr);Zombie preview;MemeAdventure::OnZombieSpawned(&preview);assert(preview.id==0);

@@ -15,6 +15,38 @@
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
+ // Recolour only native orange, across all damage images. Do not turn
+ // white bands, black outlines or transparent padding green.
+ for(int stage=0;stage<3;++stage){const char* files[]={"Zombie_cone1.png","Zombie_cone2.png","Zombie_cone3.png"};auto* source=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::NativeImage(files[stage]));assert(source);
+  source->bits[0]=0xffff8000;source->bits[1]=0xff101010;source->bits[2]=0xffffffff;source->bits[3]=0x00ee8822;
+  auto* coloured=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::GreenCone(stage));assert(coloured&&coloured->mWidth==source->mWidth&&coloured->mHeight==source->mHeight);
+  const auto p=coloured->bits[0];assert(((p>>8)&255)>((p>>16)&255)&&((p>>8)&255)>(p&255)&&(p>>24)==255);
+  for(int i:{1,2,3})assert(coloured->bits[i]==source->bits[i]);
+ }
+ // Only the cone bone changes. Its bottom attachment is stable as layers
+ // break; previews/rotation and native frame/render-group gates agree.
+ for(int id:{218,219}){SandboxZombies::Reset();Board w;auto* z=w.AddZombieInRow(static_cast<ZombieType>(2),2,-1);SandboxZombies::Assign(z,id);
+  Reanimation body;Track tracks[]={{"anim_cone"},{"anim_head1"},{"Zombie_body"}};TrackInstance instances[3];body.def.mTracks={3,tracks};body.mTrackInstances=instances;
+  auto* original=SandboxArt::NativeImage("Zombie_cone1.png");for(auto& i:instances)i.mImageOverride=original;body.pose.mImage=original;
+  app.reanims[96]=&body;z->mBodyReanimID=96;
+  for(int armor:{7400,7399,7030,7029,370,249,123,1,0})for(float angle:{0.f,25.f,110.f}){
+   z->mHelmHealth=id==218?std::min(armor,740):armor;
+   body.pose.mTransX=13.1f;body.pose.mTransY=-18.7f;body.pose.mSkewX=body.pose.mSkewY=angle;body.pose.mScaleX=body.pose.mScaleY=.8f;
+   {AbstractRigVisuals::Scope scope(z);auto hat=body.pose;AbstractRigVisuals::Transform(&body,0,hat);assert(instances[0].mImageOverride==nullptr);
+    if(!armor)assert(hat.mAlpha==0);
+    else{const int count=SandboxZombies::TowerCount(z->mHelmHealth);const float rise=id==219?6*(count-1):0,k=angle*3.14159265f/180;
+     assert(hat.mImage==(id==218?SandboxArt::GreenCone(SandboxZombies::ConeDamageStage(z->mHelmHealth/2)):SandboxArt::ConeTower(z->mHelmHealth)));
+     near(hat.mTransX-rise*.8f*std::sin(k),body.pose.mTransX);near(hat.mTransY+rise*.8f*std::cos(k),body.pose.mTransY);
+     if(id==219)assert(hat.mImage->mHeight==original->mHeight+rise);
+    }
+    auto hidden=body.pose;hidden.mFrame=-1;AbstractRigVisuals::Transform(&body,0,hidden);assert(hidden.mImage==original&&hidden.mFrame==-1);
+    for(int i:{1,2}){auto t=body.pose;AbstractRigVisuals::Transform(&body,i,t);assert(t.mImage==original&&instances[i].mImageOverride==original);near(t.mTransY,body.pose.mTransY);}
+   }
+   for(auto& i:instances)assert(i.mImageOverride==original&&i.mRenderGroup==0);
+  }
+  SandboxZombies::Forget(z);{AbstractRigVisuals::Scope scope(z);auto hat=body.pose;AbstractRigVisuals::Transform(&body,0,hat);assert(hat.mImage==original);}
+  app.reanims.clear();
+ }
  // The entire native rig rotates on exactly the same slowed clock as its
  // flight/lane curve. Native facing is mirrored once; the pivot stays fixed.
  for(int id:{216,217})for(float facing:{1.f,-1.f}){SandboxZombies::Reset();Board w;auto* z=w.AddZombieInRow(static_cast<ZombieType>(SandboxZombies::Base(id)),2,-1);SandboxZombies::Assign(z,id);

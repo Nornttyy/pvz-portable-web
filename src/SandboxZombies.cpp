@@ -75,7 +75,7 @@ void Assign(Zombie* z,int id){
   z->mBossMode=0;z->mSummonCounter=0;
   z->mTargetRow=z->mRow;z->UpdateAnimSpeed();return;
  }
- if(id==ConeWrap){
+ if(id==ConeWrap||id==GreenCone||id==ConeTower){
   z->mBodyHealth=z->mBodyMaxHealth=Find(id)->health;
   z->mHelmHealth=z->mHelmMaxHealth=Find(id)->armor;
   z->UpdateAnimSpeed();return;
@@ -261,15 +261,16 @@ void DrawPortrait(Sexy::Graphics* g,int x,int y,int w,int h,int id){
  static std::array<std::unique_ptr<Sexy::MemoryImage>,Definitions.size()> portraits;
  auto& portrait=portraits[Find(id)-Definitions.data()];
  if(!portrait){
-  portrait=gLawnApp->mReanimatorCache->MakeBlankMemoryImage(200,210);Sexy::Graphics canvas(portrait.get());canvas.SetLinearBlend(true);
-  Reanimation anim;anim.ReanimationInitializeType(40,40,id==GiantImp?REANIM_IMP:REANIM_ZOMBIE);anim.SetFramesForLayer(id==GiantImp?"anim_walk":id==Runner?"anim_walk2":"anim_idle");Zombie::SetupReanimLayers(&anim,static_cast<ZombieType>(Base(id)));
+  const bool tower=id==ConeTower;
+  portrait=gLawnApp->mReanimatorCache->MakeBlankMemoryImage(200,tower?340:210);Sexy::Graphics canvas(portrait.get());canvas.SetLinearBlend(true);
+  Reanimation anim;anim.ReanimationInitializeType(40,tower?170:40,id==GiantImp?REANIM_IMP:REANIM_ZOMBIE);anim.SetFramesForLayer(id==GiantImp?"anim_walk":id==Runner?"anim_walk2":"anim_idle");Zombie::SetupReanimLayers(&anim,static_cast<ZombieType>(Base(id)));
   if(id==Louis)for(const char* prefix:{"anim_head","anim_hair","anim_tongue"})anim.AssignRenderGroupToPrefix(prefix,RENDER_GROUP_HIDDEN);
   if(id==Runner){anim.mAnimTime=0.35f;anim.mOverlayMatrix.m01=0.13f;anim.mOverlayMatrix.m02-=15.6f;}
   AbstractRigVisuals::Scope pose(&anim,id);anim.Draw(&canvas);
  }
  SandboxArt::DrawFit(g,portrait.get(),x+4,y+5,w-8,h-10);
 }
-float Speed(Zombie* z){return IsClever(z)?(IsRetreating(z)?CleverFleeSpeed:CleverSpeed):IsConeWrap(z)?ConeWrapSpeed:1.0f;}
+float Speed(Zombie* z){return IsClever(z)?(IsRetreating(z)?CleverFleeSpeed:CleverSpeed):IsConeWrap(z)?ConeWrapSpeed:Type(z)==ConeTower?ConeTowerSpeed:1.0f;}
 int Damage(Zombie*,int damage,unsigned){return damage;}
 bool ElectricHit(Zombie*){return false;}
 void CombatDeath(Zombie*){}
@@ -282,6 +283,6 @@ void ForgetShot(Projectile* shot){dodged.erase(shot);}
 void ForgetPlant(Plant*){}
 bool AttackSlowed(const Plant*){return false;}
 void RefreshDamageArt(Zombie* z){if(IsLouis(z))z->SetupReanimForLostHead();if(IsClever(z))RefreshCleverRig(z);}
-Sexy::Image* DetachedArmor(const Zombie*){return nullptr;}
+Sexy::Image* DetachedArmor(const Zombie* z){return Type(z)==GreenCone?SandboxArt::GreenCone(2):nullptr;}
 Sexy::Image* DetachedHead(const Zombie* z){return IsGiantImp(z)?SandboxArt::NativeImage("Zombie_gargantuar_head.png"):nullptr;}
 }

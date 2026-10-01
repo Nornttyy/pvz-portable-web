@@ -1,4 +1,5 @@
 #include "graphics/ImageFont.h"
+#include "graphics/MemoryImage.h"
 #include "../src/SandboxFonts.h"
 #include "../src/SandboxFontRules.h"
 #include <cassert>
@@ -73,9 +74,13 @@ int main(){
         FontData wrap;wrap.mFontLayerList.emplace_back();auto& wrapDonor=wrap.mFontLayerList.back();wrapDonor.mImage=42;
         for(char32_t c:U"六果装")wrapDonor.mCharDataMap[c]={{0,0,cell,cell},{-5,-4},14};
         ImageFont wrapFont;wrapFont.mFontData=&wrap;FONT_BRIANNETOD12=&wrapFont;SandboxRepairFonts();
-        assert(wrap.mFontLayerList.size()==4&&wrapFont.prepared==1);
-        for(const auto& l:wrap.mFontLayerList)if(l.mCharDataMap.contains(U'裹')){const auto& g=l.mCharDataMap.at(U'裹');assert(g.mWidth==14&&g.mImageRect.mWidth==cell&&g.mImageRect.mHeight>0);}
-        SandboxRepairFonts();assert(wrap.mFontLayerList.size()==4&&wrapFont.prepared==1);FONT_BRIANNETOD12=nullptr;
+        assert(wrap.mFontLayerList.size()==4&&wrapFont.prepared==3);
+        for(const auto& l:wrap.mFontLayerList)for(char32_t c:U"裹叠绿")if(c&&l.mCharDataMap.contains(c)){
+         const auto& g=l.mCharDataMap.at(c);assert(g.mWidth==14&&g.mImageRect.mWidth==cell&&g.mImageRect.mHeight==cell);
+         assert(g.mOffset.mX==-5&&g.mOffset.mY==-4);MemoryImage* bitmap=l.mImage;assert(bitmap);
+         int ink=0;for(auto p:bitmap->bits)ink+=(p>>24)>0;assert(ink>30&&ink<14*14);
+        }
+        SandboxRepairFonts();assert(wrap.mFontLayerList.size()==4&&wrapFont.prepared==3);FONT_BRIANNETOD12=nullptr;
         FontData timing;timing.mFontLayerList.emplace_back();auto& donor=timing.mFontLayerList.back();donor.mImage=42;donor.mAscent=12;
         donor.mCharDataMap[U'种']={{100,200,cell,cell},{-5,-4},14};
         donor.mCharDataMap[U'沙']={{300,400,cell,cell},{-5,-4},14};
@@ -88,6 +93,17 @@ int main(){
         assert(a.mWidth==14&&b.mWidth==14&&a.mImageRect.mWidth==split&&b.mImageRect.mWidth==cell-split);
         assert(a.mOffset.mX==-5&&b.mOffset.mX==-5+split&&a.mOffset.mY==-4&&b.mOffset.mY==-4);
         SandboxRepairFonts();assert(timing.mFontLayerList.size()==3&&timingFont.prepared==1);FONT_BRIANNETOD12=nullptr;
+    }
+    // Coloured atlases keep their dominant ink (never the brightest bevel),
+    // and complete native glyphs are left untouched on every repeated call.
+    {MemoryImage atlas;atlas.Create(27,27);for(int y=5;y<21;++y)for(int x=5;x<21;++x)atlas.bits[y*27+x]=0xff00c400;
+     atlas.bits[5*27+5]=0xffffffff;
+     FontData data;data.mFontLayerList.emplace_back();auto& main=data.mFontLayerList.back();main.mImage=&atlas;
+     main.mCharDataMap[U'装']={{0,0,27,27},{-5,-4},16};main.mCharDataMap[U'叠']={{0,0,27,27},{-5,-4},16};
+     ImageFont font;font.mFontData=&data;FONT_DWARVENTODCRAFT18GREENINSET=&font;SandboxRepairFonts();
+     assert(data.mFontLayerList.size()==3&&font.prepared==2);assert(!data.mFontLayerMap.contains("EXACTGLYPHSTACK"));
+     for(const char* key:{"EXACTGLYPHWRAP","EXACTGLYPHGREEN"}){auto* l=data.mFontLayerMap.at(key);MemoryImage* image=l->mImage;assert(image);for(auto p:image->bits)if(p>>24)assert((p&0xffffff)==0x00c400);}
+     SandboxRepairFonts();assert(font.prepared==2&&main.mCharDataMap.at(U'叠').mWidth==16);FONT_DWARVENTODCRAFT18GREENINSET=nullptr;
     }
     std::cout<<"Three font sizes, prior measurement, original glyph preservation and idempotence passed.\n";
 }

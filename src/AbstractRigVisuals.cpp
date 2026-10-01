@@ -17,6 +17,13 @@ namespace AbstractRigVisuals {
 namespace {
 struct Pose {Reanimation* anim;const Plant* plant;std::array<int,10> state;int part;ReanimatorTransform head;};
 std::vector<Pose> poses;
+void ConeHatPose(Scope& scope,Reanimation* a,int id,int armor){
+ if(!a)return;
+ std::array<int,10> state{};state[0]=id;state[1]=armor;poses.push_back({a,nullptr,state,0});
+ for(int i=0;i<a->mDefinition->mTracks.count;++i)if(std::string_view(a->mDefinition->mTracks.tracks[i].mName)=="anim_cone"){
+  auto* track=&a->mTrackInstances[i];scope.images.push_back({track,track->mImageOverride});track->mImageOverride=nullptr;
+ }
+}
 void CleverPose(Scope& scope,Reanimation* a,bool jaw){
  if(!a)return;
  std::array<int,10> state{};state[0]=SandboxZombies::Clever;state[1]=jaw;poses.push_back({a,nullptr,state,0});
@@ -77,11 +84,14 @@ Scope::Scope(const Plant* p):mark(poses.size()){
 }
 // Identity gates keep ordinary coneheads and unrelated cached previews intact.
 Scope::Scope(Zombie* z):mark(poses.size()){
+ const int id=SandboxZombies::Type(z);
+ if(id==SandboxZombies::GreenCone||id==SandboxZombies::ConeTower)ConeHatPose(*this,gLawnApp->ReanimationTryToGet(z->mBodyReanimID),id,z->mHelmHealth);
  if(SandboxZombies::IsClever(z)&&z->mHasHead&&!z->mDead)CleverPose(*this,gLawnApp->ReanimationTryToGet(z->mBodyReanimID),SandboxZombies::ShowsCleverJaw(z));
  if(SandboxZombies::IsConeWrap(z))ConePose(*this,gLawnApp->ReanimationTryToGet(z->mBodyReanimID),z->mHelmHealth);
  if(SandboxZombies::IsGiantImp(z))GiantImpPose(*this,gLawnApp->ReanimationTryToGet(z->mBodyReanimID),int(z->mZombiePhase)==SandboxZombies::JawSmash?z->mPhaseCounter:0);
 }
 Scope::Scope(Reanimation* a,int type):mark(poses.size()){
+ if(type==SandboxZombies::GreenCone||type==SandboxZombies::ConeTower)ConeHatPose(*this,a,type,SandboxZombies::Find(type)->armor);
  if(type==SandboxZombies::Clever||type==SandboxZombies::CleverCone)CleverPose(*this,a,false);
  if(type==SandboxZombies::ConeWrap)ConePose(*this,a,SandboxZombies::ConeCount*SandboxZombies::ConeHealth);
  if(type==SandboxZombies::GiantImp)GiantImpPose(*this,a,0);
@@ -92,6 +102,18 @@ Scope::~Scope(){for(auto& [track,image]:images)track->mImageOverride=image;for(a
 void Transform(Reanimation* a,int track,ReanimatorTransform& t){
  const Pose* p=nullptr;for(auto i=poses.rbegin();i!=poses.rend();++i)if(i->anim==a){p=&*i;break;}
  if(!p)return;
+ if(p->state[0]==SandboxZombies::GreenCone||p->state[0]==SandboxZombies::ConeTower){
+  if(std::string_view(a->mDefinition->mTracks.tracks[track].mName)!="anim_cone"||t.mFrame<0||t.mAlpha<=0)return;
+  const int armor=p->state[1];if(armor<=0){t.mAlpha=0;return;}
+  if(p->state[0]==SandboxZombies::GreenCone)t.mImage=SandboxArt::GreenCone(SandboxZombies::ConeDamageStage(armor/2));
+  else{
+   t.mImage=SandboxArt::ConeTower(armor);
+   // The bottom cone stays registered to the ORIGINAL hat bone. The stack
+   // extends upwards in bone-local space, including walking/death rotation.
+   OffsetLocal(t,0,-SandboxZombies::TowerConeRise*(SandboxZombies::TowerCount(armor)-1));
+  }
+  return;
+ }
  if(p->state[0]==SandboxZombies::Clever){
   const std::string_view name=a->mDefinition->mTracks.tracks[track].mName;
   if(name!="anim_head1"||t.mFrame<0||t.mAlpha<=0)return;

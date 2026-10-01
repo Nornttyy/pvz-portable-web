@@ -4,6 +4,7 @@
 #include "AbstractPhonePixels.h"
 #include "CactusPalmPixels.h"
 #include "CleverHeadPixels.h"
+#include "SandboxZombies.h"
 #include "LawnApp.h"
 #include "graphics/GLImage.h"
 #include "graphics/Graphics.h"
@@ -15,6 +16,43 @@
 #include <algorithm>
 #include <cmath>
 namespace SandboxArt {
+Sexy::Image* GreenCone(int damage){
+ damage=std::clamp(damage,0,2);static std::unique_ptr<Sexy::MemoryImage> images[3];auto& out=images[damage];if(out)return out.get();
+ const char* files[]={"Zombie_cone1.png","Zombie_cone2.png","Zombie_cone3.png"};
+ auto* source=dynamic_cast<Sexy::MemoryImage*>(NativeImage(files[damage]));if(!source)return nullptr;
+ out=std::make_unique<Sexy::MemoryImage>();out->Create(source->mWidth,source->mHeight);
+ const auto* in=source->GetBits();auto* bits=out->GetBits();
+ for(int i=0;i<source->mWidth*source->mHeight;++i){
+  const auto p=in[i];const int r=(p>>16)&255,g=(p>>8)&255,b=p&255;
+  // Recolour orange pigment only. Native outlines, white band, alpha and
+  // all three damaged silhouettes remain unchanged.
+  bits[i]=(p>>24)&&r>g+12&&g>=b&&r>40?(p&0xff000000u)|(unsigned(g*.62f)<<16)|(unsigned(r*.82f)<<8)|unsigned(b*.5f+g*.22f):p;
+ }
+ out->BitsChanged();return out.get();
+}
+Sexy::Image* ConeTower(int armor){
+ using namespace SandboxZombies;const int count=TowerCount(armor);if(!count)return nullptr;
+ const int damage=ConeDamageStage(TowerTopHealth(armor));
+ static std::map<int,std::unique_ptr<Sexy::MemoryImage>> images;auto& out=images[count*3+damage];if(out)return out.get();
+ const char* files[]={"Zombie_cone1.png","Zombie_cone2.png","Zombie_cone3.png"};
+ auto* whole=dynamic_cast<Sexy::MemoryImage*>(NativeImage(files[0]));
+ auto* top=dynamic_cast<Sexy::MemoryImage*>(NativeImage(files[damage]));if(!whole||!top)return nullptr;
+ const int width=whole->mWidth,height=whole->mHeight+TowerConeRise*(count-1);
+ out=std::make_unique<Sexy::MemoryImage>();out->Create(width,height);auto* bits=out->GetBits();std::fill(bits,bits+width*height,0u);
+ // Nested original cones, bottom first. Every extra cone contributes a
+ // visible rim; only the exposed top cone carries partial armour damage.
+ for(int part=0;part<count;++part){
+  auto* source=part==count-1?top:whole;const auto* in=source->GetBits();const int dy=TowerConeRise*(count-1-part);
+  for(int y=0;y<source->mHeight;++y)for(int x=0;x<std::min(width,source->mWidth);++x){
+   const unsigned s=in[y*source->mWidth+x],sa=s>>24;if(!sa||y+dy>=height)continue;
+   auto& d=bits[(y+dy)*width+x];const unsigned da=d>>24,a=sa+(da*(255-sa)+127)/255;
+   unsigned rgb=0;for(int shift:{0,8,16}){
+    const unsigned v=(((s>>shift)&255)*sa+(((d>>shift)&255)*da*(255-sa)+127)/255+a/2)/a;rgb|=v<<shift;
+   }d=(a<<24)|rgb;
+  }
+ }
+ out->BitsChanged();return out.get();
+}
 Sexy::Image* CleverHead(bool jawPose){
  static std::unique_ptr<Sexy::MemoryImage> images[2];auto& image=images[jawPose?1:0];
  if(!image){using namespace CleverHeadPixels;image=std::make_unique<Sexy::MemoryImage>();image->Create(Width,Height);

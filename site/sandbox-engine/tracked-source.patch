@@ -1304,7 +1304,7 @@ index 804aeba..76f9563 100644
  	SaveFileHeaderV4 aHeader{};
  	memcpy(aHeader.mMagic, SAVE_FILE_MAGIC_V4, sizeof(aHeader.mMagic));
 diff --git a/src/Lawn/Widget/AlmanacDialog.cpp b/src/Lawn/Widget/AlmanacDialog.cpp
-index 8fb1d2a..7c79731 100644
+index 8fb1d2a..a33723c 100644
 --- a/src/Lawn/Widget/AlmanacDialog.cpp
 +++ b/src/Lawn/Widget/AlmanacDialog.cpp
 @@ -35,12 +35,20 @@
@@ -1336,7 +1336,7 @@ index 8fb1d2a..7c79731 100644
  	mPlant->mX = aPosX;
  	mPlant->mY = aPosY;
  }
-@@ -162,7 +171,8 @@ void AlmanacDialog::SetupZombie()
+@@ -162,9 +171,13 @@ void AlmanacDialog::SetupZombie()
  
  	mZombie = std::make_unique<Zombie>();
  	mZombie->mBoard = nullptr;
@@ -1345,8 +1345,13 @@ index 8fb1d2a..7c79731 100644
 +	SandboxZombies::Assign(mZombie.get(),int(mSelectedZombie));
  	mZombie->mPosX = ALMANAC_ZOMBIE_POSITION_X;
  	mZombie->mPosY = ALMANAC_ZOMBIE_POSITION_Y;
++	// Fit the complete twenty-cone silhouette in the almanac window only.
++	// Native scaling pivots at the feet; live combat size stays untouched.
++	if (int(mSelectedZombie) == SandboxZombies::ConeTower) mZombie->mScaleZombie = 0.65f;
  }
-@@ -251,6 +261,7 @@ void AlmanacDialog::Update()
+ 
+ void AlmanacDialog::SetPage(AlmanacPage thePage)
+@@ -251,6 +264,7 @@ void AlmanacDialog::Update()
  
  ZombieType AlmanacDialog::GetZombieType(int theIndex)
  {
@@ -1354,7 +1359,7 @@ index 8fb1d2a..7c79731 100644
  	return theIndex < NUM_ZOMBIE_TYPES ? (ZombieType)theIndex : ZOMBIE_INVALID;
  }
  
-@@ -279,7 +290,7 @@ void AlmanacDialog::DrawPlants(Graphics* g)
+@@ -279,7 +293,7 @@ void AlmanacDialog::DrawPlants(Graphics* g)
  	PvzpDrawString(g, "[SUBURBAN_ALMANAC_PLANTS]", BOARD_WIDTH / 2, 48, Sexy::FONT_HOUSEOFTERROR20, Color(213, 159, 43), DrawStringJustification::DS_ALIGN_CENTER);
  
  	SeedType aSeedMouseOn = SeedHitTest(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY);
@@ -1363,7 +1368,7 @@ index 8fb1d2a..7c79731 100644
  	{
  		int aPosX, aPosY;
  		GetSeedPosition(aSeedType, aPosX, aPosY);
-@@ -293,9 +304,12 @@ void AlmanacDialog::DrawPlants(Graphics* g)
+@@ -293,9 +307,12 @@ void AlmanacDialog::DrawPlants(Graphics* g)
  			}
  			else
  			{
@@ -1378,7 +1383,7 @@ index 8fb1d2a..7c79731 100644
  			}
  		}
  	}
-@@ -335,18 +349,22 @@ void AlmanacDialog::DrawPlants(Graphics* g)
+@@ -335,18 +352,22 @@ void AlmanacDialog::DrawPlants(Graphics* g)
  	const PlantDefinition& aPlantDef = GetPlantDefinition(mSelectedSeed);
  	std::string aName = Plant::GetNameString(mSelectedSeed, SEED_NONE);
  	std::string aDescriptionName = std::format("[{}_DESCRIPTION]", aPlantDef.mPlantName);
@@ -1403,7 +1408,7 @@ index 8fb1d2a..7c79731 100644
  		);
  		aRechargeStr = PvzpReplaceString(aRechargeStr, "{WAIT_TIME}", "[WAIT_TIME]");
  		PvzpDrawStringWrapped(g, aRechargeStr, Rect(600, 520, 139, 50), Sexy::FONT_BRIANNETOD12, Color(40, 50, 90), DS_ALIGN_RIGHT);
-@@ -359,11 +377,12 @@ void AlmanacDialog::DrawZombies(Graphics* g)
+@@ -359,11 +380,12 @@ void AlmanacDialog::DrawZombies(Graphics* g)
  	PvzpDrawString(g, "[SUBURBAN_ALMANAC_ZOMBIES]", BOARD_WIDTH / 2, 54, Sexy::FONT_DWARVENTODCRAFT24, Color(0, 196, 0), DS_ALIGN_CENTER);
  
  	ZombieType aZombieMouseOn = ZombieHitTest(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY);
@@ -1417,7 +1422,7 @@ index 8fb1d2a..7c79731 100644
  		if (aZombieType != ZombieType::ZOMBIE_INVALID)
  		{
  			if (!ZombieIsShown(aZombieType))
-@@ -383,10 +402,10 @@ void AlmanacDialog::DrawZombies(Graphics* g)
+@@ -383,10 +405,10 @@ void AlmanacDialog::DrawZombies(Graphics* g)
  
  				ZombieType aZombieTypeToDraw = aZombieType;
  				Graphics aZombieGraphics = Graphics(*g);
@@ -1431,7 +1436,7 @@ index 8fb1d2a..7c79731 100644
  				switch (aZombieType)
  				{
  				case ZombieType::ZOMBIE_POLEVAULTER:
-@@ -416,7 +435,8 @@ void AlmanacDialog::DrawZombies(Graphics* g)
+@@ -416,7 +438,8 @@ void AlmanacDialog::DrawZombies(Graphics* g)
  					aZombieGraphics.SetColor(Color(0, 0, 0, 40));
  					aZombieGraphics.SetColorizeImages(true);
  				}
@@ -1441,7 +1446,7 @@ index 8fb1d2a..7c79731 100644
  				aZombieGraphics.SetColorizeImages(false);
  
  				g->DrawImage(Sexy::IMAGE_ALMANAC_ZOMBIEWINDOW2, aPosX, aPosY);
-@@ -431,6 +451,8 @@ void AlmanacDialog::DrawZombies(Graphics* g)
+@@ -431,6 +454,8 @@ void AlmanacDialog::DrawZombies(Graphics* g)
  				}
  			}
  		}
@@ -1450,7 +1455,7 @@ index 8fb1d2a..7c79731 100644
  	}
  
  	g->DrawImage(mZombie->mZombieType == ZombieType::ZOMBIE_ZAMBONI || mZombie->mZombieType == ZombieType::ZOMBIE_BOBSLED ?
-@@ -458,15 +480,16 @@ void AlmanacDialog::DrawZombies(Graphics* g)
+@@ -458,15 +483,16 @@ void AlmanacDialog::DrawZombies(Graphics* g)
  	}
  	g->DrawImage(Sexy::IMAGE_ALMANAC_ZOMBIECARD, 455, 78);
  
@@ -1470,7 +1475,7 @@ index 8fb1d2a..7c79731 100644
  		aAlign = DS_ALIGN_LEFT;
  	}
  	else
-@@ -521,26 +544,22 @@ void AlmanacDialog::Draw(Graphics* g)
+@@ -521,26 +547,22 @@ void AlmanacDialog::Draw(Graphics* g)
  
  void AlmanacDialog::GetSeedPosition(SeedType theSeedType, int& x, int& y)
  {
@@ -1502,7 +1507,7 @@ index 8fb1d2a..7c79731 100644
  				if (aSeedRect.Contains(x, y)) return aSeedType;
  			}
  		}
-@@ -560,6 +579,7 @@ bool AlmanacDialog::ZombieHasSilhouette(ZombieType theZombieType)
+@@ -560,6 +582,7 @@ bool AlmanacDialog::ZombieHasSilhouette(ZombieType theZombieType)
  
  bool AlmanacDialog::ZombieIsShown(ZombieType theZombieType)
  {
@@ -1510,7 +1515,7 @@ index 8fb1d2a..7c79731 100644
  	// trial mode only shows zombies up to the Snorkel Zombie
  	if (mApp->IsTrialStageLocked() && theZombieType > ZombieType::ZOMBIE_SNORKEL)
  		return false;
-@@ -586,6 +606,7 @@ bool AlmanacDialog::ZombieIsShown(ZombieType theZombieType)
+@@ -586,6 +609,7 @@ bool AlmanacDialog::ZombieIsShown(ZombieType theZombieType)
  
  bool AlmanacDialog::ZombieHasDescription(ZombieType theZombieType)
  {
@@ -1518,7 +1523,7 @@ index 8fb1d2a..7c79731 100644
  	int aLevel = mApp->mPlayerInfo->GetLevel();
  	int aStart = GetZombieDefinition(theZombieType).mStartingLevel;
  
-@@ -608,27 +629,23 @@ bool AlmanacDialog::ZombieHasDescription(ZombieType theZombieType)
+@@ -608,27 +632,23 @@ bool AlmanacDialog::ZombieHasDescription(ZombieType theZombieType)
  
  void AlmanacDialog::GetZombiePosition(ZombieType theZombieType, int& x, int& y)
  {

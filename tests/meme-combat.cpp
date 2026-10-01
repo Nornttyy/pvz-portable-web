@@ -15,6 +15,8 @@ Sexy::Image* NativeImage(const char*){return nullptr;}
 Sexy::Image* Phone(int){return nullptr;}
 Sexy::Image* Palm(){return nullptr;}
 Sexy::Image* CleverHead(bool){return nullptr;}
+Sexy::Image* GreenCone(int){return nullptr;}
+Sexy::Image* ConeTower(int){return nullptr;}
 bool PalmMatrix(Reanimation*,Sexy::SexyTransform2D&){return false;}
 void DrawPalm(Sexy::Graphics*,Reanimation*){}
 Sexy::Image* PhoneHands(const char*){return nullptr;}
@@ -474,7 +476,13 @@ int main(){
   SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved)&&SandboxPlants::SavePower(p)==saved);
  }
  // Every formerly modified native zombie retains its armor, position and phase.
- static_assert(SandboxZombies::Definitions.size()==6&&SandboxZombies::Find(212)->base==0&&SandboxZombies::Find(213)->base==0&&SandboxZombies::Find(214)->base==2&&SandboxZombies::Find(215)->base==24&&SandboxZombies::Find(216)->base==0&&SandboxZombies::Find(217)->base==2);
+ static_assert(SandboxZombies::Definitions.size()==8&&SandboxZombies::Find(212)->base==0&&SandboxZombies::Find(213)->base==0&&SandboxZombies::Find(214)->base==2&&SandboxZombies::Find(215)->base==24&&SandboxZombies::Find(216)->base==0&&SandboxZombies::Find(217)->base==2&&SandboxZombies::Find(218)->base==2&&SandboxZombies::Find(219)->base==2);
+ for(int id:{218,219}){World w;auto* z=w.enemy(500,2,static_cast<ZombieType>(2));SandboxZombies::Assign(z,id);
+  assert(z->mBodyHealth==270&&z->mBodyMaxHealth==270);assert(z->mHelmHealth==(id==218?740:7400));
+  assert(z->mHelmMaxHealth==z->mHelmHealth);assert(std::abs(SandboxZombies::Speed(z)-(id==218?1.f:.15f))<.0001f);
+  z->mBodyHealth=134;z->mHelmHealth=321;SandboxZombies::Forget(z);assert(SandboxZombies::Restore(z,id));assert(z->mBodyHealth==134&&z->mHelmHealth==321);
+ }
+ for(int hp=0;hp<=7400;++hp){const int n=SandboxZombies::TowerCount(hp);assert(n==(hp+369)/370);assert(SandboxZombies::TowerTopHealth(hp)==(n?hp-(n-1)*370:0));}
  for(int id=200;id<212;++id)assert(!SandboxZombies::Find(id));
  {World w;auto* z=w.enemy(600,1,ZOMBIE_IMP);z->mBodyHealth=173;SandboxZombies::Assign(z,215);
   assert(SandboxZombies::IsGiantImp(z)&&z->mBodyHealth==173&&SandboxZombies::Speed(z)==1);

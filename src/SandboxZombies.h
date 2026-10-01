@@ -30,16 +30,25 @@ constexpr float SlowFlipProgress(float t){
  const float u=t*4;return u*(.375f+u*(.43f-.385f*u));
 }
 inline constexpr float CleverSpeed=1.25f,CleverFleeSpeed=3.0f;
-inline constexpr std::array<Definition,6> Definitions{{
+inline constexpr int GreenCone=218,GreenConeUnlock=27,ConeTower=219,ConeTowerUnlock=32;
+inline constexpr int TowerCones=20,TowerConeRise=6;
+inline constexpr float ConeTowerSpeed=.15f;
+inline constexpr std::array<Definition,8> Definitions{{
  {Louis,0,"路易十六","天生无头，照常走路啃咬。",nullptr,270,0,LouisUnlock},
  {Runner,0,"跑路僵尸","冲到后排，转身就跑。",nullptr,270,0,RunnerUnlock},
  {ConeWrap,2,"雪糕桶包裹我","20桶组成，7桶耐久。",nullptr,270,ConeCount*ConeHealth,ConeWrapUnlock},
  {GiantImp,24,"巨人小鬼","巨人头，小鬼身。一击秒杀植物。",nullptr,270,0,GiantImpUnlock},
  {Clever,0,"智斗僵尸","70%翻身闪弹，30%换路。翻身时10%前飞两格，偷完就跑。",nullptr,270,0,CleverUnlock},
- {CleverCone,2,"路障智斗僵尸","戴路障的智斗僵尸。入水套泳圈，偷完就跑。",nullptr,270,ConeHealth,CleverConeUnlock}
+ {CleverCone,2,"路障智斗僵尸","戴路障的智斗僵尸。入水套泳圈，偷完就跑。",nullptr,270,ConeHealth,CleverConeUnlock},
+ {GreenCone,2,"绿路障僵尸","绿色路障，双倍耐久。",nullptr,270,2*ConeHealth,GreenConeUnlock},
+ {ConeTower,2,"路障叠叠高僵尸","头顶20个路障。极慢，极耐打，无法游泳。",nullptr,270,TowerCones*ConeHealth,ConeTowerUnlock}
 }};
 constexpr const Definition* Find(int id){for(const auto& d:Definitions)if(d.id==id)return &d;return nullptr;}
 constexpr int Base(int id){auto* d=Find(id);return d?d->base:id;}
+constexpr bool WaterAllowed(int id){return id!=ConeTower;}
+constexpr int ConeVariantWave(int level,int base,int wave,bool water){return base!=2||wave<1?-1:level>=ConeTowerUnlock&&wave%8==1&&!water?ConeTower:level>=GreenConeUnlock&&wave%4==0?GreenCone:-1;}
+constexpr int TowerCount(int armor){return armor<=0?0:armor>=TowerCones*ConeHealth?TowerCones:(armor+ConeHealth-1)/ConeHealth;}
+constexpr int TowerTopHealth(int armor){return TowerCount(armor)?armor-(TowerCount(armor)-1)*ConeHealth:0;}
 constexpr bool LouisWave(int level,int base,int wave){return level>=LouisUnlock&&base==0&&wave>=0&&wave%3==0;}
 constexpr bool RunnerWave(int level,int base,int wave){return level>=RunnerUnlock&&base==0&&wave>=0&&wave%4==1;}
 constexpr bool ConeWrapWave(int level,int base,int wave){return level>=ConeWrapUnlock&&base==2&&wave>=3&&wave%4==3;}

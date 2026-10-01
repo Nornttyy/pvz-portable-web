@@ -52,6 +52,11 @@ void OnPlanted(Plant* p){
 void OnZombieSpawned(Zombie* z){
  // Introduce originals gradually; previews, specials and tutorials stay native.
  if(!RosterEnabled()||!z||!z->mBoard||!z->IsOnBoard())return;
+ const int coneVariant=SandboxZombies::ConeVariantWave(z->mBoard->mLevel,int(z->mZombieType),z->mFromWave,z->mBoard->IsPoolSquare(0,z->mRow));
+ if(coneVariant>=0){
+  bool exists=false;for(auto* other:z->mBoard->mZombies)if(other!=z&&SandboxZombies::Type(other)==coneVariant&&other->mFromWave==z->mFromWave)exists=true;
+  if(!exists){SandboxZombies::Assign(z,coneVariant);return;}
+ }
  const int clever=SandboxZombies::CleverWave(z->mBoard->mLevel,int(z->mZombieType),z->mFromWave);
  if(clever>=0){
   bool exists=false;for(auto* other:z->mBoard->mZombies)if(other!=z&&SandboxZombies::Type(other)==clever&&other->mFromWave==z->mFromWave)exists=true;
