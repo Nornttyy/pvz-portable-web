@@ -26,6 +26,7 @@
 #include "Board.h"
 #include "../ConstEnums.h"
 #include "Zombie.h"
+#include "../StinkShroom.h"
 #include "Cutscene.h"
 #include "GridItem.h"
 #include "LawnMower.h"
@@ -4379,7 +4380,7 @@ void Zombie::Update()
 		}
 		else
 		{
-			if (mPhaseCounter > 0 && !IsImmobilizied() && !SandboxZombies::HasInteraction(this))
+			if (mPhaseCounter > 0 && !IsImmobilizied() && !SandboxZombies::HasInteraction(this) && !StinkShroom::Controls(this))
 			{
 				mPhaseCounter--;
 			}
@@ -4675,6 +4676,7 @@ void Zombie::UpdatePlaying()
 		}
 	}
 
+	if (StinkShroom::UpdateZombie(this)) return;
 	if (SandboxZombies::UpdateInteraction(this)) return;
 	if (mZombiePhase == ZombiePhase::PHASE_RISING_FROM_GRAVE)
 	{
@@ -5117,6 +5119,7 @@ void Zombie::DrawZombie(Graphics* g, const ZombieDrawPosition& theDrawPos)
 
 bool Zombie::IsWalkingBackwards()
 {
+	if (StinkShroom::Fleeing(this)) return true;
 	if (SandboxZombies::IsRetreating(this)) return true;
 	if (mMindControlled)
 		return true;
@@ -6638,7 +6641,7 @@ void Zombie::CheckSquish(ZombieAttackType theAttackType)
 
 bool Zombie::IsImmobilizied()
 {
-	return mIceTrapCounter > 0 || mButteredCounter > 0;
+	return mIceTrapCounter > 0 || mButteredCounter > 0 || StinkShroom::Stunned(this);
 }
 
 bool Zombie::IsMovingAtChilledSpeed()
@@ -7499,6 +7502,7 @@ void Zombie::BungeeDie()
 
 void Zombie::DieNoLoot()
 {
+	StinkShroom::Forget(this);
 	StopZombieSound();
 	AttachmentDie(mAttachmentID);
 	mApp->RemoveReanimation(mBodyReanimID);

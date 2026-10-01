@@ -27,6 +27,7 @@
 #include "../../LawnApp.h"
 #include "../../Sandbox.h"
 #include "../../MemeAdventure.h"
+#include "../../StinkShroom.h"
 #include "../CursorObject.h"
 #include "../../Resources.h"
 #include "../../ConstEnums.h"
@@ -94,7 +95,8 @@ enum SaveChunkTypeV4
 	SAVE4_CHUNK_MUSIC = 20,
 	SAVE4_CHUNK_MEME_POWERS = 21,
 	SAVE4_CHUNK_MEME_PROJECTILES = 22,
-	SAVE4_CHUNK_MEME_ZOMBIES = 23
+	SAVE4_CHUNK_MEME_ZOMBIES = 23,
+	SAVE4_CHUNK_STINK_STATUS = 24
 };
 
 static constexpr const uint32_t SAVE4_CHUNK_VERSION = 1U;
@@ -1998,6 +2000,21 @@ static void SyncMemeZombiesPortable(PortableSaveContext& c,Board* board)
 	if(c.mReading&&!c.mFailed)MemeAdventure::LoadZombies(save.zombies);
 }
 
+// Optional status extension. Original plant/zombie layouts and old saves stay intact.
+static void SyncStinkStatusPortable(PortableSaveContext& c,Board* board)
+{
+	auto save=c.mReading?StinkShroom::Save{}:StinkShroom::Capture(board);
+	int plants=static_cast<int>(save.plants.size());c.SyncInt32(plants);
+	if(plants<0||plants>1024){c.mFailed=true;return;}
+	if(c.mReading)save.plants.resize(plants);
+	for(auto& p:save.plants){c.SyncUInt32(p.key);c.SyncInt32(p.exposure);}
+	int zombies=static_cast<int>(save.zombies.size());c.SyncInt32(zombies);
+	if(zombies<0||zombies>1024){c.mFailed=true;return;}
+	if(c.mReading)save.zombies.resize(zombies);
+	for(auto& z:save.zombies){c.SyncUInt32(z.key);c.SyncInt32(z.stun);c.SyncInt32(z.push);c.SyncInt32(z.flee);c.SyncInt32(z.stepMilli);}
+	if(c.mReading&&!c.mFailed)StinkShroom::Load(save);
+}
+
 static ChunkSyncFn GetChunkSyncFn(uint32_t theChunkType)
 {
 	switch (theChunkType)
@@ -2048,6 +2065,8 @@ static ChunkSyncFn GetChunkSyncFn(uint32_t theChunkType)
 		return SyncMemeProjectilesPortable;
 	case SAVE4_CHUNK_MEME_ZOMBIES:
 		return SyncMemeZombiesPortable;
+	case SAVE4_CHUNK_STINK_STATUS:
+		return SyncStinkStatusPortable;
 	default:
 		return nullptr;
 	}
@@ -2331,6 +2350,7 @@ static bool LawnLoadGameV4(Board* theBoard, const std::string& theFilePath)
 
 	FixBoardAfterLoad(theBoard);
 	MemeAdventure::Restore(theBoard);
+	StinkShroom::Restore(theBoard);
 	theBoard->mApp->mGameScene = GameScenes::SCENE_PLAYING;
 	return true;
 }
@@ -2800,6 +2820,7 @@ static void SyncBoard(SaveGameContext& theContext, Board* theBoard)
 
 bool LawnLoadGame(Board* theBoard, const std::string& theFilePath)
 {
+	StinkShroom::Reset();
 	MemeAdventure::Reset();
 	SandboxPlants::Reset();
 	if (LawnLoadGameV4(theBoard, theFilePath))
@@ -2862,6 +2883,7 @@ bool LawnSaveGame(Board* theBoard, const std::string& theFilePath)
 	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_MEME_POWERS, theBoard)) return false;
 	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_MEME_PROJECTILES, theBoard)) return false;
 	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_MEME_ZOMBIES, theBoard)) return false;
+	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_STINK_STATUS, theBoard)) return false;
 
 	SaveFileHeaderV4 aHeader{};
 	memcpy(aHeader.mMagic, SAVE_FILE_MAGIC_V4, sizeof(aHeader.mMagic));

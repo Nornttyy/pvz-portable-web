@@ -19,6 +19,12 @@ std::string_view plant(int id){return MemeCharacters::Find(id)->description;}
 int main(){
  using namespace MemeCharacters;
  using namespace MemeShooterRules;
+ includes(plant(StinkShroom),"伤害"+number(StinkShroomRules::Damage));
+ includes(plant(StinkShroom),"每"+number(StinkShroomRules::Interval/100.0)+"秒喷射");
+ includes(plant(StinkShroom),"眩晕"+number(StinkShroomRules::StunTicks/100.0)+"秒");
+ includes(plant(StinkShroom),"普通"+number(StinkShroomRules::PushNormal/80.0)+"格 / 巨人"+number(StinkShroomRules::PushGiant/80.0)+"格");
+ includes(plant(StinkShroom),"待"+number(StinkShroomRules::Exposure/100.0)+"秒");
+ includes(plant(StinkShroom),"冷却"+number(PlantingCooldown(StinkShroom)/100.0)+"秒");
  includes(plant(NukeShroom),"全屏爆炸"+number(NukeShroomRules::Pulses)+"次");
  includes(plant(NukeShroom),"间隔"+number(NukeShroomRules::Interval/100.0)+"秒");
  includes(plant(NukeShroom),"留下3×3大坑");

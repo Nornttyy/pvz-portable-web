@@ -164,6 +164,7 @@ export const ORIGINAL_PLANTS = [
   [524,26,'仙人的掌','5秒一掌 · 80伤害 · 20%暴击'],
   [525,8,'真·小喷菇','同格最多5只 · 冷却2秒 · 伤害10'],
   [526,15,'核爆菇','全屏五连爆 · 留下3×3大坑'],
+  [527,10,'喷粪菇','深棕喷射 · 周围植物也犯恶心'],
 ].map(([id,base,name,note])=>({id,base,name,note}));
 export const nativeBase = id => ORIGINAL_PLANTS.find(p=>p.id===id)?.base ?? RETIRED_CHARACTERS.find(p=>p.id===id)?.base ?? RETIRED_PLANTS.find(p=>p.id===id)?.base ?? id;
 export const PLANTS = [...plantNames.map((name,id) => ORIGINAL_PLANTS.find(p=>p.base===id) ?? ({id,name,note:notes[id] ?? '免费 · 无冷却'})),...ORIGINAL_PLANTS.filter(p=>p.base>=48)];

@@ -2,8 +2,26 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Ten abstract plants and eight independent zombies (212..219). Nuclear Shroom replaces native Doom-shroom: five full-board green explosions, a persistent 3x3 crater, 250 sun and a 30-second planting recharge. Adventure and sandbox share the same replacement. Other combat, progression and saves are preserved.",
-  "almanacCopy": "All ten original plants and eight original zombies show explicit numeric statistics separately from surreal character-specific flavour text. Native cost/recharge footer and full supplemental Chinese glyphs.",
+  "mode": "Eleven abstract plants and eight independent zombies (212..219). Stink Shroom replaces native Fume-shroom with dark brown, two-second piercing sprays, nausea, fleeing and knockback, plus a delayed neighbouring plant production/attack penalty. Nuclear Shroom keeps its five green blasts and 3x3 crater. Adventure and sandbox share replacements; other progression and saves are preserved.",
+  "almanacCopy": "All eleven original plants and eight original zombies show explicit numeric statistics separately from surreal character-specific flavour text. Native cost/recharge footer and full supplemental Chinese glyphs.",
+  "stinkShroom": {
+    "id": 527,
+    "nativeSlot": 10,
+    "name": "喷粪菇",
+    "cost": 75,
+    "rechargeTicks": 750,
+    "intervalTicks": 200,
+    "damage": 20,
+    "hitRoll": "One mutually exclusive roll per struck ground walker: 50% stun, 5% flee, 10% knockback, 35% normal hit",
+    "stunTicks": 50,
+    "knockbackTiles": {
+      "normal": 0.5,
+      "giant": 0.2
+    },
+    "aura": "Eight surrounding cells, 2000 continuous exposure ticks, production and attack frequency reduced by 30%; no stacking, restores immediately when no awake source is nearby",
+    "art": "Native fume rig and cloud textures, dark brown particle tint; short reused odor wisps and native disgust SFX, no floating text",
+    "save": "Optional portable chunk 24 retains exposure, stun, continuous push and fleeing without changing native object layouts"
+  },
   "nukeShroom": {
     "id": 526,
     "nativeSlot": 15,
@@ -164,13 +182,13 @@
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 278999,
-      "sha256": "16d27614ce9fac626121caab9d3b3d90bbe891bb8b15ff0486f748907fcffc1e"
+      "size": 279075,
+      "sha256": "852bf96d06b0570b9cb259cdf9e4ea4010d316b9c4293be44d967f9d0d18aa78"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7859972,
-      "sha256": "70f9515b3b19dbb990a311920be323f41bed0eafead49f71d31aa8297eac29d0"
+      "size": 7904459,
+      "sha256": "7c577e1ce607539ee80e2ba868aec37b79bce44bdef8f191a63e49edd02f5f62"
     }
   ]
 }

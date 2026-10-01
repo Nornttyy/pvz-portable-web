@@ -22,6 +22,7 @@
 #include "Coin.h"
 #include "Plant.h"
 #include "../NukeShroom.h"
+#include "../StinkShroom.h"
 #include "Board.h"
 #include "Zombie.h"
 #include "Cutscene.h"
@@ -723,6 +724,7 @@ void Plant::DoRowAreaDamage(int theDamage, unsigned int theDamageFlags)
 				}
 
 				aZombie->TakeDamage(aDamage, theDamageFlags);
+				StinkShroom::Hit(this,aZombie);
 				mApp->PlayFoley(FoleyType::FOLEY_SPLAT);
 			}
 		}
@@ -960,6 +962,7 @@ void Plant::StarFruitFire()
 
 void Plant::UpdateShooter()
 {
+	if (!StinkShroom::WorkTick(this)) return;
 	if (MemeCharacters::Type(this) == MemeCharacters::CactusPalm) return; // Exact five-second clock; raising must not create a free shot.
 	if (mLaunchCounter<=1 && !SandboxPlants::NativeCanAct(this)) return;
 	// Let an existing native shooting animation finish before starting another.
@@ -967,7 +970,7 @@ void Plant::UpdateShooter()
 	mLaunchCounter--;
 	if (mLaunchCounter <= 0)
 	{
-		mLaunchCounter = mLaunchRate - Sexy::Rand(15);
+		mLaunchCounter = MemeCharacters::Type(this)==MemeCharacters::StinkShroom ? StinkShroomRules::Interval : mLaunchRate - Sexy::Rand(15);
 
 		if (mSeedType == SeedType::SEED_THREEPEATER)
 		{
@@ -1023,6 +1026,7 @@ bool Plant::MakesSun()
 
 void Plant::UpdateProductionPlant()
 {
+	if (!StinkShroom::WorkTick(this)) return;
 	if (MemeCharacters::Is(this) && !MemeCharacters::Producing(this)) return;
 	if (!IsInPlay() || mApp->IsIZombieLevel() || mApp->mGameMode == GameMode::GAMEMODE_UPSELL || mApp->mGameMode == GameMode::GAMEMODE_INTRO)
 		return;
@@ -2556,6 +2560,7 @@ void Plant::UpdateAbilities()
 {
 	if (!IsInPlay())
 		return;
+	StinkShroom::UpdatePlant(this);
 
 	if (mState == PlantState::STATE_DOINGSPECIAL || mSquished)
 	{
@@ -3257,7 +3262,8 @@ void Plant::UpdateShooting()
 	if (mSeedType == SeedType::SEED_FUMESHROOM && mShootingCounter == 15)
 	{
 		int aRenderPosition = Board::MakeRenderOrder(RenderLayer::RENDER_LAYER_PARTICLE, mRow, 0);
-		AddAttachedParticle(mX + 85, mY + 31, aRenderPosition, ParticleEffect::PARTICLE_FUMECLOUD);
+		auto* cloud=AddAttachedParticle(mX + 85, mY + 31, aRenderPosition, ParticleEffect::PARTICLE_FUMECLOUD);
+		if (cloud && MemeCharacters::Type(this)==MemeCharacters::StinkShroom) cloud->OverrideColor(nullptr,Color(125,93,44));
 	}
 
 	if (mSeedType == SeedType::SEED_GLOOMSHROOM)
@@ -5043,6 +5049,7 @@ int Plant::DistanceToClosestZombie()
 
 void Plant::Die()
 {
+	StinkShroom::Forget(this);
 	SandboxPlants::Forget(this);
 	if (IsOnBoard() && mSeedType == SeedType::SEED_TANGLEKELP)
 	{

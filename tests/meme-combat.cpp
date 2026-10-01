@@ -35,6 +35,11 @@ struct World:Board {
  void step(int count=1){while(count--){SandboxPlants::Tick(this);SandboxZombies::Tick(this);if(!mPaused)++mMainCounter;}}
 };
 int main(){
+ {World w;auto* p=w.add(MemeCharacters::StinkShroom);assert(p->mLaunchCounter==200&&p->mLaunchRate==200);
+  p->mLaunchCounter=83;p->mShootingCounter=18;w.step(30);const auto record=SandboxPlants::SavePower(p);
+  SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,record));assert(p->mLaunchCounter==83&&p->mShootingCounter==18&&p->mLaunchRate==200);
+ }
+ {World w;auto* p=w.add(500);w.enemy();StinkShroom::allowWork=false;w.step(500);assert(w.mProjectiles.mSize==0);StinkShroom::allowWork=true;w.step(200);assert(w.mProjectiles.mSize>0);}
  // Nuclear shroom owns visuals only; native sleep and detonation clocks survive.
  {World w;auto* p=w.add(MemeCharacters::NukeShroom);p->mPlantHealth=217;p->mShootingCounter=11;p->mLaunchCounter=29;
   w.step(60);const auto record=SandboxPlants::SavePower(p);assert(record[0]==526&&record[6]==60&&p->mShootingCounter==11&&p->mLaunchCounter==29);
@@ -482,7 +487,7 @@ int main(){
  }
 
  // Removed originals cannot be assigned, restored or re-entered through legacy powers.
- static_assert(MemeCharacters::Definitions.size()==10&&SandboxPlants::Definitions.size()==10);
+ static_assert(MemeCharacters::Definitions.size()==11&&SandboxPlants::Definitions.size()==11);
  {World w;auto* p=w.add(519);const int x=p->mX,y=p->mY;w.step(100);assert(w.mProjectiles.mSize==0);
   auto* z=w.enemy();w.step();assert(w.mProjectiles.mSize==1);w.step(149);assert(w.mProjectiles.mSize==1);w.step();assert(w.mProjectiles.mSize==2);
   auto* shot=w.mProjectiles.values[0];assert(shot->mVelX>0&&shot->mVelY==0&&shot->mMotionType==MOTION_STAR);

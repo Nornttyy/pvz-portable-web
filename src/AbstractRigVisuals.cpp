@@ -4,6 +4,7 @@
 #include "MemeShooterRules.h"
 #include "SandboxArt.h"
 #include "SandboxZombies.h"
+#include "StinkShroom.h"
 #include "ConeBodyRules.h"
 #include "Resources.h"
 #include "graphics/Image.h"
@@ -89,6 +90,15 @@ Scope::Scope(Zombie* z):mark(poses.size()){
  if(SandboxZombies::IsClever(z)&&z->mHasHead&&!z->mDead)CleverPose(*this,gLawnApp->ReanimationTryToGet(z->mBodyReanimID),SandboxZombies::ShowsCleverJaw(z));
  if(SandboxZombies::IsConeWrap(z))ConePose(*this,gLawnApp->ReanimationTryToGet(z->mBodyReanimID),z->mHelmHealth);
  if(SandboxZombies::IsGiantImp(z))GiantImpPose(*this,gLawnApp->ReanimationTryToGet(z->mBodyReanimID),int(z->mZombiePhase)==SandboxZombies::JawSmash?z->mPhaseCounter:0);
+ // Reuse the native disgust face for the half-second nausea, without starting
+ // garlic's lane-changing state or leaving shared/serialized texture overrides.
+ if(StinkShroom::Stunned(z)&&z->mHasHead&&z->HasYuckyFaceImage()&&!SandboxZombies::IsLouis(z)&&!SandboxZombies::IsConeWrap(z)&&!SandboxZombies::IsClever(z)){
+  if(auto* a=gLawnApp->ReanimationTryToGet(z->mBodyReanimID))for(int i=0;i<a->mDefinition->mTracks.count;++i){
+   const std::string_view name=a->mDefinition->mTracks.tracks[i].mName;auto* track=&a->mTrackInstances[i];
+   if(name=="anim_head1"){images.push_back({track,track->mImageOverride});track->mImageOverride=Sexy::IMAGE_REANIM_ZOMBIE_HEAD_GROSSOUT;}
+   if(name=="anim_head2"||name=="anim_head_jaw"||name=="anim_tongue"){groups.push_back({track,track->mRenderGroup});track->mRenderGroup=RENDER_GROUP_HIDDEN;}
+  }
+ }
 }
 Scope::Scope(Reanimation* a,int type):mark(poses.size()){
  if(type==SandboxZombies::GreenCone||type==SandboxZombies::ConeTower)ConeHatPose(*this,a,type,SandboxZombies::Find(type)->armor);

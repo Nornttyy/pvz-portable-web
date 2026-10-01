@@ -7,6 +7,8 @@
 #include <string>
 #include <algorithm>
 #include <cstdint>
+class Plant;class Zombie;
+namespace StinkShroom {inline bool allowWork=true;inline const Zombie* nauseated=nullptr;inline bool WorkTick(const Plant*){return allowWork;}inline bool Stunned(const Zombie* z){return z==nauseated;}}
 enum SeedType {SEED_PEASHOOTER=0,SEED_SUNFLOWER=1,SEED_LILYPAD=16,SEED_IMITATER=48,SEED_SMALL_NUT=53,SEED_NONE=-1};
 enum ZombieType {ZOMBIE_NORMAL=0,ZOMBIE_IMP=24,ZOMBIE_GARGANTUAR=23,ZOMBIE_REDEYE_GARGANTUAR=32,ZOMBIE_ZAMBONI=12};
 enum ZombieID : unsigned { ZOMBIEID_NULL=0 };
@@ -47,6 +49,7 @@ struct Graphics{
  void DrawImage(Image*,Rect,Rect){};
 };
 inline Image* IMAGE_SEEDS=nullptr;inline int FONT_BRIANNETOD12=0;
+inline Image grossFace;inline Image* IMAGE_REANIM_ZOMBIE_HEAD_GROSSOUT=&grossFace;
 inline Image* IMAGE_PROJECTILEPEA=nullptr;
 }
 struct Track{const char* mName="";};
@@ -86,6 +89,7 @@ public:
  void ReanimIgnoreClipRect(const char*,bool){}void SetupWaterTrack(const char*){}void CheckForBoardEdge(){if(mPosX>850)mDead=true;}
  int mPhaseCounter=0,mShieldHealth=0,mShieldMaxHealth=0,mShieldType=0,mZombieAge=0,mFromWave=0;float mAltitude=0;bool flying=false;
  bool IsFlying(){return flying;}
+ bool HasYuckyFaceImage(){return mZombieType==ZOMBIE_NORMAL;}
  Sexy::Rect GetZombieAttackRect(){auto r=mZombieAttackRect;r.mX+=int(mPosX);r.mY+=int(mPosY);return r;}
  void StopEating(){mIsEating=false;}void AttachShield(){}void PickRandomSpeed(){}
  void SetRow(int row){mRow=row;}

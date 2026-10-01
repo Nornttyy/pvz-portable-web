@@ -1,4 +1,6 @@
 #include "ConstEnums.h"
+class Plant;
+namespace StinkShroom {bool work=true;bool WorkTick(const Plant*){return work;}}
 #include <algorithm>
 #include <cassert>
 #include <iostream>
@@ -37,6 +39,10 @@ int PvzpAnimateCurve(int,int,int,int,int,PvzpCurves){return 0;}
 namespace Sexy {int Rand(int){return 50;}}
 // The runner appends the actual production/growth/value implementations.
 int main(){
+ {Plant p;p.mLaunchCounter=2500;
+  for(int tick=0;tick<1000;++tick){StinkShroom::work=tick%10>=3;p.UpdateProductionPlant();}
+  assert(p.mLaunchCounter==1100&&p.board.coins.empty());StinkShroom::work=true;
+ }
  {Plant p;p.mSeedType=SEED_SUNFLOWER;p.meme=true;p.UpdateProductionPlant();
   assert(p.board.coins.size()==1&&p.board.coins[0].GetSunValue()==25);
   p.UpdateProductionPlant();assert(p.mLaunchCounter==2498);

@@ -15,6 +15,13 @@
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
+ {Board b;SandboxZombies::Reset();auto* z=b.AddZombieInRow(ZOMBIE_NORMAL,2,-1);Reanimation body;Track tracks[]={{"anim_head1"},{"anim_head2"},{"anim_head_jaw"},{"Zombie_body"}};TrackInstance instances[4];body.def.mTracks={4,tracks};body.mTrackInstances=instances;
+  auto* original=SandboxArt::NativeImage("Zombie_head.png");for(auto& i:instances)i.mImageOverride=original;app.reanims[98]=&body;z->mBodyReanimID=98;
+  StinkShroom::nauseated=z;{AbstractRigVisuals::Scope scope(z);assert(instances[0].mImageOverride==Sexy::IMAGE_REANIM_ZOMBIE_HEAD_GROSSOUT);assert(instances[1].mRenderGroup==RENDER_GROUP_HIDDEN&&instances[2].mRenderGroup==RENDER_GROUP_HIDDEN);assert(instances[3].mImageOverride==original);}
+  for(auto& i:instances)assert(i.mImageOverride==original&&i.mRenderGroup==RENDER_GROUP_NORMAL);
+  SandboxZombies::Assign(z,212);{AbstractRigVisuals::Scope scope(z);assert(instances[0].mImageOverride==original);} // Never regrow Louis's head.
+  StinkShroom::nauseated=nullptr;app.reanims.erase(98);SandboxZombies::Reset();
+ }
  // Energy recolouring must not detach a head or leak into ordinary previews.
  {Reanimation body;Track tracks[]={{"DoomShroom_head1"},{"other"}};TrackInstance instances[2];body.def.mTracks={2,tracks};body.mTrackInstances=instances;
   auto* source=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::NativeImage("DoomShroom_head1.png"));source->bits[0]=0xff151515;source->bits[1]=0x00808080;

@@ -30,6 +30,7 @@
 #include "../SandboxUIRules.h"
 #include "../SandboxPlants.h"
 #include "../NukeShroom.h"
+#include "../StinkShroom.h"
 #include "../SandboxZombies.h"
 #include "LawnCommon.h"
 #include "System/Music.h"
@@ -77,6 +78,7 @@ bool gShownMoreSunTutorial = false;
 
 Board::Board(LawnApp* theApp)
 {
+	StinkShroom::Reset();
 	mApp = theApp;
 	mApp->mBoard = this;
 
@@ -6353,6 +6355,7 @@ void Board::DrawGameObjects(Graphics* g)
         case RENDER_ITEM_SANDBOX_EFFECTS:
             SandboxPlants::DrawEffects(g,this,aRenderItem.mBoardGridY);
             SandboxZombies::DrawEffects(g,this,aRenderItem.mBoardGridY);
+            StinkShroom::DrawEffects(g,this,aRenderItem.mBoardGridY);
             break;
 		case RenderObjectType::RENDER_ITEM_PLANT:
 		{
