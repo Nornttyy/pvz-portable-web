@@ -8,6 +8,10 @@ const browser=await chromium.launch({executablePath:'/Applications/Google Chrome
 const page=await browser.newPage({viewport:{width:1100,height:750}}),errors=[],pages=[];page.on('pageerror',e=>errors.push(e.message));
 async function click(x,y){const b=await page.locator('#canvas').boundingBox(),s=await page.evaluate(()=>[Module.canvas.width,Module.canvas.height]);await page.mouse.click(b.x+x*b.width/s[0],b.y+y*b.height/s[1]);await page.waitForTimeout(220);}
 const snap=name=>page.screenshot({path:join(out,name+'.png')});
+async function phoneSnap(name){
+ await page.setViewportSize({width:844,height:390});await page.waitForTimeout(250);await snap(name+'-phone');
+ await page.setViewportSize({width:1100,height:750});await page.waitForTimeout(250);
+}
 try{
  await page.goto(process.env.PVZ_QA_URL||'http://127.0.0.1:8097/');await page.waitForFunction(()=>!document.getElementById('start').disabled,undefined,{timeout:90000});
  await page.evaluate(async()=>{
@@ -23,9 +27,10 @@ try{
  for(const [id,base]of [[500,0],[501,3],[519,52],[520,1],[521,7],[522,40],[523,53],[524,26]]){
   const slot=base===52?8:base===53?9:base>=8?base+2:base;
   await click(48+slot%9*46,123+Math.floor(slot/9)*76);await snap('plant-'+id);pages.push(id);
+  if(id===500||id===524)await phoneSnap('plant-'+id);
  }
  await click(110,580);await click(590,366);
- for(let i=0;i<8;++i){const slot=26+i;await click(53+slot%6*71,117+Math.floor(slot/6)*80);await snap('zombie-'+(212+i));pages.push(212+i);}
+ for(let i=0;i<8;++i){const slot=26+i;await click(53+slot%6*71,117+Math.floor(slot/6)*80);await snap('zombie-'+(212+i));pages.push(212+i);if(i===4||i===5)await phoneSnap('zombie-'+(212+i));}
  await page.setViewportSize({width:844,height:390});await page.waitForTimeout(500);await snap('phone');
  assert.deepEqual(errors,[]);assert.equal(pages.length,16);
  await writeFile(join(out,'report.json'),JSON.stringify({pages,errors},null,2));console.log('All sixteen almanac pages captured',out);

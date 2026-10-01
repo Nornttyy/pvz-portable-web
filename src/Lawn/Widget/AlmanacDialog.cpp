@@ -362,14 +362,14 @@ void AlmanacDialog::DrawPlants(Graphics* g)
 		PvzpDrawStringWrapped(g, aCostStr, Rect(485, 520, 134, 50), Sexy::FONT_BRIANNETOD12, Color::White, DS_ALIGN_LEFT);
 
 		const std::string aWaitTime = MemeAdventure::Replacement(int(mSelectedSeed)) ?
-			std::format("{} 秒", Plant::GetRefreshTime(mSelectedSeed, SEED_NONE) / 100) :
+			std::format("{:g} 秒", Plant::GetRefreshTime(mSelectedSeed, SEED_NONE) / 100.0) :
 			aPlantDef.mRefreshTime == 750 ? "[WAIT_TIME_SHORT]" : aPlantDef.mRefreshTime == 3000 ? "[WAIT_TIME_LONG]" : "[WAIT_TIME_VERY_LONG]";
 		std::string aRechargeStr = PvzpReplaceString(
 			"{KEYWORD}{WAIT_TIME}: {STAT}{WAIT_TIME_LENGTH}",
 			"{WAIT_TIME_LENGTH}",
 			aWaitTime
 		);
-		aRechargeStr = PvzpReplaceString(aRechargeStr, "{WAIT_TIME}", "[WAIT_TIME]");
+		aRechargeStr = PvzpReplaceString(aRechargeStr, "{WAIT_TIME}", MemeAdventure::Replacement(int(mSelectedSeed)) ? "种植冷却" : "[WAIT_TIME]");
 		PvzpDrawStringWrapped(g, aRechargeStr, Rect(600, 520, 139, 50), Sexy::FONT_BRIANNETOD12, Color(40, 50, 90), DS_ALIGN_RIGHT);
 	}
 }

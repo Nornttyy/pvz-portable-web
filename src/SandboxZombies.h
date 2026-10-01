@@ -34,14 +34,14 @@ inline constexpr int GreenCone=218,GreenConeUnlock=27,ConeTower=219,ConeTowerUnl
 inline constexpr int TowerCones=20,TowerConeRise=6;
 inline constexpr float ConeTowerSpeed=.15f;
 inline constexpr std::array<Definition,8> Definitions{{
- {Louis,0,"路易十六","出场就没有头，照常走路啃咬。\n\n别人来草地是为了吃脑子，他是来找售后。出发前清点装备时，漏数了自己。",nullptr,270,0,LouisUnlock},
- {Runner,0,"跑路僵尸","冲到后排，马上转身逃跑。\n\n他不是来吃脑子的，是来检查你有没有手忙脚乱。看见你把阳光花光，他就满意地回去了。",nullptr,270,0,RunnerUnlock},
- {ConeWrap,2,"雪糕桶包裹我","20个雪糕桶组成身体，7个桶的耐久。\n\n打开一个桶，里面还是桶。你问僵尸在哪？他问你：我都包裹成这样了，还能看出是我？",nullptr,270,ConeCount*ConeHealth,ConeWrapUnlock},
- {GiantImp,24,"巨人小鬼","小鬼的身体，巨人的头，下颚一击秒杀植物。\n\n身高不够，下巴来凑。别的小鬼靠巨人扔，他靠巨人脸。植物刚想笑他的个头，就被下巴打断了。",nullptr,270,0,GiantImpUnlock},
- {Clever,0,"智斗僵尸","翻身时60%换行、30%前飞两格，遇到植物就偷走。\n\n战术一：别打到我。战术二：把你的植物变成我的植物。至于下颚线，那是他的第三道防线。",nullptr,270,0,CleverUnlock},
- {CleverCone,2,"路障智斗僵尸","智斗僵尸的路障版，会闪避、换行和偷植物。\n\n他认为路障能增加智商。实测只增加了耐久，但他坚持认为是测试的人不够聪明。",nullptr,270,ConeHealth,CleverConeUnlock},
- {GreenCone,2,"绿路障僵尸","绿色路障，耐久是普通路障的两倍。\n\n别人头上的叫路障，他头上的叫安全感。至于为什么是绿的，他说这个问题没有讨论的必要。",nullptr,270,2*ConeHealth,GreenConeUnlock},
- {ConeTower,2,"路障叠叠高僵尸","头顶20个路障，极慢，耐久极高，无法游泳。\n\n队友都到门口了，他还在等最上面那个路障出发。别问为什么不下水，20个路障都说自己不会游。",nullptr,270,TowerCones*ConeHealth,ConeTowerUnlock}
+ {Louis,0,"路易十六","生命270 / 护甲0\n正常移速，啃食100伤害/秒\n出场无头，不因无头持续掉血\n\n{KEYWORD}脑子落在家里了，家也忘在哪了。报名啃脑培训，表格要求从头写起，他当场被判缺考。",nullptr,270,0,LouisUnlock},
+ {Runner,0,"跑路僵尸","生命270 / 护甲0\n冲刺7格/秒 / 逃跑9格/秒\n刹车0.08秒，冲到后排即返回\n奔跑时不啃食植物\n\n{KEYWORD}收到草地有免费脑子的消息，冲进去才发现是自己的。为防止被自己吃掉，现已原路撤回。",nullptr,270,0,RunnerUnlock},
+ {ConeWrap,2,"雪糕桶包裹我","生命270 / 护甲2590，合计2860\n外形20个桶，耐久相当于7个桶\n移速为普通60%，啃食100伤害/秒\n\n{KEYWORD}全家桶拒绝认他当亲戚，因为他没有全家，只有桶。体检时医生敲了半天，问：有人吗？里面回：有桶。",nullptr,270,ConeCount*ConeHealth,ConeWrapUnlock},
+ {GiantImp,24,"巨人小鬼","生命270 / 护甲0\n下颚伤害：目标全部剩余生命\n前摇0.55秒 / 一轮动作0.9秒\n3-2起出现，不随巨人投掷\n\n{KEYWORD}小鬼报名当巨人，系统只批准了头。每次点头，植物就以为天黑了。下巴目前单独交房租。",nullptr,270,0,GiantImpUnlock},
+ {Clever,0,"智斗僵尸","生命270 / 护甲0\n普速1.25倍 / 逃跑3倍\n躲弹70%，翻身1.6秒免普通子弹\n翻身换行60% / 前飞2格30%\n闪避间隔1.2秒；偷1株就跑\n入水自带泳圈\n\n{KEYWORD}脑子说走上路，下巴说走下路，身体决定先后空翻。偷到植物才想起来：我家没有草坪。",nullptr,270,0,CleverUnlock},
+ {CleverCone,2,"路障智斗僵尸","生命270 / 护甲370，合计640\n普速1.25倍 / 逃跑3倍\n躲弹70%，翻身1.6秒免普通子弹\n翻身换行60% / 前飞2格30%\n闪避间隔1.2秒；偷1株就跑\n入水自带泳圈\n\n{KEYWORD}给路障报了补习班，考试时自己躲进路障。成绩出来，路障考了第一，他被判定为文具。",nullptr,270,ConeHealth,CleverConeUnlock},
+ {GreenCone,2,"绿路障僵尸","生命270 / 护甲740，合计1010\n护甲为普通路障的2倍\n正常移速，啃食100伤害/秒\n\n{KEYWORD}给路障浇了三年水，终于绿了。他坚信再等两年会长出红绿灯，届时所有豌豆都得等红灯。",nullptr,270,2*ConeHealth,GreenConeUnlock},
+ {ConeTower,2,"路障叠叠高僵尸","生命270 / 护甲7400，合计7670\n20个路障，每个370耐久\n移速为普通15%，啃食100伤害/秒\n无法游泳\n\n{KEYWORD}二十个路障轮流当头。走一步先开二十次会，最上面说通过，最下面说收到的时候，天已经亮了。",nullptr,270,TowerCones*ConeHealth,ConeTowerUnlock}
 }};
 constexpr const Definition* Find(int id){for(const auto& d:Definitions)if(d.id==id)return &d;return nullptr;}
 constexpr int Base(int id){auto* d=Find(id);return d?d->base:id;}
