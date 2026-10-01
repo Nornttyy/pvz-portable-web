@@ -23,6 +23,7 @@
 #include "Plant.h"
 #include "../NukeShroom.h"
 #include "../StinkShroom.h"
+#include "../AbstractRigVisuals.h"
 #include "Board.h"
 #include "Zombie.h"
 #include "Cutscene.h"
@@ -3989,6 +3990,7 @@ void Plant::DrawShadow(Sexy::Graphics* g, float theOffsetX, float theOffsetY)
 
 void Plant::Draw(Graphics* g)
 {
+	AbstractRigVisuals::NauseaScope nausea(this);
 	float aOffsetX = 0.0f;
 	float aOffsetY = PlantDrawHeightOffset(mBoard, this, mSeedType, mPlantCol, mRow);
 	if (Plant::IsFlying(mSeedType) && mSquished)
@@ -4147,6 +4149,7 @@ void Plant::Draw(Graphics* g)
 			}
 		}
 
+		SandboxPlants::DrawNausea(g,this);
 		if (mSeedType == SeedType::SEED_MAGNETSHROOM && !DrawMagnetItemsOnTop())
 		{
 			DrawMagnetItems(g);
@@ -4205,6 +4208,11 @@ void Plant::DrawSeedType(Graphics* g, SeedType theSeedType, SeedType theImitater
 	if (aSeedType == SeedType::SEED_DOOMSHROOM && (gSandboxEnabled || MemeAdventure::RosterEnabled()))
 	{
 		SandboxPlants::DrawNukePreview(&aSeedG,thePosX,thePosY,aDrawVariation==VARIATION_IMITATER);
+		return;
+	}
+	if (aSeedType == SeedType::SEED_FUMESHROOM && (gSandboxEnabled || MemeAdventure::RosterEnabled()))
+	{
+		SandboxPlants::DrawStinkPreview(&aSeedG,thePosX,thePosY,aDrawVariation==VARIATION_IMITATER);
 		return;
 	}
 	if (aSeedType == SeedType::SEED_LEFTPEATER)

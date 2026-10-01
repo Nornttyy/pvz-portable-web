@@ -67,6 +67,8 @@ void DrawCard(Sexy::Graphics* g,int x,int y,int id);
 void DrawPeaHeadPreview(Sexy::Graphics* g,float x,float y,bool imitater=false);
 void DrawPalmPreview(Sexy::Graphics* g,float x,float y,bool imitater=false);
 void DrawNukePreview(Sexy::Graphics* g,float x,float y,bool imitater=false);
+void DrawStinkPreview(Sexy::Graphics* g,float x,float y,bool imitater=false);
+void DrawNausea(Sexy::Graphics*,const Plant*);
 void DrawTuckingPreview(Sexy::Graphics* g,float x,float y,bool imitater=false);
 // Original reanimations, temporary colour overrides; native layers stay intact.
 bool DrawBody(Sexy::Graphics* g,const Plant* plant,float x,float y,bool squished=false);

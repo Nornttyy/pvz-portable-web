@@ -41,15 +41,19 @@ try{
   for(let i=1;i<results.cadence.length;++i){const delta=results.cadence[i].tick-results.cadence[i-1].tick;assert.ok(delta>=195&&delta<=205,'native two-second interval: '+delta);}
   await page.evaluate(()=>clearInterval(window.stinkMonitor));
   await api(6); // Keep the exposure test independent of the attacking zombie pile.
-  await api(5,4);await api(4,0);await wait(()=>Module._pvz_stink_data(0,1,0)===2000);await api(4,1);await api(5,1);
+  await api(1,527,3,2); // Neighbouring Stink Shrooms must both remain immune.
+  await api(1,501,1,2);await api(1,6,1,1);await api(1,500,1,3);
+  await api(5,4);await api(4,0);await wait(()=>Module._pvz_stink_data(0,5,0)===2000);await api(4,1);await api(5,1);
   assert.equal(await data(0,1,1),1);assert.equal(await data(0,2,1),0);assert.equal(await data(0,0,1),0);
   results.exposure=await plants();await snap('neighbour-nausea');
+  assert.equal(results.exposure.filter(p=>p[2]===527).length,2);
+  assert.ok(results.exposure.filter(p=>p[2]===527).every(p=>p[0]===0&&p[1]===0),'all Stink Shrooms immune, not only their own aura');
   results.outcomes=await page.evaluate(()=>[0,1,2,3].map(f=>Module._pvz_stink_data(2,0,f)));assert.ok(results.outcomes[1]>0&&results.outcomes[2]>0&&results.outcomes[3]>0);
   await api(6); // Remove combat noise before measuring production with exact native ticks.
   while(await data(0,1,5)<300||await data(0,2,5)<400)await step(10);
   const before=await plants();await step(100);const after=await plants();
   results.production={near:before[1][5]-after[1][5],far:before[2][5]-after[2][5]};assert.deepEqual(results.production,{near:140,far:200});
-  await api(3,0,2,2);assert.equal(await data(0,0,1),0);results.removalRestores=true;
+  await api(3,0,3,2);await api(3,0,2,2);assert.equal(await data(0,0,1),0);results.removalRestores=true;await snap('recovered-colours');
   // A daytime sleeping shroom does not expose neighbours or spray.
   await api(7);await api(4,1);await api(12,0);await api(1,527,2,2);await api(1,520,2,1);await api(5,4);await api(4,0);await page.waitForTimeout(6000);await api(4,1);assert.equal(await data(0,1,0),0);await snap('sleeping');
   await page.setViewportSize({width:844,height:390});await snap('phone');await page.setViewportSize({width:1100,height:750});
@@ -72,5 +76,5 @@ try{
  await click(400,401);await page.waitForTimeout(350);await click(305,394);await page.waitForTimeout(1800);await click(560,135);await wait(()=>Module._pvz_adventure_power_data(-1,5)===1);
  results.saveAfter=await plants();assert.deepEqual(results.saveAfter,results.saveBefore);await click(280,371);await page.waitForTimeout(1200);await snap('adventure-resumed');
  assert.deepEqual(errors,[]);await writeFile(join(out,'report.json'),JSON.stringify({results,errors},null,2));console.log('Stink shroom QA passed',out,results);
-}catch(e){await snap('failure');await writeFile(join(out,'failure.json'),JSON.stringify({error:String(e),results,errors,plants:await plants(),log:await page.evaluate(()=>window.pvzEngineLog)},null,2));throw e;}
+}catch(e){console.error('QA failure:',e);await snap('failure').catch(()=>{});await writeFile(join(out,'failure.json'),JSON.stringify({error:String(e),results,errors,plants:await plants().catch(()=>[]),log:await page.evaluate(()=>window.pvzEngineLog).catch(()=>[])},null,2));throw e;}
 finally{await browser.close();}

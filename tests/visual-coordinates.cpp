@@ -15,6 +15,42 @@
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
+ // Brown cap copies retain native silhouette, spots, ink and alpha. Never
+ // recolour the pale-green stalk/eyes or mutate the shared purple source.
+ for(const char* file:{"FumeShroom_head.png","FumeShroom_spout.png","FumeShroom_tip.png"}){
+  auto* source=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::NativeImage(file));
+  source->bits[0]=0xff965090;source->bits[1]=0xff161016;source->bits[2]=0xffaabb77;source->bits[3]=0x00965090;
+  auto* brown=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::StinkCap(file));const auto p=brown->bits[0];
+  assert(((p>>16)&255)>((p>>8)&255)&&((p>>8)&255)>(p&255)&&source->bits[0]==0xff965090);
+  assert(brown->mWidth==source->mWidth&&brown->mHeight==source->mHeight);
+  for(int i:{1,2,3})assert(brown->bits[i]==source->bits[i]);
+ }
+ {Board b;SandboxPlants::Reset();auto* p=b.plant(2,2);p->mSeedType=SeedType(10);SandboxPlants::Assign(p,527);
+  Reanimation body;Track tracks[]={{"DoomShroom_head"},{"DoomShroom_spout"},{"DoomShroom_tip"},{"anim_face"},{"anim_blink"}};TrackInstance instances[5];body.def.mTracks={5,tracks};body.mTrackInstances=instances;app.reanims[99]=&body;p->mBodyReanimID=99;
+  auto* source=SandboxArt::NativeImage("FumeShroom_head.png");ReanimatorTransform original;original.mImage=source;original.mTransX=13;original.mTransY=-3;original.mScaleX=.8f;
+  for(bool preview:{false,true}){auto check=[&]{for(int i=0;i<5;++i){auto t=original;AbstractRigVisuals::Transform(&body,i,t);assert((t.mImage!=source)==(i<3));near(t.mTransX,13);near(t.mTransY,-3);near(t.mScaleX,.8f);}};
+   if(preview){AbstractRigVisuals::Scope scope(&body,527);check();}else{AbstractRigVisuals::Scope scope(p);check();}
+  }
+  auto native=original;AbstractRigVisuals::Transform(&body,0,native);assert(native.mImage==source);
+  SandboxPlants::Reset();app.reanims.erase(99);
+ }
+ // The same healthy atlas may be drawn immediately after a sick instance.
+ // All head/body/blink pieces are green only inside that plant's draw scope.
+ {Board b;auto* p=b.plant(2,1);Reanimation body,blink,other;app.reanims[98]=&body;app.reanims[97]=&blink;p->mBodyReanimID=98;p->mBlinkReanimID=97;
+  auto* source=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::NativeImage("SunFlower_head.png"));source->mNumCols=2;
+  source->bits[0]=0xffdd9922;source->bits[1]=0xff963090;source->bits[2]=0xffffffff;source->bits[3]=0xff101010;source->bits[4]=0x00aa5544;
+  StinkShroom::nauseatedPlant=p;
+  {AbstractRigVisuals::NauseaScope scope(p);auto* green=dynamic_cast<Sexy::MemoryImage*>(AbstractRigVisuals::NauseatedImage(&body,source));assert(green&&green!=source&&green->mNumCols==2);
+   for(int i:{0,1}){const auto v=green->bits[i];assert(((v>>8)&255)>((v>>16)&255)&&((v>>8)&255)>(v&255));}
+   for(int i:{2,3,4})assert(green->bits[i]==source->bits[i]);
+   assert(AbstractRigVisuals::NauseatedImage(&blink,source)==green&&AbstractRigVisuals::NauseatedImage(&other,source)==source);
+  }
+  assert(AbstractRigVisuals::NauseatedImage(&body,source)==source&&source->bits[0]==0xffdd9922);
+  Sexy::MemoryImage canvas;Sexy::Graphics g(&canvas);g.mTransX=200;g.mTransY=300;body.track="anim_face";body.pose.mImage=source;body.matrix.m02=40;body.matrix.m12=35;
+  testBlits.clear();b.mMainCounter=10;SandboxPlants::DrawNausea(&g,p);assert(testBlits.size()==1&&testBlits[0].path=="images/waterdrop.png");
+  near(testBlits[0].matrix.m02,258);assert(testBlits[0].matrix.m12>317&&testBlits[0].matrix.m12<349);
+  StinkShroom::nauseatedPlant=nullptr;testBlits.clear();SandboxPlants::DrawNausea(&g,p);assert(testBlits.empty());app.reanims.clear();
+ }
  {Board b;SandboxZombies::Reset();auto* z=b.AddZombieInRow(ZOMBIE_NORMAL,2,-1);Reanimation body;Track tracks[]={{"anim_head1"},{"anim_head2"},{"anim_head_jaw"},{"Zombie_body"}};TrackInstance instances[4];body.def.mTracks={4,tracks};body.mTrackInstances=instances;
   auto* original=SandboxArt::NativeImage("Zombie_head.png");for(auto& i:instances)i.mImageOverride=original;app.reanims[98]=&body;z->mBodyReanimID=98;
   StinkShroom::nauseated=z;{AbstractRigVisuals::Scope scope(z);assert(instances[0].mImageOverride==Sexy::IMAGE_REANIM_ZOMBIE_HEAD_GROSSOUT);assert(instances[1].mRenderGroup==RENDER_GROUP_HIDDEN&&instances[2].mRenderGroup==RENDER_GROUP_HIDDEN);assert(instances[3].mImageOverride==original);}

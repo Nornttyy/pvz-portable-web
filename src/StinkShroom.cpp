@@ -19,7 +19,7 @@ Save pending;
 int hitCounts[4]{},lastYuck=-1000;
 bool Source(const Plant* p){return !p->mDead&&!p->mSquished&&!p->mIsAsleep&&p->mPlantHealth>0&&!const_cast<Plant*>(p)->NotOnGround()&&MemeCharacters::Type(p)==StinkShroomRules::Id;}
 bool Nearby(const Plant* p){
- if(!p->mBoard||p->mDead||p->mSquished||const_cast<Plant*>(p)->NotOnGround())return false;
+ if(!p->mBoard||p->mDead||p->mSquished||MemeCharacters::Type(p)==StinkShroomRules::Id||const_cast<Plant*>(p)->NotOnGround())return false;
  for(auto* other:p->mBoard->mPlants)if(other!=p&&Source(other)&&StinkShroomRules::Adjacent(p->mPlantCol,p->mRow,other->mPlantCol,other->mRow))return true;
  return false;
 }
@@ -84,7 +84,6 @@ void DrawEffects(Sexy::Graphics* g,Board* b,int row){
  auto odor=[&](float x,float y){for(int i=0;i<2;++i){const float t=((b->mMainCounter+i*29)%60)/60.f;
   Sexy::Graphics draw(*g);draw.SetColorizeImages(true);draw.SetColor(Sexy::Color(125,103,57,int(125*(1-t))));
   PvzpDrawImageScaledF(&draw,puff,x-4+i*12+std::sin(t*5)*3,y-t*18,(12+6*t)/puff->mWidth,(12+6*t)/puff->mHeight);}};
- for(auto* p:b->mPlants)if(p->mRow==row&&Affected(p))odor(p->mX+35,p->mY+4);
  for(auto* z:b->mZombies)if(!z->mDead&&!z->IsDeadOrDying()&&z->IsOnBoard()&&z->mRow==row&&Stunned(z))odor(z->mPosX+47,z->mPosY-z->mAltitude+5);
 }
 }

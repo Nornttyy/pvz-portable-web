@@ -43,6 +43,15 @@ int main(){
   for(int i=0;i<2000;++i)StinkShroom::UpdatePlant(&p);assert(StinkShroom::Affected(&p)==Adjacent(p.mPlantCol,p.mRow,2,2));
  }
  // Every random value traverses the actual production hit branch.
+ {Board b;Plant a{&b,&b.app},a2{&b,&b.app},neighbour{&b,&b.app};a.type=a2.type=527;a2.mPlantCol=3;neighbour.mRow=1;
+  b.mPlants={&a,&a2,&neighbour};StinkShroom::Reset();
+  for(int i=0;i<2500;++i)for(auto* p:b.mPlants)StinkShroom::UpdatePlant(p);
+  assert(!StinkShroom::Affected(&a)&&!StinkShroom::Affected(&a2)&&StinkShroom::Affected(&neighbour));
+  for(int tick=0;tick<100;++tick){b.mMainCounter=tick;assert(StinkShroom::WorkTick(&a)&&StinkShroom::WorkTick(&a2));}
+  // Old saves may contain exposure on another Fume-shroom: it is immune too.
+  StinkShroom::Load({{{1,2000},{2,2000}}, {}});StinkShroom::Restore(&b);
+  assert(!StinkShroom::Affected(&a)&&!StinkShroom::Affected(&a2));
+ }
  int counts[4]{};
  for(int roll=0;roll<100;++roll){Board b;Plant p{&b,&b.app};p.type=527;Zombie z{&b};b.mZombies={&z};StinkShroom::Reset();Sexy::roll=roll;StinkShroom::Hit(&p,&z);
   const auto result=Roll(roll);++counts[result];const auto save=StinkShroom::Capture(&b);

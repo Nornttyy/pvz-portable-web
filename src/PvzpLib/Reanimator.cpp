@@ -762,6 +762,7 @@ bool Reanimation::DrawTrack(Graphics* g, int theTrackIndex, [[maybe_unused]] int
 		{
 			aImage = FilterEffectGetImage(aImage, mFilterEffect);
 		}
+		aImage = AbstractRigVisuals::NauseatedImage(this, aImage);
 		theTriangleGroup->AddTriangle(g, aImage, aMatrix, aClipRect, aColor, g->mDrawMode, aSrcRect);
 		if (mEnableExtraAdditiveDraw && !aTrackInstance->mIgnoreExtraAdditiveColor)
 		{
@@ -780,6 +781,7 @@ bool Reanimation::DrawTrack(Graphics* g, int theTrackIndex, [[maybe_unused]] int
 			aImage = FilterEffectGetImage(aImage, mFilterEffect);
 		}
 
+		aImage = AbstractRigVisuals::NauseatedImage(this, aImage);
 		while (aImageFrame >= aImage->mNumCols)
 		{
 			aImageFrame -= aImage->mNumCols;

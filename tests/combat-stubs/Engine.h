@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <cstdint>
 class Plant;class Zombie;
-namespace StinkShroom {inline bool allowWork=true;inline const Zombie* nauseated=nullptr;inline bool WorkTick(const Plant*){return allowWork;}inline bool Stunned(const Zombie* z){return z==nauseated;}}
+namespace StinkShroom {inline bool allowWork=true;inline const Zombie* nauseated=nullptr;inline const Plant* nauseatedPlant=nullptr;inline bool Affected(const Plant* p){return p==nauseatedPlant;}inline bool WorkTick(const Plant*){return allowWork;}inline bool Stunned(const Zombie* z){return z==nauseated;}}
 enum SeedType {SEED_PEASHOOTER=0,SEED_SUNFLOWER=1,SEED_LILYPAD=16,SEED_IMITATER=48,SEED_SMALL_NUT=53,SEED_NONE=-1};
 enum ZombieType {ZOMBIE_NORMAL=0,ZOMBIE_IMP=24,ZOMBIE_GARGANTUAR=23,ZOMBIE_REDEYE_GARGANTUAR=32,ZOMBIE_ZAMBONI=12};
 enum ZombieID : unsigned { ZOMBIEID_NULL=0 };
@@ -19,7 +19,7 @@ constexpr int PHASE_LADDER_CARRYING=4,PHASE_LADDER_PLACING=5;
 constexpr int PHASE_POLEVAULTER_PRE_VAULT=6,PHASE_POLEVAULTER_POST_VAULT=7;
 constexpr int PHASE_BALLOON_FLYING=8;
 constexpr int STATE_NOTREADY=0,STATE_SQUASH_DONE_FALLING=50;
-enum ReanimationType {REANIM_ZOMBIE,REANIM_FLAG,REANIM_REPEATER,REANIM_SUNFLOWER,REANIM_IMP,REANIM_CACTUS,REANIM_DOOMSHROOM};
+enum ReanimationType {REANIM_ZOMBIE,REANIM_FLAG,REANIM_REPEATER,REANIM_SUNFLOWER,REANIM_IMP,REANIM_CACTUS,REANIM_DOOMSHROOM,REANIM_FUMESHROOM};
 enum DrawVariation {VARIATION_NORMAL,VARIATION_IMITATER};
 enum ProjectileType {PROJECTILE_PEA,PROJECTILE_SNOWPEA,PROJECTILE_FIREBALL,PROJECTILE_ZOMBIE_PEA,PROJECTILE_SPIKE,PROJECTILE_BUTTER,PROJECTILE_KERNEL,PROJECTILE_CABBAGE,PROJECTILE_STAR,PROJECTILE_PUFF,PROJECTILE_COBBIG,PROJECTILE_BASKETBALL};
 enum ProjectileMotion {MOTION_STRAIGHT,MOTION_STAR,MOTION_HOMING,MOTION_THREEPEATER,MOTION_BACKWARDS,MOTION_PUFF};
@@ -35,7 +35,7 @@ inline int Rand(int n){if(!queuedRolls.empty()){const int r=queuedRolls.front();
 struct Color{int mRed,mGreen,mBlue,mAlpha;Color(int r=0,int g=0,int b=0,int a=255):mRed(r),mGreen(g),mBlue(b),mAlpha(a){}};
 struct SexyTransform2D{float m00=1,m01=0,m02=0,m10=0,m11=1,m12=0;void LoadIdentity(){*this={};}};
 struct Rect{int mX,mY,mWidth,mHeight;Rect(int x=0,int y=0,int w=0,int h=0):mX(x),mY(y),mWidth(w),mHeight(h){}};
-struct Image{int mWidth=80,mHeight=80;std::string path;virtual~Image()=default;};
+struct Image{int mWidth=80,mHeight=80,mNumCols=1,mNumRows=1;std::string path;virtual~Image()=default;};
 struct MemoryImage:Image{std::vector<uint32_t> bits=std::vector<uint32_t>(6400,0xffffffff);uint32_t* GetBits(){return bits.data();}void Create(int w,int h){mWidth=w;mHeight=h;bits.resize(w*h);}void BitsChanged(){}};
 struct GLImage:MemoryImage{};
 struct RectDraw{Rect bounds;Color color;};

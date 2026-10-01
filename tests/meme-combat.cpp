@@ -13,6 +13,7 @@ namespace SandboxArt {
 void DrawNukeEnergy(Sexy::Graphics*,Reanimation*,int){}
 Sexy::Image* Image(const char*,const char*){return nullptr;}
 Sexy::Image* NativeImage(const char*){return nullptr;}
+Sexy::Image* WaterDrop(){return nullptr;}
 Sexy::Image* Phone(int){return nullptr;}
 Sexy::Image* Palm(){return nullptr;}
 Sexy::Image* CleverHead(bool){return nullptr;}

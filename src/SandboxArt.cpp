@@ -17,6 +17,34 @@
 #include <algorithm>
 #include <cmath>
 namespace SandboxArt {
+Sexy::Image* StinkCap(const char* file){
+ static std::map<std::string,std::unique_ptr<Sexy::MemoryImage>> images;auto& out=images[file];if(out)return out.get();
+ auto* source=dynamic_cast<Sexy::MemoryImage*>(NativeImage(file));if(!source)return nullptr;
+ out=std::make_unique<Sexy::MemoryImage>();out->Create(source->mWidth,source->mHeight);
+ const auto* in=source->GetBits();auto* bits=out->GetBits();
+ for(int i=0;i<source->mWidth*source->mHeight;++i){
+  const auto p=in[i];const int r=(p>>16)&255,g=(p>>8)&255,b=p&255,hi=std::max(r,b);
+  // Cocoa-coloured pigment, retaining native spots, highlights, ink and alpha.
+  bits[i]=(p>>24)&&r>g+4&&b>g+4&&hi>40?(p&0xff000000u)|(unsigned(hi)<<16)|(unsigned(g+(hi-g)*42/100)<<8)|unsigned(g*82/100):p;
+ }
+ out->BitsChanged();return out.get();
+}
+Sexy::Image* NauseatedImage(Sexy::Image* image){
+ auto* source=dynamic_cast<Sexy::MemoryImage*>(image);if(!source)return image;
+ static std::map<Sexy::Image*,std::unique_ptr<Sexy::MemoryImage>> images;auto& out=images[image];if(out)return out.get();
+ out=std::make_unique<Sexy::MemoryImage>();out->Create(source->mWidth,source->mHeight);out->mNumCols=source->mNumCols;out->mNumRows=source->mNumRows;
+ const auto* in=source->GetBits();auto* bits=out->GetBits();
+ for(int i=0;i<source->mWidth*source->mHeight;++i){
+  const auto p=in[i];const int r=(p>>16)&255,g=(p>>8)&255,b=p&255,hi=std::max({r,g,b}),lo=std::min({r,g,b});
+  // Hue replacement, not a dark multiplicative wash: purple/red bodies also
+  // become green. White eyes, black outlines and transparent pixels stay intact.
+  bits[i]=(p>>24)&&hi>30&&hi-lo>=12?(p&0xff000000u)|(unsigned(lo+(hi-lo)*30/100)<<16)|(unsigned(hi)<<8)|unsigned(lo+(hi-lo)*18/100):p;
+ }
+ out->BitsChanged();return out.get();
+}
+Sexy::Image* WaterDrop(){
+ static std::unique_ptr<Sexy::GLImage> image;if(!image)image.reset(gLawnApp->GetImage("images/waterdrop.png"));return image.get();
+}
 Sexy::Image* NukeNative(const char* file,int phase){
  phase=(phase%8+8)%8;static std::map<std::pair<std::string,int>,std::unique_ptr<Sexy::MemoryImage>> images;
  auto& out=images[{file,phase}];if(out)return out.get();

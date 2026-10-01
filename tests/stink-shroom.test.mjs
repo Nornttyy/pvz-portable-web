@@ -24,3 +24,11 @@ test('stink replaces the native card with brown penetrating fume; only productio
  assert.match(z,/if \(StinkShroom::Fleeing\(this\)\) return true;/);
  assert.match(save,/SAVE4_CHUNK_STINK_STATUS = 24/);assert.match(save,/StinkShroom::Restore\(theBoard\)/);assert.match(save,/WriteChunkV4\(aPayload, SAVE4_CHUNK_STINK_STATUS, theBoard\)/);
 });
+test('nausea visuals are scoped to living plants; cap/card art and native waterdrop stay consistent',async()=>{
+ const plant=await read('src/Lawn/Plant.cpp'),render=await read('src/PvzpLib/Reanimator.cpp'),source=await read('src/StinkShroom.cpp'),art=await read('src/SandboxPlants.cpp');
+ assert.match(plant,/AbstractRigVisuals::NauseaScope nausea\(this\)/);assert.match(plant,/SandboxPlants::DrawNausea\(g,this\)/);
+ assert.equal(render.match(/aImage = AbstractRigVisuals::NauseatedImage\(this, aImage\);/g).length,2,'both atlas and raw image paths');
+ assert.match(plant,/SEED_FUMESHROOM[\s\S]*SandboxPlants::DrawStinkPreview/);
+ assert.match(source,/MemeCharacters::Type\(p\)==StinkShroomRules::Id\|\|const_cast<Plant\*>\(p\)->NotOnGround/);
+ assert.match(art,/if\(!StinkShroom::Affected\(p\)\)return;/);assert.match(art,/height=35\*size\*grow,width=24\*size\*grow/);
+});

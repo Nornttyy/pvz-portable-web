@@ -12,6 +12,9 @@ Sexy::Image* Palm();
 Sexy::Image* CleverHead(bool jawPose);
 Sexy::Image* GreenCone(int damage);
 Sexy::Image* NukeNative(const char* file,int phase);
+Sexy::Image* StinkCap(const char* file);
+Sexy::Image* NauseatedImage(Sexy::Image* source);
+Sexy::Image* WaterDrop();
 void DrawNukeEnergy(Sexy::Graphics*,Reanimation*,int age);
 Sexy::Image* ConeTower(int armor);
 // Shared by attachment, card preview and projectile launch: opaque wrist

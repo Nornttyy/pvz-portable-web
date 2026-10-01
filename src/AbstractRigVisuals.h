@@ -5,6 +5,13 @@
 class Plant; class Zombie; class Reanimation; class ReanimatorTransform; class ReanimatorTrackInstance;
 namespace Sexy {class Image;}
 namespace AbstractRigVisuals {
+// Per-plant draw scope; shared atlases/cards never inherit the illness colour.
+struct NauseaScope {
+ std::size_t mark;
+ explicit NauseaScope(const Plant*);
+ ~NauseaScope();
+};
+Sexy::Image* NauseatedImage(Reanimation*,Sexy::Image*);
 // Scoped draw-only poses. No shared definitions or serialized rig sizes change.
 struct Scope {
  std::size_t mark;

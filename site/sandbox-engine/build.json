@@ -18,8 +18,8 @@
       "normal": 0.5,
       "giant": 0.2
     },
-    "aura": "Eight surrounding cells, 2000 continuous exposure ticks, production and attack frequency reduced by 30%; no stacking, restores immediately when no awake source is nearby",
-    "art": "Native fume rig and cloud textures, dark brown particle tint; short reused odor wisps and native disgust SFX, no floating text",
+    "aura": "Eight surrounding cells, 2000 continuous exposure ticks, production and attack frequency reduced by 30%; no stacking, restores immediately when no awake source is nearby. All Stink Shrooms are immune, including adjacent ones and old-save exposure.",
+    "art": "Native cap, spout and tip recoloured cocoa brown in battle/cards/almanac; pale-green body unchanged. Affected other plants turn green and shed a large native blue waterdrop following their face bone. Colours and waterdrops stop on recovery. Dark brown spray and native disgust SFX, no floating text.",
     "save": "Optional portable chunk 24 retains exposure, stun, continuous push and fleeing without changing native object layouts"
   },
   "nukeShroom": {
@@ -182,13 +182,13 @@
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 279075,
-      "sha256": "852bf96d06b0570b9cb259cdf9e4ea4010d316b9c4293be44d967f9d0d18aa78"
+      "size": 279332,
+      "sha256": "3a368efe69d496091e3e2613a6aced72c3f57994d930675a59182d657e483af2"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7904459,
-      "sha256": "7c577e1ce607539ee80e2ba868aec37b79bce44bdef8f191a63e49edd02f5f62"
+      "size": 7919229,
+      "sha256": "759068058e7de726c30b664850e202bdaa7efc39a8e8862e8d0a7c6494a04102"
     }
   ]
 }

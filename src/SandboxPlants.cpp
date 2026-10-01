@@ -5,6 +5,7 @@
 #include "SandboxVisualRules.h"
 #include "MemeShooterRules.h"
 #include "AbstractRigVisuals.h"
+#include "StinkShroom.h"
 #include "LawnApp.h"
 #include "Resources.h"
 #include "Lawn/Board.h"
@@ -213,6 +214,38 @@ void DrawNukePreview(Sexy::Graphics* g,float x,float y,bool imitater){
   AbstractRigVisuals::Scope pose(&anim,MemeCharacters::NukeShroom);anim.Draw(&canvas);
  }
  PvzpDrawImageScaledF(g,cached.get(),x-20*g->mScaleX,y-20*g->mScaleY,g->mScaleX,g->mScaleY);
+}
+void DrawStinkPreview(Sexy::Graphics* g,float x,float y,bool imitater){
+ static std::unique_ptr<Sexy::MemoryImage> previews[2];auto& cached=previews[imitater?1:0];
+ if(!cached){
+  cached=gLawnApp->mReanimatorCache->MakeBlankMemoryImage(120,120);Sexy::Graphics canvas(cached.get());canvas.SetLinearBlend(true);
+  Reanimation anim;anim.ReanimationInitializeType(20,20,REANIM_FUMESHROOM);anim.SetFramesForLayer("anim_idle");
+  if(imitater)gLawnApp->mReanimatorCache->UpdateReanimationForVariation(&anim,VARIATION_IMITATER);
+  AbstractRigVisuals::Scope pose(&anim,MemeCharacters::StinkShroom);anim.Draw(&canvas);
+ }
+ PvzpDrawImageScaledF(g,cached.get(),x-20*g->mScaleX,y-20*g->mScaleY,g->mScaleX,g->mScaleY);
+}
+void DrawNausea(Sexy::Graphics* g,const Plant* p){
+ if(!StinkShroom::Affected(p))return;
+ auto* drop=SandboxArt::WaterDrop();if(!drop)return;
+ AbstractRigVisuals::Scope pose(p);float x=48,y=24;bool found=false;
+ // Follow the current face/head bone, including tucking, small puffs and pots.
+ for(auto id:{p->mHeadReanimID,p->mBodyReanimID}){
+  auto* a=gLawnApp->ReanimationTryToGet(id);if(!a)continue;
+  for(const char* track:{"PuffShroom_head","DoomShroom_head","anim_face","anim_idle"}){
+   if(!a->TrackExists(track))continue;
+   const int index=a->FindTrackIndex(track);ReanimatorTransform t;a->GetCurrentTransform(index,&t);
+   if(!t.mImage||t.mFrame<0||t.mAlpha<=0)continue;
+   Sexy::SexyTransform2D m;a->GetTrackMatrix(index,m);x=m.m02;y=m.m12;found=true;break;
+  }if(found)break;
+ }
+ const float size=MemeCharacters::Type(p)==MemeCharacters::TinyPuff?.5f:p->mSeedType==SEED_SMALL_NUT?.7f:1.f;
+ const float t=((p->mBoard->mMainCounter+p->mPlantCol*17+p->mRow*31)%140)/140.f;
+ const float grow=.75f+.25f*std::min(1.f,t*5),height=35*size*grow,width=24*size*grow;
+ Sexy::SexyTransform2D m;m.LoadIdentity();m.m00=width/drop->mWidth;m.m11=height/drop->mHeight;
+ m.m02=x+18*size+g->mTransX;m.m12=y-18*size+32*size*t*t+g->mTransY;
+ const int alpha=t<.8f?245:int(245*(1-t)/.2f);
+ PvzpBltMatrix(g,drop,m,g->mClipRect,Sexy::Color(255,255,255,alpha),g->mDrawMode,Sexy::Rect(0,0,drop->mWidth,drop->mHeight));
 }
 void DrawCard(Sexy::Graphics* g,int x,int y,int id){
  if(MemeCharacters::Is(id)){MemeCharacters::Card(g,x,y,id);return;}
