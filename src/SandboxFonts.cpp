@@ -125,9 +125,7 @@ void SandboxRepairFonts(){
         // The right-hand bird radical from 鸣, without its inner eye dot.
         // Centre it inside the original cell; preserve native bitmap metrics.
         Supplement(font,U'乌',"WU",{{U'鸣',.46f,0,.54f,.4167f,-.16f,0},{U'鸣',.46f,.4167f,.08f,.0833f,-.16f,0},{U'鸣',.625f,.4167f,.375f,.0833f,-.16f,0},{U'鸣',.46f,.5f,.54f,.5f,-.16f,0}});
-        ExactGlyph(font,U'裹',"WRAP",ExactGlyphPixels::Wrap);
-        ExactGlyph(font,U'叠',"STACK",ExactGlyphPixels::Stack);
-        ExactGlyph(font,U'绿',"GREEN",ExactGlyphPixels::Green);
+        for(const auto& glyph:ExactGlyphPixels::Glyphs)ExactGlyph(font,glyph.character,glyph.key,glyph.pixels);
         Supplement(font,U'罡',"GANG",{{U'四',0,0,1,0.46f},{U'正',0,0.46f,1,0.54f}});
         Supplement(font,U'梗',"GENG",{{U'样',0,0,0.46f,1},{U'硬',0.46f,0,0.54f,1}});
         Supplement(font,U'锅',"GUO",{{U'钢',0,0,0.46f,1},{U'蜗',0.46f,0,0.54f,1}});

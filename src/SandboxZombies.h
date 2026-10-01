@@ -34,14 +34,14 @@ inline constexpr int GreenCone=218,GreenConeUnlock=27,ConeTower=219,ConeTowerUnl
 inline constexpr int TowerCones=20,TowerConeRise=6;
 inline constexpr float ConeTowerSpeed=.15f;
 inline constexpr std::array<Definition,8> Definitions{{
- {Louis,0,"路易十六","天生无头，照常走路啃咬。",nullptr,270,0,LouisUnlock},
- {Runner,0,"跑路僵尸","冲到后排，转身就跑。",nullptr,270,0,RunnerUnlock},
- {ConeWrap,2,"雪糕桶包裹我","20桶组成，7桶耐久。",nullptr,270,ConeCount*ConeHealth,ConeWrapUnlock},
- {GiantImp,24,"巨人小鬼","巨人头，小鬼身。一击秒杀植物。",nullptr,270,0,GiantImpUnlock},
- {Clever,0,"智斗僵尸","70%翻身闪弹。翻身时60%换路、30%前飞两格，偷完就跑。",nullptr,270,0,CleverUnlock},
- {CleverCone,2,"路障智斗僵尸","戴路障的智斗僵尸。入水套泳圈，偷完就跑。",nullptr,270,ConeHealth,CleverConeUnlock},
- {GreenCone,2,"绿路障僵尸","绿色路障，双倍耐久。",nullptr,270,2*ConeHealth,GreenConeUnlock},
- {ConeTower,2,"路障叠叠高僵尸","头顶20个路障。极慢，极耐打，无法游泳。",nullptr,270,TowerCones*ConeHealth,ConeTowerUnlock}
+ {Louis,0,"路易十六","出场就没有头，照常走路啃咬。\n\n别人来草地是为了吃脑子，他是来找售后。出发前清点装备时，漏数了自己。",nullptr,270,0,LouisUnlock},
+ {Runner,0,"跑路僵尸","冲到后排，马上转身逃跑。\n\n他不是来吃脑子的，是来检查你有没有手忙脚乱。看见你把阳光花光，他就满意地回去了。",nullptr,270,0,RunnerUnlock},
+ {ConeWrap,2,"雪糕桶包裹我","20个雪糕桶组成身体，7个桶的耐久。\n\n打开一个桶，里面还是桶。你问僵尸在哪？他问你：我都包裹成这样了，还能看出是我？",nullptr,270,ConeCount*ConeHealth,ConeWrapUnlock},
+ {GiantImp,24,"巨人小鬼","小鬼的身体，巨人的头，下颚一击秒杀植物。\n\n身高不够，下巴来凑。别的小鬼靠巨人扔，他靠巨人脸。植物刚想笑他的个头，就被下巴打断了。",nullptr,270,0,GiantImpUnlock},
+ {Clever,0,"智斗僵尸","翻身时60%换行、30%前飞两格，遇到植物就偷走。\n\n战术一：别打到我。战术二：把你的植物变成我的植物。至于下颚线，那是他的第三道防线。",nullptr,270,0,CleverUnlock},
+ {CleverCone,2,"路障智斗僵尸","智斗僵尸的路障版，会闪避、换行和偷植物。\n\n他认为路障能增加智商。实测只增加了耐久，但他坚持认为是测试的人不够聪明。",nullptr,270,ConeHealth,CleverConeUnlock},
+ {GreenCone,2,"绿路障僵尸","绿色路障，耐久是普通路障的两倍。\n\n别人头上的叫路障，他头上的叫安全感。至于为什么是绿的，他说这个问题没有讨论的必要。",nullptr,270,2*ConeHealth,GreenConeUnlock},
+ {ConeTower,2,"路障叠叠高僵尸","头顶20个路障，极慢，耐久极高，无法游泳。\n\n队友都到门口了，他还在等最上面那个路障出发。别问为什么不下水，20个路障都说自己不会游。",nullptr,270,TowerCones*ConeHealth,ConeTowerUnlock}
 }};
 constexpr const Definition* Find(int id){for(const auto& d:Definitions)if(d.id==id)return &d;return nullptr;}
 constexpr int Base(int id){auto* d=Find(id);return d?d->base:id;}

@@ -3,6 +3,7 @@
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
   "mode": "Eight abstract plants and eight independent zombies (212..219). Green Cone and land-only Twenty-Cone Tower use native cone textures/rigs with gradual adventure unlocks. Both clever variants now roll 60% lane changes and 30% forward flights per accepted flip. Motion timing, other stats, progression and saves are preserved.",
+  "almanacCopy": "All eight original plants and eight original zombies have concise ability summaries plus absurd character-specific flavour text. Names, card hints, combat, unlocks and balance are unchanged. Seventeen complete supplemental Chinese glyphs prevent missing characters while keeping native font metrics.",
   "coneVariants": {
     "green": {
       "id": 218,
@@ -133,12 +134,12 @@
     {
       "name": "pvz-portable.js",
       "size": 278906,
-      "sha256": "ba4ebe1ee3284b918598d0a784859ed5e53468b4d00ab0bdee0eca792823205f"
+      "sha256": "ab67e92575dd35f5b4ab632ce4ac6de46ab51be4ec8a65ef7f61d291586e31a4"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7663464,
-      "sha256": "6e9854fe462363e979c4937266bf75151162aa5f1e31bddebc372cf3be56dd64"
+      "size": 7722887,
+      "sha256": "e321441c9bbf318a69cebc9ffc918ef179d679ff0f68ef94d00bbf477800741e"
     }
   ]
 }

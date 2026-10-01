@@ -2,10 +2,12 @@
 #include "graphics/MemoryImage.h"
 #include "../src/SandboxFonts.h"
 #include "../src/SandboxFontRules.h"
+#include "../src/ExactGlyphPixels.h"
 #include <cassert>
 #include <iostream>
 namespace Sexy {_Font* FONT_BRIANNETOD12=nullptr;_Font* FONT_BRIANNETOD16=nullptr;_Font* FONT_DWARVENTODCRAFT18=nullptr;_Font* FONT_DWARVENTODCRAFT24=nullptr;_Font* FONT_DWARVENTODCRAFT18YELLOW=nullptr;_Font* FONT_DWARVENTODCRAFT18GREENINSET=nullptr;_Font* FONT_DWARVENTODCRAFT18BRIGHTGREENINSET=nullptr;_Font* FONT_HOUSEOFTERROR16=nullptr;_Font* FONT_HOUSEOFTERROR28=nullptr;}
 using namespace Sexy;
+constexpr int exactGlyphCount=sizeof(ExactGlyphPixels::Glyphs)/sizeof(ExactGlyphPixels::Glyphs[0]);
 void check(int cell,int advance,int offset,int split,bool measured){
     FontData data;data.mFontLayerList.emplace_back();
     auto& main=data.mFontLayerList.back();main.mImage=42;main.mAscent=12;main.mHeight=16;main.mPointSize=10;
@@ -74,13 +76,14 @@ int main(){
         FontData wrap;wrap.mFontLayerList.emplace_back();auto& wrapDonor=wrap.mFontLayerList.back();wrapDonor.mImage=42;
         for(char32_t c:U"六果装")wrapDonor.mCharDataMap[c]={{0,0,cell,cell},{-5,-4},14};
         ImageFont wrapFont;wrapFont.mFontData=&wrap;FONT_BRIANNETOD12=&wrapFont;SandboxRepairFonts();
-        assert(wrap.mFontLayerList.size()==4&&wrapFont.prepared==3);
-        for(const auto& l:wrap.mFontLayerList)for(char32_t c:U"裹叠绿")if(c&&l.mCharDataMap.contains(c)){
+        assert(wrap.mFontLayerList.size()==1+exactGlyphCount&&wrapFont.prepared==exactGlyphCount);
+        for(const auto& l:wrap.mFontLayerList)for(const auto& exact:ExactGlyphPixels::Glyphs)if(l.mCharDataMap.contains(exact.character)){
+         const char32_t c=exact.character;
          const auto& g=l.mCharDataMap.at(c);assert(g.mWidth==14&&g.mImageRect.mWidth==cell&&g.mImageRect.mHeight==cell);
          assert(g.mOffset.mX==-5&&g.mOffset.mY==-4);MemoryImage* bitmap=l.mImage;assert(bitmap);
          int ink=0;for(auto p:bitmap->bits)ink+=(p>>24)>0;assert(ink>30&&ink<14*14);
         }
-        SandboxRepairFonts();assert(wrap.mFontLayerList.size()==4&&wrapFont.prepared==3);FONT_BRIANNETOD12=nullptr;
+        SandboxRepairFonts();assert(wrap.mFontLayerList.size()==1+exactGlyphCount&&wrapFont.prepared==exactGlyphCount);FONT_BRIANNETOD12=nullptr;
         FontData timing;timing.mFontLayerList.emplace_back();auto& donor=timing.mFontLayerList.back();donor.mImage=42;donor.mAscent=12;
         donor.mCharDataMap[U'种']={{100,200,cell,cell},{-5,-4},14};
         donor.mCharDataMap[U'沙']={{300,400,cell,cell},{-5,-4},14};
@@ -101,9 +104,9 @@ int main(){
      FontData data;data.mFontLayerList.emplace_back();auto& main=data.mFontLayerList.back();main.mImage=&atlas;
      main.mCharDataMap[U'装']={{0,0,27,27},{-5,-4},16};main.mCharDataMap[U'叠']={{0,0,27,27},{-5,-4},16};
      ImageFont font;font.mFontData=&data;FONT_DWARVENTODCRAFT18GREENINSET=&font;SandboxRepairFonts();
-     assert(data.mFontLayerList.size()==3&&font.prepared==2);assert(!data.mFontLayerMap.contains("EXACTGLYPHSTACK"));
-     for(const char* key:{"EXACTGLYPHWRAP","EXACTGLYPHGREEN"}){auto* l=data.mFontLayerMap.at(key);MemoryImage* image=l->mImage;assert(image);for(auto p:image->bits)if(p>>24)assert((p&0xffffff)==0x00c400);}
-     SandboxRepairFonts();assert(font.prepared==2&&main.mCharDataMap.at(U'叠').mWidth==16);FONT_DWARVENTODCRAFT18GREENINSET=nullptr;
+     assert(data.mFontLayerList.size()==exactGlyphCount&&font.prepared==exactGlyphCount-1);assert(!data.mFontLayerMap.contains("EXACTGLYPHSTACK"));
+     for(const auto& exact:ExactGlyphPixels::Glyphs)if(exact.character!=U'叠'){auto* l=data.mFontLayerMap.at(std::string("EXACTGLYPH")+exact.key);MemoryImage* image=l->mImage;assert(image);for(auto p:image->bits)if(p>>24)assert((p&0xffffff)==0x00c400);}
+     SandboxRepairFonts();assert(font.prepared==exactGlyphCount-1&&main.mCharDataMap.at(U'叠').mWidth==16);FONT_DWARVENTODCRAFT18GREENINSET=nullptr;
     }
     std::cout<<"Three font sizes, prior measurement, original glyph preservation and idempotence passed.\n";
 }
