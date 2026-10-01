@@ -48,6 +48,23 @@ int main(){
   w.step(327);assert(!MemeCharacters::Embarrassed(p)&&MemeCharacters::Data(neighbour,1)==0&&MemeCharacters::Data(neighbour,5)==0);
   neighbour->mDead=true;MemeCharacters::OnSunProduced(p);w.step();assert(!MemeCharacters::Embarrassed(p));
  }
+ // Gaze roles are exclusive, the current observer target stays fixed, and
+ // a newly embarrassed producer immediately drops its own previous gaze.
+ {World w;auto* a=w.add(520);a->mPlantCol=1;auto* b=w.add(520);b->mPlantCol=2;auto* c=w.add(520);c->mPlantCol=3;
+  MemeCharacters::OnSunProduced(a);w.step();const int aCell=1+a->mPlantCol+a->mRow*9;
+  assert(MemeCharacters::Embarrassed(a)&&MemeCharacters::Data(b,1)==aCell);
+  MemeCharacters::OnSunProduced(c);w.step();assert(!MemeCharacters::Embarrassed(c)&&MemeCharacters::Data(b,1)==aCell);
+  MemeCharacters::OnSunProduced(b);w.step();assert(MemeCharacters::Embarrassed(b)&&MemeCharacters::Data(b,1)==0&&MemeCharacters::Data(b,5)==0);
+  assert(MemeCharacters::Data(a,1)==0&&MemeCharacters::Data(a,5)==0);
+  assert(MemeCharacters::Data(c,1)==1+b->mPlantCol+b->mRow*9);
+  const auto saved=MemeCharacters::Save(b);assert(MemeCharacters::Restore(b,saved)&&MemeCharacters::Save(b)==saved);
+ }
+ // Simultaneous production cannot create reciprocal embarrassed observers.
+ {World w;auto* a=w.add(520);auto* b=w.add(520);b->mPlantCol=2;
+  MemeCharacters::OnSunProduced(a);MemeCharacters::OnSunProduced(b);w.step();
+  assert(MemeCharacters::Embarrassed(a)&&!MemeCharacters::Embarrassed(b));
+  assert(MemeCharacters::Data(a,1)==0&&MemeCharacters::Data(a,5)==0&&MemeCharacters::Data(b,1)>0);
+ }
  // All eight adjacent cells count; other rows, removed/asleep/lifted plants don't.
  {World w;auto* p=w.add(520);p->mPlantCol=4;
   for(int dx=-1;dx<=1;++dx)for(int dy=-1;dy<=1;++dy)if(dx||dy){auto* q=w.add(520,2+dy);q->mPlantCol=4+dx;}

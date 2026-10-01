@@ -22,12 +22,15 @@ try{
  await boot(8);await click(260,348);await wait(()=>Module.canvas.width===1024);await api(7);await api(4,1);
  for(const [id,col,row] of [[520,2,2],[520,1,2],[520,2,1],[520,7,3],[1,4,2]])assert.ok(await api(1,id,col,row)>0);
  assert.equal((await data(0))[0],520);await click(132,535);await click(718,62);await snap('new-card-and-idle');
- await api(4,0);await wait(()=>Module._pvz_sandbox_plant_data(0,4)===1);await page.waitForTimeout(1200);
+ await api(4,0);await wait(()=>Module._pvz_sandbox_plant_data(0,4)===1,undefined,30000);await page.waitForTimeout(1200);
  // Move through native sun pickup areas so the produced sun does not obscure
  // the face in visual evidence. These are ordinary clicks, not state writes.
  for(const [x,y] of [[446,286],[446,305],[460,323],[366,305],[446,205]])await click(x,y);
  await api(4,1);
- const watched=await data(0);assert.ok(watched[6]>100&&watched[7]===2);assert.ok((await data(1))[10]>0&&(await data(2))[10]>0);assert.equal((await data(3))[4],0);await snap('embarrassed-and-neighbours-look');
+ const watched=await data(0);assert.ok(watched[6]>100&&watched[7]>=1);assert.equal(watched[5],0);assert.equal(watched[10],0);
+ const neighbours=[await data(1),await data(2)];assert.ok(neighbours.some(a=>a[4]===0&&a[5]===21&&a[10]>0));
+ for(const a of [watched,...neighbours])if(a[4]===1){assert.equal(a[5],0);assert.equal(a[10],0);}
+ assert.equal((await data(3))[4],0);results.exclusiveRoles=true;await snap('embarrassed-and-neighbours-look');
  const normal=await data(4);for(let i=0;i<20;++i)await step();
  const after=await data(0),normalAfter=await data(4);assert.equal(watched[11]-after[11],20);assert.equal(normal[11]-normalAfter[11],40);results.halfSpeed=true;results.solo=true;results.neighbours=true;
  await api(4,0);await wait(()=>Module._pvz_sandbox_plant_data(0,4)===0);await api(4,1);await snap('smile-restored');

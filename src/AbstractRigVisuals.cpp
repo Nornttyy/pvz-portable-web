@@ -44,14 +44,14 @@ void Transform(Reanimation* a,int track,ReanimatorTransform& t){
   const bool face=name=="anim_idle",blink=name.starts_with("anim_blink"),petal=name.starts_with("SunFlower_");
   if(!face&&!blink&&!petal)return; // Never detach stem, roots or leaves.
   if(face&&s[4]>0)if(auto* image=SandboxArt::AwkwardFace())t.mImage=image;
-  float dx=0,dy=0;
-  if(p->plant&&s[3]>0&&s[5]>0){
-   const float blend=std::min({1.0f,(MemeCharacters::AwkwardDuration-s[5])/22.0f,s[5]/35.0f});
-   dx=((s[3]-1)%9-p->plant->mPlantCol)*blend;dy=((s[3]-1)/9-p->plant->mRow)*blend;
+  // The embarrassed producer faces forward. Observers snap to one fixed
+  // angle: face, blink and every petal share a single rigid head pivot.
+  // No easing, squash, independent face slide, or time-dependent turn.
+  if(p->plant&&s[4]==0&&s[3]>0&&s[5]>0){
+   const int dx=(s[3]-1)%9-p->plant->mPlantCol,dy=(s[3]-1)/9-p->plant->mRow;
+   const float angle=(dx||dy)?std::atan2(float(dx),-float(dy))*.20f:0;
+   Rotate(t,37,53,angle);
   }
-  Warp(t,37,53,1-.13f*std::abs(dx),1,dx*.24f);
-  t.mTransX+=dx*(face||blink?5:2);t.mTransY+=dy*4;
-  if(s[4]>0){const float q=std::min({1.0f,(MemeCharacters::AwkwardDuration-s[4])/20.0f,s[4]/30.0f});t.mTransY+=2.5f*q;}
   return;
  }
  if(p->state[0]==MemeCharacters::ShooterPea){

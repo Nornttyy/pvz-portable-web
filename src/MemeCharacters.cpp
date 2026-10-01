@@ -59,7 +59,9 @@ std::array<int,10> Save(const Plant* p){auto it=states.find(p);if(it==states.end
 bool Restore(Plant* p,const std::array<int,10>& a){
  if(a[0]==AwkwardSunflower){
   if(int(p->mSeedType)!=Find(a[0])->base||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>1||a[3]<0||a[3]>54||a[4]<0||a[4]>AwkwardDuration||a[5]<0||a[5]>AwkwardDuration||a[6]<0||a[6]>=1000000||a[7]<0||a[7]>1||a[8]<0||a[8]>8||a[9]!=1||a[2]!=(a[4]>0)||((a[3]==0)!=(a[5]==0)))return false;
-  states[p]={a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9]};return true; // Native save owns the production countdown.
+  states[p]={a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9]};
+  if(a[4]>0){states[p].heat=0;states[p].delay=0;} // Migrate old mutually staring saves.
+  return true; // Native save owns the production countdown.
  }
  const bool shooter=a[0]==500,newShooter=shooter&&a[9]==2;
  const auto* d=Find(a[0]);if(!d||int(p->mSeedType)!=d->base||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>(newShooter?1:2)||a[3]<0||a[3]>(newShooter?300:1000)||a[4]<0||a[4]>2000||a[5]<0||a[5]>2000||a[6]<0||a[6]>=1000000||a[7]<0||a[7]>50||a[8]<0||a[8]>(newShooter?150:3)||(!newShooter&&a[9]!=1&&a[9]!=-1))return false;
@@ -91,6 +93,7 @@ void Tick(Board* b){
   s.age=(s.age+1)%1000000;if(s.pulse&&s.id!=AwkwardSunflower)--s.pulse;if(s.delay)--s.delay;if(s.timer)--s.timer;
   if(s.id==AwkwardSunflower){
    s.phase=s.timer>0;
+   if(s.timer){s.heat=0;s.delay=0;}
    if(!s.timer)s.remaining=0;
    if(!s.delay)s.heat=0;
   }else if(s.id==500){
@@ -136,9 +139,13 @@ void Tick(Board* b){
   for(auto* observer:b->mPlants){
    if(observer==producer||observer->mDead||observer->mSquished||observer->mIsAsleep||observer->NotOnGround()||observer->mPlantHealth<=0||Type(observer)!=AwkwardSunflower)continue;
    if(std::abs(observer->mPlantCol-producer->mPlantCol)>1||std::abs(observer->mRow-producer->mRow)>1)continue;
-   auto& watching=states.at(observer);watching.heat=1+producer->mPlantCol+producer->mRow*9;watching.delay=AwkwardDuration;++count;
+   auto& watching=states.at(observer);
+   if(watching.timer>0)continue; // An embarrassed flower cannot stare at someone else.
+   const int target=1+producer->mPlantCol+producer->mRow*9;
+   if(watching.delay>0&&watching.heat!=target)continue; // Finish this look before accepting another target.
+   watching.heat=target;watching.delay=AwkwardDuration;++count;
   }
-  if(count){auto& s=it->second;s.timer=AwkwardDuration;s.phase=1;s.remaining=std::min(count,8);}
+  if(count){auto& s=it->second;s.timer=AwkwardDuration;s.phase=1;s.remaining=std::min(count,8);s.heat=0;s.delay=0;}
  }
 }
 void Tint(const Plant*,Sexy::Color&){}
