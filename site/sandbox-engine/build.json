@@ -2,8 +2,20 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Eleven abstract plants and eight independent zombies (212..219). Stink Shroom replaces native Fume-shroom with dark brown, two-second piercing sprays, nausea, fleeing and knockback, plus a delayed neighbouring plant production/attack penalty. Nuclear Shroom keeps its five green blasts and 3x3 crater. Adventure and sandbox share replacements; other progression and saves are preserved.",
-  "almanacCopy": "All eleven original plants and eight original zombies show explicit numeric statistics separately from surreal character-specific flavour text. Native cost/recharge footer and full supplemental Chinese glyphs.",
+  "mode": "Twelve abstract plants and eight independent zombies (212..219). Ice Chili adds an independent row-damage and freeze card alongside the unchanged native Jalapeno. Adventure and sandbox share replacements; other progression and saves are preserved.",
+  "almanacCopy": "All twelve original plants and eight original zombies show explicit numeric statistics separately from surreal character-specific flavour text. Native cost/recharge footer and full supplemental Chinese glyphs.",
+  "iceChili": {
+    "id": 528,
+    "nativeSlot": 51,
+    "cost": 150,
+    "rechargeTicks": 5000,
+    "windupTicks": 100,
+    "rowDamage": 1200,
+    "freezeTicks": 300,
+    "adventureUnlock": 26,
+    "art": "Native Jalapeno rig recoloured ice blue; original ink, stalk, eyes, shading and bone registration preserved. Native ice shards and frozen-zombie blocks.",
+    "boundaries": "Same-row hostile on-board zombies only; preserve longer freeze and existing chill. No knockback, added lingering slow or terrain. Original Jalapeno and non-adventure Zen Garden sprouts unchanged. Native enum IDs and save object layouts preserved."
+  },
   "stinkShroom": {
     "id": 527,
     "nativeSlot": 10,
@@ -183,12 +195,12 @@
     {
       "name": "pvz-portable.js",
       "size": 279332,
-      "sha256": "3a368efe69d496091e3e2613a6aced72c3f57994d930675a59182d657e483af2"
+      "sha256": "48667972365b83cf34c20b17f5b5fc5e5e5a495425ca3790449f67916813a3dc"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7919229,
-      "sha256": "759068058e7de726c30b664850e202bdaa7efc39a8e8862e8d0a7c6494a04102"
+      "size": 7947199,
+      "sha256": "38cdbce22b906e7bf99eec4154a28db5f4559663d7843cf8cdb79928419339ce"
     }
   ]
 }

@@ -2297,6 +2297,8 @@ int LawnApp::GetSeedsAvailable()
 
 bool LawnApp::HasSeedType(SeedType theSeedType)
 {
+	if (theSeedType == SEED_SPROUT) return MemeAdventure::RosterEnabled() && mPlayerInfo &&
+		(HasFinishedAdventure() || mPlayerInfo->GetLevel() >= IceChiliRules::Unlock);
 	if (theSeedType == SEED_SMALL_NUT) return MemeAdventure::RosterEnabled() && mPlayerInfo &&
 		(HasFinishedAdventure() || mPlayerInfo->GetLevel() >= MemeCharacters::Find(MemeCharacters::SmallNut)->unlock);
 	// Existing unused left-facing shooter ID keeps old saves and enum values intact.

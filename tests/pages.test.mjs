@@ -8,6 +8,7 @@ import './almanac-copy.test.mjs';
 import './tiny-puff.test.mjs';
 import './nuke-shroom.test.mjs';
 import './stink-shroom.test.mjs';
+import './ice-chili.test.mjs';
 import './expansion.test.mjs';
 import './adventure-replacements.test.mjs';
 import './giant-imp.test.mjs';

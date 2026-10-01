@@ -10,6 +10,7 @@ constexpr int Slot(int seed, bool expanded) {
     if (!expanded) return seed;
     if (seed == SEED_LEFTPEATER) return 8;
     if (seed == SEED_SMALL_NUT) return 9;
+    if (seed == SEED_SPROUT) return 50; // New card, without moving existing slots.
     return seed >= SEED_PUFFSHROOM ? seed + 2 : seed;
 }
 struct Position { int x, y; };
@@ -19,7 +20,9 @@ constexpr Position Imitater(bool expanded) {
     return {464 + ExtraWidth(expanded), expanded ? 473 : 515};
 }
 constexpr Position Card(int seed, bool expanded, bool upgrades) {
-    const int slot = Slot(seed, expanded), columns = Columns(expanded);
+    // Before store upgrades, keep the new card in the existing fifth row;
+    // opening the sixth row early would overlap the start button.
+    const int slot = expanded && !upgrades && seed == SEED_SPROUT ? 42 : Slot(seed, expanded), columns = Columns(expanded);
     return {22 + slot % columns * 53,
             (upgrades ? 123 : 128) + slot / columns * (upgrades ? 70 : 73)};
 }

@@ -66,6 +66,7 @@ constexpr int DAMAGE_PER_EAT=4,SOUND_GULP=0;
 enum PlantState{STATE_NOTREADY,STATE_FLOWERPOT_INVULNERABLE,STATE_LILYPAD_INVULNERABLE,STATE_SQUASH_LOOK,STATE_SQUASH_PRE_LAUNCH};
 enum FoleyType{FOLEY_THUMP};enum ZombieAttackType{ATTACKTYPE_CHEW};
 struct Plant {SeedType mSeedType=SEED_WALLNUT;PlantState mState=STATE_NOTREADY;int mPlantHealth=4000,mPlantCol=5,mRow=0,mRecentlyEatenCountdown=0,mX=0,mY=0;bool mDead=false,mIsAsleep=false;int specials=0;void Die(){mDead=true;}void DoSpecial(){++specials;}};
+namespace MemeCharacters {constexpr int IceChili=528;int Type(const Plant* p){return p->mSeedType==SEED_SPROUT?IceChili:0;}}
 struct App {int sounds=0;bool IsIZombieLevel(){return false;}bool IsFirstTimeAdventureMode(){return false;}void PlaySample(int){}void PlayFoley(FoleyType){++sounds;}};
 struct Challenge {int kills=0;void ZombieAtePlant(Plant*){++kills;}};
 struct Board {Challenge challenge;Challenge* mChallenge=&challenge;int mPlantsEaten=0,mLevel=22;struct{int mSize=1;}mPlants;bool ladder=false;bool GetLadderAt(int,int){return ladder;}void AddCoin(int,int,CoinType,CoinMotion){}void DisplayAdvice(const char*,MessageStyle,AdviceType){}};
@@ -86,7 +87,7 @@ int main(){
  p=Plant{};z.EatPlant(&p);z.target=nullptr;for(int i=0;i<90;++i)z.Tick();assert(!p.mDead);
  z.target=&p;z.EatPlant(&p);z.mHasHead=false;z.Tick();assert(z.mZombiePhase==PHASE_ZOMBIE_NORMAL&&!p.mDead&&!z.mIsEating);z.mHasHead=true;
  // Native invulnerable explosives/pots and ladders remain native.
- for(SeedType seed:{SEED_CHERRYBOMB,SEED_JALAPENO,SEED_ICESHROOM,SEED_HYPNOSHROOM}){p=Plant{};p.mSeedType=seed;z.EatPlant(&p);assert(!p.mDead&&p.mPlantHealth==4000&&z.mZombiePhase==PHASE_ZOMBIE_NORMAL);}
+ for(SeedType seed:{SEED_CHERRYBOMB,SEED_JALAPENO,SEED_ICESHROOM,SEED_HYPNOSHROOM,SEED_SPROUT}){p=Plant{};p.mSeedType=seed;z.EatPlant(&p);assert(!p.mDead&&p.mPlantHealth==4000&&z.mZombiePhase==PHASE_ZOMBIE_NORMAL);}
  p=Plant{};b.ladder=true;z.EatPlant(&p);assert(z.mZombieHeight==HEIGHT_UP_LADDER&&!p.mDead);b.ladder=false;z.mZombieHeight=HEIGHT_ZOMBIE_NORMAL;
  // Ordinary/thrown imp still takes normal bites, never jaw-smashes.
  p=Plant{};z.id=24;z.EatPlant(&p);assert(p.mPlantHealth==3996&&z.mZombiePhase==PHASE_ZOMBIE_NORMAL);

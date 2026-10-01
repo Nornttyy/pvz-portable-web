@@ -1,4 +1,4 @@
-// View all nineteen original entries in the real game with an isolated save.
+// View all twenty original entries in the real game with an isolated save.
 import assert from 'node:assert/strict';
 import {mkdir,writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
@@ -24,15 +24,15 @@ try{
  });
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);
  await click(370,455);await click(208,366);
- for(const [id,base]of [[500,0],[501,3],[519,52],[520,1],[521,7],[522,40],[523,53],[524,26],[525,8],[526,15],[527,10]]){
-  const slot=base===52?8:base===53?9:base>=8?base+2:base;
+ for(const [id,base]of [[500,0],[501,3],[519,52],[520,1],[521,7],[522,40],[523,53],[524,26],[525,8],[526,15],[527,10],[528,51]]){
+  const slot=base===52?8:base===53?9:base===51?50:base>=8?base+2:base;
   await click(48+slot%9*46,123+Math.floor(slot/9)*76);await snap('plant-'+id);pages.push(id);
   if(id===500||id===524)await phoneSnap('plant-'+id);
  }
  await click(110,580);await click(590,366);
  for(let i=0;i<8;++i){const slot=26+i;await click(53+slot%6*71,117+Math.floor(slot/6)*80);await snap('zombie-'+(212+i));pages.push(212+i);if(i===4||i===5)await phoneSnap('zombie-'+(212+i));}
  await page.setViewportSize({width:844,height:390});await page.waitForTimeout(500);await snap('phone');
- assert.deepEqual(errors,[]);assert.equal(pages.length,19);
- await writeFile(join(out,'report.json'),JSON.stringify({pages,errors},null,2));console.log('All nineteen almanac pages captured',out);
+ assert.deepEqual(errors,[]);assert.equal(pages.length,20);
+ await writeFile(join(out,'report.json'),JSON.stringify({pages,errors},null,2));console.log('All twenty almanac pages captured',out);
 }catch(e){await snap('failure');throw e;}
 finally{await browser.close();}

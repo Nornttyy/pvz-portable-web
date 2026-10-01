@@ -10,7 +10,7 @@ namespace Sexy { class Graphics; class Color; }
 namespace SandboxPlants {
 enum class Element { Fire, Ice, Alternating, Native };
 struct Definition { int id, base; Element element; const char* name; const char* note; const char* art=nullptr; int rate=0,damage=20; float scale=1.0f; };
-inline constexpr std::array<Definition,11> Definitions{{
+inline constexpr std::array<Definition,12> Definitions{{
     {500,0,Element::Native,"红温豌豆","满300怒气 · 3秒乱射40发"},
     {501,3,Element::Native,"反咬坚果","被啃后反击 · 冷却3秒"},
     {519,52,Element::Native,"射手豌豆","头是豌豆 · 发射射手"},
@@ -22,6 +22,7 @@ inline constexpr std::array<Definition,11> Definitions{{
     {525,8,Element::Native,"真·小喷菇","同格最多5只 · 冷却2秒"},
     {526,15,Element::Native,"核爆菇","全屏五连爆 · 留下3×3大坑"},
     {527,10,Element::Native,"喷粪菇","深棕喷射 · 周围植物也犯恶心"},
+    {528,51,Element::Native,"冰爆辣椒","整行冰爆 · 冻结幸存僵尸"},
 }};
 constexpr const Definition* Find(int id) {
     for(const auto& d:Definitions)if(d.id==id)return &d;
@@ -68,6 +69,7 @@ void DrawPeaHeadPreview(Sexy::Graphics* g,float x,float y,bool imitater=false);
 void DrawPalmPreview(Sexy::Graphics* g,float x,float y,bool imitater=false);
 void DrawNukePreview(Sexy::Graphics* g,float x,float y,bool imitater=false);
 void DrawStinkPreview(Sexy::Graphics* g,float x,float y,bool imitater=false);
+void DrawIceChiliPreview(Sexy::Graphics* g,float x,float y,bool imitater=false);
 void DrawNausea(Sexy::Graphics*,const Plant*);
 void DrawTuckingPreview(Sexy::Graphics* g,float x,float y,bool imitater=false);
 // Original reanimations, temporary colour overrides; native layers stay intact.

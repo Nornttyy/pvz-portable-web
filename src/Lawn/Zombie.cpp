@@ -6426,7 +6426,7 @@ bool Zombie::CanTargetPlant(Plant* thePlant, ZombieAttackType theAttackType)
 
 	if (theAttackType == ZombieAttackType::ATTACKTYPE_DRIVE_OVER)
 	{
-		if (thePlant->mSeedType == SeedType::SEED_CHERRYBOMB || thePlant->mSeedType == SeedType::SEED_JALAPENO ||
+		if (MemeCharacters::Type(thePlant) == MemeCharacters::IceChili || thePlant->mSeedType == SeedType::SEED_CHERRYBOMB || thePlant->mSeedType == SeedType::SEED_JALAPENO ||
 			thePlant->mSeedType == SeedType::SEED_BLOVER || thePlant->mSeedType == SeedType::SEED_SQUASH)
 		{
 			return false;
@@ -7115,7 +7115,7 @@ void Zombie::EatPlant(Plant* thePlant)
 	}
 
 	StartEating();
-	if (thePlant->mSeedType == SeedType::SEED_JALAPENO ||
+	if (MemeCharacters::Type(thePlant) == MemeCharacters::IceChili || thePlant->mSeedType == SeedType::SEED_JALAPENO ||
 		thePlant->mSeedType == SeedType::SEED_CHERRYBOMB ||
 		thePlant->mSeedType == SeedType::SEED_DOOMSHROOM ||
 		thePlant->mSeedType == SeedType::SEED_ICESHROOM ||

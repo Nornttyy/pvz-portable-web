@@ -100,8 +100,8 @@ test('native projectile integration retains splats, centered scaling and fire at
  const plant=source.slice(source.indexOf('void Plant::Fire('),source.indexOf('Zombie* Plant::FindTargetZombie('));
  assert.ok(plant.indexOf('aProjectile->ConvertToFireball(mPlantCol)')>plant.indexOf('SandboxPlants::OnFired(this,aProjectile,theTargetZombie)'),'fire attaches only after muzzle correction');
 });
-test('eleven originals remain; retired formations migrate without losing native plants',async()=>{
- assert.equal(ORIGINAL_PLANTS.length,11);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,519,520,521,522,523,524,525,526,527]);assert.deepEqual(ORIGINAL_ZOMBIES.map(z=>z.id),[212,213,214,215,216,217,218,219]);assert.equal(ZOMBIES.length,31);
+test('twelve originals remain; retired formations migrate without losing native plants',async()=>{
+ assert.equal(ORIGINAL_PLANTS.length,12);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,519,520,521,522,523,524,525,526,527,528]);assert.deepEqual(ORIGINAL_ZOMBIES.map(z=>z.id),[212,213,214,215,216,217,218,219]);assert.equal(ZOMBIES.length,31);
  const bases=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
  for(let id=100;id<120;++id)assert.equal(validateLayout({schema:1,map:0,plants:[{type:id,col:0,row:0}]}).plants[0].type,bases[id-100]);
  for(const p of [...RETIRED_PLANTS,...RETIRED_CHARACTERS]){

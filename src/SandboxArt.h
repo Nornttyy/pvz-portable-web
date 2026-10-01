@@ -13,6 +13,7 @@ Sexy::Image* CleverHead(bool jawPose);
 Sexy::Image* GreenCone(int damage);
 Sexy::Image* NukeNative(const char* file,int phase);
 Sexy::Image* StinkCap(const char* file);
+Sexy::Image* IceChiliNative(const char* file);
 Sexy::Image* NauseatedImage(Sexy::Image* source);
 Sexy::Image* WaterDrop();
 void DrawNukeEnergy(Sexy::Graphics*,Reanimation*,int age);

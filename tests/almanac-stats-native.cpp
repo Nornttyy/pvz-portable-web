@@ -19,6 +19,11 @@ std::string_view plant(int id){return MemeCharacters::Find(id)->description;}
 int main(){
  using namespace MemeCharacters;
  using namespace MemeShooterRules;
+ includes(plant(IceChili),"整行伤害"+number(IceChiliRules::Damage));
+ includes(plant(IceChili),"种下"+number(IceChiliRules::Windup/100.0)+"秒");
+ includes(plant(IceChili),"冻结"+number(IceChiliRules::Freeze/100.0)+"秒");
+ includes(plant(IceChili),number(IceChiliRules::Cost)+"阳光");
+ includes(plant(IceChili),"冷却"+number(PlantingCooldown(IceChili)/100.0)+"秒");
  includes(plant(StinkShroom),"伤害"+number(StinkShroomRules::Damage));
  includes(plant(StinkShroom),"每"+number(StinkShroomRules::Interval/100.0)+"秒喷射");
  includes(plant(StinkShroom),"眩晕"+number(StinkShroomRules::StunTicks/100.0)+"秒");

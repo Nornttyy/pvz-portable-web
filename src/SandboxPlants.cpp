@@ -225,6 +225,16 @@ void DrawStinkPreview(Sexy::Graphics* g,float x,float y,bool imitater){
  }
  PvzpDrawImageScaledF(g,cached.get(),x-20*g->mScaleX,y-20*g->mScaleY,g->mScaleX,g->mScaleY);
 }
+void DrawIceChiliPreview(Sexy::Graphics* g,float x,float y,bool imitater){
+ static std::unique_ptr<Sexy::MemoryImage> previews[2];auto& cached=previews[imitater?1:0];
+ if(!cached){
+  cached=gLawnApp->mReanimatorCache->MakeBlankMemoryImage(120,120);Sexy::Graphics canvas(cached.get());canvas.SetLinearBlend(true);
+  Reanimation anim;anim.ReanimationInitializeType(20,20,REANIM_JALAPENO);anim.SetFramesForLayer("anim_idle");
+  if(imitater)gLawnApp->mReanimatorCache->UpdateReanimationForVariation(&anim,VARIATION_IMITATER);
+  AbstractRigVisuals::Scope pose(&anim,MemeCharacters::IceChili);anim.Draw(&canvas);
+ }
+ PvzpDrawImageScaledF(g,cached.get(),x-20*g->mScaleX,y-20*g->mScaleY,g->mScaleX,g->mScaleY);
+}
 void DrawNausea(Sexy::Graphics* g,const Plant* p){
  if(!StinkShroom::Affected(p))return;
  auto* drop=SandboxArt::WaterDrop();if(!drop)return;

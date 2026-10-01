@@ -387,7 +387,7 @@ void SeedChooserScreen::Draw(Graphics* g)
 		}
 	}
 
-	for (SeedType extra : {SEED_LEFTPEATER, SEED_SMALL_NUT}) if (AbstractChooserExpanded())
+	for (SeedType extra : {SEED_LEFTPEATER, SEED_SMALL_NUT, SEED_SPROUT}) if (AbstractChooserExpanded())
 	{
 		int x, y;
 		GetSeedPositionInChooser(extra, x, y);

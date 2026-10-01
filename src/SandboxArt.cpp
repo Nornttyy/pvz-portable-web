@@ -17,6 +17,19 @@
 #include <algorithm>
 #include <cmath>
 namespace SandboxArt {
+Sexy::Image* IceChiliNative(const char* file){
+ static std::map<std::string,std::unique_ptr<Sexy::MemoryImage>> images;auto& out=images[file];if(out)return out.get();
+ auto* source=dynamic_cast<Sexy::MemoryImage*>(NativeImage(file));if(!source)return nullptr;
+ out=std::make_unique<Sexy::MemoryImage>();out->Create(source->mWidth,source->mHeight);
+ const auto* in=source->GetBits();auto* bits=out->GetBits();
+ for(int i=0;i<source->mWidth*source->mHeight;++i){
+  const auto p=in[i];const int r=(p>>16)&255,g=(p>>8)&255,b=p&255,lo=std::min(g,b);
+  // Recolour only red pigment: retain native ink, white eyes, green stalk,
+  // shading, alpha and exact bone registration, including the exploding pose.
+  bits[i]=(p>>24)&&r>g+8&&r>b+8&&r>40?(p&0xff000000u)|(unsigned(lo+(r-lo)*20/100)<<16)|(unsigned(lo+(r-lo)*70/100)<<8)|unsigned(r):p;
+ }
+ out->BitsChanged();return out.get();
+}
 Sexy::Image* StinkCap(const char* file){
  static std::map<std::string,std::unique_ptr<Sexy::MemoryImage>> images;auto& out=images[file];if(out)return out.get();
  auto* source=dynamic_cast<Sexy::MemoryImage*>(NativeImage(file));if(!source)return nullptr;

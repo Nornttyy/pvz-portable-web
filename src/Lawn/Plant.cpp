@@ -24,6 +24,7 @@
 #include "../NukeShroom.h"
 #include "../StinkShroom.h"
 #include "../AbstractRigVisuals.h"
+#include "../IceChili.h"
 #include "Board.h"
 #include "Zombie.h"
 #include "Cutscene.h"
@@ -476,6 +477,13 @@ void Plant::PlantInitialize(int theGridX, int theGridY, SeedType theSeedType, Se
 		PVZP_ASSERT(aBodyReanim);
 		break;
 	case SeedType::SEED_SPROUT:
+		if (aPlantDef.mReanimationType == REANIM_JALAPENO && IsInPlay())
+		{
+			mDoSpecialCountdown = IceChiliRules::Windup;
+			aBodyReanim->SetFramesForLayer("anim_explode");
+			aBodyReanim->mLoopType = REANIM_PLAY_ONCE_AND_HOLD;
+			mApp->PlayFoley(FOLEY_REVERSE_EXPLOSION);
+		}
 		break;
 	case SeedType::SEED_FLOWERPOT:
 		if (IsInPlay())
@@ -2371,7 +2379,7 @@ void Plant::Squish()
 
 	if (!mIsAsleep)
 	{
-		if (mSeedType == SeedType::SEED_CHERRYBOMB || mSeedType == SeedType::SEED_JALAPENO ||
+		if (MemeCharacters::Type(this) == MemeCharacters::IceChili || mSeedType == SeedType::SEED_CHERRYBOMB || mSeedType == SeedType::SEED_JALAPENO ||
 			mSeedType == SeedType::SEED_DOOMSHROOM || mSeedType == SeedType::SEED_ICESHROOM)
 		{
 			DoSpecial();
@@ -3471,7 +3479,7 @@ void Plant::UpdateShooting()
 
 void Plant::Animate()
 {
-	if ((mSeedType == SeedType::SEED_CHERRYBOMB || mSeedType == SeedType::SEED_JALAPENO) && mApp->mGameMode != GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN)
+	if ((MemeCharacters::Type(this) == MemeCharacters::IceChili || mSeedType == SeedType::SEED_CHERRYBOMB || mSeedType == SeedType::SEED_JALAPENO) && mApp->mGameMode != GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN)
 	{
 		mShakeOffsetX = RandRangeFloat(-1.0f, 1.0f);
 		mShakeOffsetY = RandRangeFloat(-1.0f, 1.0f);
@@ -4215,6 +4223,11 @@ void Plant::DrawSeedType(Graphics* g, SeedType theSeedType, SeedType theImitater
 		SandboxPlants::DrawStinkPreview(&aSeedG,thePosX,thePosY,aDrawVariation==VARIATION_IMITATER);
 		return;
 	}
+	if (aSeedType == SeedType::SEED_SPROUT && (gSandboxEnabled || MemeAdventure::RosterEnabled()))
+	{
+		SandboxPlants::DrawIceChiliPreview(&aSeedG,thePosX,thePosY,aDrawVariation==VARIATION_IMITATER);
+		return;
+	}
 	if (aSeedType == SeedType::SEED_LEFTPEATER)
 	{
 		aOffsetX += aSeedG.mScaleX * 80.0f;
@@ -4378,6 +4391,7 @@ void Plant::KillAllPlantsNearDoom()
 
 void Plant::DoSpecial()
 {
+	if (IceChili::Detonate(this)) return;
 	int aPosX = mX + mWidth / 2;
 	int aPosY = mY + mHeight / 2;
 	int aDamageRangeFlags = GetDamageRangeFlags(PlantWeapon::WEAPON_PRIMARY);
@@ -5094,6 +5108,13 @@ void Plant::Die()
 
 const PlantDefinition& GetPlantDefinition(SeedType theSeedType)
 {
+	if (theSeedType == SEED_SPROUT && (gSandboxEnabled || MemeAdventure::RosterEnabled()))
+	{
+		static const PlantDefinition ice{.mSeedType=SEED_SPROUT,.mPlantImage=nullptr,.mReanimationType=REANIM_JALAPENO,
+			.mPacketIndex=11,.mSeedCost=IceChiliRules::Cost,.mRefreshTime=IceChiliRules::Recharge,
+			.mSubClass=SUBCLASS_NORMAL,.mLaunchRate=0,.mPlantName="ICE_CHILI"};
+		return ice;
+	}
 	PVZP_ASSERT(gPlantDefs[theSeedType].mSeedType == theSeedType);
 	PVZP_ASSERT(theSeedType >= 0 && theSeedType < static_cast<int>(SeedType::NUM_SEED_TYPES));
 

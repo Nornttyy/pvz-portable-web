@@ -15,6 +15,25 @@
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
+ // Ice recolouring never mutates native red art, white eyes, green stalk or alpha.
+ for(const char* file:{"Jalapeno_body.png","Jalapeno_cheek.png","Jalapeno_mouth.png"}){
+  auto* source=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::NativeImage(file));
+  source->bits[0]=0xffdd5533;source->bits[1]=0xff171115;source->bits[2]=0xff77aa22;source->bits[3]=0x00dd5533;source->bits[4]=0xffffffff;
+  auto* ice=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::IceChiliNative(file));const auto p=ice->bits[0];
+  assert((p&255)>((p>>8)&255)&&((p>>8)&255)>((p>>16)&255)&&source->bits[0]==0xffdd5533);
+  assert(ice->mWidth==source->mWidth&&ice->mHeight==source->mHeight);
+  for(int i:{1,2,3,4})assert(ice->bits[i]==source->bits[i]);
+ }
+ {Board b;SandboxPlants::Reset();auto* p=b.plant(2,2);p->mSeedType=SeedType(51);SandboxPlants::Assign(p,528);
+  Reanimation body;Track tracks[]={{"Jalapeno_body"},{"Jalapeno_cheek"},{"Jalapeno_mouth"},{"Jalapeno_stem"},{"Jalapeno_eye1"}};TrackInstance instances[5];body.def.mTracks={5,tracks};body.mTrackInstances=instances;app.reanims[99]=&body;p->mBodyReanimID=99;
+  auto* source=SandboxArt::NativeImage("Jalapeno_body.png");ReanimatorTransform original;original.mImage=source;original.mTransX=13;original.mTransY=-3;original.mScaleX=.8f;
+  for(bool preview:{false,true}){auto check=[&]{for(int i=0;i<5;++i){auto t=original;AbstractRigVisuals::Transform(&body,i,t);assert((t.mImage!=source)==(i<3));near(t.mTransX,13);near(t.mTransY,-3);near(t.mScaleX,.8f);}};
+   if(preview){AbstractRigVisuals::Scope scope(&body,528);check();}else{AbstractRigVisuals::Scope scope(p);check();}
+  }
+  auto native=original;AbstractRigVisuals::Transform(&body,0,native);assert(native.mImage==source);
+  const auto saved=SandboxPlants::SavePower(p);SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved));assert(SandboxPlants::Type(p)==528);
+  SandboxPlants::Reset();app.reanims.erase(99);
+ }
  // Brown cap copies retain native silhouette, spots, ink and alpha. Never
  // recolour the pale-green stalk/eyes or mutate the shared purple source.
  for(const char* file:{"FumeShroom_head.png","FumeShroom_spout.png","FumeShroom_tip.png"}){
