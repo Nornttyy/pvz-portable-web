@@ -3,6 +3,7 @@
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
   "mode": "Five abstract plants (500,501,519,520,521), Louis XVI (212), and Runaway Zombie (213). Replacements occupy vanilla peashooter, sunflower, walnut and repeater slots in adventure and one unified sandbox catalogue, with no New Cards tab or duplicate vanilla entries. Tucking Sunflower (520) uses the standing native sunflower portrait and native slot 1; slot 53 plants and cards migrate on save restore, preserving health and sun countdown. Its proximity tucking/pass-through and native 25-sun production remain unchanged. Long Repeater (521) commits to 50 native peas, one every 2 ticks, then rests 150 ticks; each pea does 1 damage (2 after native torchwood conversion), with native speed, straight motion and splat, no knockback. Per-projectile damage tags and partial volleys survive save/restore. Shooter Pea (519) remains one standalone entry in the same catalogue. Other mechanics and campaign progress are preserved.",
+  "weakPeaVisualScale": 0.6,
   "files": [
     {
       "name": "pvz-portable.js",
@@ -11,8 +12,8 @@
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7565813,
-      "sha256": "884164bd71f1fbd632ad46319a694500cd2ce771e9e2974b8f8a4bdfbdaf0cb9"
+      "size": 7565932,
+      "sha256": "89011177decf241f5cbc5bafe606076c6550bc5d35f45077413ce8267aa1479e"
     }
   ]
 }

@@ -1179,7 +1179,11 @@ void Projectile::DrawShadow(Graphics* g)
 		aScale *= 200.0f / (aHeight + 200.0f);
 	}
 
-    aScale *= SandboxPlants::ShotScale(this);
+	const float aVisualScale = SandboxPlants::ShotScale(this);
+	// Shrink around the existing shadow centre, not its top-left corner.
+	aOffsetX += IMAGE_PEA_SHADOWS->GetCelWidth() * 0.5f * aScale * aStretch * (1.0f - aVisualScale);
+	aOffsetY += IMAGE_PEA_SHADOWS->GetCelHeight() * 0.5f * aScale * (1.0f - aVisualScale);
+	aScale *= aVisualScale;
 	PvzpDrawImageCelScaledF(g, IMAGE_PEA_SHADOWS, aOffsetX, (mShadowY - mPosY + aOffsetY), aCelCol, 0, aScale * aStretch, aScale);
 }
 

@@ -87,6 +87,20 @@ int main(){
  auto* wave=board.AddProjectile(0,0,0,2,PROJECTILE_PEA);SandboxPlants::OnFired(rage,wave,nullptr);
  near(wave->mPosX+12,rage->mX+60);near(wave->mPosY+12,rage->mY+50.44f);near(SandboxPlants::ShotScale(wave),1);
  assert(MemeCharacters::ShotStyle(wave)>0&&!SandboxPlants::DrawShot(&g,wave));
+ // Only the 50-shot Repeater's peas shrink. Native muzzle coordinates,
+ // collision radius, damage tag and other shooters remain untouched.
+ {auto* p=board.plant(2,2);p->mSeedType=static_cast<SeedType>(7);SandboxPlants::Assign(p,521);
+  auto* shot=board.AddProjectile(220,250,0,2,PROJECTILE_PEA);SandboxPlants::OnFired(p,shot,nullptr);
+  near(SandboxPlants::ShotScale(shot),.6f);near(shot->mPosX,220);near(shot->mPosY,250);
+  assert(SandboxPlants::ShotRadius(shot)==12&&SandboxPlants::ShotDamage(shot,20)==1);
+  assert(!SandboxPlants::DrawShot(&g,shot));
+  const int saved=SandboxPlants::SaveShot(shot);SandboxPlants::ForgetShot(shot);SandboxPlants::RestoreShot(shot,saved);near(SandboxPlants::ShotScale(shot),.6f);
+  shot->mProjectileType=PROJECTILE_SNOWPEA;near(SandboxPlants::ShotScale(shot),.6f);
+  shot->mProjectileType=PROJECTILE_FIREBALL;near(SandboxPlants::ShotScale(shot),1);assert(SandboxPlants::ShotDamage(shot,40)==2);
+  auto* native=board.AddProjectile(220,250,0,2,PROJECTILE_PEA);near(SandboxPlants::ShotScale(native),1);near(SandboxPlants::ShotScale(wave),1);
+  // The native pea centre stays at 12px even when its raster cel is 27px.
+  near(SandboxVisualRules::NativePeaOffset(27,.6f)+(12-13.5f)*.6f,12);
+ }
  {Reanimation body;Track tracks[]={{"anim_face"}};TrackInstance instances[1];body.def.mTracks={1,tracks};body.mTrackInstances=instances;
   auto* native=SandboxArt::NativeImage("PeaShooter_Head.png");instances[0].mImageOverride=native;app.reanims[80]=&body;rage->mBodyReanimID=80;
   assert(SandboxPlants::RestorePower(rage,{500,300,1,0,0,0,0,0,50,2}));

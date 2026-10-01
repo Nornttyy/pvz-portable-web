@@ -113,7 +113,12 @@ void RestoreShot(const Projectile* p,int record){
 }
 void AdjustScale(const Plant* p,float& x,float& y,float& sx,float& sy){MemeCharacters::Scale(p,x,y,sx,sy);}
 void AdjustShadow(const Plant*,float&,float&,float&){}
-float ShotScale(const Projectile*){return 1;}
+float ShotScale(const Projectile* shot){
+ // Visual only: weak Repeater peas are smaller, not weaker or slower.
+ // Torchwood's attached fire animation keeps its native size and shadow.
+ return MemeCharacters::ShotStyle(shot)==MemeCharacters::WeakProjectile&&
+  (shot->mProjectileType==PROJECTILE_PEA||shot->mProjectileType==PROJECTILE_SNOWPEA)?0.6f:1.0f;
+}
 bool HasShot(const Projectile* p){return MemeCharacters::ShotStyle(p)!=0;}
 bool UsesCustomShotArt(const Projectile*){return false;}
 int ShotRadius(const Projectile*){return 12;}
