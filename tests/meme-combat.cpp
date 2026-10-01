@@ -43,8 +43,8 @@ int main(){
    if(dodge){
     assert(SandboxZombies::IsDodging(z)&&z->mPhaseCounter==160&&SandboxZombies::FlipDuration(z)==160);
     const int target=z->mTargetRow;assert(target>=0&&target<5&&std::abs(target-2)<=1);
-    assert((target!=2)==(roll<30));
-    const bool flying=roll<10;assert(SandboxZombies::IsForwardFlight(z)==flying&&SandboxZombies::UsesSlowFlip(z));
+    assert((target!=2)==(roll<60));
+    const bool flying=roll<30;assert(SandboxZombies::IsForwardFlight(z)==flying&&SandboxZombies::UsesSlowFlip(z));
     assert(SandboxZombies::ShowsCleverJaw(z)&&z->mSummonCounter==180);
     // Ice holds the actual flip clock; a new projectile can hit while frozen.
     z->mIceTrapCounter=20;auto* next=w.AddProjectile(500,200,0,2,PROJECTILE_PEA);
@@ -72,11 +72,20 @@ int main(){
   assert(successes==70);Sexy::forcedRoll=-1;
  }
  // Lane and flight rolls are independent, including all exact boundaries.
- for(int id:{216,217})for(int lane:{29,30})for(int fly:{9,10}){World w;auto* z=w.enemy(500,2,static_cast<ZombieType>(SandboxZombies::Base(id)));SandboxZombies::Assign(z,id);
+ for(int id:{216,217})for(int lane:{59,60})for(int fly:{29,30}){World w;auto* z=w.enemy(500,2,static_cast<ZombieType>(SandboxZombies::Base(id)));SandboxZombies::Assign(z,id);
   auto* shot=w.AddProjectile(500,200,0,2,PROJECTILE_PEA);
-  Sexy::queuedRolls=lane<30?std::vector<int>{69,lane,0,fly}:std::vector<int>{69,lane,fly};
+  Sexy::queuedRolls=lane<60?std::vector<int>{69,lane,0,fly}:std::vector<int>{69,lane,fly};
   assert(SandboxZombies::DodgeProjectile(shot,z)&&Sexy::queuedRolls.empty());
-  assert((z->mTargetRow!=2)==(lane<30));assert(SandboxZombies::IsForwardFlight(z)==(fly<10));
+  assert((z->mTargetRow!=2)==(lane<60));assert(SandboxZombies::IsForwardFlight(z)==(fly<30));
+ }
+ // Exercise every random value through the real production decision path,
+ // independently of the 70% initial dodge roll, for both native body types.
+ for(int id:{216,217}){int changed=0,flew=0;
+  for(int roll=0;roll<100;++roll){World w;auto* z=w.enemy(500,2,static_cast<ZombieType>(SandboxZombies::Base(id)));SandboxZombies::Assign(z,id);
+   auto* shot=w.AddProjectile(500,200,0,2,PROJECTILE_PEA);const int fly=(37*roll+11)%100;
+   Sexy::queuedRolls=roll<60?std::vector<int>{69,roll,roll%2,fly}:std::vector<int>{69,roll,fly};
+   assert(SandboxZombies::DodgeProjectile(shot,z)&&Sexy::queuedRolls.empty());changed+=z->mTargetRow!=2;flew+=SandboxZombies::IsForwardFlight(z);
+  }assert(changed==60&&flew==30);
  }
  for(int id:{216,217}){World w;w.pool=true;auto* z=w.enemy(400,1,id==217?static_cast<ZombieType>(2):ZOMBIE_NORMAL);SandboxZombies::Assign(z,id);
   assert(SandboxZombies::Speed(z)==1.25f);z->mHelmHealth=id==217?370:0;

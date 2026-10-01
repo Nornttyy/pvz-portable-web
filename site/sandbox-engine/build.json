@@ -2,7 +2,7 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Eight abstract plants and eight independent zombies (212..219). Added Green Cone and land-only Twenty-Cone Tower; native cone textures/rigs, gradual adventure unlocks and correct full Unicode glyphs. Existing clever slow motion, balance, progression and saves are preserved.",
+  "mode": "Eight abstract plants and eight independent zombies (212..219). Green Cone and land-only Twenty-Cone Tower use native cone textures/rigs with gradual adventure unlocks. Both clever variants now roll 60% lane changes and 30% forward flights per accepted flip. Motion timing, other stats, progression and saves are preserved.",
   "coneVariants": {
     "green": {
       "id": 218,
@@ -41,8 +41,8 @@
     "dodgePercentWhenReady": 70,
     "flipTicks": 160,
     "recoveryTicks": 120,
-    "laneChangePercent": 30,
-    "forwardFlightPercentPerFlip": 10,
+    "laneChangePercent": 60,
+    "forwardFlightPercentPerFlip": 30,
     "forwardFlightTiles": 2,
     "jawPoseTicks": 110,
     "flipJawTicks": 180,
@@ -138,7 +138,7 @@
     {
       "name": "pvz-portable.wasm",
       "size": 7663464,
-      "sha256": "0f6293ca17212c1f1e35734c8ee0bf1e6b0b169edd9f80d37e767bd0e7216ba1"
+      "sha256": "6e9854fe462363e979c4937266bf75151162aa5f1e31bddebc372cf3be56dd64"
     }
   ]
 }

@@ -14,7 +14,7 @@ inline constexpr int RunIn=1040,RunBrake=1041,RunOut=1042,BrakeTicks=8;
 inline constexpr float RunInSpeed=5.6f,RunOutSpeed=7.2f,RunAnimRate=68.0f;
 inline constexpr int Clever=216,CleverCone=217,CleverUnlock=23,CleverConeUnlock=26;
 inline constexpr int CleverFlip=1044,CleverFlee=1045,FlipTicks=160,LegacyFlipTicks=90,DodgeRecovery=120;
-inline constexpr int DodgePercent=70,LaneChangePercent=30,ForwardFlightPercent=10;
+inline constexpr int DodgePercent=70,LaneChangePercent=60,ForwardFlightPercent=30;
 inline constexpr int ForwardFlightTag=21610,JawPoseTicks=110;
 // Version the motion in a native saved field, so an older mid-air save can
 // finish its original trajectory without a position/rotation jump.
@@ -38,7 +38,7 @@ inline constexpr std::array<Definition,8> Definitions{{
  {Runner,0,"跑路僵尸","冲到后排，转身就跑。",nullptr,270,0,RunnerUnlock},
  {ConeWrap,2,"雪糕桶包裹我","20桶组成，7桶耐久。",nullptr,270,ConeCount*ConeHealth,ConeWrapUnlock},
  {GiantImp,24,"巨人小鬼","巨人头，小鬼身。一击秒杀植物。",nullptr,270,0,GiantImpUnlock},
- {Clever,0,"智斗僵尸","70%翻身闪弹，30%换路。翻身时10%前飞两格，偷完就跑。",nullptr,270,0,CleverUnlock},
+ {Clever,0,"智斗僵尸","70%翻身闪弹。翻身时60%换路、30%前飞两格，偷完就跑。",nullptr,270,0,CleverUnlock},
  {CleverCone,2,"路障智斗僵尸","戴路障的智斗僵尸。入水套泳圈，偷完就跑。",nullptr,270,ConeHealth,CleverConeUnlock},
  {GreenCone,2,"绿路障僵尸","绿色路障，双倍耐久。",nullptr,270,2*ConeHealth,GreenConeUnlock},
  {ConeTower,2,"路障叠叠高僵尸","头顶20个路障。极慢，极耐打，无法游泳。",nullptr,270,TowerCones*ConeHealth,ConeTowerUnlock}

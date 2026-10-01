@@ -4,13 +4,13 @@ import {readFile} from 'node:fs/promises';
 const read=p=>readFile(new URL('../'+p,import.meta.url),'utf8');
 test('clever variants share the requested probabilities and registered action-only jaw art',async()=>{
  const h=await read('src/SandboxZombies.h'),custom=await read('src/SandboxZombies.cpp'),rig=await read('src/AbstractRigVisuals.cpp');
- assert.match(h,/DodgePercent=70,LaneChangePercent=30,ForwardFlightPercent=10/);
+ assert.match(h,/DodgePercent=70,LaneChangePercent=60,ForwardFlightPercent=30/);
  assert.match(h,/ForwardFlightDistance=160\.0f/);
  assert.match(custom,/FlipTravel\(t\)-FlipTravel\(previous\)/);
  assert.doesNotMatch(custom,/Zombie_head_sunglasses/);
  assert.match(rig,/CleverHead\(p->state\[1\]!=0\)/);
  const meta=JSON.parse(await read('site/sandbox-engine/build.json')).cleverZombies;
- assert.equal(meta.dodgePercentWhenReady,70);assert.equal(meta.laneChangePercent,30);assert.equal(meta.forwardFlightPercentPerFlip,10);assert.equal(meta.forwardFlightTiles,2);
+ assert.equal(meta.dodgePercentWhenReady,70);assert.equal(meta.laneChangePercent,60);assert.equal(meta.forwardFlightPercentPerFlip,30);assert.equal(meta.forwardFlightTiles,2);
  assert.equal(meta.flipTicks,160);assert.equal(meta.flipJawTicks,180);assert.equal(meta.recoveryTicks,120);
 });
 test('slow motion drives every local movement channel without slowing the board',async()=>{
