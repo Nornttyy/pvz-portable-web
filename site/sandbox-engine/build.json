@@ -4,6 +4,7 @@
   "openmpt": "0.8.4",
   "mode": "Six abstract plants (500,501,519,520,521,522), Louis XVI (212), and Runaway Zombie (213). Replacements occupy vanilla seed slots in adventure and one unified sandbox catalogue, without a New Cards tab or duplicate vanilla entries. Gatling Shooter (522) replaces slot 40, retaining native art, 250-sun price and Repeater upgrade requirement: one 15-damage native pea every 10 ticks, overheat after 120 shots (12 seconds), then exactly 350 cooling ticks (3.5 seconds). Neither Rage Pea nor Gatling displays progress bars. Gatling's native head, mouth and blinks progressively redden with heat and fade to green during cooling; helmet, metal barrels and card art remain unchanged. Native steam is retained. Per-plant heat, cooling clocks and per-projectile damage tags survive optional saves; native fire conversion does 30 damage. Tucking Sunflower (520) keeps its standing portrait and slot-53 save migration. Long Repeater (521) retains its 50-shot, 1-damage volley and 60-percent pea/shadow size. Other mechanics, native gating and campaign progress are unchanged.",
   "weakPeaVisualScale": 0.6,
+  "tuckingPoolSupport": "Standing and tucked sunflowers in pool squares disappear after losing their last living lily pad, including unsupported flowers restored from old saves. Land and lifted plants are unchanged.",
   "mobileTextInput": "Tappable native-widget overlay inside the fullscreen canvas container, with IME composition, native text/width limits, selection, deletion and ordered submit. Desktop keyboard behavior is unchanged.",
   "gatling": {
     "id": 522,
@@ -21,8 +22,8 @@
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7570585,
-      "sha256": "3ba041cd161b3917f501b8ced7634356429a2a0faa41db7082de964a354c2a3f"
+      "size": 7571104,
+      "sha256": "159d6c7a6ab27df1933b423985af0eb05ffc665b354ada4795181a9121afa4f4"
     }
   ]
 }

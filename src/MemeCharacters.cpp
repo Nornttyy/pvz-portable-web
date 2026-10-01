@@ -105,6 +105,17 @@ void Tick(Board* b){
  if(b->mPaused)return;
  for(auto* p:b->mPlants){
   auto it=states.find(p);if(it==states.end())continue;if(p->mDead){states.erase(it);continue;}auto& s=it->second;
+  // Hiding lets zombies chew the pad underneath, but does not make the
+  // sunflower aquatic. Also repair unsupported flowers restored from saves.
+  if(s.id==TuckingSunflower&&p->IsInPlay()&&!p->NotOnGround()&&b->IsPoolSquare(p->mPlantCol,p->mRow)){
+   bool supported=false;
+   for(auto* pad:b->mPlants){
+    if(pad->mDead||pad->NotOnGround()||pad->mPlantHealth<=0||pad->mPlantCol!=p->mPlantCol||pad->mRow!=p->mRow)continue;
+    const auto type=pad->mSeedType==SEED_IMITATER?pad->mImitaterType:pad->mSeedType;
+    if(type==SEED_LILYPAD){supported=true;break;}
+   }
+   if(!supported){p->Die();continue;} // Die erases s via SandboxPlants::Forget.
+  }
   if(s.id!=TuckingSunflower){p->mLaunchCounter=9999;p->mShootingCounter=0;}
   if(p->mIsAsleep||p->mSquished||p->NotOnGround()||p->mPlantHealth<=0){if(s.id==TuckingSunflower)s.phase=0;continue;}
   s.age=(s.age+1)%1000000;if(s.pulse)--s.pulse;if(s.delay)--s.delay;if(s.timer)--s.timer;

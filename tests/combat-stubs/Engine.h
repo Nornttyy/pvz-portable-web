@@ -7,7 +7,7 @@
 #include <string>
 #include <algorithm>
 #include <cstdint>
-enum SeedType {SEED_PEASHOOTER=0,SEED_SUNFLOWER=1,SEED_NONE=-1};
+enum SeedType {SEED_PEASHOOTER=0,SEED_SUNFLOWER=1,SEED_LILYPAD=16,SEED_IMITATER=48,SEED_NONE=-1};
 enum ZombieType {ZOMBIE_NORMAL=0,ZOMBIE_IMP=24,ZOMBIE_GARGANTUAR=23,ZOMBIE_REDEYE_GARGANTUAR=32,ZOMBIE_ZAMBONI=12};
 enum ZombieID : unsigned { ZOMBIEID_NULL=0 };
 constexpr int PHASE_ZOMBIE_NORMAL=0,HEIGHT_ZOMBIE_NORMAL=0,HEIGHT_FALLING=1;
@@ -107,6 +107,8 @@ public:
  void ApplyChill(bool){chill=600;}
  static void PreloadZombieResources(ZombieType){};static void SetupReanimLayers(Reanimation*,ZombieType){}
 };
+class Plant;
+namespace SandboxPlants {void Forget(Plant*);}
 class Plant{
 public:
  Board* mBoard=nullptr;SeedType mSeedType=SEED_PEASHOOTER;
@@ -116,10 +118,11 @@ public:
  int mRenderOrder=0,mEatenFlashCountdown=0,mState=STATE_READY,mStateCountdown=0;
  int mTargetX=0;
  int CalcRenderOrder(){return mRow*100;}void PlayBodyReanim(const char*,int,int,float){}
- bool mDead=false,mIsAsleep=false,mSquished=false,airborne=false;
+ bool mDead=false,mIsAsleep=false,mSquished=false,airborne=false,inPlay=true;
  float drawHeightOffset=0;
- bool NotOnGround(){return airborne;}
- void SetSleeping(bool value){mIsAsleep=value;}void Die(){mDead=true;}
+ bool NotOnGround(){return airborne||mSquished||mDead;}
+ bool IsInPlay(){return inPlay;}
+ void SetSleeping(bool value){mIsAsleep=value;}void Die(){SandboxPlants::Forget(this);mDead=true;}
  int GetDamageRangeFlags(PlantWeapon){return 0;};Zombie* FindTargetZombie(int row,PlantWeapon);
  void Fire(Zombie*,int row,PlantWeapon);
  bool FindTargetAndFire(int row,PlantWeapon);
@@ -158,6 +161,7 @@ public:
  void AddCoin(int,int,int,int){++mCoins.mSize;}
  std::vector<std::unique_ptr<Plant>> ownedPlants;std::vector<std::unique_ptr<Zombie>> ownedZombies;std::vector<std::unique_ptr<Projectile>> ownedShots;
  bool StageHasPool(){return pool;}
+ bool IsPoolSquare(int col,int row){return pool&&col>=0&&col<9&&(row==2||row==3);}
  int GridToPixelX(int col,int){return col*80;}int GridToPixelY(int,int row){return row*100;}
  int PixelToGridXKeepOnBoard(int x,int){return std::clamp(x/80,0,8);}
  bool RowCanHaveZombies(int row){return row>=0&&row<(pool?6:5);}

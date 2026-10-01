@@ -5,6 +5,8 @@
 - Nearby hostile ground zombies in the same lane trigger tucking, based on their native attack rectangles: enter within 60 native pixels of the plant bounds, recover beyond 84. This prevents repeated switching at the boundary.
 - The whole head (face, petals and blink) uses a shared 0.8 scale and 24-pixel downward shift; stalk tracks retract to 0.35 height. Leaves and roots keep their native pose. No new bitmap, generated face, sweat overlay or per-part turn is used.
 - Chewing and vault targeting skip a tucked flower. Other plants remain targetable; crushing and collateral damage are not globally disabled.
+- In a pool square, it still needs a living lily pad in the same cell. Losing the last pad removes the flower on the next active tick, standing or tucked; old unsupported saves are cleaned up too. Land, lifted plants and non-gameplay previews are unaffected.
 - Native 25-sun production/countdown is unchanged while tucked. No crowd gaze or production penalty remains.
 - Optional ten-int saves use version 3. Version 1 embarrassment saves and old native slot 53 plants/seed-bank entries migrate in place without changing health, native sun countdown or campaign progress.
 - QA: `scripts/qa-tucking-sunflower.mjs` covers real native zombie pass-through, backline eating, recovery/repeated tucking, adventure card, hidden save/resume, phone layout and almanac.
+- Pool regression: `scripts/qa-tucking-pool.mjs` checks a native swimming zombie eating the pad under a tucked flower, with supported-water and land controls. Combat tests also cover pause/resume, saves, stacked pads and imitater pads.

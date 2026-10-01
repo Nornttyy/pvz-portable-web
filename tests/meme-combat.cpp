@@ -105,6 +105,35 @@ int main(){
   p->mIsAsleep=true;w.step();assert(!MemeCharacters::Hiding(p));p->mIsAsleep=false;w.step();assert(MemeCharacters::Hiding(p));
   p->mSquished=true;w.step();assert(!MemeCharacters::Hiding(p));
  }
+ // Tucking skips chewing, not the need for a lily pad. Losing the final
+ // support removes both standing and hidden flowers, including loaded saves.
+ for(bool hidden:{false,true}){World w;w.pool=true;auto* p=w.add(520);auto* pad=w.add(16);
+  if(hidden)w.enemy(80);w.step();assert(!p->mDead&&MemeCharacters::Hiding(p)==hidden);
+  const auto saved=MemeCharacters::Save(p);const int countdown=p->mLaunchCounter;
+  pad->Die();w.mPaused=true;w.step();assert(!p->mDead);w.mPaused=false;
+  SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved));
+  w.step();assert(p->mDead&&p->mLaunchCounter==countdown&&!MemeCharacters::Is(p));
+ }
+ // Other rows/cells and dead, crushed or carried pads cannot support it.
+ for(int invalid=0;invalid<7;++invalid){World w;w.pool=true;auto* p=w.add(520);auto* pad=w.add(16);
+  if(invalid==0)pad->mRow=3;if(invalid==1)pad->mPlantCol=2;if(invalid==2)pad->mDead=true;
+  if(invalid==3)pad->mSquished=true;if(invalid==4)pad->airborne=true;if(invalid==5)pad->mPlantHealth=0;
+  if(invalid==6)pad->mSeedType=static_cast<SeedType>(33); // A flower pot is not a lily pad.
+  w.step();assert(p->mDead);
+ }
+ // Sandbox stacks survive while any valid pad remains; an imitater pad is
+ // treated as support during its native transformation too.
+ {World w;w.pool=true;auto* p=w.add(520);auto* first=w.add(16);auto* second=w.add(16);
+  first->Die();w.step();assert(!p->mDead);second->mSeedType=SEED_IMITATER;second->mImitaterType=SEED_LILYPAD;
+  w.step();assert(!p->mDead);second->Die();w.step();assert(p->mDead);
+ }
+ // Scope: land plants and lifted/display plants are unaffected. A flower
+ // returned to unsupported water is cleaned up, even if sleeping.
+ {World w;w.pool=true;auto* land=w.add(520,1);auto* lifted=w.add(520);lifted->airborne=true;
+  auto* preview=w.add(520);preview->inPlay=false;auto* other=w.add(500);
+  w.step();assert(!land->mDead&&!lifted->mDead&&!preview->mDead&&!other->mDead);
+  lifted->airborne=false;lifted->mIsAsleep=true;w.step();assert(lifted->mDead&&!land->mDead&&!preview->mDead&&!other->mDead);
+ }
  // Migrate legacy embarrassment/pending-sun saves without reviving the old
  // mechanic or changing health/production. New hidden saves round-trip.
  {World w;auto* p=w.add(520);p->mPlantHealth=177;p->mLaunchCounter=821;
