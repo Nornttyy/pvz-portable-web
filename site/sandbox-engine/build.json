@@ -17,13 +17,15 @@
     "walkMultiplier": 1.25,
     "escapeMultiplier": 3,
     "dodgePercentWhenReady": 70,
-    "flipTicks": 90,
+    "flipTicks": 160,
     "recoveryTicks": 120,
     "laneChangePercent": 30,
     "forwardFlightPercentPerFlip": 10,
     "forwardFlightTiles": 2,
     "jawPoseTicks": 110,
-    "animation": "Generated smug face without glasses; an angular jaw with prominent crease marks appears on flips, lane changes and steals. Shared skull registration on the native head bone; original body, cone and duck ring. Two-tile flight follows a continuous eased arc. No global time scaling. Carries the stolen native plant frame. No bucket variant."
+    "flipJawTicks": 180,
+    "slowMotion": "1.6 seconds per flip. The middle 0.8 seconds covers 16% of rotation and travel. C1-continuous takeoff/landing; one local progress curve drives rotation, horizontal travel, lane interpolation and height. Other entities and game clocks keep normal speed. Legacy mid-flight saves complete their original 90-tick trajectory.",
+    "animation": "Generated smug face without glasses; an angular jaw with prominent crease marks appears on flips, lane changes and steals. Shared skull registration on the native head bone; original body, cone and duck ring. Two-tile flight follows a continuous slow-motion arc. No global time scaling. Carries the stolen native plant frame. No bucket variant."
   },
   "cactusPalm": {
     "id": 524,
@@ -113,8 +115,8 @@
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7638798,
-      "sha256": "25cd744cdfbb761b7452fbdae15b84d82123a05db2870e137fb60a7e29521474"
+      "size": 7640243,
+      "sha256": "8a12a46267413c3fed1965483466a0436eeb5722b9c655458477d6c1e83561b3"
     }
   ]
 }

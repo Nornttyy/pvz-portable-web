@@ -338,8 +338,8 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_zombie_data(int index,int field) {
     // Read-only diagnostics also cover adventure save/resume. Commands remain
     // sandbox-only; this cannot spawn enemies or alter campaign progress.
-    auto* board=gLawnApp?gLawnApp->mBoard:nullptr;if(!board||index<0||field<0||field>28)return -1;
-    if(field>=25){for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard())if(index--==0)return field==25?int(z->mBossMode==SandboxZombies::ForwardFlightTag):field==26?z->mSummonCounter:field==27?z->mBossBungeeCounter:int(z->mPosX*1000);return -1;}
+    auto* board=gLawnApp?gLawnApp->mBoard:nullptr;if(!board||index<0||field<0||field>29)return -1;
+    if(field>=25){for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard())if(index--==0)return field==25?int(SandboxZombies::IsForwardFlight(z)):field==26?z->mSummonCounter:field==27?z->mBossBungeeCounter:field==28?int(z->mPosX*1000):SandboxZombies::FlipDuration(z);return -1;}
     if(field>=21){for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard())if(index--==0)return field==21?int(z->mInPool):field==22?z->mBossHeadCounter-1:field==23?z->mBossStompCounter:z->mTargetRow;return -1;}
     if(field>=16){for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard())if(index--==0)return field==16?z->mChilledCounter:field==17?z->mIceTrapCounter:field==18?int(z->IsWalkingBackwards()):field==19?z->mTargetCol:int(z->mIsEating);return -1;}
     for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard()){if(index--==0)return field==0?SandboxZombies::Type(z):field==1?z->mRow:field==2?int(z->mPosX):field==3?int(z->mPosY):field==4?z->mBodyHealth:field==5?z->mHelmHealth:field==6?int(z->mZombiePhase):field==7?z->mShieldHealth:field==9?int(SandboxZombies::Speed(z)*100):field==10?z->mZombieAge:field==11?int(z->mAltitude):field==12?int(SandboxZombies::IsResting(z)):field==13?int(z->mHasHead&&!SandboxZombies::IsLouis(z)):field==14?int(z->mHasHead):field==15?int(z->mZombieType):z->mPhaseCounter;}

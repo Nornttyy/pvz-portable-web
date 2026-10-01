@@ -15,6 +15,19 @@
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
+ // The entire native rig rotates on exactly the same slowed clock as its
+ // flight/lane curve. Native facing is mirrored once; the pivot stays fixed.
+ for(int id:{216,217})for(float facing:{1.f,-1.f}){SandboxZombies::Reset();Board w;auto* z=w.AddZombieInRow(static_cast<ZombieType>(SandboxZombies::Base(id)),2,-1);SandboxZombies::Assign(z,id);
+  z->mZombiePhase=SandboxZombies::CleverFlip;z->mBossMode=SandboxZombies::SlowFlipTag;
+  for(int elapsed:{0,10,39,40,41,60,80,100,119,120,121,150,159,160}){
+   z->mPhaseCounter=160-elapsed;Reanimation body;body.mOverlayMatrix={facing,0,220,0,1,150};
+   SandboxZombies::AdjustPose(z,&body);const auto m=body.mOverlayMatrix;
+   const float angle=SandboxZombies::SlowFlipProgress(float(elapsed)/160)*6.2831853f;
+   near(m.m00,facing*std::cos(angle));near(m.m01,-facing*std::sin(angle));near(m.m10,std::sin(angle));near(m.m11,std::cos(angle));
+   near(m.m02+m.m00*40+m.m01*80,220+facing*40);near(m.m12+m.m10*40+m.m11*80,230);
+  }
+  SandboxZombies::Forget(z);Reanimation ordinary;ordinary.mOverlayMatrix={facing,0,220,0,1,150};SandboxZombies::AdjustPose(z,&ordinary);near(ordinary.mOverlayMatrix.m00,facing);near(ordinary.mOverlayMatrix.m02,220);
+ }
  // Both generated faces share one skull registration; body/hat/ring keep
  // native transforms and all temporary overrides are restored after drawing.
  for(int id:{216,217}){SandboxZombies::Reset();Board w;auto* z=w.AddZombieInRow(static_cast<ZombieType>(SandboxZombies::Base(id)),2,-1);SandboxZombies::Assign(z,id);

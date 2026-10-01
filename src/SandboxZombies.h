@@ -13,11 +13,22 @@ inline constexpr float ConeWrapSpeed=0.60f;
 inline constexpr int RunIn=1040,RunBrake=1041,RunOut=1042,BrakeTicks=8;
 inline constexpr float RunInSpeed=5.6f,RunOutSpeed=7.2f,RunAnimRate=68.0f;
 inline constexpr int Clever=216,CleverCone=217,CleverUnlock=23,CleverConeUnlock=26;
-inline constexpr int CleverFlip=1044,CleverFlee=1045,FlipTicks=90,DodgeRecovery=120;
+inline constexpr int CleverFlip=1044,CleverFlee=1045,FlipTicks=160,LegacyFlipTicks=90,DodgeRecovery=120;
 inline constexpr int DodgePercent=70,LaneChangePercent=30,ForwardFlightPercent=10;
 inline constexpr int ForwardFlightTag=21610,JawPoseTicks=110;
+// Version the motion in a native saved field, so an older mid-air save can
+// finish its original trajectory without a position/rotation jump.
+inline constexpr int SlowFlipTag=21620,SlowForwardFlightTag=21621,FlipJawTicks=FlipTicks+20;
 inline constexpr float ForwardFlightDistance=160.0f;
 constexpr float FlipTravel(float t){return t*t*(3.0f-2.0f*t);}
+constexpr float SlowFlipProgress(float t){
+ if(t<=0)return 0;if(t>=1)return 1;
+ if(t>.75f)return 1-SlowFlipProgress(1-t);
+ if(t>=.25f)return .42f+(t-.25f)*.32f;
+ // C1-continuous takeoff -> slow apex -> landing. The middle 0.8 seconds
+ // covers only 16% of the action; all motion uses this one local clock.
+ const float u=t*4;return u*(.375f+u*(.43f-.385f*u));
+}
 inline constexpr float CleverSpeed=1.25f,CleverFleeSpeed=3.0f;
 inline constexpr std::array<Definition,6> Definitions{{
  {Louis,0,"路易十六","天生无头，照常走路啃咬。",nullptr,270,0,LouisUnlock},
@@ -44,6 +55,9 @@ bool IsConeWrap(const Zombie*);
 bool IsGiantImp(const Zombie*);
 bool IsClever(const Zombie*);
 bool IsDodging(const Zombie*);
+bool UsesSlowFlip(const Zombie*);
+bool IsForwardFlight(const Zombie*);
+int FlipDuration(const Zombie*);
 bool ShowsCleverJaw(const Zombie*);
 bool SkipsProjectile(const Projectile*,const Zombie*);
 bool DodgeProjectile(Projectile*,Zombie*);

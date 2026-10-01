@@ -9,7 +9,8 @@ const page=await browser.newPage({viewport:{width:1100,height:750}}),errors=[],r
 const api=(...a)=>page.evaluate(a=>Module._pvz_sandbox_command(...[...a,0,0,0,0].slice(0,4)),a);
 const snap=n=>page.screenshot({path:join(out,n+'.png')});
 const wait=(f,t=30000)=>page.waitForFunction(f,undefined,{timeout:t});
-const zombies=()=>page.evaluate(()=>{const out=[];for(let i=0;i<100;++i){const z=Array.from({length:29},(_,f)=>Module._pvz_sandbox_zombie_data(i,f));if(z[0]<0)break;out.push(z);}return out;});
+const zombies=()=>page.evaluate(()=>{const out=[];for(let i=0;i<100;++i){const z=Array.from({length:30},(_,f)=>Module._pvz_sandbox_zombie_data(i,f));if(z[0]<0)break;out.push(z);}return out;});
+const slowProgress=t=>t<=0?0:t>=1?1:t>.75?1-slowProgress(1-t):t>=.25?.42+(t-.25)*.32:(t*4)*(.375+(t*4)*(.43-.385*t*4));
 async function click(x,y){const b=await page.locator('#canvas').boundingBox(),s=await page.evaluate(()=>[Module.canvas.width,Module.canvas.height]);await page.mouse.click(b.x+x*b.width/s[0],b.y+y*b.height/s[1]);await page.waitForTimeout(100);}
 async function steps(n){for(let i=0;i<n;++i){await api(13);await page.waitForTimeout(35);}}
 async function fresh(){await api(7);await api(4,1);await api(5,1);}
@@ -30,19 +31,21 @@ try{
  await snap('roster');await api(4,0);
  await wait(()=>{for(let i=0;i<10;++i)if(Module._pvz_sandbox_zombie_data(i,6)===1044)return true;return false;});await api(4,1);
  results.flip=await zombies();await snap('flip-start');
- for(let frame=0;frame<4;++frame){await steps(18);await snap('flip-'+frame);}
+ for(let frame=0;frame<4;++frame){await steps(35);await snap('flip-'+frame);}
  await api(4,0);await page.waitForTimeout(2000);await api(4,1);results.landed=await zombies();await snap('landed');
  // Wait for a real random two-cell flight, then inspect each native tick.
  // No RNG setter/teleport/debug damage is used in the shipped engine.
  await fresh();for(let row=0;row<5;++row){await api(1,0,0,row);for(let col=6;col<=8;++col)await api(2,col%2?216:217,col,row);}
  await api(4,0);await wait(()=>{for(let i=0;i<30;++i)if(Module._pvz_sandbox_zombie_data(i,25)===1)return true;return false;},60000);await api(4,1);
  const list=await zombies(),flying=list.findIndex(z=>z[25]===1);assert.ok(flying>=0);
- const start=list[flying],remaining=start[8];assert.equal(start[6],1044);assert.ok(start[26]>0);await snap('forward-start');
+ const start=list[flying],remaining=start[8];assert.equal(start[6],1044);assert.equal(start[29],160);assert.ok(start[26]>remaining);await snap('forward-start');
  const path=[start];for(let i=0;i<remaining;++i){await steps(1);path.push((await zombies())[flying]);if(i===Math.floor(remaining/2))await snap('forward-mid');}
- const end=path.at(-1),t=1-remaining/90,expected=-160*(1-t*t*(3-2*t));
+ const end=path.at(-1),t=1-remaining/160,expected=-160*(1-slowProgress(t));
  assert.ok(Math.abs((end[28]-start[28])/1000-expected)<.025);assert.equal(end[25],0);assert.notEqual(end[6],1044);
- for(let i=1;i<path.length;++i){const dx=(path[i][28]-path[i-1][28])/1000;assert.ok(dx<=.001&&dx>=-2.68);assert.ok(Math.abs(path[i][3]-path[i-1][3])<=2);}
- results.forwardFlight={ticks:remaining,expected,actual:(end[28]-start[28])/1000,start,end,maxTickPixels:Math.max(...path.slice(1).map((z,i)=>Math.abs(z[28]-path[i][28])/1000))};await snap('forward-landed');
+ let slowTicks=0;for(let i=1;i<path.length;++i){const dx=(path[i][28]-path[i-1][28])/1000,elapsed=160-path[i][8];assert.ok(dx<=.001&&dx>=-2.15);assert.ok(Math.abs(path[i][3]-path[i-1][3])<=2);
+  if(elapsed>40&&elapsed<=120){++slowTicks;assert.ok(Math.abs(dx)<=.322);assert.ok(path[i][26]>0);}
+ }assert.ok(slowTicks>60);
+ results.forwardFlight={ticks:remaining,slowTicks,expected,actual:(end[28]-start[28])/1000,start,end,maxTickPixels:Math.max(...path.slice(1).map((z,i)=>Math.abs(z[28]-path[i][28])/1000))};await snap('forward-landed');
  // Native target selection steals the main plant, leaving its lily pad intact.
  await api(8,1);await fresh();await api(1,16,4,2);await api(1,3,4,2);await api(2,217,4,2);await api(4,0);
  await wait(()=>Module._pvz_sandbox_zombie_data(0,22)===3);await api(4,1);

@@ -39,17 +39,22 @@ int main(){
    const bool dodge=SandboxZombies::DodgeProjectile(shot,z);successes+=dodge;
    assert(dodge==(roll<70)&&!shot->mDead&&z->mBodyHealth==1000);
    if(dodge){
-    assert(SandboxZombies::IsDodging(z)&&z->mPhaseCounter==90);
+    assert(SandboxZombies::IsDodging(z)&&z->mPhaseCounter==160&&SandboxZombies::FlipDuration(z)==160);
     const int target=z->mTargetRow;assert(target>=0&&target<5&&std::abs(target-2)<=1);
     assert((target!=2)==(roll<30));
-    const bool flying=roll<10;assert((z->mBossMode==SandboxZombies::ForwardFlightTag)==flying);
-    assert(SandboxZombies::ShowsCleverJaw(z)&&z->mSummonCounter==110);
+    const bool flying=roll<10;assert(SandboxZombies::IsForwardFlight(z)==flying&&SandboxZombies::UsesSlowFlip(z));
+    assert(SandboxZombies::ShowsCleverJaw(z)&&z->mSummonCounter==180);
     // Ice holds the actual flip clock; a new projectile can hit while frozen.
     z->mIceTrapCounter=20;auto* next=w.AddProjectile(500,200,0,2,PROJECTILE_PEA);
-    assert(!SandboxZombies::SkipsProjectile(next,z));SandboxZombies::UpdateClever(z);assert(z->mPhaseCounter==90&&z->mSummonCounter==110);z->mIceTrapCounter=0;
+    assert(!SandboxZombies::SkipsProjectile(next,z));SandboxZombies::UpdateClever(z);assert(z->mPhaseCounter==160&&z->mSummonCounter==180);z->mIceTrapCounter=0;
     const float before=z->mPosX;
-    for(int i=0;i<90;++i){const float x=z->mPosX;assert(SandboxZombies::UpdateClever(z));
-     const float step=z->mPosX-x;assert(std::abs(step)<2.67f);assert(flying?step<=0:step>=0);
+    for(int i=0;i<160;++i){const float x=z->mPosX;assert(SandboxZombies::UpdateClever(z));
+     const float step=z->mPosX-x;assert(std::abs(step)<2.15f);assert(flying?step<=0:step>=0);
+     const float progress=SandboxZombies::SlowFlipProgress(float(i+1)/160);
+     assert(std::abs(z->mPosX-before-(flying?-160:28)*progress)<.01f);
+     if(i+1<160)assert(std::abs(z->mPosY-(2*100*(1-progress)+target*100*progress))<.001f);
+     if(i>=40&&i<120)assert(std::abs(step)<(flying?.321f:.057f));
+     assert(SandboxZombies::ShowsCleverJaw(z));
     }
     assert(!SandboxZombies::IsDodging(z)&&z->mRow==target&&z->mBossStompCounter==120);
     assert(std::abs(z->mPosX-before-(flying?-160:28))<.01&&z->mAltitude==0&&z->mBossMode==0);
@@ -69,26 +74,43 @@ int main(){
   auto* shot=w.AddProjectile(500,200,0,2,PROJECTILE_PEA);
   Sexy::queuedRolls=lane<30?std::vector<int>{69,lane,0,fly}:std::vector<int>{69,lane,fly};
   assert(SandboxZombies::DodgeProjectile(shot,z)&&Sexy::queuedRolls.empty());
-  assert((z->mTargetRow!=2)==(lane<30));assert((z->mBossMode==SandboxZombies::ForwardFlightTag)==(fly<10));
+  assert((z->mTargetRow!=2)==(lane<30));assert(SandboxZombies::IsForwardFlight(z)==(fly<10));
  }
  for(int id:{216,217}){World w;w.pool=true;auto* z=w.enemy(400,1,id==217?static_cast<ZombieType>(2):ZOMBIE_NORMAL);SandboxZombies::Assign(z,id);
   assert(SandboxZombies::Speed(z)==1.25f);z->mHelmHealth=id==217?370:0;
   auto* shot=w.AddProjectile(400,100,0,1,PROJECTILE_PEA);Sexy::forcedRoll=0;
   assert(SandboxZombies::DodgeProjectile(shot,z));z->mTargetRow=2;
-  for(int i=0;i<45;++i)SandboxZombies::UpdateClever(z);
+  for(int i=0;i<80;++i)SandboxZombies::UpdateClever(z);
   assert(z->mInPool&&z->mRow==2);const int counter=z->mPhaseCounter;const float y=z->mPosY;
-  SandboxZombies::Forget(z);assert(SandboxZombies::Restore(z,id));assert(z->mPhaseCounter==counter&&z->mPosY==y&&z->mBossMode==SandboxZombies::ForwardFlightTag&&z->mSummonCounter==65);
-  for(int i=0;i<45;++i)SandboxZombies::UpdateClever(z);
+  SandboxZombies::Forget(z);assert(SandboxZombies::Restore(z,id));assert(z->mPhaseCounter==counter&&z->mPosY==y&&z->mBossMode==SandboxZombies::SlowForwardFlightTag&&z->mSummonCounter==100);
+  for(int i=0;i<80;++i)SandboxZombies::UpdateClever(z);
   assert(z->mAltitude==-40&&z->mInPool&&z->mRow==2);
   auto* pad=w.add(16);auto* nut=w.add(501);assert(SandboxZombies::StealPlant(z,nut));
   assert(nut->mDead&&!pad->mDead&&z->mBossHeadCounter==502&&SandboxZombies::IsRetreating(z)&&SandboxZombies::Speed(z)==3&&SandboxZombies::ShowsCleverJaw(z)&&z->mSummonCounter==110);
   assert(!SandboxZombies::StealPlant(z,pad));SandboxZombies::Forget(z);assert(SandboxZombies::Restore(z,id));assert(z->mBossHeadCounter==502);
   auto* cob=w.AddProjectile(400,100,0,1,PROJECTILE_COBBIG);z->mBossStompCounter=0;assert(!SandboxZombies::DodgeProjectile(cob,z));
   auto* fresh=w.AddProjectile(400,200,0,2,PROJECTILE_PEA);const float fleeX=z->mPosX;
-  assert(SandboxZombies::DodgeProjectile(fresh,z));for(int i=0;i<90;++i)SandboxZombies::UpdateClever(z);
+  assert(SandboxZombies::DodgeProjectile(fresh,z));for(int i=0;i<160;++i)SandboxZombies::UpdateClever(z);
   assert(SandboxZombies::IsRetreating(z)&&std::abs(z->mPosX-fleeX-160)<.01f&&z->mBossHeadCounter==502);
   z->mHasHead=false;SandboxZombies::UpdateClever(z);assert(z->mZombiePhase==PHASE_ZOMBIE_NORMAL&&!SandboxZombies::IsRetreating(z)&&!SandboxZombies::ShowsCleverJaw(z));
   Sexy::forcedRoll=-1;
+ }
+ // A legacy save in mid-flight keeps the exact old location and remaining
+ // path. Neither loading nor the new timing can send it backwards/teleport.
+ for(int id:{216,217})for(bool fly:{false,true}){World w;auto* z=w.enemy(480,2,static_cast<ZombieType>(SandboxZombies::Base(id)));SandboxZombies::Assign(z,id);
+  z->mZombiePhase=SandboxZombies::CleverFlip;z->mBossMode=fly?SandboxZombies::ForwardFlightTag:0;z->mPhaseCounter=45;
+  z->mBossBungeeCounter=2;z->mTargetRow=3;z->mPosY=250;z->mSummonCounter=65;
+  SandboxZombies::Forget(z);assert(SandboxZombies::Restore(z,id)&&SandboxZombies::FlipDuration(z)==90&&!SandboxZombies::UsesSlowFlip(z));
+  assert(z->mPosX==480&&z->mPosY==250&&z->mPhaseCounter==45);
+  for(int i=0;i<45;++i)SandboxZombies::UpdateClever(z);
+  assert(std::abs(z->mPosX-(fly?400:494))<.01f&&z->mPosY==300&&z->mRow==3&&!SandboxZombies::IsDodging(z));
+ }
+ // Slow-motion curve is monotone, symmetric and velocity-continuous at both
+ // transitions; it never pauses or reverses a flying/lane-changing zombie.
+ {using namespace SandboxZombies;
+  assert(SlowFlipProgress(0)==0&&SlowFlipProgress(1)==1);
+  for(int i=1;i<=160;++i){float t=float(i)/160;assert(SlowFlipProgress(t)>SlowFlipProgress(t-1.f/160));assert(std::abs(SlowFlipProgress(t)+SlowFlipProgress(1-t)-1)<.00001f);}
+  for(float t:{.25f,.75f}){const float d=.0001f,left=(SlowFlipProgress(t)-SlowFlipProgress(t-d))/d,right=(SlowFlipProgress(t+d)-SlowFlipProgress(t))/d;assert(std::abs(left-right)<.005f);}
  }
  {World w;auto* z=w.enemy();auto* shot=w.AddProjectile(0,0,0,2,PROJECTILE_PEA);Sexy::forcedRoll=0;
   assert(!SandboxZombies::DodgeProjectile(shot,z));SandboxZombies::Assign(z,216);z->mButteredCounter=50;assert(!SandboxZombies::DodgeProjectile(shot,z));

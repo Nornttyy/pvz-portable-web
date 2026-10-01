@@ -44,6 +44,9 @@ bool IsConeWrap(const Zombie* z){return z&&Type(z)==ConeWrap;}
 bool IsGiantImp(const Zombie* z){return z&&Type(z)==GiantImp;}
 bool IsClever(const Zombie* z){return z&&(Type(z)==Clever||Type(z)==CleverCone);}
 bool IsDodging(const Zombie* z){return IsClever(z)&&int(z->mZombiePhase)==CleverFlip&&!z->mDead&&z->mHasHead;}
+bool UsesSlowFlip(const Zombie* z){return IsClever(z)&&(z->mBossMode==SlowFlipTag||z->mBossMode==SlowForwardFlightTag);}
+bool IsForwardFlight(const Zombie* z){return IsClever(z)&&(z->mBossMode==ForwardFlightTag||z->mBossMode==SlowForwardFlightTag);}
+int FlipDuration(const Zombie* z){return UsesSlowFlip(z)?FlipTicks:LegacyFlipTicks;}
 bool ShowsCleverJaw(const Zombie* z){return IsClever(z)&&z->mHasHead&&!z->mDead&&(IsDodging(z)||z->mSummonCounter>0);}
 bool IsRunning(const Zombie* z){return IsRunner(z)&&!z->mDead&&z->mHasHead&&int(z->mZombiePhase)>=RunIn&&int(z->mZombiePhase)<=RunOut;}
 void Reset(){identities.clear();dodged.clear();}
@@ -139,8 +142,8 @@ bool DodgeProjectile(Projectile* shot,Zombie* z){
   if(count)z->mTargetRow=choices[Sexy::Rand(count)];
  }
  // Independent roll once per accepted flip, serialized until landing.
- z->mBossMode=Sexy::Rand(100)<ForwardFlightPercent?ForwardFlightTag:0;
- z->mSummonCounter=JawPoseTicks;
+ z->mBossMode=Sexy::Rand(100)<ForwardFlightPercent?SlowForwardFlightTag:SlowFlipTag;
+ z->mSummonCounter=FlipJawTicks;
  z->PlayZombieReanim("anim_walk2",REANIM_LOOP,0,0);z->UpdateReanim();return true;
 }
 void RefreshCleverRig(Zombie* z){
@@ -165,24 +168,27 @@ bool UpdateClever(Zombie* z){
  if(z->IsImmobilizied())return IsDodging(z);
  if(z->mSummonCounter>0)--z->mSummonCounter;
  if(!IsDodging(z)){if(z->mBossStompCounter>0)--z->mBossStompCounter;return false;}
- const float previous=1-float(z->mPhaseCounter)/FlipTicks;
+ const int duration=FlipDuration(z);const bool slow=UsesSlowFlip(z);
+ const float previous=1-float(z->mPhaseCounter)/duration;
  if(z->mPhaseCounter>0)--z->mPhaseCounter;
- const float t=1-float(z->mPhaseCounter)/FlipTicks;
+ const float t=1-float(z->mPhaseCounter)/duration;
+ const float progress=slow?SlowFlipProgress(t):t;
  const int from=z->mBossBungeeCounter,to=z->mTargetRow;
  if(!z->mBoard->RowCanHaveZombies(from)||!z->mBoard->RowCanHaveZombies(to)){
   z->mBossBungeeCounter=z->mTargetRow=z->mRow;z->mPhaseCounter=0;
  }else{
-  z->mPosY=z->GetPosYBasedOnRow(from)*(1-t)+z->GetPosYBasedOnRow(to)*t;
-  if(t>=.5f&&z->mRow!=to)z->SetRow(to);
+  z->mPosY=z->GetPosYBasedOnRow(from)*(1-progress)+z->GetPosYBasedOnRow(to)*progress;
+  if(progress>=.5f&&z->mRow!=to)z->SetRow(to);
  }
  const float direction=IsRetreating(z)?1.0f:-1.0f;
- const float distance=z->mBossMode==ForwardFlightTag?ForwardFlightDistance:-28.0f;
- z->mPosX+=direction*distance*(FlipTravel(t)-FlipTravel(previous));z->mX=int(z->mPosX);z->mY=int(z->mPosY);
+ const float distance=IsForwardFlight(z)?ForwardFlightDistance:-28.0f;
+ const float travel=slow?progress-SlowFlipProgress(previous):FlipTravel(t)-FlipTravel(previous);
+ z->mPosX+=direction*distance*travel;z->mX=int(z->mPosX);z->mY=int(z->mPosY);
  const bool pool=z->mBoard->IsPoolSquare(z->mBoard->PixelToGridXKeepOnBoard(z->mX+60,z->mY),z->mRow)&&z->mPosX<680;
  z->mInPool=pool;
  const float fromDepth=z->mBoard->IsPoolSquare(0,from)&&z->mPosX<680?-40*z->mScaleZombie:0;
  const float toDepth=z->mBoard->IsPoolSquare(0,to)&&z->mPosX<680?-40*z->mScaleZombie:0;
- z->mAltitude=fromDepth*(1-t)+toDepth*t+55*std::sin(3.14159265f*t);
+ z->mAltitude=fromDepth*(1-progress)+toDepth*progress+55*std::sin(3.14159265f*progress);
  if(z->mPhaseCounter==0){
   z->mZombiePhase=static_cast<decltype(z->mZombiePhase)>(z->mBossHeadCounter>0?CleverFlee:int(PHASE_ZOMBIE_NORMAL));
   z->mBossStompCounter=DodgeRecovery;z->mAltitude=pool?-40*z->mScaleZombie:0;
@@ -227,9 +233,10 @@ void PoleLanded(Zombie*){}
 void ArmorBroken(Zombie*){}
 void AdjustPose(Zombie* z,Reanimation* body){
  if(body&&IsDodging(z)){
-  const float t=1.0f-float(z->mPhaseCounter)/FlipTicks;
-  // Fast takeoff/landing, stretched mid-air turn: local bullet-time only.
-  const float p=t<.2f?t*1.5f:t<.8f?.3f+(t-.2f)*(.4f/.6f):.7f+(t-.8f)*1.5f;
+  const float t=1.0f-float(z->mPhaseCounter)/FlipDuration(z);
+  // Rotation, lane movement, horizontal travel and height share one clock.
+  // Old mid-air saves retain the previous curve until they land.
+  const float p=UsesSlowFlip(z)?SlowFlipProgress(t):t<.2f?t*1.5f:t<.8f?.3f+(t-.2f)*(.4f/.6f):.7f+(t-.8f)*1.5f;
   // The native overlay already mirrors a fleeing zombie. Reversing the
   // angle a second time would turn its backflip into a forward somersault.
   const float angle=p*6.2831853f;
