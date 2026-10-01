@@ -6361,8 +6361,9 @@ void Zombie::Draw(Graphics* g)
 
 bool Zombie::CanTargetPlant(Plant* thePlant, ZombieAttackType theAttackType)
 {
-	// Fake death only fools biting. Vehicles and giant smashes still hit it.
-	if (theAttackType == ZombieAttackType::ATTACKTYPE_CHEW && MemeCharacters::Hiding(thePlant)) return false;
+	// Tucked flowers are not a mouthful or a vaulting obstacle. This does not
+	// make them immune to vehicle crushes or collateral explosions.
+	if ((theAttackType == ZombieAttackType::ATTACKTYPE_CHEW || theAttackType == ZombieAttackType::ATTACKTYPE_VAULT) && MemeCharacters::Hiding(thePlant)) return false;
 	if (mApp->IsWallnutBowlingLevel() && theAttackType != ZombieAttackType::ATTACKTYPE_VAULT)
 		return false;
 

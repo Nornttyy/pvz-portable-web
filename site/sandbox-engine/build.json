@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Four abstract plants (500,501,519,520), Louis XVI (212), and Runaway Zombie (213). Awkward Sunflower (520, native slot 53) is a separate 50-sun card unlocked from adventure 1-6. Produces native 25-value suns; adjacent same-species flowers turn toward a producer, which loses its smile, shows one large blue water drop and advances production at half speed for four seconds. Observers turn face and petals together without a transition; embarrassed producers do not observe others. Ordinary sunflower remains unchanged. Generated face and transparent blue drop PNGs are embedded; original petals, stem, leaves and blink are reused. Native production countdown plus optional ten-int state preserve progress across saves. Chooser/almanac extra cards remain inside the grid; all original special-card IDs remain stable. Retired characters stay removed.",
+  "mode": "Four abstract plants (500,501,519,520), Louis XVI (212), and Runaway Zombie (213). Tucking Sunflower (520, native slot 53, legacy key AWKWARD_SUNFLOWER) replaces Awkward Sunflower in place. Still a 50-sun card unlocked from adventure 1-6 with a three-second card cooldown, producing native 25-value suns at unchanged speed. Same-lane nearby hostile zombies cause its native head and petals to lower together as the stalk retracts. Chewing/vault targets ignore tucked flowers and walkers continue toward the backline; collateral damage is not disabled. It recovers when the danger passes, with proximity hysteresis to avoid edge flicker. Gaze, embarrassment slowdown, generated face and sweat drop are removed from runtime; historical assets remain archived only. Legacy optional saves migrate without changing health, native production progress or campaign progress. Ordinary sunflower and other characters remain unchanged.",
   "files": [
     {
       "name": "pvz-portable.js",
       "size": 277501,
-      "sha256": "592087711f23266119325f2b2d6d712cdcb7e38bf3b5360c644bba0d2d6eb66c"
+      "sha256": "2d20055031139e66951170dddca45d8c5c2066733dd9f4e3666bde93f6ab4e08"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7588065,
-      "sha256": "0f4816a65b087cb295b096d5c76bf24180d89be895e78ee97413df3b55ddac98"
+      "size": 7567454,
+      "sha256": "588b4d7c7125b8e6a7cc9c78a10c2317c4997379bd6b0021a316bfa693b7153f"
     }
   ]
 }

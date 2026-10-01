@@ -155,6 +155,8 @@ test('retired zombie art and extra seed cannot leak into native previews or menu
  assert.equal(wasm.includes(await read('addons/art/bucket-glove.png')),false);
  assert.equal(wasm.includes(await read('addons/art/squash-headband.png')),false);
  assert.equal(wasm.includes(await read('addons/audio/rage-scream.wav')),true);
- assert.equal(wasm.includes(await read('addons/art/awkward-sunflower-face.png')),true);
- assert.equal(wasm.includes(await read('addons/art/awkward-blue-drop.png')),true);
+ assert.equal(wasm.includes(await read('addons/art/awkward-sunflower-face.png')),false);
+ assert.equal(wasm.includes(await read('addons/art/awkward-blue-drop.png')),false);
+ assert.match((await read('src/MemeCharacters.h')).toString(),/缩头乌葵/);
+ assert.doesNotMatch((await read('src/SandboxPlants.cpp')).toString(),/AwkwardSweat|AwkwardDrop|AwkwardFace/);
 });

@@ -2298,7 +2298,7 @@ int LawnApp::GetSeedsAvailable()
 bool LawnApp::HasSeedType(SeedType theSeedType)
 {
 	if (theSeedType == SEED_AWKWARD_SUNFLOWER) return MemeAdventure::RosterEnabled() && mPlayerInfo &&
-		(HasFinishedAdventure() || mPlayerInfo->GetLevel() >= MemeCharacters::Find(MemeCharacters::AwkwardSunflower)->unlock);
+		(HasFinishedAdventure() || mPlayerInfo->GetLevel() >= MemeCharacters::Find(MemeCharacters::TuckingSunflower)->unlock);
 	// Existing unused left-facing shooter ID keeps old saves and enum values intact.
 	if (theSeedType == SEED_LEFTPEATER) return MemeAdventure::RosterEnabled() && mPlayerInfo &&
 		(HasFinishedAdventure() || mPlayerInfo->GetLevel() >= MemeCharacters::Find(MemeCharacters::ShooterPea)->unlock);

@@ -161,7 +161,7 @@ void AlmanacDialog::SetupPlant()
 	mPlant->mIsOnBoard = false;
 	mPlant->PlantInitialize(0, 0, mSelectedSeed, SEED_NONE);
 	if (mSelectedSeed == SEED_LEFTPEATER && MemeAdventure::RosterEnabled()) SandboxPlants::Assign(mPlant.get(), MemeCharacters::ShooterPea);
-	if (mSelectedSeed == SEED_AWKWARD_SUNFLOWER && MemeAdventure::RosterEnabled()) SandboxPlants::Assign(mPlant.get(), MemeCharacters::AwkwardSunflower);
+	if (mSelectedSeed == SEED_AWKWARD_SUNFLOWER && MemeAdventure::RosterEnabled()) SandboxPlants::Assign(mPlant.get(), MemeCharacters::TuckingSunflower);
 	mPlant->mX = aPosX;
 	mPlant->mY = aPosY;
 }

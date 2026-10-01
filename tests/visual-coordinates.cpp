@@ -14,38 +14,35 @@
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
- // Awkward expression and look direction are scoped to the head tracks.
- // Normal sunflower images/definitions and the stem are never overwritten.
+ // Tucking retracts the native stalk, head and every petal as one group.
+ // No replacement face, sweat overlays, drifting parts or accumulated pose.
  {SandboxPlants::Reset();Board w;auto* p=w.plant(2,2);p->mSeedType=static_cast<SeedType>(53);SandboxPlants::Assign(p,520);
-  Reanimation body;Track tracks[]={{"anim_idle"},{"SunFlower_leftpetal1"},{"anim_blink"},{"stalk_top"},{"SunFlower_rightpetal9"},{"SunFlower_toppetals"},{"SunFlower_bottompetals"}};TrackInstance instances[7];body.def.mTracks={7,tracks};body.mTrackInstances=instances;body.track="anim_idle";body.matrix={.8f,0,35,0,.7f,40};app.reanims[82]=&body;p->mBodyReanimID=82;
+  Reanimation body;Track tracks[]={{"anim_idle"},{"SunFlower_leftpetal1"},{"anim_blink"},{"stalk_top"},{"SunFlower_rightpetal9"},{"SunFlower_toppetals"},{"SunFlower_bottompetals"},{"frontleaf"},{"backleaf"},{"stalk_bottom"}};TrackInstance instances[10];body.def.mTracks={10,tracks};body.mTrackInstances=instances;body.track="anim_idle";body.matrix={.8f,0,35,0,.7f,40};app.reanims[82]=&body;p->mBodyReanimID=82;
   ReanimatorTransform original;original.mImage=SandboxArt::NativeImage("SunFlower_head.png");original.mTransX=14.3f;original.mTransY=20.4f;original.mScaleX=.8f;original.mScaleY=.712f;
-  for(int dx:{-1,1})for(int remaining:{400,399,300,100,1}){
-   assert(MemeCharacters::Restore(p,{520,300,0,1+2+dx+2*9,0,remaining,100,0,0,1}));
-   AbstractRigVisuals::Scope scope(p);auto face=original;AbstractRigVisuals::Transform(&body,0,face);assert(face.mImage==original.mImage);near(face.mSkewX,dx*18.0f);
+  for(int age:{0,1,40,300,900}){
+   assert(MemeCharacters::Restore(p,{520,300,1,0,0,0,age,0,0,3}));
+   AbstractRigVisuals::Scope scope(p);auto face=original;AbstractRigVisuals::Transform(&body,0,face);assert(face.mImage==original.mImage);near(face.mSkewX,0);
+   near(face.mTransX,37+(original.mTransX-37)*.8f);near(face.mTransY,45+(original.mTransY-45)*.8f+24);
    for(int track:{1,2,4,5,6}){auto part=original;AbstractRigVisuals::Transform(&body,track,part);
     near(part.mSkewX,face.mSkewX);near(part.mSkewY,face.mSkewY);near(part.mTransX,face.mTransX);near(part.mTransY,face.mTransY);
-    near(part.mScaleX,original.mScaleX);near(part.mScaleY,original.mScaleY);assert(part.mImage==original.mImage);
+    near(part.mScaleX,original.mScaleX*.8f);near(part.mScaleY,original.mScaleY*.8f);assert(part.mImage==original.mImage);
    }
-   auto stalk=original;AbstractRigVisuals::Transform(&body,3,stalk);near(stalk.mTransX,original.mTransX);near(stalk.mTransY,original.mTransY);
+   for(int track:{3,9}){auto stalk=original;AbstractRigVisuals::Transform(&body,track,stalk);near(stalk.mTransX,original.mTransX);near(stalk.mTransY,80+(original.mTransY-80)*.35f);near(stalk.mScaleY,original.mScaleY*.35f);}
+   for(int track:{7,8}){auto leaf=original;AbstractRigVisuals::Transform(&body,track,leaf);near(leaf.mTransX,original.mTransX);near(leaf.mTransY,original.mTransY);near(leaf.mScaleY,original.mScaleY);}
   }
-  // Old saves could have both roles set. Loading cancels the gaze, not the
-  // embarrassment/production timer; every head part stays in its native pose.
-  assert(MemeCharacters::Restore(p,{520,300,1,22,300,300,100,0,1,1}));assert(MemeCharacters::Data(p,1)==0&&MemeCharacters::Data(p,5)==0);
-  {AbstractRigVisuals::Scope scope(p);for(int track:{0,1,2,4,5,6}){auto part=original;AbstractRigVisuals::Transform(&body,track,part);
+  // Old saves lose embarrassment/gaze. Native pose is restored exactly.
+  assert(MemeCharacters::Restore(p,{520,300,1,22,300,300,100,0,1,1}));assert(!MemeCharacters::Hiding(p));
+  {AbstractRigVisuals::Scope scope(p);for(int track=0;track<10;++track){auto part=original;AbstractRigVisuals::Transform(&body,track,part);
    near(part.mTransX,original.mTransX);near(part.mTransY,original.mTransY);near(part.mSkewX,original.mSkewX);
-   assert(part.mImage==(track==0?SandboxArt::AwkwardFace():original.mImage));
+   assert(part.mImage==original.mImage);near(part.mScaleY,original.mScaleY);
   }}
   auto unscoped=original;AbstractRigVisuals::Transform(&body,0,unscoped);assert(unscoped.mImage==original.mImage);
   Sexy::Graphics g(nullptr);g.mTransX=224;g.mTransY=50;
-  for(int remaining:{400,300,120,1}){
-   assert(MemeCharacters::Restore(p,{520,300,1,0,remaining,0,100,0,1,1}));
-   testBlits.clear();assert(SandboxPlants::DrawBody(&g,p,0,0));assert(testBlits.size()==1);
-   const auto& blit=testBlits[0];auto* drop=SandboxArt::AwkwardDrop();
-   assert(blit.path=="/addons/art/awkward-blue-drop.png"&&blit.alpha==255);
-   near(blit.matrix.m02,279.4f);near(blit.matrix.m12,78.45f);
-   near(blit.matrix.m00*drop->mWidth,19.2f);near(blit.matrix.m11*drop->mHeight,25.2f);
+  for(int phase:{0,1,0,1,0}){
+   assert(MemeCharacters::Restore(p,{520,300,phase,0,0,0,100,0,0,3}));
+   testBlits.clear();assert(SandboxPlants::DrawBody(&g,p,0,0));assert(testBlits.empty());
   }
-  assert(MemeCharacters::Restore(p,{520,300,0,0,0,0,500,0,0,1}));
+  assert(MemeCharacters::Restore(p,{520,300,0,0,0,0,500,0,0,3}));
   {AbstractRigVisuals::Scope scope(p);auto face=original;AbstractRigVisuals::Transform(&body,0,face);assert(face.mImage==original.mImage);near(face.mTransX,original.mTransX);}
   testBlits.clear();assert(SandboxPlants::DrawBody(&g,p,0,0));assert(testBlits.empty());app.reanims.clear();
  }

@@ -44,23 +44,28 @@ void Puff(Sexy::Graphics* g,float x,float y,int age,int alpha){
 }
 int Type(const Plant* p){auto it=states.find(p);return it==states.end()?0:it->second.id;}
 bool Is(const Plant* p){return states.contains(p);}
-bool Hiding(const Plant*){return false;}
-bool Producing(const Plant* p){return Type(p)==AwkwardSunflower;}
-bool Embarrassed(const Plant* p){auto it=states.find(p);return it!=states.end()&&it->second.id==AwkwardSunflower&&it->second.timer>0;}
-void OnSunProduced(Plant* p){auto it=states.find(p);if(it!=states.end()&&it->second.id==AwkwardSunflower)it->second.pulse=1;}
+bool Hiding(const Plant* p){auto it=states.find(p);return it!=states.end()&&it->second.id==TuckingSunflower&&it->second.phase==1&&!p->mDead&&!p->mSquished&&!p->mIsAsleep&&p->mPlantHealth>0&&!const_cast<Plant*>(p)->NotOnGround();}
+bool Producing(const Plant* p){return Type(p)==TuckingSunflower;}
 void Reset(){states.clear();shotStyles.clear();}
 void Forget(Plant* p){states.erase(p);}
 void Assign(Plant* p,int id){const auto* d=Find(id);if(!d||int(p->mSeedType)!=d->base)return;
  State s;s.id=id;s.health=p->mPlantHealth;s.timer=0;if(id==500)s.direction=2;states[p]=s;
- if(id==AwkwardSunflower){states[p].delay=0;return;}
+ if(id==TuckingSunflower){states[p].delay=0;states[p].direction=3;return;}
  p->mLaunchCounter=9999;p->mShootingCounter=0;
 }
 std::array<int,10> Save(const Plant* p){auto it=states.find(p);if(it==states.end())return {};const auto& s=it->second;return {s.id,s.health,s.phase,s.heat,s.timer,s.delay,s.age,s.pulse,s.remaining,s.direction};}
 bool Restore(Plant* p,const std::array<int,10>& a){
- if(a[0]==AwkwardSunflower){
-  if(int(p->mSeedType)!=Find(a[0])->base||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>1||a[3]<0||a[3]>54||a[4]<0||a[4]>AwkwardDuration||a[5]<0||a[5]>AwkwardDuration||a[6]<0||a[6]>=1000000||a[7]<0||a[7]>1||a[8]<0||a[8]>8||a[9]!=1||a[2]!=(a[4]>0)||((a[3]==0)!=(a[5]==0)))return false;
-  states[p]={a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9]};
-  if(a[4]>0){states[p].heat=0;states[p].delay=0;} // Migrate old mutually staring saves.
+ if(a[0]==TuckingSunflower){
+  if(int(p->mSeedType)!=Find(a[0])->base||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>1||a[6]<0||a[6]>=1000000)return false;
+  if(a[9]==1){
+   // Old embarrassment/gaze saves become this card, without changing health,
+   // sun countdown, planted position or the player's campaign progress.
+   if(a[3]<0||a[3]>54||a[4]<0||a[4]>400||a[5]<0||a[5]>400||a[7]<0||a[7]>1||a[8]<0||a[8]>8||a[2]!=(a[4]>0)||((a[3]==0)!=(a[5]==0)))return false;
+   states[p]={a[0],a[1],0,0,0,0,a[6],0,0,3};
+  }else{
+   if(a[9]!=3||a[3]||a[4]||a[5]||a[7]||a[8])return false;
+   states[p]={a[0],a[1],a[2],0,0,0,a[6],0,0,3};
+  }
   return true; // Native save owns the production countdown.
  }
  const bool shooter=a[0]==500,newShooter=shooter&&a[9]==2;
@@ -74,7 +79,7 @@ bool Restore(Plant* p,const std::array<int,10>& a){
  if(shooter)s.remaining=std::min(s.remaining,MemeShooterRules::BurstCount); // Read old 80/150-pea saves without adding shots.
  states[p]=s;p->mLaunchCounter=9999;p->mShootingCounter=0;return true;
 }
-int Data(const Plant* p,int field){const auto it=states.find(p);if(it==states.end())return -1;const auto& s=it->second;if(field==5)return s.id==AwkwardSunflower?s.delay:-1;return field==0?s.phase:field==1?s.heat:field==2?s.timer:field==3?s.direction:s.remaining;}
+int Data(const Plant* p,int field){const auto it=states.find(p);if(it==states.end())return -1;const auto& s=it->second;if(field==5)return -1;return field==0?s.phase:field==1?s.heat:field==2?s.timer:field==3?s.direction:s.remaining;}
 // Keep legacy input/ABI callers harmless; rage is automatic only.
 bool Activate(Plant*,int){return false;}
 bool Click(Board*,int,int){return false;}
@@ -88,14 +93,20 @@ void Tick(Board* b){
  if(b->mPaused)return;
  for(auto* p:b->mPlants){
   auto it=states.find(p);if(it==states.end())continue;if(p->mDead){states.erase(it);continue;}auto& s=it->second;
-  if(s.id!=AwkwardSunflower){p->mLaunchCounter=9999;p->mShootingCounter=0;}
-  if(p->mIsAsleep||p->mSquished||p->NotOnGround()||p->mPlantHealth<=0)continue;
-  s.age=(s.age+1)%1000000;if(s.pulse&&s.id!=AwkwardSunflower)--s.pulse;if(s.delay)--s.delay;if(s.timer)--s.timer;
-  if(s.id==AwkwardSunflower){
-   s.phase=s.timer>0;
-   if(s.timer){s.heat=0;s.delay=0;}
-   if(!s.timer)s.remaining=0;
-   if(!s.delay)s.heat=0;
+  if(s.id!=TuckingSunflower){p->mLaunchCounter=9999;p->mShootingCounter=0;}
+  if(p->mIsAsleep||p->mSquished||p->NotOnGround()||p->mPlantHealth<=0){if(s.id==TuckingSunflower)s.phase=0;continue;}
+  s.age=(s.age+1)%1000000;if(s.pulse)--s.pulse;if(s.delay)--s.delay;if(s.timer)--s.timer;
+  if(s.id==TuckingSunflower){
+   bool danger=false;
+   // Use native attack rectangles (including diggers/mirrored walkers), not
+   // sprite origins. A wider release boundary prevents edge flicker.
+   const int range=s.phase?84:60;
+   for(auto* z:b->mZombies){
+    if(z->mDead||!z->IsOnBoard()||z->mMindControlled||z->IsDeadOrDying()||z->IsFlying()||z->mRow!=p->mRow)continue;
+    const auto rect=z->GetZombieAttackRect();
+    if(rect.mWidth>0&&rect.mX<=p->mX+70+range&&rect.mX+rect.mWidth>=p->mX+10-range){danger=true;break;}
+   }
+   s.phase=danger?1:0;
   }else if(s.id==500){
    if(s.phase==0&&s.heat>=MemeShooterRules::MaxRage)Burst(s);
    const bool room=b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8;
@@ -128,24 +139,6 @@ void Tick(Board* b){
    if(!s.pulse)s.phase=0;
   }
   s.health=p->mPlantHealth;
- }
- // Resolve last tick's sun events together. The pending bit is saved too,
- // including a save made immediately after the sun leaves the flower.
- for(auto* producer:b->mPlants){
-  auto it=states.find(producer);if(it==states.end()||it->second.id!=AwkwardSunflower||!it->second.pulse)continue;
-  it->second.pulse=0;
-  if(producer->mDead||producer->mSquished||producer->NotOnGround())continue;
-  int count=0;
-  for(auto* observer:b->mPlants){
-   if(observer==producer||observer->mDead||observer->mSquished||observer->mIsAsleep||observer->NotOnGround()||observer->mPlantHealth<=0||Type(observer)!=AwkwardSunflower)continue;
-   if(std::abs(observer->mPlantCol-producer->mPlantCol)>1||std::abs(observer->mRow-producer->mRow)>1)continue;
-   auto& watching=states.at(observer);
-   if(watching.timer>0)continue; // An embarrassed flower cannot stare at someone else.
-   const int target=1+producer->mPlantCol+producer->mRow*9;
-   if(watching.delay>0&&watching.heat!=target)continue; // Finish this look before accepting another target.
-   watching.heat=target;watching.delay=AwkwardDuration;++count;
-  }
-  if(count){auto& s=it->second;s.timer=AwkwardDuration;s.phase=1;s.remaining=std::min(count,8);s.heat=0;s.delay=0;}
  }
 }
 void Tint(const Plant*,Sexy::Color&){}

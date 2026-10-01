@@ -57,5 +57,10 @@ int main(){
     assert(awkward.mFontLayerList.size()==6&&awkwardFont.prepared==2);
     for(char32_t c:U"尬汗"){if(!c)continue;int n=0;for(const auto& l:awkward.mFontLayerList)if(l.mCharDataMap.contains(c)){const auto& g=l.mCharDataMap.at(c);assert(g.mWidth==14&&g.mImageRect.mWidth>0&&g.mImageRect.mHeight>0);++n;}assert(n>=2);}
     SandboxRepairFonts();assert(awkward.mFontLayerList.size()==6&&awkwardFont.prepared==2);FONT_BRIANNETOD12=nullptr;
+    FontData tucking;tucking.mFontLayerList.emplace_back();tucking.mFontLayerList.back().mCharDataMap[U'鸣']={{0,0,24,24},{-5,-4},14};
+    ImageFont tuckingFont;tuckingFont.mFontData=&tucking;FONT_BRIANNETOD12=&tuckingFont;SandboxRepairFonts();
+    assert(tucking.mFontLayerList.size()==5&&tuckingFont.prepared==1);
+    for(const auto& l:tucking.mFontLayerList)if(l.mCharDataMap.contains(U'乌')){const auto& g=l.mCharDataMap.at(U'乌');assert(g.mWidth==14&&g.mImageRect.mWidth>0&&g.mImageRect.mHeight>0);}
+    SandboxRepairFonts();assert(tucking.mFontLayerList.size()==5&&tuckingFont.prepared==1);FONT_BRIANNETOD12=nullptr;
     std::cout<<"Three font sizes, prior measurement, original glyph preservation and idempotence passed.\n";
 }

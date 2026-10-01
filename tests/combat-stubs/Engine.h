@@ -84,6 +84,7 @@ public:
  int mZombiePhase=0,mZombieHeight=0;bool mInPool=false;
  int mPhaseCounter=0,mShieldHealth=0,mShieldMaxHealth=0,mShieldType=0,mZombieAge=0,mFromWave=0;float mAltitude=0;bool flying=false;
  bool IsFlying(){return flying;}
+ Sexy::Rect GetZombieAttackRect(){auto r=mZombieAttackRect;r.mX+=int(mPosX);r.mY+=int(mPosY);return r;}
  void StopEating(){mIsEating=false;}void AttachShield(){}void PickRandomSpeed(){}
  void SetRow(int row){mRow=row;}
  float GetPosYBasedOnRow(int row){return row*100.0f;}

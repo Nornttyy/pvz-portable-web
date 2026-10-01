@@ -14,7 +14,7 @@ inline constexpr std::array<Definition,4> Definitions{{
     {500,0,Element::Native,"红温豌豆","满300怒气 · 3秒乱射50发"},
     {501,3,Element::Native,"反咬坚果","被啃后反击 · 冷却3秒"},
     {519,52,Element::Native,"射手豌豆","头是豌豆 · 发射射手"},
-    {520,53,Element::Native,"尬葵","产光被围观 · 暂时减速"},
+    {520,53,Element::Native,"缩头乌葵","僵尸靠近 · 缩头让路"},
 }};
 constexpr const Definition* Find(int id) {
     for(const auto& d:Definitions)if(d.id==id)return &d;
@@ -58,7 +58,7 @@ int NextShot(Plant* plant);
 void Tick(Board* board);
 void DrawCard(Sexy::Graphics* g,int x,int y,int id);
 void DrawPeaHeadPreview(Sexy::Graphics* g,float x,float y,bool imitater=false);
-void DrawAwkwardPreview(Sexy::Graphics* g,float x,float y,bool imitater=false);
+void DrawTuckingPreview(Sexy::Graphics* g,float x,float y,bool imitater=false);
 // Original reanimations, temporary colour overrides; native layers stay intact.
 bool DrawBody(Sexy::Graphics* g,const Plant* plant,float x,float y,bool squished=false);
 void OnFired(Plant* plant,Projectile* shot,Zombie* target);

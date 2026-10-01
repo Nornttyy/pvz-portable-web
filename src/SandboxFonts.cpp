@@ -70,6 +70,9 @@ void SandboxRepairFonts(){
         // original bitmap strokes, cell size, baseline and character advance.
         Supplement(font,U'尬',"GA",{{U'优',.46f,0,.28f,.29f,-.40f,0},{U'优',.46f,.29f,.54f,.71f,-.40f,0},{U'价',.46f,0,.54f,1}});
         Supplement(font,U'汗',"HAN",{{U'池',0,0,.46f,1},{U'杆',.46f,0,.54f,1}});
+        // The right-hand bird radical from 鸣, without its inner eye dot.
+        // Centre it inside the original cell; preserve native bitmap metrics.
+        Supplement(font,U'乌',"WU",{{U'鸣',.46f,0,.54f,.4167f,-.16f,0},{U'鸣',.46f,.4167f,.08f,.0833f,-.16f,0},{U'鸣',.625f,.4167f,.375f,.0833f,-.16f,0},{U'鸣',.46f,.5f,.54f,.5f,-.16f,0}});
         Supplement(font,U'罡',"GANG",{{U'四',0,0,1,0.46f},{U'正',0,0.46f,1,0.54f}});
         Supplement(font,U'梗',"GENG",{{U'样',0,0,0.46f,1},{U'硬',0.46f,0,0.54f,1}});
         Supplement(font,U'锅',"GUO",{{U'钢',0,0,0.46f,1},{U'蜗',0.46f,0,0.54f,1}});

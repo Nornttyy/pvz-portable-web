@@ -1,5 +1,7 @@
 # 尬葵表情素材
 
+> Archived: slot 520 is now 缩头乌葵. The face and blue drop are retained here for history but are no longer loaded or embedded in the game. Its new pose uses only the native sunflower rig.
+
 - Mode: built-in image generation tool, precise-object-edit.
 - Edit reference: original `reanim/SunFlower_head.png` (57 × 43).
 - Final asset: `addons/art/awkward-sunflower-face.png` (57 × 43 RGBA).

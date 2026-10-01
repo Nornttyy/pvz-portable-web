@@ -157,7 +157,7 @@ export const ORIGINAL_PLANTS = [
   [500,0,'红温豌豆','满300怒气 · 3秒乱射50发'],
   [501,3,'反咬坚果','被啃后反击 · 冷却3秒'],
   [519,52,'射手豌豆','头是豌豆 · 发射射手'],
-  [520,53,'尬葵','产光被围观 · 暂时减速'],
+  [520,53,'缩头乌葵','僵尸靠近 · 缩头让路'],
 ].map(([id,base,name,note])=>({id,base,name,note}));
 export const nativeBase = id => ORIGINAL_PLANTS.find(p=>p.id===id)?.base ?? RETIRED_CHARACTERS.find(p=>p.id===id)?.base ?? RETIRED_PLANTS.find(p=>p.id===id)?.base ?? id;
 export const PLANTS = [...plantNames.map((name,id) => ({id,name,note:notes[id] ?? '免费 · 无冷却'})),...ORIGINAL_PLANTS];

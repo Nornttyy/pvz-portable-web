@@ -5,8 +5,6 @@ namespace SandboxArt {
 Sexy::Image* Image(const char* family,const char* part);
 // Original reanimation PNG, unchanged. Used for native-part fusion attachments.
 Sexy::Image* NativeImage(const char* file);
-Sexy::Image* AwkwardFace();
-Sexy::Image* AwkwardDrop();
 Sexy::Image* PowerNative(const char* file,int level,int power);
 Sexy::Image* WarmNative(const char* file,int level);
 Sexy::Image* Phone(int damage=0);

@@ -64,10 +64,10 @@ void Draw(Board* b,Sexy::Graphics*){
  // No second tray or floating menu: native cards now own every planting action.
 }
 std::string_view Translate(std::string_view key,std::string_view original){
- const auto* awkward=MemeCharacters::Find(MemeCharacters::AwkwardSunflower);
- if(key==awkward->key)return awkward->name;
- if(key=="AWKWARD_SUNFLOWER_TOOLTIP")return awkward->hint;
- if(key=="AWKWARD_SUNFLOWER_DESCRIPTION")return awkward->description;
+ const auto* tucking=MemeCharacters::Find(MemeCharacters::TuckingSunflower);
+ if(key==tucking->key)return tucking->name;
+ if(key=="AWKWARD_SUNFLOWER_TOOLTIP")return tucking->hint;
+ if(key=="AWKWARD_SUNFLOWER_DESCRIPTION")return tucking->description;
  if(!RosterEnabled())return original;
  for(const auto& d:MemeCharacters::Definitions){const std::string_view stem=d.key;
   if(key==stem)return d.name;

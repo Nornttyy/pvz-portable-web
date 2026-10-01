@@ -24,11 +24,11 @@ struct Plant {
  App app;Board board;App* mApp=&app;Board* mBoard=&board;
  SeedType mSeedType=SEED_SUNFLOWER;PlantState mState=STATE_NOTREADY;
  int mLaunchCounter=1,mLaunchRate=2500,mEatenFlashCountdown=0,mStateCountdown=0,mX=0,mY=0,mBodyReanimID=0;
- bool inPlay=true,meme=false,producing=true,embarrassed=false;int copies=1,notifications=0;
+ bool inPlay=true,meme=false,producing=true;int copies=1;
  bool IsInPlay(){return inPlay;}void UpdateProductionPlant();void UpdateSunShroom();
  void PlayBodyReanim(const char*,ReanimLoopType,int,float){}
 };
-namespace MemeCharacters {bool Is(Plant* p){return p->meme;}bool Producing(Plant* p){return p->producing;}bool Embarrassed(Plant* p){return p->embarrassed;}void OnSunProduced(Plant* p){++p->notifications;}}
+namespace MemeCharacters {bool Is(Plant* p){return p->meme;}bool Producing(Plant* p){return p->producing;}}
 namespace SandboxPlants {int NativeProduction(Plant* p){return p->copies;}}
 bool useLowRoll=false;
 int RandRangeInt(int low,int high){assert(low<=high);return useLowRoll?low:high;}
@@ -38,13 +38,13 @@ namespace Sexy {int Rand(int){return 50;}}
 // The runner appends the actual production/growth/value implementations.
 int main(){
  {Plant p;p.mSeedType=SEED_AWKWARD_SUNFLOWER;p.meme=true;p.UpdateProductionPlant();
-  assert(p.board.coins.size()==1&&p.board.coins[0].GetSunValue()==25&&p.notifications==1);
-  p.UpdateProductionPlant();assert(p.mLaunchCounter==2498);p.embarrassed=true;
-  for(int i=0;i<400;++i)p.UpdateProductionPlant();assert(p.mLaunchCounter==2098&&p.board.coins.size()==1);
-  p.embarrassed=false;p.UpdateProductionPlant();assert(p.mLaunchCounter==2096);
-  p.board.award=true;const int before=p.mLaunchCounter;p.UpdateProductionPlant();assert(p.mLaunchCounter==before&&p.notifications==1);
+  assert(p.board.coins.size()==1&&p.board.coins[0].GetSunValue()==25);
+  p.UpdateProductionPlant();assert(p.mLaunchCounter==2498);
+  for(int i=0;i<400;++i)p.UpdateProductionPlant();assert(p.mLaunchCounter==1698&&p.board.coins.size()==1);
+  p.UpdateProductionPlant();assert(p.mLaunchCounter==1696);
+  p.board.award=true;const int before=p.mLaunchCounter;p.UpdateProductionPlant();assert(p.mLaunchCounter==before);
  }
- {Plant p;p.mSeedType=SEED_AWKWARD_SUNFLOWER;p.board.mCoins.mSize=992;p.UpdateProductionPlant();assert(p.notifications==0);}
+ {Plant p;p.mSeedType=SEED_AWKWARD_SUNFLOWER;p.board.mCoins.mSize=992;p.UpdateProductionPlant();assert(p.board.coins.empty());}
  for(bool replacement:{false,true}){
   Plant p;p.meme=replacement;p.UpdateProductionPlant();assert(p.board.coins.size()==1);
   assert(p.board.coins[0].GetSunValue()==25&&p.board.motions[0]==COIN_MOTION_FROM_PLANT);

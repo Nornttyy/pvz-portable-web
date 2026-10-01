@@ -12,8 +12,6 @@ LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 namespace SandboxArt {
 Sexy::Image* Image(const char*,const char*){return nullptr;}
 Sexy::Image* NativeImage(const char*){return nullptr;}
-Sexy::Image* AwkwardFace(){return nullptr;}
-Sexy::Image* AwkwardDrop(){return nullptr;}
 Sexy::Image* Phone(int){return nullptr;}
 Sexy::Image* PhoneHands(const char*){return nullptr;}
 Sexy::Image* WarmNative(const char*,int){return nullptr;}
@@ -30,49 +28,39 @@ struct World:Board {
  void step(int count=1){while(count--){SandboxPlants::Tick(this);SandboxZombies::Tick(this);if(!mPaused)++mMainCounter;}}
 };
 int main(){
- // Production keeps its native countdown; only a real sun notifies neighbours.
- {World w;auto* p=w.add(520);const int countdown=p->mLaunchCounter;
-  assert(MemeCharacters::Producing(p));w.step(500);assert(p->mLaunchCounter==countdown&&!MemeCharacters::Embarrassed(p));
-  MemeCharacters::OnSunProduced(p);w.step();assert(!MemeCharacters::Embarrassed(p));
-  auto* neighbour=w.add(520);neighbour->mPlantCol=2;
-  auto* distant=w.add(520);distant->mPlantCol=5;
-  auto* ordinary=w.add(1);ordinary->mPlantCol=0;
-  MemeCharacters::OnSunProduced(p);
-  const auto pending=MemeCharacters::Save(p);assert(pending[7]==1);MemeCharacters::Forget(p);assert(MemeCharacters::Restore(p,pending));w.step();
-  assert(MemeCharacters::Embarrassed(p)&&MemeCharacters::Data(p,4)==1);
-  assert(MemeCharacters::Data(neighbour,1)==1+p->mPlantCol+p->mRow*9&&MemeCharacters::Data(neighbour,5)==400);
-  assert(!MemeCharacters::Embarrassed(neighbour)&&MemeCharacters::Data(distant,5)==0&&!MemeCharacters::Is(ordinary));
-  w.step(73);const auto saved=MemeCharacters::Save(p),look=MemeCharacters::Save(neighbour);
-  w.mPaused=true;w.step(200);assert(MemeCharacters::Save(p)==saved);w.mPaused=false;
-  MemeCharacters::Forget(p);MemeCharacters::Forget(neighbour);
-  assert(MemeCharacters::Restore(p,saved)&&MemeCharacters::Restore(neighbour,look)&&p->mLaunchCounter==countdown);
-  w.step(327);assert(!MemeCharacters::Embarrassed(p)&&MemeCharacters::Data(neighbour,1)==0&&MemeCharacters::Data(neighbour,5)==0);
-  neighbour->mDead=true;MemeCharacters::OnSunProduced(p);w.step();assert(!MemeCharacters::Embarrassed(p));
+ // Tuck before contact, stay down through the crossing, then fully recover.
+ // Production countdown and ordinary sunflowers are untouched by this tick.
+ {World w;auto* p=w.add(520);auto* ordinary=w.add(1);const int countdown=p->mLaunchCounter;
+  assert(MemeCharacters::Producing(p));w.step(500);assert(p->mLaunchCounter==countdown&&!MemeCharacters::Hiding(p));
+  auto* z=w.enemy(400);w.step();assert(!MemeCharacters::Hiding(p));
+  z->mPosX=160;w.step();assert(MemeCharacters::Hiding(p)&&!MemeCharacters::Hiding(ordinary));
+  z->mPosX=170;w.step();assert(MemeCharacters::Hiding(p)); // release hysteresis
+  z->mPosX=200;w.step();assert(!MemeCharacters::Hiding(p));
+  z->mPosX=160;w.step();assert(MemeCharacters::Hiding(p));
+  const auto saved=MemeCharacters::Save(p);w.mPaused=true;w.step(100);assert(MemeCharacters::Save(p)==saved);w.mPaused=false;
+  MemeCharacters::Forget(p);assert(MemeCharacters::Restore(p,saved)&&MemeCharacters::Hiding(p)&&p->mLaunchCounter==countdown);
+  for(int x=150;x>=-60;--x){z->mPosX=x;w.step();assert(MemeCharacters::Hiding(p)&&p->mPlantHealth==300);}
+  z->mPosX=-100;w.step();assert(!MemeCharacters::Hiding(p));
+  for(int i=0;i<8;++i){z->mPosX=80;w.step();assert(MemeCharacters::Hiding(p));z->mDead=true;w.step();assert(!MemeCharacters::Hiding(p));z->mDead=false;}
  }
- // Gaze roles are exclusive, the current observer target stays fixed, and
- // a newly embarrassed producer immediately drops its own previous gaze.
- {World w;auto* a=w.add(520);a->mPlantCol=1;auto* b=w.add(520);b->mPlantCol=2;auto* c=w.add(520);c->mPlantCol=3;
-  MemeCharacters::OnSunProduced(a);w.step();const int aCell=1+a->mPlantCol+a->mRow*9;
-  assert(MemeCharacters::Embarrassed(a)&&MemeCharacters::Data(b,1)==aCell);
-  MemeCharacters::OnSunProduced(c);w.step();assert(!MemeCharacters::Embarrassed(c)&&MemeCharacters::Data(b,1)==aCell);
-  MemeCharacters::OnSunProduced(b);w.step();assert(MemeCharacters::Embarrassed(b)&&MemeCharacters::Data(b,1)==0&&MemeCharacters::Data(b,5)==0);
-  assert(MemeCharacters::Data(a,1)==0&&MemeCharacters::Data(a,5)==0);
-  assert(MemeCharacters::Data(c,1)==1+b->mPlantCol+b->mRow*9);
-  const auto saved=MemeCharacters::Save(b);assert(MemeCharacters::Restore(b,saved)&&MemeCharacters::Save(b)==saved);
+ // No global/multi-row fear, nor fear of friendly/flying/dead zombies.
+ {World w;auto* p=w.add(520);auto* z=w.enemy(80,1);w.step();assert(!MemeCharacters::Hiding(p));
+  z->mRow=2;z->mMindControlled=true;w.step();assert(!MemeCharacters::Hiding(p));
+  z->mMindControlled=false;z->flying=true;w.step();assert(!MemeCharacters::Hiding(p));
+  z->flying=false;z->mBodyHealth=0;w.step();assert(!MemeCharacters::Hiding(p));
+  z->mBodyHealth=100;z->mHasHead=false;w.step();assert(MemeCharacters::Hiding(p)); // Louis still scares it.
+  p->airborne=true;w.step();assert(!MemeCharacters::Hiding(p));p->airborne=false;
+  p->mIsAsleep=true;w.step();assert(!MemeCharacters::Hiding(p));p->mIsAsleep=false;w.step();assert(MemeCharacters::Hiding(p));
+  p->mSquished=true;w.step();assert(!MemeCharacters::Hiding(p));
  }
- // Simultaneous production cannot create reciprocal embarrassed observers.
- {World w;auto* a=w.add(520);auto* b=w.add(520);b->mPlantCol=2;
-  MemeCharacters::OnSunProduced(a);MemeCharacters::OnSunProduced(b);w.step();
-  assert(MemeCharacters::Embarrassed(a)&&!MemeCharacters::Embarrassed(b));
-  assert(MemeCharacters::Data(a,1)==0&&MemeCharacters::Data(a,5)==0&&MemeCharacters::Data(b,1)>0);
- }
- // All eight adjacent cells count; other rows, removed/asleep/lifted plants don't.
- {World w;auto* p=w.add(520);p->mPlantCol=4;
-  for(int dx=-1;dx<=1;++dx)for(int dy=-1;dy<=1;++dy)if(dx||dy){auto* q=w.add(520,2+dy);q->mPlantCol=4+dx;}
-  auto* q=w.add(520,0);q->mPlantCol=4;
-  MemeCharacters::OnSunProduced(p);w.step();assert(MemeCharacters::Data(p,4)==8&&MemeCharacters::Data(q,5)==0);
-  auto corrupt=MemeCharacters::Save(p);corrupt[3]=55;assert(!MemeCharacters::Restore(p,corrupt));
-  corrupt=MemeCharacters::Save(p);corrupt[4]=401;assert(!MemeCharacters::Restore(p,corrupt));
+ // Migrate legacy embarrassment/pending-sun saves without reviving the old
+ // mechanic or changing health/production. New hidden saves round-trip.
+ {World w;auto* p=w.add(520);p->mPlantHealth=177;p->mLaunchCounter=821;
+  assert(MemeCharacters::Restore(p,{520,177,1,22,300,300,100,1,2,1}));
+  assert((MemeCharacters::Save(p)==std::array<int,10>{520,177,0,0,0,0,100,0,0,3}));
+  assert(p->mPlantHealth==177&&p->mLaunchCounter==821&&!MemeCharacters::Hiding(p));
+  auto corrupt=MemeCharacters::Save(p);corrupt[4]=1;assert(!MemeCharacters::Restore(p,corrupt));
+  corrupt=MemeCharacters::Save(p);corrupt[2]=2;assert(!MemeCharacters::Restore(p,corrupt));
  }
  using namespace SandboxMemeRules;
  static_assert(MemeShooterRules::BurstCount==50&&MemeShooterRules::MaxRage==300&&MemeShooterRules::PerShot==20&&MemeShooterRules::BurstTicks==300);

@@ -22,7 +22,7 @@ void Warp(ReanimatorTransform& t,float x,float y,float sx,float sy,float angle=0
 }
 void Scope::Add(Reanimation*,int,int){}
 Scope::Scope(const Plant* p):mark(poses.size()){
- if((MemeCharacters::Type(p)!=500&&MemeCharacters::Type(p)!=MemeCharacters::ShooterPea&&MemeCharacters::Type(p)!=MemeCharacters::AwkwardSunflower)||p->mSquished)return;
+ if((MemeCharacters::Type(p)!=500&&MemeCharacters::Type(p)!=MemeCharacters::ShooterPea&&MemeCharacters::Type(p)!=MemeCharacters::TuckingSunflower)||p->mSquished)return;
  const auto state=MemeCharacters::Save(p);int part=0;
  for(auto id:{p->mBodyReanimID,p->mHeadReanimID,p->mHeadReanimID2,p->mHeadReanimID3,p->mBlinkReanimID}){
   if(auto* a=gLawnApp->ReanimationTryToGet(id))poses.push_back({a,p,state,part});
@@ -33,25 +33,20 @@ Scope::Scope(const Plant* p):mark(poses.size()){
 Scope::Scope(Zombie*):mark(poses.size()){}
 Scope::Scope(Reanimation* a,int type):mark(poses.size()){
  if(a&&type==MemeCharacters::ShooterPea){std::array<int,10> state{};state[0]=type;poses.push_back({a,nullptr,state,1});}
- if(a&&type==MemeCharacters::AwkwardSunflower){std::array<int,10> state{};state[0]=type;state[4]=MemeCharacters::AwkwardDuration;poses.push_back({a,nullptr,state,0});}
+ if(a&&type==MemeCharacters::TuckingSunflower){std::array<int,10> state{};state[0]=type;state[2]=1;poses.push_back({a,nullptr,state,0});}
 }
 Scope::~Scope(){poses.resize(mark);}
 void Transform(Reanimation* a,int track,ReanimatorTransform& t){
  const Pose* p=nullptr;for(auto i=poses.rbegin();i!=poses.rend();++i)if(i->anim==a){p=&*i;break;}
  if(!p)return;
- if(p->state[0]==MemeCharacters::AwkwardSunflower){
-  const auto& s=p->state;const std::string_view name=a->mDefinition->mTracks.tracks[track].mName;
-  const bool face=name=="anim_idle",blink=name.starts_with("anim_blink"),petal=name.starts_with("SunFlower_");
-  if(!face&&!blink&&!petal)return; // Never detach stem, roots or leaves.
-  if(face&&s[4]>0)if(auto* image=SandboxArt::AwkwardFace())t.mImage=image;
-  // The embarrassed producer faces forward. Observers snap to one fixed
-  // angle: face, blink and every petal share a single rigid head pivot.
-  // No easing, squash, independent face slide, or time-dependent turn.
-  if(p->plant&&s[4]==0&&s[3]>0&&s[5]>0){
-   const int dx=(s[3]-1)%9-p->plant->mPlantCol,dy=(s[3]-1)/9-p->plant->mRow;
-   const float angle=(dx||dy)?std::atan2(float(dx),-float(dy))*.20f:0;
-   Rotate(t,37,53,angle);
-  }
+ if(p->state[0]==MemeCharacters::TuckingSunflower){
+  if(!p->state[2])return;
+  const std::string_view name=a->mDefinition->mTracks.tracks[track].mName;
+  // Retract the stalk and lower the entire head, keeping its round face and
+  // petals together. Roots/leaves stay planted; never squash the whole sprite.
+  if(name=="anim_idle"||name.starts_with("anim_blink")||name.starts_with("SunFlower_")){
+   Warp(t,37,45,.80f,.80f);t.mTransY+=24;
+  }else if(name.starts_with("stalk_"))Warp(t,37,80,1,.35f);
   return;
  }
  if(p->state[0]==MemeCharacters::ShooterPea){

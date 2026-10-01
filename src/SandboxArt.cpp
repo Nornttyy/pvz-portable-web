@@ -13,16 +13,6 @@
 #include <algorithm>
 #include <cmath>
 namespace SandboxArt {
-Sexy::Image* AwkwardFace(){
- static std::unique_ptr<Sexy::GLImage> image;
- if(!image)image.reset(gLawnApp->GetImage("/addons/art/awkward-sunflower-face.png"));
- return image.get();
-}
-Sexy::Image* AwkwardDrop(){
- static std::unique_ptr<Sexy::GLImage> image;
- if(!image)image.reset(gLawnApp->GetImage("/addons/art/awkward-blue-drop.png"));
- return image.get();
-}
 Sexy::Image* Phone(int damage){
  damage=std::clamp(damage,0,2);static std::unique_ptr<Sexy::MemoryImage> images[3];auto& im=images[damage];if(im)return im.get();
  using namespace AbstractPhonePixels;im=std::make_unique<Sexy::MemoryImage>();im->Create(Width,Height);auto* out=im->GetBits();std::copy(Pixels,Pixels+Width*Height,out);
