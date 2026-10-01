@@ -28,6 +28,17 @@ struct World:Board {
  void step(int count=1){while(count--){SandboxPlants::Tick(this);SandboxZombies::Tick(this);if(!mPaused)++mMainCounter;}}
 };
 int main(){
+ // A small nut is a separate passive defender, not a cheaper biting nut.
+ {World w;auto* p=w.add(MemeCharacters::SmallNut);p->mPlantHealth=p->mPlantMaxHealth=MemeCharacters::SmallNutHealth;
+  auto* z=w.enemy(p->mX-30);z->mIsEating=true;const int enemyHP=z->mBodyHealth;p->mRecentlyEatenCountdown=50;
+  w.step(2000);assert(w.mProjectiles.mSize==0&&z->mBodyHealth==enemyHP&&!MemeCharacters::Producing(p)&&!MemeCharacters::Hiding(p));
+  assert(p->mPlantHealth==800&&MemeCharacters::Data(p,0)==0);
+  p->mPlantHealth=257;w.step();const auto saved=SandboxPlants::SavePower(p);SandboxPlants::Forget(p);
+  assert(SandboxPlants::RestorePower(p,saved)&&p->mPlantHealth==257&&p->mPlantMaxHealth==800&&SandboxPlants::SavePower(p)==saved);
+  float x=0,y=-5,sx=1,sy=1;SandboxPlants::AdjustScale(p,x,y,sx,sy);
+  assert(std::abs(sx-.6f)<.0001f&&std::abs(sy-.6f)<.0001f&&std::abs(x+40*sx-40)<.0001f&&std::abs(y+75*sy-70)<.0001f);
+  float shadow=1;SandboxPlants::AdjustShadow(p,x,y,shadow);assert(shadow==MemeCharacters::SmallNutScale);
+ }
  // Gatling: one 15-damage pea every 10 ticks, 120 shots then exactly 350
  // cooling ticks. Heat/timers are per-plant and pause/save without free shots.
  static_assert(MemeCharacters::GatlingInterval==10&&MemeCharacters::GatlingHeatLimit==120&&MemeCharacters::GatlingCooldown==350);
@@ -314,7 +325,7 @@ int main(){
  }
 
  // Removed originals cannot be assigned, restored or re-entered through legacy powers.
- static_assert(MemeCharacters::Definitions.size()==6&&SandboxPlants::Definitions.size()==6);
+ static_assert(MemeCharacters::Definitions.size()==7&&SandboxPlants::Definitions.size()==7);
  {World w;auto* p=w.add(519);const int x=p->mX,y=p->mY;w.step(100);assert(w.mProjectiles.mSize==0);
   auto* z=w.enemy();w.step();assert(w.mProjectiles.mSize==1);w.step(149);assert(w.mProjectiles.mSize==1);w.step();assert(w.mProjectiles.mSize==2);
   auto* shot=w.mProjectiles.values[0];assert(shot->mVelX>0&&shot->mVelY==0&&shot->mMotionType==MOTION_STAR);
@@ -341,7 +352,7 @@ int main(){
   if(id==504||id==518)assert(p->mX==80&&p->mY==200);
   if(id==502)assert(p->mIsAsleep==!night);
  }
- for(int id:{500,501,519,520,521,522}){World w;auto* p=w.add(id);w.step(100);const auto saved=SandboxPlants::SavePower(p);
+ for(int id:{500,501,519,520,521,522,523}){World w;auto* p=w.add(id);w.step(100);const auto saved=SandboxPlants::SavePower(p);
   for(int field=0;field<10;++field){auto bad=saved;bad[field]=-999;assert(!SandboxPlants::RestorePower(p,bad));assert(SandboxPlants::SavePower(p)==saved);}
   SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved)&&SandboxPlants::SavePower(p)==saved);
  }

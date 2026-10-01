@@ -2,7 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Six abstract plants (500,501,519,520,521,522), Louis XVI (212), Runaway Zombie (213), and Cone Wrap (214). Replacements occupy vanilla seed slots in adventure and one unified sandbox catalogue. Cone Wrap is entirely formed from twenty native road cones, with seven cones of armor and slower walking; adventure introduction starts at level 16. Existing plant mechanics, saves, native gating and campaign progress are unchanged.",
+  "mode": "Seven abstract plants (500,501,519,520,521,522,523), Louis XVI (212), Runaway Zombie (213), and Cone Wrap (214). Small Nut is an independent passive defender in adventure and the unified sandbox catalogue. Both extra cards fit inside native chooser and almanac grids. Save-version migration preserves legacy sunflowers and shooter cards; other mechanics and campaign progress are unchanged.",
+  "smallNut": {
+    "id": 523,
+    "nativeSlot": 53,
+    "health": 800,
+    "plantingCooldownTicks": 600,
+    "cost": 25,
+    "unlock": 4,
+    "visualScale": 0.6,
+    "art": "Original wall-nut rig, blink and two damaged faces, scaled around the same ground anchor with a smaller shadow. Passive blocking only; no bite."
+  },
   "weakPeaVisualScale": 0.6,
   "wallnutPlantingCooldownTicks": 1200,
   "rageBurst": {
@@ -49,12 +59,12 @@
     {
       "name": "pvz-portable.js",
       "size": 278906,
-      "sha256": "27ed6958a950eb18611fe56608d480fdbd2d114c678a71af0634ff9b52039080"
+      "sha256": "28fe9ccd881054aff9ab5c188d2079f26455802843847e306f14b25ed1910415"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7582558,
-      "sha256": "9fd5fbcc71988211e181107fcaee82bdc91ede5f6d4a1bc1e7490d422fc78595"
+      "size": 7583851,
+      "sha256": "bec8e9d4af748b49e666a837f9c6275e7637f3f98e95c576248ca23839094698"
     }
   ]
 }

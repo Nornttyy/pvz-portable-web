@@ -7,6 +7,54 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const run=promisify(execFile),root=fileURLToPath(new URL('../',import.meta.url));
+test('small nut initializes at one fifth health and versioned saves preserve both independent cards',async()=>{
+ const source=await readFile(join(root,'src/MemeAdventure.cpp'),'utf8'),plants=await readFile(join(root,'src/Lawn/Plant.cpp'),'utf8');
+ const start=source.indexOf(' // Also migrate ordinary plants');
+ const migration=source.slice(start,source.indexOf(' if(b->mApp->IsAdventureMode())for(const auto& saved:pending.shots)',start));
+ const assign=source.slice(source.indexOf('void OnPlanted('),source.indexOf('void OnZombieSpawned('));
+ const init=plants.slice(plants.indexOf('\tcase SeedType::SEED_WALLNUT:'),plants.indexOf('\tcase SeedType::SEED_EXPLODE_O_NUT:'));
+ assert.ok(migration&&assign&&init);assert.match(plants,/mPlantMaxHealth = mPlantHealth;/);
+ const folder=await mkdtemp(join(tmpdir(),'pvz-small-nut-save-')),cpp=join(folder,'test.cpp'),binary=join(folder,'test');
+ await writeFile(cpp,`#include "ConstEnums.h"
+#include "MemeAdventure.h"
+#include <algorithm>
+#include <cassert>
+#include <iostream>
+namespace Sexy {int Rand(int){return 0;}}
+class Plant {public:SeedType mSeedType=SEED_SMALL_NUT,mImitaterType=SEED_NONE;bool mDead=false;int custom=0,mPlantHealth=123,mPlantMaxHealth=800,mBlinkCountdown=0;
+ void Initialize(){const auto theSeedType=mSeedType;switch(theSeedType){${init}default:break;}mPlantMaxHealth=mPlantHealth;}};
+struct Card{SeedType mPacketType=SEED_NONE,mImitaterType=SEED_NONE;int mRefreshTime=600,mRefreshCounter=275;bool mRefreshing=true;};
+struct Bank{int mNumPackets=4;Card mSeedPackets[4];};
+class Board{public:std::vector<Plant*> mPlants;Bank* mSeedBank=nullptr;};
+namespace MemeCharacters {bool Is(const Plant* p){return p->custom!=0;}void Assign(Plant* p,int id){p->custom=id;}}
+namespace SandboxPlants {void RestoreRetired(Plant* p,const PowerSave&){p->mSeedType=SEED_PEASHOOTER;}}
+namespace MemeAdventure {
+ Save pending;bool RosterEnabled(){return true;}
+ const MemeCharacters::Definition* Replacement(int seed,int imitater){return MemeCharacters::ForBase(seed==48?imitater:seed);}
+ ${assign}
+ void RestoreRoster(Board* b){${migration}}
+}
+int main(){
+ Plant small;small.Initialize();Plant big;big.mSeedType=SEED_WALLNUT;big.Initialize();assert(small.mPlantHealth==800&&small.mPlantMaxHealth==800&&small.mPlantHealth*5==big.mPlantHealth);
+ for(int version:{0,51800,51900,52300}){
+  Plant shooter,nut,copy;shooter.mSeedType=SEED_LEFTPEATER;copy.mSeedType=SEED_IMITATER;copy.mImitaterType=SEED_SMALL_NUT;
+  Bank bank;bank.mSeedPackets[0].mPacketType=SEED_LEFTPEATER;bank.mSeedPackets[1].mPacketType=SEED_SMALL_NUT;
+  bank.mSeedPackets[2].mPacketType=SEED_IMITATER;bank.mSeedPackets[2].mImitaterType=SEED_SMALL_NUT;
+  bank.mSeedPackets[3].mPacketType=SEED_IMITATER;bank.mSeedPackets[3].mImitaterType=SEED_LEFTPEATER;
+  Board b;b.mPlants={&shooter,&nut,&copy};b.mSeedBank=&bank;MemeAdventure::pending.cooldown=version;MemeAdventure::RestoreRoster(&b);
+  assert(shooter.mSeedType==(version<51900?SEED_PEASHOOTER:SEED_LEFTPEATER));assert(shooter.custom==(version<51900?500:519));
+  assert(nut.mSeedType==(version<52300?SEED_SUNFLOWER:SEED_SMALL_NUT));assert(nut.custom==(version<52300?520:523));
+  assert(copy.mImitaterType==nut.mSeedType&&copy.mSeedType==SEED_IMITATER);
+  assert(bank.mSeedPackets[0].mPacketType==shooter.mSeedType&&bank.mSeedPackets[3].mImitaterType==shooter.mSeedType);
+  assert(bank.mSeedPackets[1].mPacketType==nut.mSeedType&&bank.mSeedPackets[2].mImitaterType==nut.mSeedType);
+  assert(nut.mPlantHealth==123&&shooter.mPlantHealth==123); // Never heal during migration.
+  if(version==52300){assert(bank.mSeedPackets[1].mRefreshTime==600&&bank.mSeedPackets[1].mRefreshCounter==275);assert(bank.mSeedPackets[2].mRefreshTime==600&&bank.mSeedPackets[2].mRefreshCounter==275);}
+ }
+ std::cout<<"Small nut native HP and old/current roster save migration passed\\n";
+}`);
+ await run(process.env.CXX||'c++',['-std=c++20','-Isrc',cpp,'-o',binary],{cwd:root});
+ assert.match((await run(binary)).stdout,/Small nut native HP and old\/current roster save migration passed/);
+});
 test('wall-nut planting takes 12 seconds, including imitater and resumed seed cards, without changing attacks',async()=>{
  const source=await readFile(join(root,'src/MemeAdventure.cpp'),'utf8'),plants=await readFile(join(root,'src/Lawn/Plant.cpp'),'utf8'),packets=await readFile(join(root,'src/Lawn/SeedPacket.cpp'),'utf8');
  const mapping=source.slice(source.indexOf('bool RosterEnabled(){'),source.indexOf('void Reset(){'));
@@ -34,7 +82,7 @@ struct Card {int mPacketType=3,mImitaterType=-1,mRefreshTime=1200,mRefreshCounte
 void RestoreCooldown(Card& card){using namespace MemeAdventure;${restore}}
 int main(){
  definitions[3].mRefreshTime=3000;definitions[23].mRefreshTime=3000;
- for(const auto& d:MemeCharacters::Definitions){const int expected=d.id==501?1200:300;assert(Plant::GetRefreshTime(SeedType(d.base),SEED_NONE)==expected);assert(Plant::GetRefreshTime(SEED_IMITATER,SeedType(d.base))==expected);}
+ for(const auto& d:MemeCharacters::Definitions){const int expected=d.id==501?1200:d.id==523?600:300;assert(Plant::GetRefreshTime(SeedType(d.base),SEED_NONE)==expected);assert(Plant::GetRefreshTime(SEED_IMITATER,SeedType(d.base))==expected);}
  assert(Plant::GetRefreshTime(SeedType(23),SEED_NONE)==3000);
  for(int seed:{3,48}){
   Card fresh;fresh.mPacketType=seed;fresh.mImitaterType=seed==48?3:-1;
@@ -73,10 +121,10 @@ namespace MemeAdventure {${mapping}\n${translate}}
 int main(){using namespace MemeAdventure;
  for(const auto& d:MemeCharacters::Definitions){assert(Replacement(d.base,-1)->id==d.id);assert(Replacement(48,d.base)->id==d.id);assert(Translate(d.key,"old")==d.name);assert(Translate(std::string(d.key)+"_TOOLTIP","old")==d.hint);assert(Translate(std::string(d.key)+"_DESCRIPTION","old")==d.description);}
  assert(!Replacement(48,-1)&&!Replacement(2,-1)&&!Replacement(503,-1));
- assert(MemeCharacters::Definitions.size()==6);
+ assert(MemeCharacters::Definitions.size()==7);
  assert(Translate("ADVICE_QA","向日葵和双子向日葵") == "向日葵和双子向日葵");
  assert(Translate("SEED_CHOOSER_QA","豌豆射手、小喷菇、坚果墙") == "红温豌豆、小喷菇、反咬坚果");
- for(int seed=0;seed<54;++seed)if(seed!=0&&seed!=1&&seed!=3&&seed!=7&&seed!=40&&seed!=52)assert(!Replacement(seed,-1));
+ for(int seed=0;seed<54;++seed)if(seed!=0&&seed!=1&&seed!=3&&seed!=7&&seed!=40&&seed!=52&&seed!=53)assert(!Replacement(seed,-1));
  for(const char* key:{"FLAG_ZOMBIE","BUCKETHEAD_ZOMBIE","POLE_VAULTING_ZOMBIE","CONEHEAD_ZOMBIE","ZOMBIE","SCREEN_DOOR_ZOMBIE","FOOTBALL_ZOMBIE","BALLOON_ZOMBIE","NEWSPAPER_ZOMBIE","IMP","LADDER_ZOMBIE"})
   assert(Translate(key,"native")=="native"&&Translate(std::string(key)+"_DESCRIPTION","native")=="native");
  assert(Translate("GOLD_SUNFLOWER_TROPHY","金色向日葵奖杯") == "金色向日葵奖杯");

@@ -163,7 +163,7 @@ void PvzpStringListLoad(const char* theFileName)
 std::string_view PvzpStringListFind(std::string_view theName)
 {
 	// New independent cards have no key in the unchanged original string pack.
-	if (theName.starts_with("AWKWARD_SUNFLOWER"))
+	if (theName.starts_with("AWKWARD_SUNFLOWER") || theName.starts_with("SMALL_NUT"))
 		if (const auto custom = MemeAdventure::Translate(theName, {}); !custom.empty()) return custom;
 	auto anItr = gSexyAppBase->mStringProperties.find(theName);
 	if (anItr != gSexyAppBase->mStringProperties.end())

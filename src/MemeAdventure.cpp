@@ -46,7 +46,6 @@ bool MouseDown(Board* b,int x,int y,int clicks){
 }
 void OnPlanted(Plant* p){
  if(!p||p->mDead||MemeCharacters::Is(p))return;
- if(RosterEnabled()&&p->mSeedType==SEED_AWKWARD_SUNFLOWER)p->mSeedType=SEED_SUNFLOWER;
  // Imitaters acquire the new identity when their normal morph creates the plant.
  if(const auto* d=Replacement(int(p->mSeedType)))MemeCharacters::Assign(p,d->id);
 }
@@ -107,13 +106,19 @@ void Restore(Board* b){
  // Also migrate ordinary plants in pre-mod saves, keeping HP and positions.
  if(RosterEnabled()){
   for(auto* p:b->mPlants){
-   if(pending.cooldown!=RosterSaveVersion&&int(p->mSeedType)==52&&!MemeCharacters::Is(p))SandboxPlants::RestoreRetired(p,{504,0,0,0,0,0,0,0,0,1});
+   if(LegacyShooterSlot(pending.cooldown)&&int(p->mSeedType)==52&&!MemeCharacters::Is(p))SandboxPlants::RestoreRetired(p,{504,0,0,0,0,0,0,0,0,1});
+   if(LegacySunflowerSlot(pending.cooldown)){
+    if(int(p->mSeedType)==53&&!MemeCharacters::Is(p))p->mSeedType=SEED_SUNFLOWER;
+    if(int(p->mImitaterType)==53)p->mImitaterType=SEED_SUNFLOWER;
+   }
    OnPlanted(p);
   }
   if(b->mSeedBank)for(int i=0;i<b->mSeedBank->mNumPackets;++i){auto& card=b->mSeedBank->mSeedPackets[i];
-   if(card.mPacketType==SEED_AWKWARD_SUNFLOWER)card.mPacketType=SEED_SUNFLOWER;
-   if(card.mImitaterType==SEED_AWKWARD_SUNFLOWER)card.mImitaterType=SEED_SUNFLOWER;
-   if(pending.cooldown!=RosterSaveVersion){
+   if(LegacySunflowerSlot(pending.cooldown)){
+    if(int(card.mPacketType)==53)card.mPacketType=SEED_SUNFLOWER;
+    if(int(card.mImitaterType)==53)card.mImitaterType=SEED_SUNFLOWER;
+   }
+   if(LegacyShooterSlot(pending.cooldown)){
     if(int(card.mPacketType)==52)card.mPacketType=SEED_PEASHOOTER;
     if(int(card.mImitaterType)==52)card.mImitaterType=SEED_PEASHOOTER;
    }

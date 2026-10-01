@@ -33,6 +33,13 @@ void check(int cell,int advance,int offset,int split,bool measured){
     FONT_BRIANNETOD12=nullptr;
 }
 int main(){
+    {FontData dots;dots.mFontLayerList.emplace_back();auto& donor=dots.mFontLayerList.back();
+     const CharData period{{100,200,24,24},{-10,-4},3};donor.mCharDataMap[U'.']=period;donor.mCharDataMap[U'·']={};
+     ImageFont dotFont;dotFont.mFontData=&dots;FONT_BRIANNETOD12=&dotFont;SandboxRepairFonts();
+     const auto& dot=dots.mFontLayerMap.at("MEMEGLYPHMIDDLEDOT0")->mCharDataMap.at(U'·');
+     assert(dot.mImageRect==period.mImageRect&&dot.mWidth==period.mWidth&&dot.mOffset.mX==period.mOffset.mX&&dot.mOffset.mY==period.mOffset.mY-6);
+     SandboxRepairFonts();assert(dots.mFontLayerList.size()==2&&dotFont.prepared==1);FONT_BRIANNETOD12=nullptr;
+    }
     check(24,14,-5,11,false);check(27,16,-5,12,true);check(42,24,-9,19,true);
     FontData native;native.mFontLayerList.emplace_back();auto& layer=native.mFontLayerList.back();
     for(char32_t c:U"火烤陷焰种沙秒")layer.mCharDataMap[c]={{0,0,24,24},{-5,-4},14};

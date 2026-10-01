@@ -1,15 +1,16 @@
 #pragma once
 #include "ConstEnums.h"
 
-// Keep native 50 x 70 cards and their spacing. The extra adventure plant
-// occupies the ninth cell, rather than an Imitater-style external socket.
+// Keep native 50 x 70 cards and their spacing. The extra adventure
+// plants occupy grid cells, never Imitater-style external sockets.
 namespace SeedChooserLayout {
 constexpr int ExtraWidth(bool expanded) { return expanded ? 53 : 0; }
 constexpr int Columns(bool expanded) { return expanded ? 9 : 8; }
 constexpr int Slot(int seed, bool expanded) {
     if (!expanded) return seed;
     if (seed == SEED_LEFTPEATER) return 8;
-    return seed >= SEED_PUFFSHROOM ? seed + 1 : seed;
+    if (seed == SEED_SMALL_NUT) return 9;
+    return seed >= SEED_PUFFSHROOM ? seed + 2 : seed;
 }
 struct Position { int x, y; };
 constexpr Position Imitater(bool expanded) {

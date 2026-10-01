@@ -40,7 +40,7 @@
 #include "../../AlmanacPlantLayout.h"
 #include "../../SandboxFonts.h"
 
-static bool AbstractAlmanacExpanded(){return gLawnApp->HasSeedType(SEED_LEFTPEATER);}
+static bool AbstractAlmanacExpanded(){return gLawnApp->HasSeedType(SEED_LEFTPEATER)||gLawnApp->HasSeedType(SEED_SMALL_NUT);}
 static int AbstractAlmanacCount(){return AbstractAlmanacExpanded()?NUM_SEED_TYPES:NUM_ALMANAC_SEEDS;}
 
 bool gZombieDefeated[NUM_ZOMBIE_TYPES] = { false };
@@ -358,10 +358,13 @@ void AlmanacDialog::DrawPlants(Graphics* g)
 		std::string aCostStr = PvzpReplaceString(std::format("{{KEYWORD}}{{COST}}:{{STAT}} {}", Plant::GetCost(mSelectedSeed, SEED_NONE)), "{COST}", "[COST]");
 		PvzpDrawStringWrapped(g, aCostStr, Rect(485, 520, 134, 50), Sexy::FONT_BRIANNETOD12, Color::White, DS_ALIGN_LEFT);
 
+		const std::string aWaitTime = MemeAdventure::Replacement(int(mSelectedSeed)) ?
+			std::format("{} 秒", Plant::GetRefreshTime(mSelectedSeed, SEED_NONE) / 100) :
+			aPlantDef.mRefreshTime == 750 ? "[WAIT_TIME_SHORT]" : aPlantDef.mRefreshTime == 3000 ? "[WAIT_TIME_LONG]" : "[WAIT_TIME_VERY_LONG]";
 		std::string aRechargeStr = PvzpReplaceString(
 			"{KEYWORD}{WAIT_TIME}: {STAT}{WAIT_TIME_LENGTH}",
 			"{WAIT_TIME_LENGTH}",
-			Plant::GetRefreshTime(mSelectedSeed, SEED_NONE) == 300 ? "3 秒" : aPlantDef.mRefreshTime == 750 ? "[WAIT_TIME_SHORT]" : aPlantDef.mRefreshTime == 3000 ? "[WAIT_TIME_LONG]" : "[WAIT_TIME_VERY_LONG]"
+			aWaitTime
 		);
 		aRechargeStr = PvzpReplaceString(aRechargeStr, "{WAIT_TIME}", "[WAIT_TIME]");
 		PvzpDrawStringWrapped(g, aRechargeStr, Rect(600, 520, 139, 50), Sexy::FONT_BRIANNETOD12, Color(40, 50, 90), DS_ALIGN_RIGHT);

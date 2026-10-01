@@ -118,8 +118,14 @@ void RestoreShot(const Projectile* p,int record){
  if(record<0)return;const int percent=record&65535,style=record>>16;
  if(percent>=100&&percent<=300&&MemeCharacters::RestoreShotStyle(p,style)&&style!=0)damageShots[p]=percent;
 }
-void AdjustScale(const Plant* p,float& x,float& y,float& sx,float& sy){MemeCharacters::Scale(p,x,y,sx,sy);}
-void AdjustShadow(const Plant*,float&,float&,float&){}
+void AdjustScale(const Plant* p,float& x,float& y,float& sx,float& sy){
+ if(p->mSeedType==SEED_SMALL_NUT){
+  x+=40*sx*(1-MemeCharacters::SmallNutScale);y+=75*sy*(1-MemeCharacters::SmallNutScale);
+  sx*=MemeCharacters::SmallNutScale;sy*=MemeCharacters::SmallNutScale;
+ }
+ MemeCharacters::Scale(p,x,y,sx,sy);
+}
+void AdjustShadow(const Plant* p,float&,float&,float& scale){if(p->mSeedType==SEED_SMALL_NUT)scale*=MemeCharacters::SmallNutScale;}
 float ShotScale(const Projectile* shot){
  // Visual only: weak Repeater peas are smaller, not weaker or slower.
  // Torchwood's attached fire animation keeps its native size and shadow.

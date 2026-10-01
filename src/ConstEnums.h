@@ -1088,7 +1088,7 @@ enum SeedType : int32_t
 	SEED_GIANT_WALLNUT,
 	SEED_SPROUT,
 	SEED_LEFTPEATER,
-	SEED_AWKWARD_SUNFLOWER = 53,
+	SEED_SMALL_NUT = 53, // Former extra sunflower slot; old saves migrate by roster version.
 	NUM_SEED_TYPES,
 	SEED_BEGHOULED_BUTTON_SHUFFLE = 54, // Preserve every native special-card/save ID.
 	SEED_BEGHOULED_BUTTON_CRATER,

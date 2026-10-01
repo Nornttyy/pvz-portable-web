@@ -66,6 +66,9 @@ void Repair(_Font* source) {
 void SandboxRepairFonts(){
     for(auto* font:{FONT_BRIANNETOD12,FONT_BRIANNETOD16,FONT_DWARVENTODCRAFT18,FONT_DWARVENTODCRAFT24,FONT_DWARVENTODCRAFT18YELLOW,FONT_DWARVENTODCRAFT18GREENINSET,FONT_DWARVENTODCRAFT18BRIGHTGREENINSET,FONT_HOUSEOFTERROR16,FONT_HOUSEOFTERROR28}){
         Repair(font);
+        // The bullet is a missing-glyph box in this atlas. Raise its real
+        // period by a quarter-cell to form the middle dot in 小·坚果.
+        Supplement(font,U'·',"MIDDLEDOT",{{U'.',0,0,1,1,0,-.25f}});
         // 尢 from 优 (omit its top-right dot), and 介 from 价. Keep the
         // original bitmap strokes, cell size, baseline and character advance.
         Supplement(font,U'尬',"GA",{{U'优',.46f,0,.28f,.29f,-.40f,0},{U'优',.46f,.29f,.54f,.71f,-.40f,0},{U'价',.46f,0,.54f,1}});

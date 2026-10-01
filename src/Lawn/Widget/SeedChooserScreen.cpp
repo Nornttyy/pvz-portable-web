@@ -45,7 +45,7 @@
 #include "../../SeedChooserLayout.h"
 #include "../../SandboxFonts.h"
 
-static bool AbstractChooserExpanded(){return gLawnApp->HasSeedType(SEED_LEFTPEATER);}
+static bool AbstractChooserExpanded(){return gLawnApp->HasSeedType(SEED_LEFTPEATER)||gLawnApp->HasSeedType(SEED_SMALL_NUT);}
 static int AbstractChooserCount(){return AbstractChooserExpanded()?NUM_SEED_TYPES:NUM_SEEDS_IN_CHOOSER;}
 
 SeedChooserScreen::SeedChooserScreen()
@@ -387,11 +387,13 @@ void SeedChooserScreen::Draw(Graphics* g)
 		}
 	}
 
-	if (mApp->HasSeedType(SEED_LEFTPEATER) && mChosenSeeds[SEED_LEFTPEATER].mSeedState != SEED_IN_CHOOSER)
+	for (SeedType extra : {SEED_LEFTPEATER, SEED_SMALL_NUT}) if (AbstractChooserExpanded())
 	{
 		int x, y;
-		GetSeedPositionInChooser(SEED_LEFTPEATER, x, y);
-		DrawSeedPacket(g, x, y, SEED_LEFTPEATER, SEED_NONE, 0, 55, true, false);
+		GetSeedPositionInChooser(extra, x, y);
+		if (!mApp->HasSeedType(extra)) g->DrawImage(Sexy::IMAGE_SEEDPACKETSILHOUETTE, x, y);
+		else if (mChosenSeeds[extra].mSeedState != SEED_IN_CHOOSER)
+			DrawSeedPacket(g, x, y, extra, SEED_NONE, 0, 55, true, false);
 	}
 
 	int aNumSeedsInBank = mBoard->mSeedBank->mNumPackets;
@@ -644,7 +646,7 @@ void SeedChooserScreen::OnStartButton()
 			return;
 		}
 	}
-	if (!PickedPlantType(SEED_SUNFLOWER) && !PickedPlantType(SEED_TWINSUNFLOWER) && !PickedPlantType(SEED_SUNSHROOM) && !PickedPlantType(SEED_AWKWARD_SUNFLOWER) &&
+	if (!PickedPlantType(SEED_SUNFLOWER) && !PickedPlantType(SEED_TWINSUNFLOWER) && !PickedPlantType(SEED_SUNSHROOM) &&
 		!mBoard->mCutScene->IsSurvivalRepick() && mApp->mGameMode != GAMEMODE_CHALLENGE_LAST_STAND)
 	{
 		if (mApp->IsFirstTimeAdventureMode() && mBoard->mLevel == 11)

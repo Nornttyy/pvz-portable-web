@@ -37,14 +37,15 @@ int PvzpAnimateCurve(int,int,int,int,int,PvzpCurves){return 0;}
 namespace Sexy {int Rand(int){return 50;}}
 // The runner appends the actual production/growth/value implementations.
 int main(){
- {Plant p;p.mSeedType=SEED_AWKWARD_SUNFLOWER;p.meme=true;p.UpdateProductionPlant();
+ {Plant p;p.mSeedType=SEED_SUNFLOWER;p.meme=true;p.UpdateProductionPlant();
   assert(p.board.coins.size()==1&&p.board.coins[0].GetSunValue()==25);
   p.UpdateProductionPlant();assert(p.mLaunchCounter==2498);
   for(int i=0;i<400;++i)p.UpdateProductionPlant();assert(p.mLaunchCounter==1698&&p.board.coins.size()==1);
   p.UpdateProductionPlant();assert(p.mLaunchCounter==1696);
   p.board.award=true;const int before=p.mLaunchCounter;p.UpdateProductionPlant();assert(p.mLaunchCounter==before);
  }
- {Plant p;p.mSeedType=SEED_AWKWARD_SUNFLOWER;p.board.mCoins.mSize=992;p.UpdateProductionPlant();assert(p.board.coins.empty());}
+ {Plant p;p.mSeedType=SEED_SUNFLOWER;p.board.mCoins.mSize=992;p.UpdateProductionPlant();assert(p.board.coins.empty());}
+ {Plant p;p.mSeedType=SEED_SMALL_NUT;p.meme=true;p.producing=false;p.UpdateProductionPlant();assert(p.board.coins.empty()&&p.mLaunchCounter==1);}
  for(bool replacement:{false,true}){
   Plant p;p.meme=replacement;p.UpdateProductionPlant();assert(p.board.coins.size()==1);
   assert(p.board.coins[0].GetSunValue()==25&&p.board.motions[0]==COIN_MOTION_FROM_PLANT);
