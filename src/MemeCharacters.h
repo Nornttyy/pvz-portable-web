@@ -11,6 +11,8 @@ inline constexpr int LongRepeater=521, WeakProjectile=297;
 inline constexpr int RepeaterCount=50, RepeaterInterval=2, RepeaterRest=150;
 inline constexpr int GatlingShooter=522, GatlingProjectile=298;
 inline constexpr int GatlingInterval=10, GatlingHeatLimit=120, GatlingCooldown=350;
+// Seed-card recharge, separate from each character's combat cooldown.
+constexpr int PlantingCooldown(int id){return id==501?1200:300;}
 constexpr bool IsStraightShot(int style){return style==WeakProjectile||style==GatlingProjectile;}
 constexpr int BaseShotStyle(int style){return style&(ReflectedShot-1);}
 struct Definition {int id,base,cost,unlock;const char* name;const char* shortName;const char* hint;const char* key;const char* description;};

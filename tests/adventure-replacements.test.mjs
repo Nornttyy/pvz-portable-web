@@ -7,6 +7,53 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const run=promisify(execFile),root=fileURLToPath(new URL('../',import.meta.url));
+test('wall-nut planting takes 12 seconds, including imitater and resumed seed cards, without changing attacks',async()=>{
+ const source=await readFile(join(root,'src/MemeAdventure.cpp'),'utf8'),plants=await readFile(join(root,'src/Lawn/Plant.cpp'),'utf8'),packets=await readFile(join(root,'src/Lawn/SeedPacket.cpp'),'utf8');
+ const mapping=source.slice(source.indexOf('bool RosterEnabled(){'),source.indexOf('void Reset(){'));
+ const recharge=plants.slice(plants.indexOf('int Plant::GetRefreshTime('),plants.indexOf('bool Plant::IsNocturnal('));
+ const restore=source.slice(source.indexOf('   if(const auto* replacement=Replacement(int(card.mPacketType)'),source.indexOf('\n  }\n }\n if(b->mApp->IsAdventureMode())for(const auto& saved:pending.shots)'));
+ const update=packets.slice(packets.indexOf('\tif (!mActive && mRefreshing)'),packets.indexOf('\n\tif (mSlotMachineCountDown > 0)'));
+ assert.ok(mapping&&recharge&&restore&&update);
+ const folder=await mkdtemp(join(tmpdir(),'pvz-nut-cooldown-')),cpp=join(folder,'test.cpp'),binary=join(folder,'test');
+ await writeFile(cpp,`#include "MemeCharacters.h"
+#include <algorithm>
+#include <cassert>
+#include <iostream>
+struct App {bool adventure=true,bowling=false,pots=false,whack=false;
+ bool IsAdventureMode(){return adventure;}bool IsWallnutBowlingLevel(){return bowling;}bool IsScaryPotterLevel(){return pots;}bool IsWhackAZombieLevel(){return whack;}
+} app;
+App* gLawnApp=&app;bool gSandboxEnabled=false;
+namespace MemeAdventure {${mapping}}
+enum SeedType {SEED_NONE=-1,SEED_WALLNUT=3,SEED_IMITATER=48};
+struct PlantDefinition {int mRefreshTime=750;};PlantDefinition definitions[60];
+const PlantDefinition& GetPlantDefinition(SeedType type){return definitions[int(type)];}
+namespace Challenge {bool IsZombieSeedType(SeedType){return false;}}
+struct Plant {static int GetRefreshTime(SeedType,SeedType);};${recharge}
+struct Card {int mPacketType=3,mImitaterType=-1,mRefreshTime=1200,mRefreshCounter=0;bool mRefreshing=true,mActive=false;
+ void Activate(){mActive=true;}void FlashIfReady(){}void Update(){${update}}};
+void RestoreCooldown(Card& card){using namespace MemeAdventure;${restore}}
+int main(){
+ definitions[3].mRefreshTime=3000;definitions[23].mRefreshTime=3000;
+ for(const auto& d:MemeCharacters::Definitions){const int expected=d.id==501?1200:300;assert(Plant::GetRefreshTime(SeedType(d.base),SEED_NONE)==expected);assert(Plant::GetRefreshTime(SEED_IMITATER,SeedType(d.base))==expected);}
+ assert(Plant::GetRefreshTime(SeedType(23),SEED_NONE)==3000);
+ for(int seed:{3,48}){
+  Card fresh;fresh.mPacketType=seed;fresh.mImitaterType=seed==48?3:-1;
+  for(int tick=0;tick<1200;++tick){fresh.Update();assert(!fresh.mActive&&fresh.mRefreshing);}fresh.Update();assert(fresh.mActive&&!fresh.mRefreshing);
+  Card saved;saved.mPacketType=seed;saved.mImitaterType=fresh.mImitaterType;saved.mRefreshCounter=475;RestoreCooldown(saved);assert(saved.mRefreshTime==1200&&saved.mRefreshCounter==475);
+  saved.mRefreshTime=300;saved.mRefreshCounter=100;RestoreCooldown(saved);assert(saved.mRefreshTime==1200&&saved.mRefreshCounter==100);
+  saved.mRefreshTime=3000;saved.mRefreshCounter=2900;RestoreCooldown(saved);assert(saved.mRefreshTime==1200&&saved.mRefreshCounter==1100);
+  saved.mRefreshing=false;saved.mRefreshTime=300;saved.mRefreshCounter=0;RestoreCooldown(saved);assert(saved.mRefreshTime==300&&!saved.mRefreshing);
+ }
+ Card pea;pea.mPacketType=0;pea.mRefreshTime=3000;pea.mRefreshCounter=100;RestoreCooldown(pea);assert(pea.mRefreshTime==300&&pea.mRefreshCounter==0);
+ for(bool* mode:{&gSandboxEnabled,&app.bowling,&app.pots,&app.whack}){*mode=true;assert(Plant::GetRefreshTime(SEED_WALLNUT,SEED_NONE)==3000);Card native;native.mRefreshTime=3000;RestoreCooldown(native);assert(native.mRefreshTime==3000);*mode=false;}
+ app.adventure=false;assert(Plant::GetRefreshTime(SEED_WALLNUT,SEED_NONE)==3000);
+ std::cout<<"12-second native planting and save boundaries passed\\n";
+}`);
+ await run(process.env.CXX||'c++',['-std=c++20','-Isrc',cpp,'-o',binary],{cwd:root});
+ assert.match((await run(binary)).stdout,/12-second native planting and save boundaries passed/);
+ const combat=await readFile(join(root,'src/MemeCharacters.cpp'),'utf8');
+ assert.match(combat,/if\(target\)\{s\.timer=300;s\.pulse=50;/);
+});
 test('production replacement and localization respect native IDs, special modes and unrelated names',async()=>{
  const source=await readFile(join(root,'src/MemeAdventure.cpp'),'utf8');
  const mapping=source.slice(source.indexOf('bool RosterEnabled(){'),source.indexOf('void Reset(){'));

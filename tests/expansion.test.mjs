@@ -86,7 +86,7 @@ test('adventure replaces native cards, preserving optional saves and combat tick
  assert.match(adventure,/SandboxPlants::RestoreRetired\(p,saved.state\)/);
  const board=(await read('src/Lawn/Board.cpp')).toString();assert.match(board,/MemeAdventure::OnPlanted\(aPlant\)/);
  const plants=(await read('src/Lawn/Plant.cpp')).toString();
- assert.match(plants,/MemeAdventure::Replacement\(int\(theSeedType\), int\(theImitaterType\)\)\) return 300/);
+ assert.match(plants,/MemeAdventure::Replacement\(int\(theSeedType\), int\(theImitaterType\)\)\) return MemeCharacters::PlantingCooldown\(replacement->id\)/);
  assert.match(plants,/MemeCharacters::Is\(this\) && !MemeCharacters::Producing\(this\)/);
  assert.match(adventure,/OnPlanted\(p\)/);assert.match(adventure,/pending.cooldown!=RosterSaveVersion/);
  assert.doesNotMatch((await read('src/Lawn/SeedPacket.cpp')).toString(),/MemeAdventure::DrawCardName/);

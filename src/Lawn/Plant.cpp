@@ -5147,7 +5147,7 @@ std::string Plant::GetToolTip(SeedType theSeedType)
 
 int Plant::GetRefreshTime(SeedType theSeedType, SeedType theImitaterType)
 {
-	if (MemeAdventure::Replacement(int(theSeedType), int(theImitaterType))) return 300;
+	if (const auto* replacement = MemeAdventure::Replacement(int(theSeedType), int(theImitaterType))) return MemeCharacters::PlantingCooldown(replacement->id);
 	if (Challenge::IsZombieSeedType(theSeedType))
 	{
 		return 0;

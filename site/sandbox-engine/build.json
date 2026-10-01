@@ -4,6 +4,7 @@
   "openmpt": "0.8.4",
   "mode": "Six abstract plants (500,501,519,520,521,522), Louis XVI (212), Runaway Zombie (213), and Cone Wrap (214). Replacements occupy vanilla seed slots in adventure and one unified sandbox catalogue. Cone Wrap is entirely formed from twenty native road cones, with seven cones of armor and slower walking; adventure introduction starts at level 16. Existing plant mechanics, saves, native gating and campaign progress are unchanged.",
   "weakPeaVisualScale": 0.6,
+  "wallnutPlantingCooldownTicks": 1200,
   "coneWrapZombie": {
     "id": 214,
     "name": "雪糕桶包裹我",
@@ -38,8 +39,8 @@
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7581887,
-      "sha256": "a9538facd61956c15eca6d09e349b6ce82426de77b78b86f2fdc724c82e9fd16"
+      "size": 7581980,
+      "sha256": "7e098c279df54b6cad0a6ddb8d2b0f45cdf78312950730bc38f6ca9a90562ada"
     }
   ]
 }

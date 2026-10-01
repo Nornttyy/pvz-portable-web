@@ -117,8 +117,14 @@ void Restore(Board* b){
     if(int(card.mPacketType)==52)card.mPacketType=SEED_PEASHOOTER;
     if(int(card.mImitaterType)==52)card.mImitaterType=SEED_PEASHOOTER;
    }
-   if(Replacement(int(card.mPacketType),int(card.mImitaterType))&&card.mRefreshing&&card.mRefreshTime>300){
-    const int left=std::clamp(card.mRefreshTime-card.mRefreshCounter,0,300);card.mRefreshTime=300;card.mRefreshCounter=300-left;
+   if(const auto* replacement=Replacement(int(card.mPacketType),int(card.mImitaterType));replacement&&card.mRefreshing){
+    const int cooldown=MemeCharacters::PlantingCooldown(replacement->id);
+    if(card.mRefreshTime<cooldown){
+     // Old three-second nut cards keep time already elapsed, but use 12s now.
+     card.mRefreshCounter=std::clamp(card.mRefreshCounter,0,cooldown);card.mRefreshTime=cooldown;
+    }else if(card.mRefreshTime>cooldown){
+     const int left=std::clamp(card.mRefreshTime-card.mRefreshCounter,0,cooldown);card.mRefreshTime=cooldown;card.mRefreshCounter=cooldown-left;
+    }
    }
   }
  }

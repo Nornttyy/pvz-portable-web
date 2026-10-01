@@ -348,7 +348,7 @@ index cdec611..194aa2c 100644
  
  int Coin::GetSunValue()
 diff --git a/src/Lawn/Plant.cpp b/src/Lawn/Plant.cpp
-index c934659..204c98a 100644
+index c934659..e5463ad 100644
 --- a/src/Lawn/Plant.cpp
 +++ b/src/Lawn/Plant.cpp
 @@ -30,6 +30,11 @@
@@ -845,7 +845,7 @@ index c934659..204c98a 100644
  
  int Plant::GetRefreshTime(SeedType theSeedType, SeedType theImitaterType)
  {
-+	if (MemeAdventure::Replacement(int(theSeedType), int(theImitaterType))) return 300;
++	if (const auto* replacement = MemeAdventure::Replacement(int(theSeedType), int(theImitaterType))) return MemeCharacters::PlantingCooldown(replacement->id);
  	if (Challenge::IsZombieSeedType(theSeedType))
  	{
  		return 0;
