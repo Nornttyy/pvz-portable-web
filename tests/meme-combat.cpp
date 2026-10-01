@@ -70,6 +70,9 @@ int main(){
   assert(nut->mDead&&!pad->mDead&&z->mBossHeadCounter==502&&SandboxZombies::IsRetreating(z)&&SandboxZombies::Speed(z)==3);
   assert(!SandboxZombies::StealPlant(z,pad));SandboxZombies::Forget(z);assert(SandboxZombies::Restore(z,id));assert(z->mBossHeadCounter==502);
   auto* cob=w.AddProjectile(400,100,0,1,PROJECTILE_COBBIG);z->mBossStompCounter=0;assert(!SandboxZombies::DodgeProjectile(cob,z));
+  auto* fresh=w.AddProjectile(400,200,0,2,PROJECTILE_PEA);const float fleeX=z->mPosX;
+  assert(SandboxZombies::DodgeProjectile(fresh,z));for(int i=0;i<90;++i)SandboxZombies::UpdateClever(z);
+  assert(SandboxZombies::IsRetreating(z)&&std::abs(z->mPosX-fleeX+28)<.005f&&z->mBossHeadCounter==502);
   z->mHasHead=false;SandboxZombies::UpdateClever(z);assert(z->mZombiePhase==PHASE_ZOMBIE_NORMAL&&!SandboxZombies::IsRetreating(z));
   Sexy::forcedRoll=-1;
  }

@@ -166,7 +166,7 @@ bool UpdateClever(Zombie* z){
   z->mPosY=z->GetPosYBasedOnRow(from)*(1-t)+z->GetPosYBasedOnRow(to)*t;
   if(t>=.5f&&z->mRow!=to)z->SetRow(to);
  }
- z->mPosX+=28*(t-previous);z->mX=int(z->mPosX);z->mY=int(z->mPosY);
+ z->mPosX+=(IsRetreating(z)?-28:28)*(t-previous);z->mX=int(z->mPosX);z->mY=int(z->mPosY);
  const bool pool=z->mBoard->IsPoolSquare(z->mBoard->PixelToGridXKeepOnBoard(z->mX+60,z->mY),z->mRow)&&z->mPosX<680;
  z->mInPool=pool;
  const float fromDepth=z->mBoard->IsPoolSquare(0,from)&&z->mPosX<680?-40*z->mScaleZombie:0;
@@ -217,7 +217,9 @@ void AdjustPose(Zombie* z,Reanimation* body){
   const float t=1.0f-float(z->mPhaseCounter)/FlipTicks;
   // Fast takeoff/landing, stretched mid-air turn: local bullet-time only.
   const float p=t<.2f?t*1.5f:t<.8f?.3f+(t-.2f)*(.4f/.6f):.7f+(t-.8f)*1.5f;
-  const float angle=p*6.2831853f*(IsRetreating(z)?-1.f:1.f);
+  // The native overlay already mirrors a fleeing zombie. Reversing the
+  // angle a second time would turn its backflip into a forward somersault.
+  const float angle=p*6.2831853f;
   const float c=std::cos(angle),s=std::sin(angle);
   auto& m=body->mOverlayMatrix;const auto old=m;
   m.m00=old.m00*c+old.m01*s;m.m01=-old.m00*s+old.m01*c;
