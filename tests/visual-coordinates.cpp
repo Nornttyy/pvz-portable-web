@@ -80,6 +80,17 @@ int main(){
   app.reanims.clear();
  }
  SandboxPlants::Reset();
+ // Gatling heat/cooldown is a compact world-space bar; reuse native steam.
+ {Board w;auto* p=w.plant(2,2);p->mSeedType=static_cast<SeedType>(40);SandboxPlants::Assign(p,522);
+  Sexy::Graphics g(nullptr);
+  for(const auto state:{std::array<int,10>{522,300,0,60,0,10,50,0,0,1},std::array<int,10>{522,300,1,120,175,0,50,0,0,1}}){
+   assert(SandboxPlants::RestorePower(p,state));Sexy::drawnRects.clear();testBlits.clear();MemeCharacters::Effects(&g,&w,2);
+   assert(Sexy::drawnRects.size()==2);const auto bar=Sexy::drawnRects[1].bounds;
+   assert(bar.mX==p->mX+13&&bar.mY==p->mY+78&&bar.mWidth==27&&bar.mHeight==4);
+   assert(testBlits.size()==(state[2]?1:0));
+  }
+  SandboxPlants::Forget(p);
+ }
  Sexy::Graphics g(nullptr);Reanimation mouth;mouth.track="idle_mouth";mouth.matrix={0,-0.72f,60,0.72f,0,40};
  Board board;app.reanims[1]=&mouth;
  // New rage shots keep the exact native muzzle registration and pea scale.

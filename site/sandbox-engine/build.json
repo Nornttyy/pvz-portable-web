@@ -2,18 +2,26 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Five abstract plants (500,501,519,520,521), Louis XVI (212), and Runaway Zombie (213). Replacements occupy vanilla peashooter, sunflower, walnut and repeater slots in adventure and one unified sandbox catalogue, with no New Cards tab or duplicate vanilla entries. Tucking Sunflower (520) uses the standing native sunflower portrait and native slot 1; slot 53 plants and cards migrate on save restore, preserving health and sun countdown. Its proximity tucking/pass-through and native 25-sun production remain unchanged. Long Repeater (521) commits to 50 native peas, one every 2 ticks, then rests 150 ticks; each pea does 1 damage (2 after native torchwood conversion), with native speed, straight motion and splat, no knockback. Per-projectile damage tags and partial volleys survive save/restore. Shooter Pea (519) remains one standalone entry in the same catalogue. Other mechanics and campaign progress are preserved.",
+  "mode": "Six abstract plants (500,501,519,520,521,522), Louis XVI (212), and Runaway Zombie (213). Replacements occupy vanilla seed slots in adventure and one unified sandbox catalogue, without a New Cards tab or duplicate vanilla entries. Gatling Shooter (522) replaces slot 40, retaining native art, 250-sun price and Repeater upgrade requirement: one 15-damage native pea every 10 ticks, overheat after 120 shots (12 seconds), then exactly 350 cooling ticks (3.5 seconds). A compact heat/cooling bar and native steam indicate state. Per-plant heat, cooling clocks and per-projectile damage tags survive optional saves; native fire conversion does 30 damage. Tucking Sunflower (520) keeps its standing portrait and slot-53 save migration. Long Repeater (521) retains its 50-shot, 1-damage volley and 60-percent pea/shadow size. Other mechanics, native gating and campaign progress are unchanged.",
   "weakPeaVisualScale": 0.6,
+  "gatling": {
+    "id": 522,
+    "nativeBase": 40,
+    "intervalTicks": 10,
+    "damage": 15,
+    "overheatShots": 120,
+    "cooldownTicks": 350
+  },
   "files": [
     {
       "name": "pvz-portable.js",
       "size": 277501,
-      "sha256": "158d19f1631bc2b6e752d9538f829751ad6b78ada8611e66cb73f56a45e36dca"
+      "sha256": "58938dbc402ab16ca1f5ccffd47d0d1683604f4b3afdf72d12886c858de44c68"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7565932,
-      "sha256": "89011177decf241f5cbc5bafe606076c6550bc5d35f45077413ce8267aa1479e"
+      "size": 7568081,
+      "sha256": "5438823bc99499a1c148618c403ba2b0bf0a841ab3f7b180570b2ab66f52556d"
     }
   ]
 }

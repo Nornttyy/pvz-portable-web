@@ -35,7 +35,7 @@ void check(int cell,int advance,int offset,int split,bool measured){
 int main(){
     check(24,14,-5,11,false);check(27,16,-5,12,true);check(42,24,-9,19,true);
     FontData native;native.mFontLayerList.emplace_back();auto& layer=native.mFontLayerList.back();
-    for(char32_t c:U"火烤陷焰")layer.mCharDataMap[c]={{0,0,24,24},{-5,-4},14};
+    for(char32_t c:U"火烤陷焰种沙秒")layer.mCharDataMap[c]={{0,0,24,24},{-5,-4},14};
     ImageFont font;font.mFontData=&native;FONT_DWARVENTODCRAFT24=&font;
     SandboxRepairFonts();assert(native.mFontLayerList.size()==1&&font.prepared==0);
     FONT_DWARVENTODCRAFT24=nullptr;SandboxRepairFonts();
@@ -62,5 +62,19 @@ int main(){
     assert(tucking.mFontLayerList.size()==5&&tuckingFont.prepared==1);
     for(const auto& l:tucking.mFontLayerList)if(l.mCharDataMap.contains(U'乌')){const auto& g=l.mCharDataMap.at(U'乌');assert(g.mWidth==14&&g.mImageRect.mWidth>0&&g.mImageRect.mHeight>0);}
     SandboxRepairFonts();assert(tucking.mFontLayerList.size()==5&&tuckingFont.prepared==1);FONT_BRIANNETOD12=nullptr;
+    for(const int cell:{24,27,42}){
+        FontData timing;timing.mFontLayerList.emplace_back();auto& donor=timing.mFontLayerList.back();donor.mImage=42;donor.mAscent=12;
+        donor.mCharDataMap[U'种']={{100,200,cell,cell},{-5,-4},14};
+        donor.mCharDataMap[U'沙']={{300,400,cell,cell},{-5,-4},14};
+        donor.mCharDataMap[U'秒']={}; // A width query may have left an empty entry.
+        ImageFont timingFont;timingFont.mFontData=&timing;FONT_BRIANNETOD12=&timingFont;SandboxRepairFonts();
+        assert(timing.mFontLayerList.size()==3&&timingFont.prepared==1);
+        const auto& left=*timing.mFontLayerMap.at("MEMEGLYPHMIAO0");const auto& right=*timing.mFontLayerMap.at("MEMEGLYPHMIAO1");
+        const auto& a=left.mCharDataMap.at(U'秒');const auto& b=right.mCharDataMap.at(U'秒');const int split=int(cell*.46f+.5f);
+        assert(left.mImage==42&&right.mImage==42&&left.mAscent==12&&right.mAscent==12);
+        assert(a.mWidth==14&&b.mWidth==14&&a.mImageRect.mWidth==split&&b.mImageRect.mWidth==cell-split);
+        assert(a.mOffset.mX==-5&&b.mOffset.mX==-5+split&&a.mOffset.mY==-4&&b.mOffset.mY==-4);
+        SandboxRepairFonts();assert(timing.mFontLayerList.size()==3&&timingFont.prepared==1);FONT_BRIANNETOD12=nullptr;
+    }
     std::cout<<"Three font sizes, prior measurement, original glyph preservation and idempotence passed.\n";
 }

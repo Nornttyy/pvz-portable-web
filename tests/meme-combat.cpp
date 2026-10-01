@@ -28,6 +28,37 @@ struct World:Board {
  void step(int count=1){while(count--){SandboxPlants::Tick(this);SandboxZombies::Tick(this);if(!mPaused)++mMainCounter;}}
 };
 int main(){
+ // Gatling: one 15-damage pea every 10 ticks, 120 shots then exactly 350
+ // cooling ticks. Heat/timers are per-plant and pause/save without free shots.
+ static_assert(MemeCharacters::GatlingInterval==10&&MemeCharacters::GatlingHeatLimit==120&&MemeCharacters::GatlingCooldown==350);
+ {World w;auto* p=w.add(522);w.enemy();p->mPlantHealth=183;
+  for(int tick=1;tick<=1200;++tick){w.step();assert(w.mProjectiles.mSize==tick/10);}
+  assert(MemeCharacters::Data(p,0)==1&&MemeCharacters::Data(p,1)==120&&MemeCharacters::Data(p,2)==350);
+  const auto saved=SandboxPlants::SavePower(p);w.mPaused=true;w.step(400);assert(SandboxPlants::SavePower(p)==saved);w.mPaused=false;
+  SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved)&&SandboxPlants::SavePower(p)==saved);
+  w.step(349);assert(w.mProjectiles.mSize==120&&MemeCharacters::Data(p,2)==1);
+  w.step();assert(w.mProjectiles.mSize==121&&MemeCharacters::Data(p,0)==0&&MemeCharacters::Data(p,1)==1&&p->mPlantHealth==183);
+  for(auto* shot:w.mProjectiles){
+   assert(MemeCharacters::ShotStyle(shot)==MemeCharacters::GatlingProjectile&&MemeCharacters::CanHit(shot));
+   assert(shot->mMotionType==MOTION_STRAIGHT&&shot->mVelY==0&&SandboxPlants::ShotDamage(shot,20)==15&&SandboxPlants::ShotScale(shot)==1);
+   const int packed=SandboxPlants::SaveShot(shot);SandboxPlants::ForgetShot(shot);SandboxPlants::RestoreShot(shot,packed);
+   assert(SandboxPlants::SaveShot(shot)==packed&&SandboxPlants::ShotDamage(shot,20)==15);
+   shot->mProjectileType=PROJECTILE_FIREBALL;assert(SandboxPlants::ShotDamage(shot,40)==30);
+   SandboxPlants::ForgetShot(shot);SandboxPlants::RestoreShot(shot,packed);assert(SandboxPlants::ShotDamage(shot,40)==30);
+  }
+  auto* plain=w.AddProjectile(0,200,0,2,PROJECTILE_PEA);assert(SandboxPlants::ShotDamage(plain,20)==20);
+ }
+ {World w;auto* p=w.add(522);w.step(1500);assert(w.mProjectiles.mSize==0&&MemeCharacters::Data(p,1)==0);
+  auto* z=w.enemy();w.step();w.step(360);assert(w.mProjectiles.mSize==37&&MemeCharacters::Data(p,1)==37);
+  const auto saved=SandboxPlants::SavePower(p);SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved));
+  w.step(9);assert(w.mProjectiles.mSize==37);w.step();assert(w.mProjectiles.mSize==38);
+  z->mDead=true;w.step(300);assert(w.mProjectiles.mSize==38&&MemeCharacters::Data(p,1)==38);
+  z->mDead=false;w.mProjectiles.mMaxSize=w.mProjectiles.mSize+8;w.step(300);assert(MemeCharacters::Data(p,1)==38);
+  w.mProjectiles.mMaxSize=10000;p->mIsAsleep=true;w.step(100);assert(w.mProjectiles.mSize==38);p->mIsAsleep=false;
+  w.step();assert(w.mProjectiles.mSize==39);auto* other=w.add(522);assert(MemeCharacters::Data(other,1)==0);
+  auto bad=SandboxPlants::SavePower(p);bad[2]=1;assert(!SandboxPlants::RestorePower(p,bad));
+  bad=SandboxPlants::SavePower(p);bad[4]=350;assert(!SandboxPlants::RestorePower(p,bad));
+ }
  // Exactly 50 weak native peas, with independent damage tags and resumable
  // partial volleys. No enemy means no new volley; losing one doesn't cancel it.
  {World w;auto* p=w.add(521);w.step(200);assert(w.mProjectiles.mSize==0);
@@ -237,7 +268,7 @@ int main(){
  }
 
  // Removed originals cannot be assigned, restored or re-entered through legacy powers.
- static_assert(MemeCharacters::Definitions.size()==5&&SandboxPlants::Definitions.size()==5);
+ static_assert(MemeCharacters::Definitions.size()==6&&SandboxPlants::Definitions.size()==6);
  {World w;auto* p=w.add(519);const int x=p->mX,y=p->mY;w.step(100);assert(w.mProjectiles.mSize==0);
   auto* z=w.enemy();w.step();assert(w.mProjectiles.mSize==1);w.step(149);assert(w.mProjectiles.mSize==1);w.step();assert(w.mProjectiles.mSize==2);
   auto* shot=w.mProjectiles.values[0];assert(shot->mVelX>0&&shot->mVelY==0&&shot->mMotionType==MOTION_STAR);
@@ -264,7 +295,7 @@ int main(){
   if(id==504||id==518)assert(p->mX==80&&p->mY==200);
   if(id==502)assert(p->mIsAsleep==!night);
  }
- for(int id:{500,501,519,520,521}){World w;auto* p=w.add(id);w.step(100);const auto saved=SandboxPlants::SavePower(p);
+ for(int id:{500,501,519,520,521,522}){World w;auto* p=w.add(id);w.step(100);const auto saved=SandboxPlants::SavePower(p);
   for(int field=0;field<10;++field){auto bad=saved;bad[field]=-999;assert(!SandboxPlants::RestorePower(p,bad));assert(SandboxPlants::SavePower(p)==saved);}
   SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved)&&SandboxPlants::SavePower(p)==saved);
  }

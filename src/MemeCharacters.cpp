@@ -49,7 +49,7 @@ bool Producing(const Plant* p){return Type(p)==TuckingSunflower;}
 void Reset(){states.clear();shotStyles.clear();}
 void Forget(Plant* p){states.erase(p);}
 void Assign(Plant* p,int id){const auto* d=Find(id);if(!d||int(p->mSeedType)!=d->base)return;
- State s;s.id=id;s.health=p->mPlantHealth;s.timer=0;if(id==500)s.direction=2;states[p]=s;
+ State s;s.id=id;s.health=p->mPlantHealth;s.timer=0;if(id==500)s.direction=2;if(id==GatlingShooter)s.delay=GatlingInterval;states[p]=s;
  if(id==TuckingSunflower){states[p].delay=0;states[p].direction=3;return;}
  p->mLaunchCounter=9999;p->mShootingCounter=0;
 }
@@ -72,6 +72,12 @@ bool Restore(Plant* p,const std::array<int,10>& a){
  if(a[0]==LongRepeater){
   if(int(p->mSeedType)!=Find(a[0])->base||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>1||a[3]||a[4]||a[5]<0||a[5]>RepeaterRest||a[6]<0||a[6]>=1000000||a[7]||a[8]<0||a[8]>RepeaterCount||a[9]!=1||bool(a[2])!=bool(a[8]))return false;
   states[p]={a[0],a[1],a[2],0,0,a[5],a[6],0,a[8],1};
+  p->mLaunchCounter=9999;p->mShootingCounter=0;return true;
+ }
+ if(a[0]==GatlingShooter){
+  if(int(p->mSeedType)!=Find(a[0])->base||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>1||a[3]<0||a[3]>GatlingHeatLimit||a[4]<0||a[4]>GatlingCooldown||a[5]<0||a[5]>GatlingInterval||a[6]<0||a[6]>=1000000||a[7]||a[8]||a[9]!=1)return false;
+  if(a[2]?(a[3]!=GatlingHeatLimit||!a[4]||a[5]):(a[3]>=GatlingHeatLimit||a[4]))return false;
+  states[p]={a[0],a[1],a[2],a[3],a[4],a[5],a[6],0,0,1};
   p->mLaunchCounter=9999;p->mShootingCounter=0;return true;
  }
  const bool shooter=a[0]==500,newShooter=shooter&&a[9]==2;
@@ -127,6 +133,16 @@ void Tick(Board* b){
      if(s.heat>=MemeShooterRules::MaxRage)Burst(s);
     }
    }
+  }else if(s.id==GatlingShooter){
+   if(s.phase&&!s.timer){s.phase=0;s.heat=0;s.delay=0;}
+   if(!s.phase&&!s.delay&&b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8){
+    if(auto* target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY)){
+     // Reuse the native multi-barrel recoil, without restarting it every pea.
+     if(s.heat%10==0)Shoot(p,target);else p->Fire(target,p->mRow,WEAPON_PRIMARY);
+     ++s.heat;s.delay=GatlingInterval;
+     if(s.heat==GatlingHeatLimit){s.phase=1;s.timer=GatlingCooldown;s.delay=0;}
+    }
+   }
   }else if(s.id==LongRepeater){
    const bool room=b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8;
    if(!s.phase&&!s.delay&&room&&p->FindTargetZombie(p->mRow,WEAPON_PRIMARY)){s.phase=1;s.remaining=RepeaterCount;}
@@ -179,6 +195,12 @@ void Effects(Sexy::Graphics* g,Board* b,int row){
    g->SetColor(s.phase==1?Sexy::Color(210,72,43):Sexy::Color(226,167,64));g->FillRect(x+13,y+78,s.phase==1?s.remaining*54/MemeShooterRules::BurstCount:s.heat*54/MemeShooterRules::MaxRage,4);
    if(s.phase==1){const int age=s.age%30;Puff(g,x+45,y+15-age,age,130);}
   }
+  if(s.id==GatlingShooter){
+   g->SetColor(Sexy::Color(57,37,18));g->FillRect(x+12,y+77,56,6);
+   g->SetColor(s.phase?Sexy::Color(104,151,164):Sexy::Color(210,117,54));
+   g->FillRect(x+13,y+78,s.phase?s.timer*54/GatlingCooldown:s.heat*54/GatlingHeatLimit,4);
+   if(s.phase){const int age=s.age%30;Puff(g,x+56,y+12-age,age,120);}
+  }
  }
 }
 void Card(Sexy::Graphics* g,int x,int y,int id){const auto* d=Find(id);if(!d)return;
@@ -187,6 +209,7 @@ void Card(Sexy::Graphics* g,int x,int y,int id){const auto* d=Find(id);if(!d)ret
  PvzpDrawString(g,std::to_string(d->cost),x+23,y+65,Sexy::FONT_BRIANNETOD12,Sexy::Color(75,51,20),DS_ALIGN_CENTER);
 }
 void OnFired(Plant* p,Projectile* shot){
+ if(Type(p)==GatlingShooter){shotStyles[shot]=GatlingProjectile;return;}
  if(Type(p)==LongRepeater){shotStyles[shot]=WeakProjectile;return;}
  if(Type(p)==ShooterPea){
   AbstractRigVisuals::Scope pose(p);
@@ -211,12 +234,12 @@ void OnFired(Plant* p,Projectile* shot){
  }
 }}
 int ShotStyle(const Projectile* shot){const auto it=shotStyles.find(shot);return it==shotStyles.end()?0:it->second;}
-bool CanHit(const Projectile* shot){return ShotStyle(shot)==WeakProjectile||ShotStyle(shot)==ShooterProjectile||MemeShooterRules::CanHit(BaseShotStyle(ShotStyle(shot)));}
+bool CanHit(const Projectile* shot){return IsStraightShot(ShotStyle(shot))||ShotStyle(shot)==ShooterProjectile||MemeShooterRules::CanHit(BaseShotStyle(ShotStyle(shot)));}
 void OnImpact(Projectile*,Zombie*){}
 bool RestoreShotStyle(const Projectile* shot,int style){
  // Keep the new projectile distinct from retired self-thrower save records.
- if(style<0||(style>20&&style!=ShooterProjectile&&style!=WeakProjectile&&!MemeShooterRules::IsFloating(style))||style==19||shot->mDead)return false;
- if(style&&(shot->mMotionType!=(style==WeakProjectile?MOTION_STRAIGHT:MOTION_STAR)||(shot->mProjectileType!=PROJECTILE_PEA&&shot->mProjectileType!=PROJECTILE_SNOWPEA&&shot->mProjectileType!=PROJECTILE_FIREBALL)))return false;
+ if(style<0||(style>20&&style!=ShooterProjectile&&!IsStraightShot(style)&&!MemeShooterRules::IsFloating(style))||style==19||shot->mDead)return false;
+ if(style&&(shot->mMotionType!=(IsStraightShot(style)?MOTION_STRAIGHT:MOTION_STAR)||(shot->mProjectileType!=PROJECTILE_PEA&&shot->mProjectileType!=PROJECTILE_SNOWPEA&&shot->mProjectileType!=PROJECTILE_FIREBALL)))return false;
  if(style)shotStyles[shot]=style;else shotStyles.erase(shot);return true;
 }
 void ForgetShot(const Projectile* shot){shotStyles.erase(shot);}
