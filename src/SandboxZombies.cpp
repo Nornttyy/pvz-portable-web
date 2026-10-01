@@ -2,6 +2,7 @@
 #include "SandboxZombies.h"
 #include "LawnApp.h"
 #include "SandboxArt.h"
+#include "AbstractRigVisuals.h"
 #include "Lawn/Board.h"
 #include "Lawn/Plant.h"
 #include "Lawn/Zombie.h"
@@ -33,6 +34,7 @@ void RestoreNative(Board* b){
 int Type(const Zombie* z){if(!z)return -1;const auto it=identities.find(z);return it==identities.end()?int(z->mZombieType):it->second;}
 bool IsLouis(const Zombie* z){return z&&Type(z)==Louis;}
 bool IsRunner(const Zombie* z){return z&&Type(z)==Runner;}
+bool IsConeWrap(const Zombie* z){return z&&Type(z)==ConeWrap;}
 bool IsRunning(const Zombie* z){return IsRunner(z)&&!z->mDead&&z->mHasHead&&int(z->mZombiePhase)>=RunIn&&int(z->mZombiePhase)<=RunOut;}
 void Reset(){identities.clear();}
 void Forget(Zombie* z){identities.erase(z);}
@@ -44,7 +46,13 @@ bool Restore(Zombie* z,int id){
  if(id==Louis)z->SetupReanimForLostHead();return true;
 }
 void Assign(Zombie* z,int id){
- if(!Restore(z,id)||id!=Runner)return;
+ if(!Restore(z,id))return;
+ if(id==ConeWrap){
+  z->mBodyHealth=z->mBodyMaxHealth=Find(id)->health;
+  z->mHelmHealth=z->mHelmMaxHealth=Find(id)->armor;
+  z->UpdateAnimSpeed();return;
+ }
+ if(id!=Runner)return;
  // These native fields are already serialized. Restore() deliberately does
  // not reset them: a saved fleeing runner must never charge in a second time.
  z->mZombiePhase=static_cast<decltype(z->mZombiePhase)>(RunIn);
@@ -105,18 +113,18 @@ void RecoverPhone(Zombie*){}
 void DrawPortrait(Sexy::Graphics* g,int x,int y,int w,int h,int id){
  if(!Find(id))return;
  // Separate cache: the native zombie portrait must keep its head.
- static std::array<std::unique_ptr<Sexy::MemoryImage>,2> portraits;
- auto& portrait=portraits[id==Runner?1:0];
+ static std::array<std::unique_ptr<Sexy::MemoryImage>,Definitions.size()> portraits;
+ auto& portrait=portraits[Find(id)-Definitions.data()];
  if(!portrait){
   portrait=gLawnApp->mReanimatorCache->MakeBlankMemoryImage(200,210);Sexy::Graphics canvas(portrait.get());canvas.SetLinearBlend(true);
-  Reanimation anim;anim.ReanimationInitializeType(40,40,REANIM_ZOMBIE);anim.SetFramesForLayer(id==Runner?"anim_walk2":"anim_idle");Zombie::SetupReanimLayers(&anim,ZOMBIE_NORMAL);
+  Reanimation anim;anim.ReanimationInitializeType(40,40,REANIM_ZOMBIE);anim.SetFramesForLayer(id==Runner?"anim_walk2":"anim_idle");Zombie::SetupReanimLayers(&anim,static_cast<ZombieType>(Base(id)));
   if(id==Louis)for(const char* prefix:{"anim_head","anim_hair","anim_tongue"})anim.AssignRenderGroupToPrefix(prefix,RENDER_GROUP_HIDDEN);
   if(id==Runner){anim.mAnimTime=0.35f;anim.mOverlayMatrix.m01=0.13f;anim.mOverlayMatrix.m02-=15.6f;}
-  anim.Draw(&canvas);
+  AbstractRigVisuals::Scope pose(&anim,id);anim.Draw(&canvas);
  }
  SandboxArt::DrawFit(g,portrait.get(),x+4,y+5,w-8,h-10);
 }
-float Speed(Zombie*){return 1.0f;}
+float Speed(Zombie* z){return IsConeWrap(z)?ConeWrapSpeed:1.0f;}
 int Damage(Zombie*,int damage,unsigned){return damage;}
 bool ElectricHit(Zombie*){return false;}
 void CombatDeath(Zombie*){}

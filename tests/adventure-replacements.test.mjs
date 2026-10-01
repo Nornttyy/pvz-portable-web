@@ -41,7 +41,7 @@ int main(){using namespace MemeAdventure;
  assert.match((await run(binary)).stdout,/Native-slot mapping and localized text passed/);
 });
 
-test('native adventure spawn hook introduces one runner per eligible wave, not in tutorials or previews',async()=>{
+test('native adventure spawn hook limits runners and cone wraps to one per eligible wave, never previews',async()=>{
  const source=await readFile(join(root,'src/MemeAdventure.cpp'),'utf8');
  const hook=source.slice(source.indexOf('void OnZombieSpawned('),source.indexOf('void Draw(Board*'));
  const folder=await mkdtemp(join(tmpdir(),'pvz-runner-wave-')),cpp=join(folder,'test.cpp'),binary=join(folder,'test');
@@ -52,14 +52,15 @@ test('native adventure spawn hook introduces one runner per eligible wave, not i
 class Zombie;
 class Board {public:int mLevel=1;std::vector<Zombie*> mZombies;};
 class Zombie {public:Board* mBoard=nullptr;int mZombieType=0,mFromWave=0,id=0;bool board=true;bool IsOnBoard(){return board;}};
-namespace SandboxZombies {bool IsRunner(const Zombie* z){return z&&z->id==Runner;}void Assign(Zombie* z,int id){z->id=id;}}
+namespace SandboxZombies {bool IsRunner(const Zombie* z){return z&&z->id==Runner;}bool IsConeWrap(const Zombie* z){return z&&z->id==ConeWrap;}void Assign(Zombie* z,int id){z->id=id;}}
 namespace MemeAdventure {bool enabled=true;bool RosterEnabled(){return enabled;} ${hook}}
 int main(){
- for(int level:{1,2,3,5,6,8,20,50})for(int wave=-3;wave<25;++wave)for(int base:{0,1,2,3,4,23})for(bool onBoard:{false,true})for(bool enabled:{false,true}){
+ for(int level:{1,2,3,5,6,8,15,16,17,20,50})for(int wave=-3;wave<25;++wave)for(int base:{0,1,2,3,4,23})for(bool onBoard:{false,true})for(bool enabled:{false,true}){
   Board b;b.mLevel=level;Zombie a{&b,base,wave,0,onBoard},c{&b,base,wave,0,onBoard};b.mZombies={&a,&c};MemeAdventure::enabled=enabled;
   MemeAdventure::OnZombieSpawned(&a);MemeAdventure::OnZombieSpawned(&c);
   const bool eligible=enabled&&onBoard;const bool runner=eligible&&SandboxZombies::RunnerWave(level,base,wave),louis=eligible&&SandboxZombies::LouisWave(level,base,wave);
-  assert(a.id==(runner?213:louis?212:0));assert(c.id==(louis?212:0));
+  const bool cone=eligible&&SandboxZombies::ConeWrapWave(level,base,wave);
+  assert(a.id==(cone?214:runner?213:louis?212:0));assert(c.id==(louis?212:0));
  }
  MemeAdventure::OnZombieSpawned(nullptr);Zombie preview;MemeAdventure::OnZombieSpawned(&preview);assert(preview.id==0);
  std::cout<<"Runner wave boundaries and at-most-one rule passed\\n";

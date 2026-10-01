@@ -63,6 +63,12 @@ int main(){
     for(const auto& l:tucking.mFontLayerList)if(l.mCharDataMap.contains(U'乌')){const auto& g=l.mCharDataMap.at(U'乌');assert(g.mWidth==14&&g.mImageRect.mWidth>0&&g.mImageRect.mHeight>0);}
     SandboxRepairFonts();assert(tucking.mFontLayerList.size()==5&&tuckingFont.prepared==1);FONT_BRIANNETOD12=nullptr;
     for(const int cell:{24,27,42}){
+        FontData wrap;wrap.mFontLayerList.emplace_back();auto& wrapDonor=wrap.mFontLayerList.back();wrapDonor.mImage=42;
+        for(char32_t c:U"六果装")wrapDonor.mCharDataMap[c]={{0,0,cell,cell},{-5,-4},14};
+        ImageFont wrapFont;wrapFont.mFontData=&wrap;FONT_BRIANNETOD12=&wrapFont;SandboxRepairFonts();
+        assert(wrap.mFontLayerList.size()==4&&wrapFont.prepared==1);
+        for(const auto& l:wrap.mFontLayerList)if(l.mCharDataMap.contains(U'裹')){const auto& g=l.mCharDataMap.at(U'裹');assert(g.mWidth==14&&g.mImageRect.mWidth==cell&&g.mImageRect.mHeight>0);}
+        SandboxRepairFonts();assert(wrap.mFontLayerList.size()==4&&wrapFont.prepared==1);FONT_BRIANNETOD12=nullptr;
         FontData timing;timing.mFontLayerList.emplace_back();auto& donor=timing.mFontLayerList.back();donor.mImage=42;donor.mAscent=12;
         donor.mCharDataMap[U'种']={{100,200,cell,cell},{-5,-4},14};
         donor.mCharDataMap[U'沙']={{300,400,cell,cell},{-5,-4},14};

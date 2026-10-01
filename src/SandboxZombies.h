@@ -6,17 +6,27 @@ namespace SandboxZombies {
 struct Definition {int id,base;const char* name;const char* note;const char* art;int health,armor,unlock;};
 // IDs 200..211 remain retired. Never reinterpret old characters as Louis.
 inline constexpr int Louis=212, LouisUnlock=3, Runner=213, RunnerUnlock=6;
+inline constexpr int ConeWrap=214, ConeWrapUnlock=16, ConeHealth=370, ConeCount=7;
+inline constexpr int ConeVisualCount=20;
+inline constexpr float ConeWrapSpeed=0.60f;
 inline constexpr int RunIn=1040,RunBrake=1041,RunOut=1042,BrakeTicks=24;
 inline constexpr float RunInSpeed=2.8f,RunOutSpeed=3.6f;
-inline constexpr std::array<Definition,2> Definitions{{
+inline constexpr std::array<Definition,3> Definitions{{
  {Louis,0,"路易十六","天生无头，照常走路啃咬。",nullptr,270,0,LouisUnlock},
- {Runner,0,"跑路僵尸","冲到后排，转身就跑。",nullptr,270,0,RunnerUnlock}
+ {Runner,0,"跑路僵尸","冲到后排，转身就跑。",nullptr,270,0,RunnerUnlock},
+ {ConeWrap,2,"雪糕桶包裹我","20桶组成，7桶耐久。",nullptr,270,ConeCount*ConeHealth,ConeWrapUnlock}
 }};
 constexpr const Definition* Find(int id){for(const auto& d:Definitions)if(d.id==id)return &d;return nullptr;}
 constexpr int Base(int id){auto* d=Find(id);return d?d->base:id;}
 constexpr bool LouisWave(int level,int base,int wave){return level>=LouisUnlock&&base==0&&wave>=0&&wave%3==0;}
 constexpr bool RunnerWave(int level,int base,int wave){return level>=RunnerUnlock&&base==0&&wave>=0&&wave%4==1;}
+constexpr bool ConeWrapWave(int level,int base,int wave){return level>=ConeWrapUnlock&&base==2&&wave>=3&&wave%4==3;}
+// Armor stays worth seven cones; the twenty visual parts are not extra HP.
+constexpr int ConePartHealth(int armor,int part){const int hp=armor-part*ConeHealth;return hp<=0?0:hp>=ConeHealth?ConeHealth:hp;}
+constexpr int ConeVisualHealth(int armor,int part){const int hp=(armor*ConeVisualCount-part*ConeCount*ConeHealth)/ConeCount;return hp<=0?0:hp>=ConeHealth?ConeHealth:hp;}
+constexpr int ConeDamageStage(int health){return health>2*ConeHealth/3?0:health>ConeHealth/3?1:2;}
 int Type(const Zombie*);
+bool IsConeWrap(const Zombie*);
 bool IsLouis(const Zombie*);
 bool IsRunner(const Zombie*);
 bool IsRunning(const Zombie*);

@@ -3527,6 +3527,7 @@ void Zombie::DropHead(unsigned int theDamageFlags)
 	// Born headless: retain ordinary low-health death behavior, but never
 	// create a severed-head particle from an invisible/nonexistent head.
 	if (SandboxZombies::IsLouis(this)) return;
+	if (SandboxZombies::IsConeWrap(this)) return; // No flesh head inside the cone body.
 	if (TestBit(theDamageFlags, DamageFlags::DAMAGE_DOESNT_LEAVE_BODY))
 	{
 		return;
@@ -3905,6 +3906,7 @@ void Zombie::DropArm(unsigned int theDamageFlags)
 	}
 
 	mHasArm = false;
+	if (SandboxZombies::IsConeWrap(this)) return; // Keep native injury rules, not arm particles.
 	SetupReanimForLostArm(theDamageFlags);
 	mApp->PlayFoley(FoleyType::FOLEY_LIMBS_POP);
 }
@@ -4119,6 +4121,7 @@ void Zombie::UpdateZombieWalking()
 	if (aBodyReanim)
 	{
 		float aSpeed;
+		bool aGroundDriven = false;
 		if (IsBouncingPogo() || mZombiePhase == ZombiePhase::PHASE_BALLOON_FLYING || mZombiePhase == ZombiePhase::PHASE_DOLPHIN_RIDING ||
 			mZombiePhase == ZombiePhase::PHASE_SNORKEL_WALKING_IN_POOL || mZombieType == ZombieType::ZOMBIE_CATAPULT)
 		{
@@ -4136,6 +4139,7 @@ void Zombie::UpdateZombieWalking()
 		else if (aBodyReanim->TrackExists("_ground"))
 		{
 			aSpeed = aBodyReanim->GetTrackVelocity("_ground") * mScaleZombie;
+			aGroundDriven = true;
 		}
 		else
 		{
@@ -4146,7 +4150,9 @@ void Zombie::UpdateZombieWalking()
 			}
 		}
 
-        aSpeed *= SandboxZombies::Speed(this);
+        // Ground-driven movement already inherits the reduced walk animation
+        // rate. Apply the multiplier only once, including swimming/fallbacks.
+        if (!aGroundDriven) aSpeed *= SandboxZombies::Speed(this);
 		if (IsWalkingBackwards() || mZombiePhase == ZombiePhase::PHASE_DANCER_DANCING_IN)
 		{
 			mPosX += aSpeed;
@@ -6715,7 +6721,7 @@ void Zombie::UpdateAnimSpeed()
 			{
 				float aOneOverSpeed = aBodyReanim->mFrameCount / aDistance;
 				float aAnimRate = mVelX * aOneOverSpeed * 47.0f / mScaleZombie;
-				ApplyAnimRate(aAnimRate);
+				ApplyAnimRate(aAnimRate * SandboxZombies::Speed(this));
 			}
 		}
 	}
@@ -8739,7 +8745,7 @@ void Zombie::ApplyBurn()
 	{
 		DieWithLoot();
 	}
-	else if (mZombieType == ZOMBIE_BUNGEE || mZombieType == ZOMBIE_YETI || Zombie::IsZombotany(mZombieType) || IsBobsledTeamWithSled() || IsFlying() || !mHasHead)
+	else if (mZombieType == ZOMBIE_BUNGEE || mZombieType == ZOMBIE_YETI || Zombie::IsZombotany(mZombieType) || IsBobsledTeamWithSled() || IsFlying() || !mHasHead || SandboxZombies::IsConeWrap(this))
 	{
 		SetAnimRate(0.0f);
 		Reanimation* aHeadReanim = mApp->ReanimationTryToGet(mSpecialHeadReanimID);

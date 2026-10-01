@@ -26,6 +26,7 @@ int ZombieCount(Board* b){return b->count;}
 int main(){
  Board b;
  for(int id:{212,213})for(int row:{0,2,3,4}){Board custom;assert(Spawn(&custom,id,8,row)==1&&custom.type==ZOMBIE_NORMAL&&assignedZombie==id);}
+ for(int row:{0,2,3,4}){Board custom;assert(Spawn(&custom,214,8,row)==1&&custom.type==2&&assignedZombie==214);}
  assert(Spawn(&b,10,8,2)==1&&b.type==ZOMBIE_NORMAL&&b.row==2);
  assert(b.zombie.mPosX==690&&b.zombie.mX==690&&b.zombie.updated&&b.marked);
  for(int waterOnly:{10,11,14}){Board land;assert(Spawn(&land,waterOnly,8,0)==-5&&land.count==0);}

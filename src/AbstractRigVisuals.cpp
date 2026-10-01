@@ -2,9 +2,12 @@
 #include "LawnApp.h"
 #include "MemeCharacters.h"
 #include "SandboxArt.h"
+#include "SandboxZombies.h"
+#include "ConeBodyRules.h"
 #include "Resources.h"
 #include "graphics/Image.h"
 #include "Lawn/Plant.h"
+#include "Lawn/Zombie.h"
 #include "PvzpLib/Reanimator.h"
 #include <algorithm>
 #include <cmath>
@@ -13,6 +16,16 @@ namespace AbstractRigVisuals {
 namespace {
 struct Pose {Reanimation* anim;const Plant* plant;std::array<int,10> state;int part;};
 std::vector<Pose> poses;
+void ConePose(Scope& scope,Reanimation* a,int armor){
+ if(!a)return; // Even with zero armor, the body remains made of cones.
+ std::array<int,10> state{};state[0]=SandboxZombies::ConeWrap;state[1]=armor;poses.push_back({a,nullptr,state,0});
+ for(int i=0;i<a->mDefinition->mTracks.count;++i){
+  const int part=ConeBodyRules::Index(a->mDefinition->mTracks.tracks[i].mName);
+  auto* track=&a->mTrackInstances[i];scope.groups.push_back({track,track->mRenderGroup});
+  track->mRenderGroup=part>=0?RENDER_GROUP_NORMAL:RENDER_GROUP_HIDDEN;
+  if(part>=0){scope.images.push_back({track,track->mImageOverride});track->mImageOverride=nullptr;}
+ }
+}
 void Rotate(ReanimatorTransform& t,float x,float y,float radians){const float c=std::cos(radians),s=std::sin(radians),dx=t.mTransX-x,dy=t.mTransY-y;t.mTransX=x+c*dx-s*dy;t.mTransY=y+s*dx+c*dy;t.mSkewX+=radians*180/3.14159265f;t.mSkewY+=radians*180/3.14159265f;}
 void Warp(ReanimatorTransform& t,float x,float y,float sx,float sy,float angle=0){
  const float kx=t.mSkewX*3.14159265f/180,ky=t.mSkewY*3.14159265f/180;
@@ -29,16 +42,37 @@ Scope::Scope(const Plant* p):mark(poses.size()){
   ++part;
  }
 }
-// Retired characters must not alter native zombies or cached/almanac previews.
-Scope::Scope(Zombie*):mark(poses.size()){}
+// Identity gates keep ordinary coneheads and unrelated cached previews intact.
+Scope::Scope(Zombie* z):mark(poses.size()){
+ if(SandboxZombies::IsConeWrap(z))ConePose(*this,gLawnApp->ReanimationTryToGet(z->mBodyReanimID),z->mHelmHealth);
+}
 Scope::Scope(Reanimation* a,int type):mark(poses.size()){
+ if(type==SandboxZombies::ConeWrap)ConePose(*this,a,SandboxZombies::ConeCount*SandboxZombies::ConeHealth);
  if(a&&type==MemeCharacters::ShooterPea){std::array<int,10> state{};state[0]=type;poses.push_back({a,nullptr,state,1});}
  // Cards always show the standing pose; only live plants can tuck their head.
 }
-Scope::~Scope(){poses.resize(mark);}
+Scope::~Scope(){for(auto& [track,image]:images)track->mImageOverride=image;for(auto& [track,group]:groups)track->mRenderGroup=group;poses.resize(mark);}
 void Transform(Reanimation* a,int track,ReanimatorTransform& t){
  const Pose* p=nullptr;for(auto i=poses.rbegin();i!=poses.rend();++i)if(i->anim==a){p=&*i;break;}
  if(!p)return;
+ if(p->state[0]==SandboxZombies::ConeWrap){
+  const int part=ConeBodyRules::Index(a->mDefinition->mTracks.tracks[track].mName);
+  if(part<0){t.mAlpha=0;return;}
+  // Native eating hides its tongue. This track now carries a structural cone,
+  // so retain it; submerged leg tracks still use the original frame/clip gates.
+  if(part==4&&t.mFrame<0)t.mFrame=0;
+  if(t.mFrame<0)return;
+  const int hp=SandboxZombies::ConeVisualHealth(p->state[1],part);
+  const char* files[]={"Zombie_cone1.png","Zombie_cone2.png","Zombie_cone3.png"};
+  auto* image=SandboxArt::NativeImage(files[SandboxZombies::ConeDamageStage(hp)]);if(!image)return;
+  const auto& fit=ConeBodyRules::Parts[part];
+  const float kx=t.mSkewX*3.14159265f/180,ky=t.mSkewY*3.14159265f/180;
+  const float dx=fit.cx-fit.width*.5f,dy=fit.cy-fit.height*.5f;
+  t.mTransX+=dx*t.mScaleX*std::cos(kx)-dy*t.mScaleY*std::sin(ky);
+  t.mTransY+=dx*t.mScaleX*std::sin(kx)+dy*t.mScaleY*std::cos(ky);
+  t.mScaleX*=fit.width/image->mWidth;t.mScaleY*=fit.height/image->mHeight;t.mImage=image;
+  return;
+ }
  if(p->state[0]==MemeCharacters::TuckingSunflower){
   if(!p->state[2])return;
   const std::string_view name=a->mDefinition->mTracks.tracks[track].mName;

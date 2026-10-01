@@ -8,12 +8,46 @@
 #include "SandboxVisualRules.h"
 #include "SandboxMemeRules.h"
 #include "MemeShooterRules.h"
+#include "ConeBodyRules.h"
 #include <cassert>
 #include <cmath>
 #include <iostream>
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
+ // Exactly twenty cones, never flesh/clothing/duck art, even at zero armor.
+ // Hidden hair/tongue bones are visible only inside this character's scope.
+ {SandboxZombies::Reset();Board w;auto* z=w.AddZombieInRow(static_cast<ZombieType>(2),2,-1);SandboxZombies::Assign(z,214);
+  static_assert(ConeBodyRules::Parts.size()==20&&SandboxZombies::ConeVisualCount==20);
+  Reanimation body;Track tracks[23];for(int i=0;i<20;++i)tracks[i].mName=ConeBodyRules::Parts[i].track.data();
+  tracks[20].mName="Zombie_duckytube";tracks[21].mName="Zombie_mustache";tracks[22].mName="anim_bucket";
+  TrackInstance instances[23];body.def.mTracks={23,tracks};body.mTrackInstances=instances;app.reanims[90]=&body;z->mBodyReanimID=90;
+  auto* originalImage=SandboxArt::NativeImage("Zombie_body.png");for(auto& i:instances){i.mImageOverride=originalImage;i.mRenderGroup=RENDER_GROUP_HIDDEN;}
+  const char* files[]={"Zombie_cone1.png","Zombie_cone2.png","Zombie_cone3.png"};
+  for(int health:{2590,2350,2200,1450,330,1,0}){
+   z->mHelmHealth=health;
+   {AbstractRigVisuals::Scope scope(z);
+    int visible=0;
+    for(int part=0;part<23;++part){
+     ReanimatorTransform t;t.mImage=originalImage;t.mTransX=14;t.mTransY=21;t.mScaleX=.8f;t.mScaleY=.7f;t.mSkewX=t.mSkewY=25;
+     const auto before=t;AbstractRigVisuals::Transform(&body,part,t);
+     if(part<20){
+      ++visible;assert(t.mAlpha==1&&instances[part].mImageOverride==nullptr&&instances[part].mRenderGroup==RENDER_GROUP_NORMAL);
+      assert(t.mImage==SandboxArt::NativeImage(files[SandboxZombies::ConeDamageStage(SandboxZombies::ConeVisualHealth(health,part))]));
+      near(t.mSkewX,25);near(t.mSkewY,25);assert(std::isfinite(t.mTransX)&&std::isfinite(t.mTransY)&&t.mScaleX>0&&t.mScaleY>0);
+      auto moved=before;moved.mTransX+=147;moved.mTransY-=83;AbstractRigVisuals::Transform(&body,part,moved);near(moved.mTransX-t.mTransX,147);near(moved.mTransY-t.mTransY,-83);
+     }else{assert(t.mAlpha==0&&instances[part].mRenderGroup==RENDER_GROUP_HIDDEN);}
+    }
+    assert(visible==20);
+    ReanimatorTransform absent;absent.mFrame=-1;absent.mImage=originalImage;AbstractRigVisuals::Transform(&body,0,absent);assert(absent.mFrame==-1&&absent.mImage==originalImage);
+    ReanimatorTransform chewing;chewing.mFrame=-1;chewing.mImage=originalImage;AbstractRigVisuals::Transform(&body,4,chewing);assert(chewing.mFrame==0&&chewing.mImage!=originalImage);
+   }
+   assert(z->mHelmHealth==health);for(auto& i:instances)assert(i.mImageOverride==originalImage&&i.mRenderGroup==RENDER_GROUP_HIDDEN);
+  }
+  {AbstractRigVisuals::Scope preview(&body,214);ReanimatorTransform t;t.mImage=originalImage;AbstractRigVisuals::Transform(&body,6,t);assert(t.mImage==SandboxArt::NativeImage(files[0]));}
+  SandboxZombies::Forget(z);{AbstractRigVisuals::Scope ordinary(z);ReanimatorTransform t;t.mImage=originalImage;AbstractRigVisuals::Transform(&body,1,t);assert(t.mImage==originalImage);}
+  app.reanims.clear();
+ }
  // Tucking retracts the native stalk, head and every petal as one group.
  // No replacement face, sweat overlays, drifting parts or accumulated pose.
  {SandboxPlants::Reset();Board w;auto* p=w.plant(2,2);p->mSeedType=SEED_SUNFLOWER;SandboxPlants::Assign(p,520);

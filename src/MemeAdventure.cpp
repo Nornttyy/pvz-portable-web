@@ -51,9 +51,12 @@ void OnPlanted(Plant* p){
  if(const auto* d=Replacement(int(p->mSeedType)))MemeCharacters::Assign(p,d->id);
 }
 void OnZombieSpawned(Zombie* z){
- // Replace only regular walkers in every third wave. Roadside previews,
- // flag/armored zombies, special modes and the opening tutorial stay native.
+ // Introduce originals gradually; previews, specials and tutorials stay native.
  if(!RosterEnabled()||!z||!z->mBoard||!z->IsOnBoard())return;
+ if(SandboxZombies::ConeWrapWave(z->mBoard->mLevel,int(z->mZombieType),z->mFromWave)){
+  bool exists=false;for(auto* other:z->mBoard->mZombies)if(other!=z&&SandboxZombies::IsConeWrap(other)&&other->mFromWave==z->mFromWave)exists=true;
+  if(!exists){SandboxZombies::Assign(z,SandboxZombies::ConeWrap);return;}
+ }
  if(SandboxZombies::RunnerWave(z->mBoard->mLevel,int(z->mZombieType),z->mFromWave)){
   bool exists=false;for(auto* other:z->mBoard->mZombies)if(other!=z&&SandboxZombies::IsRunner(other)&&other->mFromWave==z->mFromWave)exists=true;
   if(!exists){SandboxZombies::Assign(z,SandboxZombies::Runner);return;}

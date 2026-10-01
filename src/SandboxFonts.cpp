@@ -75,6 +75,9 @@ void SandboxRepairFonts(){
         // The right-hand bird radical from 鸣, without its inner eye dot.
         // Centre it inside the original cell; preserve native bitmap metrics.
         Supplement(font,U'乌',"WU",{{U'鸣',.46f,0,.54f,.4167f,-.16f,0},{U'鸣',.46f,.4167f,.08f,.0833f,-.16f,0},{U'鸣',.625f,.4167f,.375f,.0833f,-.16f,0},{U'鸣',.46f,.5f,.54f,.5f,-.16f,0}});
+        // 裹: native 亠, 果 centre and the lower 衣 strokes. No fallback font
+        // with a different size/baseline in the new zombie's catalogue name.
+        Supplement(font,U'裹',"GUOWRAP",{{U'六',0,0,1,.29f},{U'果',0,.17f,1,.54f,0,.08f},{U'装',0,.71f,1,.29f}});
         Supplement(font,U'罡',"GANG",{{U'四',0,0,1,0.46f},{U'正',0,0.46f,1,0.54f}});
         Supplement(font,U'梗',"GENG",{{U'样',0,0,0.46f,1},{U'硬',0.46f,0,0.54f,1}});
         Supplement(font,U'锅',"GUO",{{U'钢',0,0,0.46f,1},{U'蜗',0.46f,0,0.54f,1}});

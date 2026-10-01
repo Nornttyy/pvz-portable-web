@@ -2,8 +2,20 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Six abstract plants (500,501,519,520,521,522), Louis XVI (212), and Runaway Zombie (213). Replacements occupy vanilla seed slots in adventure and one unified sandbox catalogue, without a New Cards tab or duplicate vanilla entries. Gatling Shooter (522) replaces slot 40, retaining native art, 250-sun price and Repeater upgrade requirement: one 15-damage native pea every 10 ticks, overheat after 120 shots (12 seconds), then exactly 350 cooling ticks (3.5 seconds). Neither Rage Pea nor Gatling displays progress bars. Gatling's native head, mouth and blinks progressively redden with heat and fade to green during cooling; helmet, metal barrels and card art remain unchanged. Native steam is retained. Per-plant heat, cooling clocks and per-projectile damage tags survive optional saves; native fire conversion does 30 damage. Tucking Sunflower (520) keeps its standing portrait and slot-53 save migration. Long Repeater (521) retains its 50-shot, 1-damage volley and 60-percent pea/shadow size. Other mechanics, native gating and campaign progress are unchanged.",
+  "mode": "Six abstract plants (500,501,519,520,521,522), Louis XVI (212), Runaway Zombie (213), and Cone Wrap (214). Replacements occupy vanilla seed slots in adventure and one unified sandbox catalogue. Cone Wrap is entirely formed from twenty native road cones, with seven cones of armor and slower walking; adventure introduction starts at level 16. Existing plant mechanics, saves, native gating and campaign progress are unchanged.",
   "weakPeaVisualScale": 0.6,
+  "coneWrapZombie": {
+    "id": 214,
+    "name": "雪糕桶包裹我",
+    "nativeBase": 2,
+    "bodyHealth": 270,
+    "armor": 2590,
+    "armorConeEquivalent": 7,
+    "visualCones": 20,
+    "speedMultiplier": 0.6,
+    "adventureUnlock": 16,
+    "art": "Exactly twenty native cones form the entire character. All anatomical and clothing textures are replaced, including zero armor, portraits and burn/death. Original cone damage textures and draw-only bone scopes. No external art."
+  },
   "tuckingPoolSupport": "Standing and tucked sunflowers in pool squares disappear after losing their last living lily pad, including unsupported flowers restored from old saves. Land and lifted plants are unchanged.",
   "mobileTextInput": "Tappable native-widget overlay inside the fullscreen canvas container, with IME composition, native text/width limits, selection, deletion and ordered submit. Desktop keyboard behavior is unchanged.",
   "gatling": {
@@ -18,12 +30,12 @@
     {
       "name": "pvz-portable.js",
       "size": 278906,
-      "sha256": "aa6393300263b9feb85904498d2be3e5beb1f71c30624668442b52a9364d8f6a"
+      "sha256": "8bf024378e5c25c8583ce1d4f1856d507293381dd1cfb1cc1d9686d7b6b50b30"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7571104,
-      "sha256": "159d6c7a6ab27df1933b423985af0eb05ffc665b354ada4795181a9121afa4f4"
+      "size": 7581887,
+      "sha256": "4bc610640c600802288a937437221eb60b3f4b5120e573ee09304c094a16b3a0"
     }
   ]
 }

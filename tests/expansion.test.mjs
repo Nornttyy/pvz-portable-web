@@ -63,7 +63,7 @@ test('native projectile integration retains splats, centered scaling and fire at
  assert.ok(plant.indexOf('aProjectile->ConvertToFireball(mPlantCol)')>plant.indexOf('SandboxPlants::OnFired(this,aProjectile,theTargetZombie)'),'fire attaches only after muzzle correction');
 });
 test('six originals remain; retired formations migrate without losing native plants',async()=>{
- assert.equal(ORIGINAL_PLANTS.length,6);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,519,520,521,522]);assert.deepEqual(ORIGINAL_ZOMBIES.map(z=>z.id),[212,213]);assert.equal(ZOMBIES.length,25);
+ assert.equal(ORIGINAL_PLANTS.length,6);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,519,520,521,522]);assert.deepEqual(ORIGINAL_ZOMBIES.map(z=>z.id),[212,213,214]);assert.equal(ZOMBIES.length,26);
  const bases=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
  for(let id=100;id<120;++id)assert.equal(validateLayout({schema:1,map:0,plants:[{type:id,col:0,row:0}]}).plants[0].type,bases[id-100]);
  for(const p of [...RETIRED_PLANTS,...RETIRED_CHARACTERS]){
@@ -126,6 +126,18 @@ test('Louis remains visually headless without entering native terminal head-loss
  const almanac=(await read('src/Lawn/Widget/AlmanacDialog.cpp')).toString();
  assert.match(almanac,/GetZombieDefinition\(static_cast<ZombieType>\(SandboxZombies::Base\(int\(mSelectedZombie\)\)\)\)/);
  assert.match((await read('src/SandboxUI.cpp')).toString(),/SandboxZombies::Definitions\[i-Zombies.size\(\)\].id/);
+});
+test('cone-only body never leaks native head, arm or charred-body death art',async()=>{
+ const z=(await read('src/Lawn/Zombie.cpp')).toString();
+ const head=z.slice(z.indexOf('void Zombie::DropHead('),z.indexOf('void Zombie::DropArm('));
+ assert.ok(head.indexOf('mHasHead = false')<head.indexOf('if (SandboxZombies::IsConeWrap(this)) return;'));
+ assert.ok(head.indexOf('if (SandboxZombies::IsConeWrap(this)) return;')<head.indexOf('PARTICLE_ZOMBIE_HEAD'));
+ const arm=z.slice(z.indexOf('void Zombie::DropArm('),z.indexOf('void Zombie::UpdateDamageStates('));
+ assert.ok(arm.indexOf('mHasArm = false')<arm.indexOf('if (SandboxZombies::IsConeWrap(this)) return;'));
+ assert.ok(arm.indexOf('if (SandboxZombies::IsConeWrap(this)) return;')<arm.indexOf('SetupReanimForLostArm'));
+ const burn=z.slice(z.indexOf('void Zombie::ApplyBurn('),z.indexOf('void Zombie::AttachShield('));
+ assert.match(burn,/!mHasHead \|\| SandboxZombies::IsConeWrap\(this\)/);
+ assert.ok(burn.indexOf('SandboxZombies::IsConeWrap(this)')<burn.indexOf('REANIM_ZOMBIE_CHARRED'));
 });
 
 test('runner movement uses native status, terrain, mirroring and saved phase without skipping death logic',async()=>{

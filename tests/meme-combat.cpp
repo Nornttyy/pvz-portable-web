@@ -329,12 +329,31 @@ int main(){
   SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved)&&SandboxPlants::SavePower(p)==saved);
  }
  // Every formerly modified native zombie retains its armor, position and phase.
- static_assert(SandboxZombies::Definitions.size()==2&&SandboxZombies::Find(212)->base==0&&SandboxZombies::Find(213)->base==0);
+ static_assert(SandboxZombies::Definitions.size()==3&&SandboxZombies::Find(212)->base==0&&SandboxZombies::Find(213)->base==0&&SandboxZombies::Find(214)->base==2);
  for(int id=200;id<212;++id)assert(!SandboxZombies::Find(id));
  for(int level:{1,2,3,8,20,50})for(int base:{0,1,2,4,23})for(int wave=-3;wave<30;++wave){
   assert(SandboxZombies::LouisWave(level,base,wave)==(level>=3&&base==0&&wave>=0&&wave%3==0));
   assert(SandboxZombies::RunnerWave(level,base,wave)==(level>=6&&base==0&&wave>=0&&wave%4==1));
+  assert(SandboxZombies::ConeWrapWave(level,base,wave)==(level>=16&&base==2&&wave>=3&&wave%4==3));
  }
+ // Seven native cone armor units, not seven bodies or damage reduction.
+ // Injury, broken armor and identity round-trip without healing on Restore.
+ {World w;auto* z=w.enemy(700,2,static_cast<ZombieType>(2));SandboxZombies::Assign(z,214);
+  assert(SandboxZombies::IsConeWrap(z)&&z->mBodyHealth==270&&z->mBodyMaxHealth==270);
+  assert(z->mHelmHealth==2590&&z->mHelmMaxHealth==2590&&SandboxZombies::Speed(z)==.6f);
+  for(int pieces=7;pieces>0;--pieces){
+   for(int part=0;part<7;++part)assert(SandboxZombies::ConePartHealth(z->mHelmHealth,part)==(part<pieces?370:0));
+   z->TakeDamage(370,0);assert(z->mBodyHealth==270&&z->mHelmHealth==(pieces-1)*370);
+   SandboxZombies::Forget(z);assert(SandboxZombies::Restore(z,214)&&z->mHelmHealth==(pieces-1)*370);
+  }
+  z->TakeDamage(20,0);assert(z->mBodyHealth==250);SandboxZombies::Forget(z);
+  assert(SandboxZombies::Restore(z,214)&&z->mBodyHealth==250&&z->mHelmHealth==0&&SandboxZombies::Speed(z)==.6f);
+  auto* ordinary=w.enemy(700,2,static_cast<ZombieType>(2));assert(SandboxZombies::Speed(ordinary)==1&&!SandboxZombies::IsConeWrap(ordinary));
+  assert(!SandboxZombies::Restore(w.enemy(),214));z->mDead=true;assert(!SandboxZombies::Restore(z,214));
+ }
+ for(int health=1;health<=2590;++health){int total=0;for(int part=0;part<7;++part){const int hp=SandboxZombies::ConePartHealth(health,part);total+=hp;assert(hp>=0&&hp<=370);}assert(total==health);}
+ assert(SandboxZombies::ConeDamageStage(370)==0&&SandboxZombies::ConeDamageStage(200)==1&&SandboxZombies::ConeDamageStage(90)==2);
+ for(int part=0;part<20;++part){assert(SandboxZombies::ConeVisualHealth(2590,part)==370);assert(SandboxZombies::ConeVisualHealth(0,part)==0);}
  {World w;auto* z=w.enemy();z->mBodyHealth=z->mBodyMaxHealth=270;
   Reanimation rig;Track tracks[]={{"anim_head1"},{"anim_head2"},{"anim_hair"},{"anim_tongue"},{"anim_body"},{"anim_hand"},{"anim_foot"}};TrackInstance instances[7];
   rig.def.mTracks={7,tracks};rig.mTrackInstances=instances;gLawnApp->reanims[91]=&rig;z->mBodyReanimID=91;
