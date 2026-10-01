@@ -20,9 +20,21 @@ async function boot(level=0){
 }
 async function step(){await api(13);await page.waitForTimeout(45);}
 try{
- await boot(8);await click(260,348);await wait(()=>Module.canvas.width===1024);await api(7);await api(4,1);
+ await boot(9);await click(260,348);await wait(()=>Module.canvas.width===1024);await api(7);await api(4,1);
+ // Select the replacement in the native Repeater's catalogue slot (index 7).
+ await click(132,231);await click(384,330);assert.equal((await data(0))[0],521);
+ await api(2,4,8,2);await api(5,1);
+ for(let tick=0;tick<50;++tick)await step();
+ assert.equal((await data(0))[7],49);
+ for(let tick=0;tick<98;++tick)await step();
+ assert.equal((await data(0))[4],0);assert.equal((await data(0))[7],0);
+ results.repeaterShots=await page.evaluate(()=>{const shots=[];for(let i=0;i<200;++i){const style=Module._pvz_projectile_data(i,0);if(style<0)break;shots.push(Array.from({length:9},(_,f)=>Module._pvz_projectile_data(i,f)));}return shots;});
+ assert.equal(results.repeaterShots.length,50);assert.ok(results.repeaterShots.every(s=>s[0]===297&&s[4]===0&&s[8]===0));await snap('repeater-fifty-native-peas');
+ await api(7);await api(4,1);
+ // The second card replaces sunflower, with no separate New Cards category.
+ await click(81,153);await click(624,330);assert.equal((await data(0))[0],520);await api(7);
  for(const [id,col,row] of [[520,4,2],[1,1,2],[520,4,1],[520,7,4]])assert.ok(await api(1,id,col,row)>0);
- assert.equal((await data(0))[0],520);await click(132,535);await click(718,62);await snap('new-card-and-idle');
+ assert.equal((await data(0))[0],520);await click(718,62);await snap('replacement-cards-and-idle');
  await api(2,0,6,2);await api(5,4);await api(4,0);
  await wait(()=>Module._pvz_sandbox_plant_data(0,4)===1,undefined,30000);
  await api(4,1);
@@ -40,7 +52,9 @@ try{
  await page.setViewportSize({width:844,height:390});await snap('phone-sandbox');await page.setViewportSize({width:1100,height:750});
  if(!process.env.PVZ_QA_SANDBOX_ONLY){
   await api(15);await page.waitForTimeout(1800);await click(560,135);await page.waitForTimeout(15000);await snap('adventure-chooser');
-  for(const base of [0,1,3,4,5])await click(47+base*53,163);await click(471,236);await click(258,566);await wait(()=>Module._pvz_adventure_power_data(-1,5)===1,undefined,25000);
+  for(const base of [0,1,3,4,5,7])await click(47+base*53,163);await click(258,566);await wait(()=>Module._pvz_adventure_power_data(-1,5)===1,undefined,25000);
+  results.adventureCards=await page.evaluate(()=>Array.from({length:6},(_,i)=>Module._pvz_adventure_seed_data(i,0)));
+  assert.deepEqual(results.adventureCards,[500,520,501,4,5,521]);
   const card=await page.evaluate(()=>{for(let i=0;i<10;++i)if(Module._pvz_adventure_seed_data(i,0)===520)return Array.from({length:7},(_,f)=>Module._pvz_adventure_seed_data(i,f));return null;});
   assert.ok(card);assert.equal(card[1],50);assert.equal(card[2],300);results.adventureCard=true;
   await wait(()=>Module._pvz_adventure_power_data(0,16)>=0,undefined,45000);
@@ -52,7 +66,9 @@ try{
   await boot();await click(560,135);await wait(()=>Module._pvz_adventure_power_data(-1,5)===1,undefined,30000);results.resumed=[await adv(0)];
   // Coin positions change through ordinary save reconstruction; plant state must not.
   const plantState=a=>a.filter((_,i)=>i<10||i>13);assert.deepEqual(results.resumed.map(plantState),results.saved.map(plantState));await snap('resumed-expression');results.saveResume=true;
-  await boot(37);await click(370,455);await click(208,366);await click(416,199);await page.waitForTimeout(600);await snap('tucking-almanac');
+  assert.equal(results.resumed[0][8],1); // Restored sunflower keeps its vanilla slot.
+  await boot(37);await click(370,455);await click(208,366);await click(94,123);await page.waitForTimeout(600);await snap('tucking-almanac');
+  await click(370,123);await page.waitForTimeout(600);await snap('repeater-almanac');
  }
  assert.deepEqual(errors,[]);await writeFile(join(out,'report.json'),JSON.stringify({results,errors},null,2));console.log('Tucking sunflower QA passed',out,results);
 }catch(e){await snap('failure');await writeFile(join(out,'failure.json'),JSON.stringify({error:String(e),results,errors,log:await page.evaluate(()=>window.pvzEngineLog)},null,2));throw e;}

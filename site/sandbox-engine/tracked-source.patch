@@ -1235,7 +1235,7 @@ index 804aeba..76f9563 100644
  	SaveFileHeaderV4 aHeader{};
  	memcpy(aHeader.mMagic, SAVE_FILE_MAGIC_V4, sizeof(aHeader.mMagic));
 diff --git a/src/Lawn/Widget/AlmanacDialog.cpp b/src/Lawn/Widget/AlmanacDialog.cpp
-index 8fb1d2a..295fffc 100644
+index 8fb1d2a..9b48394 100644
 --- a/src/Lawn/Widget/AlmanacDialog.cpp
 +++ b/src/Lawn/Widget/AlmanacDialog.cpp
 @@ -35,12 +35,20 @@
@@ -1247,7 +1247,7 @@ index 8fb1d2a..295fffc 100644
 +#include "../../AlmanacPlantLayout.h"
 +#include "../../SandboxFonts.h"
 +
-+static bool AbstractAlmanacExpanded(){return gLawnApp->HasSeedType(SEED_LEFTPEATER)||gLawnApp->HasSeedType(SEED_AWKWARD_SUNFLOWER);}
++static bool AbstractAlmanacExpanded(){return gLawnApp->HasSeedType(SEED_LEFTPEATER);}
 +static int AbstractAlmanacCount(){return AbstractAlmanacExpanded()?NUM_SEED_TYPES:NUM_ALMANAC_SEEDS;}
  
  bool gZombieDefeated[NUM_ZOMBIE_TYPES] = { false };
@@ -1259,16 +1259,15 @@ index 8fb1d2a..295fffc 100644
  	mOpenPage = ALMANAC_PAGE_INDEX;
  	mSelectedSeed = SEED_PEASHOOTER;
  	mSelectedZombie = ZOMBIE_NORMAL;
-@@ -152,6 +160,8 @@ void AlmanacDialog::SetupPlant()
+@@ -152,6 +160,7 @@ void AlmanacDialog::SetupPlant()
  	mPlant->mBoard = nullptr;
  	mPlant->mIsOnBoard = false;
  	mPlant->PlantInitialize(0, 0, mSelectedSeed, SEED_NONE);
-+	if (mSelectedSeed == SEED_LEFTPEATER && MemeAdventure::RosterEnabled()) SandboxPlants::Assign(mPlant.get(), MemeCharacters::ShooterPea);
-+	if (mSelectedSeed == SEED_AWKWARD_SUNFLOWER && MemeAdventure::RosterEnabled()) SandboxPlants::Assign(mPlant.get(), MemeCharacters::TuckingSunflower);
++	MemeAdventure::OnPlanted(mPlant.get());
  	mPlant->mX = aPosX;
  	mPlant->mY = aPosY;
  }
-@@ -162,7 +172,8 @@ void AlmanacDialog::SetupZombie()
+@@ -162,7 +171,8 @@ void AlmanacDialog::SetupZombie()
  
  	mZombie = std::make_unique<Zombie>();
  	mZombie->mBoard = nullptr;
@@ -1278,7 +1277,7 @@ index 8fb1d2a..295fffc 100644
  	mZombie->mPosX = ALMANAC_ZOMBIE_POSITION_X;
  	mZombie->mPosY = ALMANAC_ZOMBIE_POSITION_Y;
  }
-@@ -251,6 +262,7 @@ void AlmanacDialog::Update()
+@@ -251,6 +261,7 @@ void AlmanacDialog::Update()
  
  ZombieType AlmanacDialog::GetZombieType(int theIndex)
  {
@@ -1286,7 +1285,7 @@ index 8fb1d2a..295fffc 100644
  	return theIndex < NUM_ZOMBIE_TYPES ? (ZombieType)theIndex : ZOMBIE_INVALID;
  }
  
-@@ -279,7 +291,7 @@ void AlmanacDialog::DrawPlants(Graphics* g)
+@@ -279,7 +290,7 @@ void AlmanacDialog::DrawPlants(Graphics* g)
  	PvzpDrawString(g, "[SUBURBAN_ALMANAC_PLANTS]", BOARD_WIDTH / 2, 48, Sexy::FONT_HOUSEOFTERROR20, Color(213, 159, 43), DrawStringJustification::DS_ALIGN_CENTER);
  
  	SeedType aSeedMouseOn = SeedHitTest(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY);
@@ -1295,7 +1294,7 @@ index 8fb1d2a..295fffc 100644
  	{
  		int aPosX, aPosY;
  		GetSeedPosition(aSeedType, aPosX, aPosY);
-@@ -293,9 +305,12 @@ void AlmanacDialog::DrawPlants(Graphics* g)
+@@ -293,9 +304,12 @@ void AlmanacDialog::DrawPlants(Graphics* g)
  			}
  			else
  			{
@@ -1310,7 +1309,7 @@ index 8fb1d2a..295fffc 100644
  			}
  		}
  	}
-@@ -335,18 +350,19 @@ void AlmanacDialog::DrawPlants(Graphics* g)
+@@ -335,18 +349,19 @@ void AlmanacDialog::DrawPlants(Graphics* g)
  	const PlantDefinition& aPlantDef = GetPlantDefinition(mSelectedSeed);
  	std::string aName = Plant::GetNameString(mSelectedSeed, SEED_NONE);
  	std::string aDescriptionName = std::format("[{}_DESCRIPTION]", aPlantDef.mPlantName);
@@ -1332,7 +1331,7 @@ index 8fb1d2a..295fffc 100644
  		);
  		aRechargeStr = PvzpReplaceString(aRechargeStr, "{WAIT_TIME}", "[WAIT_TIME]");
  		PvzpDrawStringWrapped(g, aRechargeStr, Rect(600, 520, 139, 50), Sexy::FONT_BRIANNETOD12, Color(40, 50, 90), DS_ALIGN_RIGHT);
-@@ -359,7 +375,7 @@ void AlmanacDialog::DrawZombies(Graphics* g)
+@@ -359,7 +374,7 @@ void AlmanacDialog::DrawZombies(Graphics* g)
  	PvzpDrawString(g, "[SUBURBAN_ALMANAC_ZOMBIES]", BOARD_WIDTH / 2, 54, Sexy::FONT_DWARVENTODCRAFT24, Color(0, 196, 0), DS_ALIGN_CENTER);
  
  	ZombieType aZombieMouseOn = ZombieHitTest(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY);
@@ -1341,7 +1340,7 @@ index 8fb1d2a..295fffc 100644
  	{
  		ZombieType aZombieType = GetZombieType(i);
  		int aPosX, aPosY;
-@@ -416,7 +432,8 @@ void AlmanacDialog::DrawZombies(Graphics* g)
+@@ -416,7 +431,8 @@ void AlmanacDialog::DrawZombies(Graphics* g)
  					aZombieGraphics.SetColor(Color(0, 0, 0, 40));
  					aZombieGraphics.SetColorizeImages(true);
  				}
@@ -1351,7 +1350,7 @@ index 8fb1d2a..295fffc 100644
  				aZombieGraphics.SetColorizeImages(false);
  
  				g->DrawImage(Sexy::IMAGE_ALMANAC_ZOMBIEWINDOW2, aPosX, aPosY);
-@@ -458,15 +475,16 @@ void AlmanacDialog::DrawZombies(Graphics* g)
+@@ -458,15 +474,16 @@ void AlmanacDialog::DrawZombies(Graphics* g)
  	}
  	g->DrawImage(Sexy::IMAGE_ALMANAC_ZOMBIECARD, 455, 78);
  
@@ -1371,7 +1370,7 @@ index 8fb1d2a..295fffc 100644
  		aAlign = DS_ALIGN_LEFT;
  	}
  	else
-@@ -521,26 +539,22 @@ void AlmanacDialog::Draw(Graphics* g)
+@@ -521,26 +538,22 @@ void AlmanacDialog::Draw(Graphics* g)
  
  void AlmanacDialog::GetSeedPosition(SeedType theSeedType, int& x, int& y)
  {
@@ -1403,7 +1402,7 @@ index 8fb1d2a..295fffc 100644
  				if (aSeedRect.Contains(x, y)) return aSeedType;
  			}
  		}
-@@ -560,6 +574,7 @@ bool AlmanacDialog::ZombieHasSilhouette(ZombieType theZombieType)
+@@ -560,6 +573,7 @@ bool AlmanacDialog::ZombieHasSilhouette(ZombieType theZombieType)
  
  bool AlmanacDialog::ZombieIsShown(ZombieType theZombieType)
  {
@@ -1411,7 +1410,7 @@ index 8fb1d2a..295fffc 100644
  	// trial mode only shows zombies up to the Snorkel Zombie
  	if (mApp->IsTrialStageLocked() && theZombieType > ZombieType::ZOMBIE_SNORKEL)
  		return false;
-@@ -586,6 +601,7 @@ bool AlmanacDialog::ZombieIsShown(ZombieType theZombieType)
+@@ -586,6 +600,7 @@ bool AlmanacDialog::ZombieIsShown(ZombieType theZombieType)
  
  bool AlmanacDialog::ZombieHasDescription(ZombieType theZombieType)
  {
@@ -1419,7 +1418,7 @@ index 8fb1d2a..295fffc 100644
  	int aLevel = mApp->mPlayerInfo->GetLevel();
  	int aStart = GetZombieDefinition(theZombieType).mStartingLevel;
  
-@@ -608,6 +624,8 @@ bool AlmanacDialog::ZombieHasDescription(ZombieType theZombieType)
+@@ -608,6 +623,8 @@ bool AlmanacDialog::ZombieHasDescription(ZombieType theZombieType)
  
  void AlmanacDialog::GetZombiePosition(ZombieType theZombieType, int& x, int& y)
  {
@@ -1428,7 +1427,7 @@ index 8fb1d2a..295fffc 100644
  	if (theZombieType == ZombieType::ZOMBIE_BOSS)
  		x = 192, y = 486;
  	else
-@@ -621,7 +639,7 @@ ZombieType AlmanacDialog::ZombieHitTest(int x, int y)
+@@ -621,7 +638,7 @@ ZombieType AlmanacDialog::ZombieHitTest(int x, int y)
  {
  	if (mMouseVisible && mOpenPage == AlmanacPage::ALMANAC_PAGE_ZOMBIES)
  	{
@@ -1543,7 +1542,7 @@ index d017de9..260efd1 100644
  	bool                        mStartingGame;
  	int                         mStartingGameCounter;
 diff --git a/src/Lawn/Widget/SeedChooserScreen.cpp b/src/Lawn/Widget/SeedChooserScreen.cpp
-index b284e6a..510f6a1 100644
+index b284e6a..644c4b2 100644
 --- a/src/Lawn/Widget/SeedChooserScreen.cpp
 +++ b/src/Lawn/Widget/SeedChooserScreen.cpp
 @@ -41,11 +41,19 @@
@@ -1554,7 +1553,7 @@ index b284e6a..510f6a1 100644
 +#include "../../SeedChooserLayout.h"
 +#include "../../SandboxFonts.h"
 +
-+static bool AbstractChooserExpanded(){return gLawnApp->HasSeedType(SEED_LEFTPEATER)||gLawnApp->HasSeedType(SEED_AWKWARD_SUNFLOWER);}
++static bool AbstractChooserExpanded(){return gLawnApp->HasSeedType(SEED_LEFTPEATER);}
 +static int AbstractChooserCount(){return AbstractChooserExpanded()?NUM_SEED_TYPES:NUM_SEEDS_IN_CHOOSER;}
  
  SeedChooserScreen::SeedChooserScreen()
@@ -1674,7 +1673,7 @@ index b284e6a..510f6a1 100644
  
  	int aNumSeeds = Has7Rows() ? 48 : 40;
  	for (SeedType aSeedShadow = SEED_PEASHOOTER; aSeedShadow < aNumSeeds; aSeedShadow = (SeedType)(aSeedShadow + 1))
-@@ -373,6 +387,19 @@ void SeedChooserScreen::Draw(Graphics* g)
+@@ -373,6 +387,13 @@ void SeedChooserScreen::Draw(Graphics* g)
  		}
  	}
  
@@ -1684,17 +1683,11 @@ index b284e6a..510f6a1 100644
 +		GetSeedPositionInChooser(SEED_LEFTPEATER, x, y);
 +		DrawSeedPacket(g, x, y, SEED_LEFTPEATER, SEED_NONE, 0, 55, true, false);
 +	}
-+	if (mApp->HasSeedType(SEED_AWKWARD_SUNFLOWER) && mChosenSeeds[SEED_AWKWARD_SUNFLOWER].mSeedState != SEED_IN_CHOOSER)
-+	{
-+		int x, y;
-+		GetSeedPositionInChooser(SEED_AWKWARD_SUNFLOWER, x, y);
-+		DrawSeedPacket(g, x, y, SEED_AWKWARD_SUNFLOWER, SEED_NONE, 0, 55, true, false);
-+	}
 +
  	int aNumSeedsInBank = mBoard->mSeedBank->mNumPackets;
  	for (int anIndex = 0; anIndex < aNumSeedsInBank; anIndex++)
  	{
-@@ -384,7 +411,7 @@ void SeedChooserScreen::Draw(Graphics* g)
+@@ -384,7 +405,7 @@ void SeedChooserScreen::Draw(Graphics* g)
  		}
  	}
  
@@ -1703,7 +1696,7 @@ index b284e6a..510f6a1 100644
  	{
  		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
  		ChosenSeedState aSeedState = aChosenSeed.mSeedState;
-@@ -408,7 +435,7 @@ void SeedChooserScreen::Draw(Graphics* g)
+@@ -408,7 +429,7 @@ void SeedChooserScreen::Draw(Graphics* g)
  	}
  
  	mImitaterButton->Draw(g);
@@ -1712,7 +1705,7 @@ index b284e6a..510f6a1 100644
  	{
  		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
  		ChosenSeedState aSeedState = aChosenSeed.mSeedState;
-@@ -520,7 +547,7 @@ void SeedChooserScreen::Update()
+@@ -520,7 +541,7 @@ void SeedChooserScreen::Update()
  	mSeedChooserAge++;
  	mToolTip->Update();
  
@@ -1721,7 +1714,7 @@ index b284e6a..510f6a1 100644
  	{
  		if (mApp->HasSeedType(aSeedType))
  		{
-@@ -623,7 +650,7 @@ void SeedChooserScreen::OnStartButton()
+@@ -623,7 +644,7 @@ void SeedChooserScreen::OnStartButton()
  			return;
  		}
  	}
@@ -1730,7 +1723,7 @@ index b284e6a..510f6a1 100644
  		!mBoard->mCutScene->IsSurvivalRepick() && mApp->mGameMode != GAMEMODE_CHALLENGE_LAST_STAND)
  	{
  		if (mApp->IsFirstTimeAdventureMode() && mBoard->mLevel == 11)
-@@ -702,7 +729,7 @@ void SeedChooserScreen::PickRandomSeeds()
+@@ -702,7 +723,7 @@ void SeedChooserScreen::PickRandomSeeds()
  	for (int anIndex = mSeedsInBank; anIndex < mBoard->mSeedBank->mNumPackets; anIndex++)
  	{
  		SeedType aSeedType;
@@ -1739,7 +1732,7 @@ index b284e6a..510f6a1 100644
  		while (!mApp->HasSeedType(aSeedType) || aSeedType == SEED_IMITATER || mChosenSeeds[aSeedType].mSeedState != SEED_IN_CHOOSER);
  		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
  		aChosenSeed.mTimeStartMotion = 0;
-@@ -714,7 +741,7 @@ void SeedChooserScreen::PickRandomSeeds()
+@@ -714,7 +735,7 @@ void SeedChooserScreen::PickRandomSeeds()
  		aChosenSeed.mSeedIndexInBank = anIndex;
  		mSeedsInBank++;
  	}
@@ -1748,7 +1741,7 @@ index b284e6a..510f6a1 100644
  		LandFlyingSeed(mChosenSeeds[aSeedFlying]);
  	CloseSeedChooser();
  }
-@@ -767,7 +794,7 @@ SeedType SeedChooserScreen::SeedHitTest(int x, int y)
+@@ -767,7 +788,7 @@ SeedType SeedChooserScreen::SeedHitTest(int x, int y)
  {
  	if (mMouseVisible)
  	{
@@ -1757,7 +1750,7 @@ index b284e6a..510f6a1 100644
  		{
  			ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
  			if (!mApp->HasSeedType(aSeedType) || aChosenSeed.mSeedState == SEED_PACKET_HIDDEN) continue;
-@@ -779,7 +806,7 @@ SeedType SeedChooserScreen::SeedHitTest(int x, int y)
+@@ -779,7 +800,7 @@ SeedType SeedChooserScreen::SeedHitTest(int x, int y)
  
  SeedType SeedChooserScreen::FindSeedInBank(int theIndexInBank)
  {
@@ -1766,7 +1759,7 @@ index b284e6a..510f6a1 100644
  	{
  		if (mApp->HasSeedType(aSeedType))
  		{
-@@ -979,7 +1006,7 @@ void SeedChooserScreen::MouseDown(int x, int y, int theClickCount)
+@@ -979,7 +1000,7 @@ void SeedChooserScreen::MouseDown(int x, int y, int theClickCount)
  
  	if (mSeedsInFlight > 0)
  	{
@@ -1775,7 +1768,7 @@ index b284e6a..510f6a1 100644
  		{
  			LandFlyingSeed(mChosenSeeds[i]);
  		}
-@@ -1071,7 +1098,7 @@ void SeedChooserScreen::MouseDown(int x, int y, int theClickCount)
+@@ -1071,7 +1092,7 @@ void SeedChooserScreen::MouseDown(int x, int y, int theClickCount)
  
  bool SeedChooserScreen::PickedPlantType(SeedType theSeedType)
  {
@@ -1784,7 +1777,7 @@ index b284e6a..510f6a1 100644
  	{
  		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
  		if (aChosenSeed.mSeedState == SEED_IN_BANK)
-@@ -1126,7 +1153,7 @@ void SeedChooserScreen::KeyChar(char theChar)
+@@ -1126,7 +1147,7 @@ void SeedChooserScreen::KeyChar(char theChar)
  
  void SeedChooserScreen::UpdateAfterPurchase()
  {
@@ -2042,7 +2035,7 @@ index c140a3d..d5fca98 100644
  	GetDrawPos(aDrawPos);
  	if (mApp->mGameScene == GameScenes::SCENE_ZOMBIES_WON && !SetupDrawZombieWon(g))
 diff --git a/src/LawnApp.cpp b/src/LawnApp.cpp
-index d360a2f..d817674 100644
+index d360a2f..93f46a5 100644
 --- a/src/LawnApp.cpp
 +++ b/src/LawnApp.cpp
 @@ -24,6 +24,10 @@
@@ -2128,12 +2121,11 @@ index d360a2f..d817674 100644
  std::string LawnApp::GetStageString(int theLevel)
  {
  	int aArea = std::clamp((theLevel - 1) / LEVELS_PER_AREA + 1, 1, ADVENTURE_AREAS + 1);
-@@ -2267,6 +2297,11 @@ int LawnApp::GetSeedsAvailable()
+@@ -2267,6 +2297,10 @@ int LawnApp::GetSeedsAvailable()
  
  bool LawnApp::HasSeedType(SeedType theSeedType)
  {
-+	if (theSeedType == SEED_AWKWARD_SUNFLOWER) return MemeAdventure::RosterEnabled() && mPlayerInfo &&
-+		(HasFinishedAdventure() || mPlayerInfo->GetLevel() >= MemeCharacters::Find(MemeCharacters::TuckingSunflower)->unlock);
++	if (theSeedType == SEED_AWKWARD_SUNFLOWER) return false; // Migration-only; replaces SUNFLOWER now.
 +	// Existing unused left-facing shooter ID keeps old saves and enum values intact.
 +	if (theSeedType == SEED_LEFTPEATER) return MemeAdventure::RosterEnabled() && mPlayerInfo &&
 +		(HasFinishedAdventure() || mPlayerInfo->GetLevel() >= MemeCharacters::Find(MemeCharacters::ShooterPea)->unlock);

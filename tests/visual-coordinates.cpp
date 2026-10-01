@@ -16,9 +16,10 @@ void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
  // Tucking retracts the native stalk, head and every petal as one group.
  // No replacement face, sweat overlays, drifting parts or accumulated pose.
- {SandboxPlants::Reset();Board w;auto* p=w.plant(2,2);p->mSeedType=static_cast<SeedType>(53);SandboxPlants::Assign(p,520);
+ {SandboxPlants::Reset();Board w;auto* p=w.plant(2,2);p->mSeedType=SEED_SUNFLOWER;SandboxPlants::Assign(p,520);
   Reanimation body;Track tracks[]={{"anim_idle"},{"SunFlower_leftpetal1"},{"anim_blink"},{"stalk_top"},{"SunFlower_rightpetal9"},{"SunFlower_toppetals"},{"SunFlower_bottompetals"},{"frontleaf"},{"backleaf"},{"stalk_bottom"}};TrackInstance instances[10];body.def.mTracks={10,tracks};body.mTrackInstances=instances;body.track="anim_idle";body.matrix={.8f,0,35,0,.7f,40};app.reanims[82]=&body;p->mBodyReanimID=82;
   ReanimatorTransform original;original.mImage=SandboxArt::NativeImage("SunFlower_head.png");original.mTransX=14.3f;original.mTransY=20.4f;original.mScaleX=.8f;original.mScaleY=.712f;
+  {AbstractRigVisuals::Scope preview(&body,520);for(int track=0;track<10;++track){auto part=original;AbstractRigVisuals::Transform(&body,track,part);near(part.mTransX,original.mTransX);near(part.mTransY,original.mTransY);near(part.mScaleY,original.mScaleY);}}
   for(int age:{0,1,40,300,900}){
    assert(MemeCharacters::Restore(p,{520,300,1,0,0,0,age,0,0,3}));
    AbstractRigVisuals::Scope scope(p);auto face=original;AbstractRigVisuals::Transform(&body,0,face);assert(face.mImage==original.mImage);near(face.mSkewX,0);

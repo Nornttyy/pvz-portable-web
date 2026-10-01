@@ -56,7 +56,7 @@ void Assign(Plant* p,int id){const auto* d=Find(id);if(!d||int(p->mSeedType)!=d-
 std::array<int,10> Save(const Plant* p){auto it=states.find(p);if(it==states.end())return {};const auto& s=it->second;return {s.id,s.health,s.phase,s.heat,s.timer,s.delay,s.age,s.pulse,s.remaining,s.direction};}
 bool Restore(Plant* p,const std::array<int,10>& a){
  if(a[0]==TuckingSunflower){
-  if(int(p->mSeedType)!=Find(a[0])->base||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>1||a[6]<0||a[6]>=1000000)return false;
+  if((int(p->mSeedType)!=Find(a[0])->base&&int(p->mSeedType)!=53)||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>1||a[6]<0||a[6]>=1000000)return false;
   if(a[9]==1){
    // Old embarrassment/gaze saves become this card, without changing health,
    // sun countdown, planted position or the player's campaign progress.
@@ -66,7 +66,13 @@ bool Restore(Plant* p,const std::array<int,10>& a){
    if(a[9]!=3||a[3]||a[4]||a[5]||a[7]||a[8])return false;
    states[p]={a[0],a[1],a[2],0,0,0,a[6],0,0,3};
   }
+  p->mSeedType=SEED_SUNFLOWER;
   return true; // Native save owns the production countdown.
+ }
+ if(a[0]==LongRepeater){
+  if(int(p->mSeedType)!=Find(a[0])->base||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>1||a[3]||a[4]||a[5]<0||a[5]>RepeaterRest||a[6]<0||a[6]>=1000000||a[7]||a[8]<0||a[8]>RepeaterCount||a[9]!=1||bool(a[2])!=bool(a[8]))return false;
+  states[p]={a[0],a[1],a[2],0,0,a[5],a[6],0,a[8],1};
+  p->mLaunchCounter=9999;p->mShootingCounter=0;return true;
  }
  const bool shooter=a[0]==500,newShooter=shooter&&a[9]==2;
  const auto* d=Find(a[0]);if(!d||int(p->mSeedType)!=d->base||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>(newShooter?1:2)||a[3]<0||a[3]>(newShooter?300:1000)||a[4]<0||a[4]>2000||a[5]<0||a[5]>2000||a[6]<0||a[6]>=1000000||a[7]<0||a[7]>50||a[8]<0||a[8]>(newShooter?150:3)||(!newShooter&&a[9]!=1&&a[9]!=-1))return false;
@@ -121,6 +127,16 @@ void Tick(Board* b){
      if(s.heat>=MemeShooterRules::MaxRage)Burst(s);
     }
    }
+  }else if(s.id==LongRepeater){
+   const bool room=b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8;
+   if(!s.phase&&!s.delay&&room&&p->FindTargetZombie(p->mRow,WEAPON_PRIMARY)){s.phase=1;s.remaining=RepeaterCount;}
+   if(s.phase&&!s.delay&&room){
+    // Keep one committed volley even if its first target dies. Recoil cycles
+    // normally, rather than resetting the head animation every two ticks.
+    if((RepeaterCount-s.remaining)%10==0)Shoot(p,nullptr);else p->Fire(nullptr,p->mRow,WEAPON_PRIMARY);
+    --s.remaining;s.delay=RepeaterInterval;
+    if(!s.remaining){s.phase=0;s.delay=RepeaterRest;}
+   }
   }else if(s.id==ShooterPea){
    if(!s.delay&&b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8){
     if(auto* target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY)){Shoot(p,target);s.delay=150;s.pulse=22;}
@@ -171,6 +187,7 @@ void Card(Sexy::Graphics* g,int x,int y,int id){const auto* d=Find(id);if(!d)ret
  PvzpDrawString(g,std::to_string(d->cost),x+23,y+65,Sexy::FONT_BRIANNETOD12,Sexy::Color(75,51,20),DS_ALIGN_CENTER);
 }
 void OnFired(Plant* p,Projectile* shot){
+ if(Type(p)==LongRepeater){shotStyles[shot]=WeakProjectile;return;}
  if(Type(p)==ShooterPea){
   AbstractRigVisuals::Scope pose(p);
   float x=58,y=34;auto* pea=Sexy::IMAGE_PROJECTILEPEA;
@@ -194,12 +211,12 @@ void OnFired(Plant* p,Projectile* shot){
  }
 }}
 int ShotStyle(const Projectile* shot){const auto it=shotStyles.find(shot);return it==shotStyles.end()?0:it->second;}
-bool CanHit(const Projectile* shot){return ShotStyle(shot)==ShooterProjectile||MemeShooterRules::CanHit(BaseShotStyle(ShotStyle(shot)));}
+bool CanHit(const Projectile* shot){return ShotStyle(shot)==WeakProjectile||ShotStyle(shot)==ShooterProjectile||MemeShooterRules::CanHit(BaseShotStyle(ShotStyle(shot)));}
 void OnImpact(Projectile*,Zombie*){}
 bool RestoreShotStyle(const Projectile* shot,int style){
  // Keep the new projectile distinct from retired self-thrower save records.
- if(style<0||(style>20&&style!=ShooterProjectile&&!MemeShooterRules::IsFloating(style))||style==19||shot->mDead)return false;
- if(style&&(shot->mMotionType!=MOTION_STAR||(shot->mProjectileType!=PROJECTILE_PEA&&shot->mProjectileType!=PROJECTILE_SNOWPEA&&shot->mProjectileType!=PROJECTILE_FIREBALL)))return false;
+ if(style<0||(style>20&&style!=ShooterProjectile&&style!=WeakProjectile&&!MemeShooterRules::IsFloating(style))||style==19||shot->mDead)return false;
+ if(style&&(shot->mMotionType!=(style==WeakProjectile?MOTION_STRAIGHT:MOTION_STAR)||(shot->mProjectileType!=PROJECTILE_PEA&&shot->mProjectileType!=PROJECTILE_SNOWPEA&&shot->mProjectileType!=PROJECTILE_FIREBALL)))return false;
  if(style)shotStyles[shot]=style;else shotStyles.erase(shot);return true;
 }
 void ForgetShot(const Projectile* shot){shotStyles.erase(shot);}

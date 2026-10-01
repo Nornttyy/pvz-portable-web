@@ -5,15 +5,18 @@ namespace Sexy {class Graphics;class Color;}
 namespace MemeCharacters {
 inline constexpr int ReflectedShot=512;
 inline constexpr int ShooterPea=519, ShooterProjectile=296;
-// Retain ID 520 / native slot 53 so existing cards and saves migrate in place.
+// Logical IDs survive save migration; sunflower now occupies its native slot.
 inline constexpr int TuckingSunflower=520;
+inline constexpr int LongRepeater=521, WeakProjectile=297;
+inline constexpr int RepeaterCount=50, RepeaterInterval=2, RepeaterRest=150;
 constexpr int BaseShotStyle(int style){return style&(ReflectedShot-1);}
 struct Definition {int id,base,cost,unlock;const char* name;const char* shortName;const char* hint;const char* key;const char* description;};
-inline constexpr std::array<Definition,4> Definitions{{
+inline constexpr std::array<Definition,5> Definitions{{
  {500,0,100,1,"红温豌豆","红温","满300怒气 · 3秒乱射50发","PEASHOOTER","普通攻击只有10%命中判定，其余豌豆反复上下飘，每次摆幅随机，不击退。每发增加20怒气，逐渐变红；满300自动在3秒内乱射50发，不能手动释放。红温子弹减速25%，射完休息3秒，不消耗生命。"},
  {501,3,50,4,"反咬坚果","反咬","被啃后反击 · 冷却3秒","WALL_NUT","被啃后反击面前的僵尸，造成80伤害。每3秒一次，不击退僵尸。"},
  {519,52,125,8,"射手豌豆","射手豌豆","头是豌豆 · 发射射手","SHOOTER_PEA","豌豆当脑袋，射手当子弹。向前发射完整的小豌豆射手，本体留在原地；每1.5秒一发，造成20伤害，不击退。冒险1-8解锁。"},
- {520,53,50,6,"缩头乌葵","缩头乌葵","僵尸靠近 · 缩头让路","AWKWARD_SUNFLOWER","僵尸靠近就缩头，让僵尸直接走过，不会挡路或被啃。危险离开后恢复。每次生产25阳光，产光速度不变。冒险1-6解锁。"},
+ {520,1,50,2,"缩头乌葵","缩头乌葵","僵尸靠近 · 缩头让路","SUNFLOWER","僵尸靠近就缩头，让僵尸直接走过，不会挡路或被啃。危险离开后恢复。每次生产25阳光，产光速度不变。替换向日葵。"},
+ {521,7,200,9,"双----------双发射手","双----------双发射手","每轮连射50发 · 单发1伤害","REPEATER","每轮连续射出50颗低伤害豌豆，每颗造成1伤害。约1秒射完，之后休息1.5秒。保留普通豌豆的弹速与直线弹道，不击退。替换双发射手。"},
 }};
 // Retired IDs are migration-only, never playable definitions.
 inline constexpr std::array<int,17> RetiredBases{8,1,0,5,7,4,26,6,32,29,34,13,10,28,21,18,17};

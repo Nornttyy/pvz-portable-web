@@ -39,10 +39,15 @@ using namespace Sexy;
 using namespace SandboxUIRules;
 namespace {
 enum Tool { PlantTool, ZombieTool, EraseTool, InteractTool };
-int panel=0, plantPage=0, selectedPlant=0, selectedZombie=0, plantSlot=0, catalog=4, catalogPage=0;
+int panel=0, selectedPlant=500, selectedZombie=0, plantSlot=0, catalog=1, catalogPage=0;
 Tool tool=PlantTool;
-std::array<int,6> plants{0,1,500,501,519,5};
-std::vector<int> DirectPlants(){std::vector<int> ids;for(const auto& d:SandboxPlants::Definitions)if(!SandboxMemeRules::IsResult(d.id))ids.push_back(d.id);return ids;}
+std::array<int,6> plants{500,520,2,501,4,5};
+std::vector<int> CataloguePlants(){
+ std::vector<int> ids;
+ for(int base=0;base<48;++base){const auto* replacement=MemeCharacters::ForBase(base);ids.push_back(replacement?replacement->id:base);}
+ for(const auto& d:MemeCharacters::Definitions)if(d.base>=48)ids.push_back(d.id);
+ return ids;
+}
 bool wasPaused=true, painting=false, dirty=false;
 int lastCell=-1, lastPlantCount=0, messageTicks=0;
 std::string message;
@@ -179,9 +184,9 @@ void Action(int index) {
 
 void SandboxUIReset() {
     SandboxUIDetach();
-    panel=0;plantPage=0;catalog=4;catalogPage=0;tool=PlantTool;painting=false;dirty=false;wasPaused=true;
-    selectedPlant=0;selectedZombie=0;plantSlot=0;lastCell=-1;lastPlantCount=0;messageTicks=0;
-    plants={0,1,500,501,519,5};
+    panel=0;catalog=1;catalogPage=0;tool=PlantTool;painting=false;dirty=false;wasPaused=true;
+    selectedPlant=500;selectedZombie=0;plantSlot=0;lastCell=-1;lastPlantCount=0;messageTicks=0;
+    plants={500,520,2,501,4,5};
     StopPainting();
     PvzpLoadResources("DelayLoad_Almanac");
     SandboxRepairFonts();
@@ -238,7 +243,7 @@ void SandboxDrawUI(Graphics* g) {
     Button(g,Control(6),flags&32?"连放：开":"连放：关",flags&32);
     Button(g,Control(7),flags&16?"同格：开":"同格：关",flags&16);
 
-    std::string title=catalog==4?"新增植物":catalog==2?"所有僵尸":"所有植物";
+    std::string title=catalog==2?"所有僵尸":"所有植物";
     std::string hoverName;
     if(catalog==2){
         const int count=int(Zombies.size()+SandboxZombies::Definitions.size());
@@ -252,30 +257,19 @@ void SandboxDrawUI(Graphics* g) {
                 else hoverName=PvzpStringTranslate(std::string("[")+GetZombieDefinition(static_cast<ZombieType>(id)).mZombieName+"]");
             }
         }
-    }else if(catalog==4){
-        for(int i=0;i<int(MemeCharacters::Definitions.size());++i){
-            const auto box=Character(i);const auto& d=MemeCharacters::Definitions[i];
-            SandboxPlants::DrawCard(g,box.x,box.y,d.id);
-            if(tool==PlantTool&&selectedPlant==d.id)Outline(g,{box.x,box.y,50,70});
-            if(Hover(box))hoverName=d.name;
-        }
     }else{
-        const auto direct=DirectPlants();const int count=plantPage?int(direct.size()):48;
+        const auto cards=CataloguePlants();const int count=int(cards.size());
         for(int i=0;i<25&&i+catalogPage*25<count;++i){
-            const int id=plantPage?direct[i+catalogPage*25]:i+catalogPage*25;
+            const int id=cards[i+catalogPage*25];
             const auto b=SidebarPlant(i);SandboxPlants::DrawCard(g,b.x,b.y,id);
             if(tool==PlantTool&&selectedPlant==id)Outline(g,b);
             if(Hover(b)){Outline(g,b);const auto* d=SandboxPlants::Find(id);hoverName=d?d->name:Plant::GetNameString(static_cast<SeedType>(id));}
         }
-        if(!plantPage){
-            Button(g,PrevPage,"<");Button(g,NextPage,">");
-            PvzpDrawString(g,std::format("{}/2",catalogPage+1),132,578,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
-        }
+        Button(g,PrevPage,"<");Button(g,NextPage,">");
+        PvzpDrawString(g,std::format("{}/{}",catalogPage+1,(count+24)/25),132,578,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
     }
     if(catalog!=2){
-        Button(g,NativeFilter,"原版",catalog==1&&!plantPage);
-        Button(g,PowerFilter,"新卡",catalog==4);
-        Button(g,FusionFilter,"操作",tool==InteractTool);
+        Button(g,PowerFilter,"操作",tool==InteractTool);
     }
     PvzpDrawString(g,title,132,107,FONT_DWARVENTODCRAFT18,Color(92,230,40),DS_ALIGN_CENTER);
     if(!hoverName.empty())PvzpDrawString(g,hoverName,132,catalog==2?578:512,FONT_BRIANNETOD12,Color(244,215,125),DS_ALIGN_CENTER);
@@ -349,17 +343,11 @@ bool SandboxMouseDown(int x,int y,int clicks) {
                 tool=ZombieTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;
             }
         }else{
-            if(PowerFilter.Contains(x,y)){catalog=4;catalogPage=0;return true;}
-            if(FusionFilter.Contains(x,y)){tool=InteractTool;return true;}
-            if(NativeFilter.Contains(x,y)){catalog=1;plantPage=0;catalogPage=0;return true;}
-            if(catalog==4){
-                for(int i=0;i<int(MemeCharacters::Definitions.size());++i)if(Character(i).Contains(x,y)){selectedPlant=MemeCharacters::Definitions[i].id;plants[plantSlot]=selectedPlant;tool=PlantTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;}
-                return true;
-            }
-            if(!plantPage&&(PrevPage.Contains(x,y)||NextPage.Contains(x,y))){catalogPage=1-catalogPage;return true;}
-            const auto direct=DirectPlants();const int count=plantPage?int(direct.size()):48;
+            if(PowerFilter.Contains(x,y)){tool=InteractTool;return true;}
+            const auto cards=CataloguePlants();const int count=int(cards.size());
+            if(PrevPage.Contains(x,y)||NextPage.Contains(x,y)){const int pages=(count+24)/25;catalogPage=(catalogPage+(NextPage.Contains(x,y)?1:pages-1))%pages;return true;}
             for(int i=0;i<25&&i+catalogPage*25<count;++i)if(SidebarPlant(i).Contains(x,y)){
-                selectedPlant=plantPage?direct[i+catalogPage*25]:i+catalogPage*25;plants[plantSlot]=selectedPlant;
+                selectedPlant=cards[i+catalogPage*25];plants[plantSlot]=selectedPlant;
                 tool=PlantTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;
             }
         }

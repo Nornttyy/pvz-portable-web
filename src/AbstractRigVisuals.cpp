@@ -33,7 +33,7 @@ Scope::Scope(const Plant* p):mark(poses.size()){
 Scope::Scope(Zombie*):mark(poses.size()){}
 Scope::Scope(Reanimation* a,int type):mark(poses.size()){
  if(a&&type==MemeCharacters::ShooterPea){std::array<int,10> state{};state[0]=type;poses.push_back({a,nullptr,state,1});}
- if(a&&type==MemeCharacters::TuckingSunflower){std::array<int,10> state{};state[0]=type;state[2]=1;poses.push_back({a,nullptr,state,0});}
+ // Cards always show the standing pose; only live plants can tuck their head.
 }
 Scope::~Scope(){poses.resize(mark);}
 void Transform(Reanimation* a,int track,ReanimatorTransform& t){

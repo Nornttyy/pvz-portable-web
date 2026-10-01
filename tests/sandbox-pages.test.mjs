@@ -9,7 +9,7 @@ import vm from 'node:vm';
 import { cacheResource } from '../web/resource-cache.mjs';
 import { verifyResourceBytes } from '../web/resource-import.mjs';
 import { validateManifest, sha256 } from '../web/resource-utils.mjs';
-import { ORIGINAL_PLANTS, validateLayout } from '../web/sandbox-data.mjs';
+import { ORIGINAL_PLANTS, PLANTS, plantsFor, validateLayout } from '../web/sandbox-data.mjs';
 const read = name => readFile(new URL('../' + name, import.meta.url));
 
 test('default page uses integrated sandbox and project-relative paths, not loopback resources', async () => {
@@ -53,9 +53,12 @@ test('published sandbox engine matches the recorded build and really initializes
   assert.equal(Module._pvz_sandbox_plant_data(0, 0), -1);
 });
 
-test('sandbox exposes four independent abstract plants', async () => {
-  assert.equal(ORIGINAL_PLANTS.length,4);assert.equal(new Set(ORIGINAL_PLANTS.map(p=>p.id)).size,4);
-  assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.base),[0,3,52,53]);
+test('sandbox replaces native cards in one catalogue, without duplicate originals', async () => {
+  assert.equal(ORIGINAL_PLANTS.length,5);assert.equal(new Set(ORIGINAL_PLANTS.map(p=>p.id)).size,5);
+  assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.base),[0,3,52,1,7]);
+  assert.equal(PLANTS.length,49);assert.equal(new Set(PLANTS.map(p=>p.id)).size,49);
+  for(const [slot,id] of [[0,500],[1,520],[3,501],[7,521]]){assert.equal(PLANTS[slot].id,id);assert.ok(!PLANTS.some(p=>p.id===slot));}
+  assert.deepEqual(plantsFor('original'),plantsFor('all'));
   const layout = {schema: 1, map: 0, plants: [{type: 500, col: 2, row: 2}]};
   assert.deepEqual(validateLayout(layout), layout);
   for (const file of ['Sandbox.cpp', 'SandboxUI.cpp', 'SandboxPlants.cpp', 'SandboxButton.cpp']) assert.ok((await read('src/' + file)).length > 1000);

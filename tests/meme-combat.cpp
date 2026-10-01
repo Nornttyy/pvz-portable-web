@@ -28,6 +28,27 @@ struct World:Board {
  void step(int count=1){while(count--){SandboxPlants::Tick(this);SandboxZombies::Tick(this);if(!mPaused)++mMainCounter;}}
 };
 int main(){
+ // Exactly 50 weak native peas, with independent damage tags and resumable
+ // partial volleys. No enemy means no new volley; losing one doesn't cancel it.
+ {World w;auto* p=w.add(521);w.step(200);assert(w.mProjectiles.mSize==0);
+  auto* z=w.enemy();w.step();assert(w.mProjectiles.mSize==1&&MemeCharacters::Data(p,4)==49);
+  w.step(19);assert(w.mProjectiles.mSize==10);const auto saved=SandboxPlants::SavePower(p);
+  w.mPaused=true;w.step(100);assert(SandboxPlants::SavePower(p)==saved);w.mPaused=false;
+  SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved));z->mDead=true;
+  w.step(79);assert(w.mProjectiles.mSize==50&&MemeCharacters::Data(p,4)==0&&MemeCharacters::Data(p,0)==0);
+  for(auto* shot:w.mProjectiles){
+   assert(MemeCharacters::ShotStyle(shot)==MemeCharacters::WeakProjectile&&MemeCharacters::CanHit(shot));
+   assert(shot->mMotionType==MOTION_STRAIGHT&&shot->mVelY==0&&SandboxPlants::ShotDamage(shot,20)==1);
+   const int packed=SandboxPlants::SaveShot(shot);SandboxPlants::ForgetShot(shot);SandboxPlants::RestoreShot(shot,packed);
+   assert(SandboxPlants::SaveShot(shot)==packed&&SandboxPlants::ShotDamage(shot,20)==1);
+   shot->mProjectileType=PROJECTILE_FIREBALL;assert(SandboxPlants::ShotDamage(shot,40)==2);
+   SandboxPlants::ForgetShot(shot);SandboxPlants::RestoreShot(shot,packed);assert(SandboxPlants::ShotDamage(shot,40)==2);
+  }
+  auto* native=w.AddProjectile(100,250,0,2,PROJECTILE_PEA);assert(SandboxPlants::ShotDamage(native,20)==20);
+  z->mDead=false;w.step(149);assert(w.mProjectiles.mSize==51);w.step();assert(w.mProjectiles.mSize==52);
+  const auto mid=SandboxPlants::SavePower(p);w.mProjectiles.mMaxSize=w.mProjectiles.mSize+8;w.step(100);assert(MemeCharacters::Data(p,4)==mid[8]);
+  w.mProjectiles.mMaxSize=10000;w.step();assert(MemeCharacters::Data(p,4)==mid[8]-1);
+ }
  // Tuck before contact, stay down through the crossing, then fully recover.
  // Production countdown and ordinary sunflowers are untouched by this tick.
  {World w;auto* p=w.add(520);auto* ordinary=w.add(1);const int countdown=p->mLaunchCounter;
@@ -56,7 +77,9 @@ int main(){
  // Migrate legacy embarrassment/pending-sun saves without reviving the old
  // mechanic or changing health/production. New hidden saves round-trip.
  {World w;auto* p=w.add(520);p->mPlantHealth=177;p->mLaunchCounter=821;
+  p->mSeedType=static_cast<SeedType>(53); // Previous build's separate card.
   assert(MemeCharacters::Restore(p,{520,177,1,22,300,300,100,1,2,1}));
+  assert(p->mSeedType==SEED_SUNFLOWER);
   assert((MemeCharacters::Save(p)==std::array<int,10>{520,177,0,0,0,0,100,0,0,3}));
   assert(p->mPlantHealth==177&&p->mLaunchCounter==821&&!MemeCharacters::Hiding(p));
   auto corrupt=MemeCharacters::Save(p);corrupt[4]=1;assert(!MemeCharacters::Restore(p,corrupt));
@@ -214,7 +237,7 @@ int main(){
  }
 
  // Removed originals cannot be assigned, restored or re-entered through legacy powers.
- static_assert(MemeCharacters::Definitions.size()==4&&SandboxPlants::Definitions.size()==4);
+ static_assert(MemeCharacters::Definitions.size()==5&&SandboxPlants::Definitions.size()==5);
  {World w;auto* p=w.add(519);const int x=p->mX,y=p->mY;w.step(100);assert(w.mProjectiles.mSize==0);
   auto* z=w.enemy();w.step();assert(w.mProjectiles.mSize==1);w.step(149);assert(w.mProjectiles.mSize==1);w.step();assert(w.mProjectiles.mSize==2);
   auto* shot=w.mProjectiles.values[0];assert(shot->mVelX>0&&shot->mVelY==0&&shot->mMotionType==MOTION_STAR);
@@ -241,7 +264,7 @@ int main(){
   if(id==504||id==518)assert(p->mX==80&&p->mY==200);
   if(id==502)assert(p->mIsAsleep==!night);
  }
- for(int id:{500,501,519,520}){World w;auto* p=w.add(id);w.step(100);const auto saved=SandboxPlants::SavePower(p);
+ for(int id:{500,501,519,520,521}){World w;auto* p=w.add(id);w.step(100);const auto saved=SandboxPlants::SavePower(p);
   for(int field=0;field<10;++field){auto bad=saved;bad[field]=-999;assert(!SandboxPlants::RestorePower(p,bad));assert(SandboxPlants::SavePower(p)==saved);}
   SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved)&&SandboxPlants::SavePower(p)==saved);
  }

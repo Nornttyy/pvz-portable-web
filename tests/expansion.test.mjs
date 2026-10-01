@@ -62,8 +62,8 @@ test('native projectile integration retains splats, centered scaling and fire at
  const plant=source.slice(source.indexOf('void Plant::Fire('),source.indexOf('Zombie* Plant::FindTargetZombie('));
  assert.ok(plant.indexOf('aProjectile->ConvertToFireball(mPlantCol)')>plant.indexOf('SandboxPlants::OnFired(this,aProjectile,theTargetZombie)'),'fire attaches only after muzzle correction');
 });
-test('four originals remain; retired formations migrate without losing native plants',async()=>{
- assert.equal(ORIGINAL_PLANTS.length,4);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,519,520]);assert.deepEqual(ORIGINAL_ZOMBIES.map(z=>z.id),[212,213]);assert.equal(ZOMBIES.length,25);
+test('five originals remain; retired formations migrate without losing native plants',async()=>{
+ assert.equal(ORIGINAL_PLANTS.length,5);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,519,520,521]);assert.deepEqual(ORIGINAL_ZOMBIES.map(z=>z.id),[212,213]);assert.equal(ZOMBIES.length,25);
  const bases=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
  for(let id=100;id<120;++id)assert.equal(validateLayout({schema:1,map:0,plants:[{type:id,col:0,row:0}]}).plants[0].type,bases[id-100]);
  for(const p of [...RETIRED_PLANTS,...RETIRED_CHARACTERS]){
@@ -147,7 +147,8 @@ test('retired zombie art and extra seed cannot leak into native previews or menu
  const rig=(await read('src/AbstractRigVisuals.cpp')).toString(),ui=(await read('src/SandboxUI.cpp')).toString();
  assert.doesNotMatch(rig,/bucket-glove|squash-headband|Phone|case 50[2-9]:|case 51[0-8]:/);
  assert.doesNotMatch(ui,/SandboxArt::Phone|500,501,502,503/);
- assert.match(ui,/plants=\{0,1,500,501,519,5\}/);
+ assert.match(ui,/plants=\{500,520,2,501,4,5\}/);
+ assert.doesNotMatch(ui,/"新卡"|"新增植物"|"原版"|catalog==4/);
  const app=(await read('src/LawnApp.cpp')).toString();assert.match(app,/if \(theSeedType == SEED_LEFTPEATER\) return MemeAdventure::RosterEnabled\(\)/);
  assert.match(app,/MemeCharacters::Find\(MemeCharacters::ShooterPea\)->unlock/);
  const z=(await read('src/SandboxZombies.cpp')).toString();assert.doesNotMatch(z,/AddZombieInRow|PlayMemeCue|TakeDamage|SetImageOverride/);

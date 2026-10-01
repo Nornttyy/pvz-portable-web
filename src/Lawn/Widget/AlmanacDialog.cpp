@@ -40,7 +40,7 @@
 #include "../../AlmanacPlantLayout.h"
 #include "../../SandboxFonts.h"
 
-static bool AbstractAlmanacExpanded(){return gLawnApp->HasSeedType(SEED_LEFTPEATER)||gLawnApp->HasSeedType(SEED_AWKWARD_SUNFLOWER);}
+static bool AbstractAlmanacExpanded(){return gLawnApp->HasSeedType(SEED_LEFTPEATER);}
 static int AbstractAlmanacCount(){return AbstractAlmanacExpanded()?NUM_SEED_TYPES:NUM_ALMANAC_SEEDS;}
 
 bool gZombieDefeated[NUM_ZOMBIE_TYPES] = { false };
@@ -160,8 +160,7 @@ void AlmanacDialog::SetupPlant()
 	mPlant->mBoard = nullptr;
 	mPlant->mIsOnBoard = false;
 	mPlant->PlantInitialize(0, 0, mSelectedSeed, SEED_NONE);
-	if (mSelectedSeed == SEED_LEFTPEATER && MemeAdventure::RosterEnabled()) SandboxPlants::Assign(mPlant.get(), MemeCharacters::ShooterPea);
-	if (mSelectedSeed == SEED_AWKWARD_SUNFLOWER && MemeAdventure::RosterEnabled()) SandboxPlants::Assign(mPlant.get(), MemeCharacters::TuckingSunflower);
+	MemeAdventure::OnPlanted(mPlant.get());
 	mPlant->mX = aPosX;
 	mPlant->mY = aPosY;
 }

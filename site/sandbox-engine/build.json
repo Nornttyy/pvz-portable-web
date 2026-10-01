@@ -2,17 +2,17 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Four abstract plants (500,501,519,520), Louis XVI (212), and Runaway Zombie (213). Tucking Sunflower (520, native slot 53, legacy key AWKWARD_SUNFLOWER) replaces Awkward Sunflower in place. Still a 50-sun card unlocked from adventure 1-6 with a three-second card cooldown, producing native 25-value suns at unchanged speed. Same-lane nearby hostile zombies cause its native head and petals to lower together as the stalk retracts. Chewing/vault targets ignore tucked flowers and walkers continue toward the backline; collateral damage is not disabled. It recovers when the danger passes, with proximity hysteresis to avoid edge flicker. Gaze, embarrassment slowdown, generated face and sweat drop are removed from runtime; historical assets remain archived only. Legacy optional saves migrate without changing health, native production progress or campaign progress. Ordinary sunflower and other characters remain unchanged.",
+  "mode": "Five abstract plants (500,501,519,520,521), Louis XVI (212), and Runaway Zombie (213). Replacements occupy vanilla peashooter, sunflower, walnut and repeater slots in adventure and one unified sandbox catalogue, with no New Cards tab or duplicate vanilla entries. Tucking Sunflower (520) uses the standing native sunflower portrait and native slot 1; slot 53 plants and cards migrate on save restore, preserving health and sun countdown. Its proximity tucking/pass-through and native 25-sun production remain unchanged. Long Repeater (521) commits to 50 native peas, one every 2 ticks, then rests 150 ticks; each pea does 1 damage (2 after native torchwood conversion), with native speed, straight motion and splat, no knockback. Per-projectile damage tags and partial volleys survive save/restore. Shooter Pea (519) remains one standalone entry in the same catalogue. Other mechanics and campaign progress are preserved.",
   "files": [
     {
       "name": "pvz-portable.js",
       "size": 277501,
-      "sha256": "2d20055031139e66951170dddca45d8c5c2066733dd9f4e3666bde93f6ab4e08"
+      "sha256": "158d19f1631bc2b6e752d9538f829751ad6b78ada8611e66cb73f56a45e36dca"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7567454,
-      "sha256": "588b4d7c7125b8e6a7cc9c78a10c2317c4997379bd6b0021a316bfa693b7153f"
+      "size": 7565813,
+      "sha256": "884164bd71f1fbd632ad46319a694500cd2ce771e9e2974b8f8a4bdfbdaf0cb9"
     }
   ]
 }

@@ -46,6 +46,7 @@ bool MouseDown(Board* b,int x,int y,int clicks){
 }
 void OnPlanted(Plant* p){
  if(!p||p->mDead||MemeCharacters::Is(p))return;
+ if(RosterEnabled()&&p->mSeedType==SEED_AWKWARD_SUNFLOWER)p->mSeedType=SEED_SUNFLOWER;
  // Imitaters acquire the new identity when their normal morph creates the plant.
  if(const auto* d=Replacement(int(p->mSeedType)))MemeCharacters::Assign(p,d->id);
 }
@@ -65,7 +66,7 @@ void Draw(Board* b,Sexy::Graphics*){
 }
 std::string_view Translate(std::string_view key,std::string_view original){
  const auto* tucking=MemeCharacters::Find(MemeCharacters::TuckingSunflower);
- if(key==tucking->key)return tucking->name;
+ if(key=="AWKWARD_SUNFLOWER")return tucking->name; // Legacy ID 53, never a second selectable card.
  if(key=="AWKWARD_SUNFLOWER_TOOLTIP")return tucking->hint;
  if(key=="AWKWARD_SUNFLOWER_DESCRIPTION")return tucking->description;
  if(!RosterEnabled())return original;
@@ -107,6 +108,8 @@ void Restore(Board* b){
    OnPlanted(p);
   }
   if(b->mSeedBank)for(int i=0;i<b->mSeedBank->mNumPackets;++i){auto& card=b->mSeedBank->mSeedPackets[i];
+   if(card.mPacketType==SEED_AWKWARD_SUNFLOWER)card.mPacketType=SEED_SUNFLOWER;
+   if(card.mImitaterType==SEED_AWKWARD_SUNFLOWER)card.mImitaterType=SEED_SUNFLOWER;
    if(pending.cooldown!=RosterSaveVersion){
     if(int(card.mPacketType)==52)card.mPacketType=SEED_PEASHOOTER;
     if(int(card.mImitaterType)==52)card.mImitaterType=SEED_PEASHOOTER;

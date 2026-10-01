@@ -45,7 +45,7 @@
 #include "../../SeedChooserLayout.h"
 #include "../../SandboxFonts.h"
 
-static bool AbstractChooserExpanded(){return gLawnApp->HasSeedType(SEED_LEFTPEATER)||gLawnApp->HasSeedType(SEED_AWKWARD_SUNFLOWER);}
+static bool AbstractChooserExpanded(){return gLawnApp->HasSeedType(SEED_LEFTPEATER);}
 static int AbstractChooserCount(){return AbstractChooserExpanded()?NUM_SEED_TYPES:NUM_SEEDS_IN_CHOOSER;}
 
 SeedChooserScreen::SeedChooserScreen()
@@ -392,12 +392,6 @@ void SeedChooserScreen::Draw(Graphics* g)
 		int x, y;
 		GetSeedPositionInChooser(SEED_LEFTPEATER, x, y);
 		DrawSeedPacket(g, x, y, SEED_LEFTPEATER, SEED_NONE, 0, 55, true, false);
-	}
-	if (mApp->HasSeedType(SEED_AWKWARD_SUNFLOWER) && mChosenSeeds[SEED_AWKWARD_SUNFLOWER].mSeedState != SEED_IN_CHOOSER)
-	{
-		int x, y;
-		GetSeedPositionInChooser(SEED_AWKWARD_SUNFLOWER, x, y);
-		DrawSeedPacket(g, x, y, SEED_AWKWARD_SUNFLOWER, SEED_NONE, 0, 55, true, false);
 	}
 
 	int aNumSeedsInBank = mBoard->mSeedBank->mNumPackets;

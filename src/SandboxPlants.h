@@ -10,11 +10,12 @@ namespace Sexy { class Graphics; class Color; }
 namespace SandboxPlants {
 enum class Element { Fire, Ice, Alternating, Native };
 struct Definition { int id, base; Element element; const char* name; const char* note; const char* art=nullptr; int rate=0,damage=20; float scale=1.0f; };
-inline constexpr std::array<Definition,4> Definitions{{
+inline constexpr std::array<Definition,5> Definitions{{
     {500,0,Element::Native,"红温豌豆","满300怒气 · 3秒乱射50发"},
     {501,3,Element::Native,"反咬坚果","被啃后反击 · 冷却3秒"},
     {519,52,Element::Native,"射手豌豆","头是豌豆 · 发射射手"},
-    {520,53,Element::Native,"缩头乌葵","僵尸靠近 · 缩头让路"},
+    {520,1,Element::Native,"缩头乌葵","僵尸靠近 · 缩头让路"},
+    {521,7,Element::Native,"双----------双发射手","每轮连射50发 · 单发1伤害"},
 }};
 constexpr const Definition* Find(int id) {
     for(const auto& d:Definitions)if(d.id==id)return &d;

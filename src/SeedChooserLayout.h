@@ -9,8 +9,7 @@ constexpr int Columns(bool expanded) { return expanded ? 9 : 8; }
 constexpr int Slot(int seed, bool expanded) {
     if (!expanded) return seed;
     if (seed == SEED_LEFTPEATER) return 8;
-    if (seed == SEED_AWKWARD_SUNFLOWER) return 17;
-    return seed >= 16 ? seed + 2 : seed >= SEED_PUFFSHROOM ? seed + 1 : seed;
+    return seed >= SEED_PUFFSHROOM ? seed + 1 : seed;
 }
 struct Position { int x, y; };
 constexpr Position Imitater(bool expanded) {
