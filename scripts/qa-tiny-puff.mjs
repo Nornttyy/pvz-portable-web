@@ -14,7 +14,8 @@ const snap=async n=>{await page.mouse.move(0,0);await page.waitForTimeout(150);a
 async function click(x,y,touch=false){const b=await page.locator('#canvas').boundingBox(),s=await page.evaluate(()=>[Module.canvas.width,Module.canvas.height]);const pos=[b.x+x*b.width/s[0],b.y+y*b.height/s[1]];if(touch)await page.touchscreen.tap(...pos);else await page.mouse.click(...pos);await page.waitForTimeout(120);}
 async function card(base){const slot=base===52?8:base===53?9:base>=8?base+2:base;await click(47+slot%9*53,163+Math.floor(slot/9)*73);}
 const plants=()=>page.evaluate(()=>Array.from({length:10},(_,i)=>[0,1,2,3,9,15].map(f=>Module._pvz_adventure_power_data(i,f))).filter(p=>p[0]>=0));
-async function place(){await wait(()=>Module._pvz_adventure_seed_data(0,4)===1);await click(await seed(0,5)+25,await seed(0,6)+35);await click(360,330);}
+// Night stages randomize graves in the right half; exercise a safe left tile.
+async function place(){await wait(()=>Module._pvz_adventure_seed_data(0,4)===1);await click(await seed(0,5)+25,await seed(0,6)+35);await click(200,330);}
 async function quit(){await click(748,14);await page.waitForTimeout(350);await snap('pause-menu');await click(400,401);await page.waitForTimeout(350);await click(305,394);await wait(()=>Module._pvz_adventure_power_data(-1,5)===-1);await page.waitForTimeout(1800);}
 try{
  await page.goto(process.env.PVZ_QA_URL||'http://127.0.0.1:8097/');await wait(()=>!document.getElementById('start').disabled,undefined,90000);
@@ -33,7 +34,7 @@ try{
  await place();assert.equal((await plants()).length,5);assert.equal(await seed(0,3),0);await click(await seed(0,5)+25,await seed(0,6)+35);await snap('adventure-five');
  await page.setViewportSize({width:390,height:844});await page.waitForTimeout(500);await snap('phone');await page.setViewportSize({width:1100,height:750});await page.waitForTimeout(800);
  await quit();await click(560,135);await wait(()=>Module._pvz_adventure_power_data(-1,5)===1);assert.deepEqual(await plants(),results.cluster);results.saveResume=true;await snap('resumed');
- await click(280,371);await click(480,40);await click(360,330);await page.waitForTimeout(250);assert.equal((await plants()).length,4);await place();assert.equal((await plants()).length,5);assert.deepEqual((await plants()).map(p=>p[5]).sort(),[0,1,2,3,4]);results.shovelRefill=true;
+ await click(280,371);await click(480,40);await click(200,330);await page.waitForTimeout(250);assert.equal((await plants()).length,4);await place();assert.equal((await plants()).length,5);assert.deepEqual((await plants()).map(p=>p[5]).sort(),[0,1,2,3,4]);results.shovelRefill=true;
  await quit();await click(260,348);await wait(()=>Module.canvas.width===1024);await api(7);await api(8);await api(4,1);
  for(let i=0;i<5;++i)assert.equal(await api(1,525,3,2),1);assert.equal(await api(1,525,3,2),-4);await api(19,1);assert.equal(await api(1,525,3,2),-4);await api(19,0);
  await api(3,0,3,2);assert.equal(await api(9),4);assert.equal(await api(1,525,3,2),1);results.sandboxShovelRefill=true;
