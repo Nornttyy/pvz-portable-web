@@ -19,6 +19,12 @@ std::string_view plant(int id){return MemeCharacters::Find(id)->description;}
 int main(){
  using namespace MemeCharacters;
  using namespace MemeShooterRules;
+ includes(plant(NukeShroom),"全屏爆炸"+number(NukeShroomRules::Pulses)+"次");
+ includes(plant(NukeShroom),"间隔"+number(NukeShroomRules::Interval/100.0)+"秒");
+ includes(plant(NukeShroom),"留下3×3大坑");
+ includes(plant(NukeShroom),number(NukeShroomRules::CraterLife/100.0)+"秒后恢复");
+ includes(plant(NukeShroom),number(NukeShroomRules::Cost)+"阳光");
+ includes(plant(NukeShroom),"冷却"+number(PlantingCooldown(NukeShroom)/100.0)+"秒");
  includes(plant(500),"单发伤害20");
  includes(plant(500),"普攻"+number(NormalDelay/100.0)+"秒/发");
  int hits=0;for(int roll=0;roll<10;++roll)hits+=CanHit(NormalStyle(roll));

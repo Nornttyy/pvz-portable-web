@@ -15,6 +15,17 @@
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
+ // Energy recolouring must not detach a head or leak into ordinary previews.
+ {Reanimation body;Track tracks[]={{"DoomShroom_head1"},{"other"}};TrackInstance instances[2];body.def.mTracks={2,tracks};body.mTrackInstances=instances;
+  auto* source=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::NativeImage("DoomShroom_head1.png"));source->bits[0]=0xff151515;source->bits[1]=0x00808080;
+  ReanimatorTransform original;original.mImage=source;original.mTransX=13;original.mTransY=-7;original.mSkewX=11;original.mScaleX=.8f;
+  {AbstractRigVisuals::Scope scope(&body,MemeCharacters::NukeShroom);auto head=original;AbstractRigVisuals::Transform(&body,0,head);
+   assert(head.mImage!=source);near(head.mTransX,13);near(head.mTransY,-7);near(head.mSkewX,11);near(head.mScaleX,.8f);
+   auto* tinted=dynamic_cast<Sexy::MemoryImage*>(head.mImage);assert(tinted&&tinted->bits[0]==source->bits[0]&&tinted->bits[1]==source->bits[1]);
+   auto other=original;AbstractRigVisuals::Transform(&body,1,other);assert(other.mImage==source);
+  }
+  auto normal=original;AbstractRigVisuals::Transform(&body,0,normal);assert(normal.mImage==source);
+ }
  {Board b;SandboxPlants::Reset();Reanimation body;Track tracks[]={{"anim_face"},{"PuffShroom_tip"},{"PuffShroom_head"}};TrackInstance instances[3];body.def.mTracks={3,tracks};body.mTrackInstances=instances;app.reanims[91]=&body;
   for(int slot=0;slot<5;++slot){auto* p=b.plant(1,2);p->mSeedType=SeedType(8);p->mBodyReanimID=91;SandboxPlants::Assign(p,525);
    const auto pose=TinyPuffRules::At(slot);ReanimatorTransform original;original.mTransX=40;original.mTransY=65;

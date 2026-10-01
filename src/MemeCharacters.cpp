@@ -61,6 +61,7 @@ bool PuffMuzzle(const Plant* p,float& x,float& y){
 void Reset(){states.clear();shotStyles.clear();}
 void Forget(Plant* p){states.erase(p);}
 void Assign(Plant* p,int id){const auto* d=Find(id);if(!d||int(p->mSeedType)!=d->base)return;
+ if(id==NukeShroom){State s;s.id=id;s.health=p->mPlantHealth;s.delay=0;states[p]=s;return;}
  if(id==TinyPuff){
   if(Type(p)==id)return;
   std::array<bool,TinyPuffRules::Limit> used{};
@@ -76,6 +77,10 @@ void Assign(Plant* p,int id){const auto* d=Find(id);if(!d||int(p->mSeedType)!=d-
 }
 std::array<int,10> Save(const Plant* p){auto it=states.find(p);if(it==states.end())return {};const auto& s=it->second;return {s.id,s.health,s.phase,s.heat,s.timer,s.delay,s.age,s.pulse,s.remaining,s.direction};}
 bool Restore(Plant* p,const std::array<int,10>& a){
+ if(a[0]==NukeShroom){
+  if(int(p->mSeedType)!=15||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]||a[3]||a[4]||a[5]||a[6]<0||a[6]>=1000000||a[7]||a[8]||a[9]!=1)return false;
+  states[p]={a[0],a[1],0,0,0,0,a[6],0,0,1};return true;
+ }
  if(a[0]==TinyPuff){
   if(int(p->mSeedType)!=8||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]||a[3]||a[4]||a[5]||a[6]||a[7]||a[8]||a[9]<0||a[9]>=TinyPuffRules::Limit)return false;
   states[p]={a[0],a[1],0,0,0,0,0,0,0,a[9]};return true;
@@ -148,6 +153,7 @@ void Tick(Board* b){
    if(!supported){p->Die();continue;} // Die erases s via SandboxPlants::Forget.
   }
   if(s.id==TinyPuff){s.health=p->mPlantHealth;continue;}
+  if(s.id==NukeShroom){s.health=p->mPlantHealth;if(!p->mIsAsleep)s.age=(s.age+1)%1000000;continue;}
   if(s.id!=TuckingSunflower){p->mLaunchCounter=9999;if(s.id!=CactusPalm)p->mShootingCounter=0;}
   if(p->mIsAsleep||p->mSquished||p->NotOnGround()||p->mPlantHealth<=0){if(s.id==TuckingSunflower)s.phase=0;continue;}
   s.age=(s.age+1)%1000000;if(s.pulse)--s.pulse;if(s.delay)--s.delay;if(s.timer)--s.timer;

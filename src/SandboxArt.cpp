@@ -5,6 +5,7 @@
 #include "CactusPalmPixels.h"
 #include "CleverHeadPixels.h"
 #include "SandboxZombies.h"
+#include "NukeShroomRules.h"
 #include "LawnApp.h"
 #include "graphics/GLImage.h"
 #include "graphics/Graphics.h"
@@ -16,6 +17,28 @@
 #include <algorithm>
 #include <cmath>
 namespace SandboxArt {
+Sexy::Image* NukeNative(const char* file,int phase){
+ phase=(phase%8+8)%8;static std::map<std::pair<std::string,int>,std::unique_ptr<Sexy::MemoryImage>> images;
+ auto& out=images[{file,phase}];if(out)return out.get();
+ auto* source=dynamic_cast<Sexy::MemoryImage*>(NativeImage(file));if(!source)return nullptr;
+ out=std::make_unique<Sexy::MemoryImage>();out->Create(source->mWidth,source->mHeight);
+ const auto* in=source->GetBits();auto* bits=out->GetBits();
+ for(int y=0;y<source->mHeight;++y)for(int x=0;x<source->mWidth;++x){const int i=y*source->mWidth+x;bits[i]=NukeShroomRules::EnergyPixel(in[i],x,y,phase);}
+ out->BitsChanged();return out.get();
+}
+void DrawNukeEnergy(Sexy::Graphics* g,Reanimation* body,int age){
+ float x=0,y=0;bool found=false;
+ for(const char* track:{"DoomShroom_head3","DoomShroom_head2","DoomShroom_head1","DoomShroom_sleepinghead"}){
+  const auto file=std::string(track)+".png";auto* head=NativeImage(file.c_str());
+  if(head&&TrackPoint(body,track,head->mWidth,head->mHeight,head->mWidth*.5f,5,x,y)){found=true;break;}
+ }
+ auto* ribbon=NativeImage("puff_3.png");if(!found||!ribbon)return;
+ for(int i=0;i<3;++i){const float t=((age+i*23)%70)/70.f;
+  Sexy::SexyTransform2D m;m.LoadIdentity();m.m00=(4+2*(1-t))/ribbon->mWidth;m.m11=(11+7*t)/ribbon->mHeight;
+  m.m02=x+(i-1)*17+std::sin(t*5+i)*3+g->mTransX;m.m12=y-7-t*24+g->mTransY;
+  PvzpBltMatrix(g,ribbon,m,g->mClipRect,Sexy::Color(100,225,60,int(150*(1-t))),g->mDrawMode,Sexy::Rect(0,0,ribbon->mWidth,ribbon->mHeight));
+ }
+}
 Sexy::Image* GreenCone(int damage){
  damage=std::clamp(damage,0,2);static std::unique_ptr<Sexy::MemoryImage> images[3];auto& out=images[damage];if(out)return out.get();
  const char* files[]={"Zombie_cone1.png","Zombie_cone2.png","Zombie_cone3.png"};

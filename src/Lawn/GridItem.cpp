@@ -21,6 +21,7 @@
 
 #include "Board.h"
 #include "GridItem.h"
+#include "../NukeShroom.h"
 #include "Challenge.h"
 #include "ZenGarden.h"
 #include "../LawnApp.h"
@@ -239,6 +240,7 @@ void GridItem::DrawStinky(Graphics* g)
 
 void GridItem::DrawCrater(Graphics* g)
 {
+	if (NukeShroom::DrawCrater(g,this)) return;
 	float aXPos = mBoard->GridToPixelX(mGridX, mGridY) - 8.0f;
 	float aYPos = mBoard->GridToPixelY(mGridX, mGridY) + 40.0f;
 	if (mGridItemCounter < 25)

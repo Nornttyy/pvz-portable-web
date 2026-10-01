@@ -204,6 +204,16 @@ void DrawPalmPreview(Sexy::Graphics* g,float x,float y,bool imitater){
  }
  PvzpDrawImageScaledF(g,cached.get(),x-20*g->mScaleX,y-20*g->mScaleY,g->mScaleX,g->mScaleY);
 }
+void DrawNukePreview(Sexy::Graphics* g,float x,float y,bool imitater){
+ static std::unique_ptr<Sexy::MemoryImage> previews[2];auto& cached=previews[imitater?1:0];
+ if(!cached){
+  cached=gLawnApp->mReanimatorCache->MakeBlankMemoryImage(120,120);Sexy::Graphics canvas(cached.get());canvas.SetLinearBlend(true);
+  Reanimation anim;anim.ReanimationInitializeType(20,20,REANIM_DOOMSHROOM);anim.SetFramesForLayer("anim_idle");
+  if(imitater)gLawnApp->mReanimatorCache->UpdateReanimationForVariation(&anim,VARIATION_IMITATER);
+  AbstractRigVisuals::Scope pose(&anim,MemeCharacters::NukeShroom);anim.Draw(&canvas);
+ }
+ PvzpDrawImageScaledF(g,cached.get(),x-20*g->mScaleX,y-20*g->mScaleY,g->mScaleX,g->mScaleY);
+}
 void DrawCard(Sexy::Graphics* g,int x,int y,int id){
  if(MemeCharacters::Is(id)){MemeCharacters::Card(g,x,y,id);return;}
  if(id>=0&&id<48)DrawSeedPacket(g,x,y,static_cast<SeedType>(id),SEED_NONE,0,255,false,false);
@@ -220,6 +230,10 @@ void DrawTuckingPreview(Sexy::Graphics* g,float x,float y,bool imitater){
 }
 bool DrawBody(Sexy::Graphics* g,const Plant* p,float,float,bool squished){
  AbstractRigVisuals::Scope allPoses(p);
+ if(MemeCharacters::Type(p)==MemeCharacters::NukeShroom&&!squished){
+  auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID);if(!body)return false;
+  body->Draw(g);if(!p->mIsAsleep)SandboxArt::DrawNukeEnergy(g,body,MemeCharacters::Save(p)[6]);return true;
+ }
  if(MemeCharacters::Type(p)==MemeCharacters::CactusPalm&&!squished){
   auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID);if(!body)return false;
   body->Draw(g);SandboxArt::DrawPalm(g,body);return true;

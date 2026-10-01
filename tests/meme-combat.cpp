@@ -10,6 +10,7 @@
 #include <iostream>
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 namespace SandboxArt {
+void DrawNukeEnergy(Sexy::Graphics*,Reanimation*,int){}
 Sexy::Image* Image(const char*,const char*){return nullptr;}
 Sexy::Image* NativeImage(const char*){return nullptr;}
 Sexy::Image* Phone(int){return nullptr;}
@@ -34,6 +35,13 @@ struct World:Board {
  void step(int count=1){while(count--){SandboxPlants::Tick(this);SandboxZombies::Tick(this);if(!mPaused)++mMainCounter;}}
 };
 int main(){
+ // Nuclear shroom owns visuals only; native sleep and detonation clocks survive.
+ {World w;auto* p=w.add(MemeCharacters::NukeShroom);p->mPlantHealth=217;p->mShootingCounter=11;p->mLaunchCounter=29;
+  w.step(60);const auto record=SandboxPlants::SavePower(p);assert(record[0]==526&&record[6]==60&&p->mShootingCounter==11&&p->mLaunchCounter==29);
+  p->mIsAsleep=true;w.step(60);assert(SandboxPlants::SavePower(p)==record);
+  SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,record));assert(p->mIsAsleep&&p->mPlantHealth==217&&p->mLaunchCounter==29&&p->mShootingCounter==11);
+  auto bad=record;bad[5]=1;assert(!SandboxPlants::RestorePower(p,bad));
+ }
  // Tiny puffs keep their native clock/sleep, have stable five-position poses,
  // independently saved health, and real 10-damage native puff projectiles.
  {World w;std::array<Plant*,5> cluster{};
@@ -474,7 +482,7 @@ int main(){
  }
 
  // Removed originals cannot be assigned, restored or re-entered through legacy powers.
- static_assert(MemeCharacters::Definitions.size()==9&&SandboxPlants::Definitions.size()==9);
+ static_assert(MemeCharacters::Definitions.size()==10&&SandboxPlants::Definitions.size()==10);
  {World w;auto* p=w.add(519);const int x=p->mX,y=p->mY;w.step(100);assert(w.mProjectiles.mSize==0);
   auto* z=w.enemy();w.step();assert(w.mProjectiles.mSize==1);w.step(149);assert(w.mProjectiles.mSize==1);w.step();assert(w.mProjectiles.mSize==2);
   auto* shot=w.mProjectiles.values[0];assert(shot->mVelX>0&&shot->mVelY==0&&shot->mMotionType==MOTION_STAR);

@@ -11,6 +11,8 @@ Sexy::Image* Phone(int damage=0);
 Sexy::Image* Palm();
 Sexy::Image* CleverHead(bool jawPose);
 Sexy::Image* GreenCone(int damage);
+Sexy::Image* NukeNative(const char* file,int phase);
+void DrawNukeEnergy(Sexy::Graphics*,Reanimation*,int age);
 Sexy::Image* ConeTower(int armor);
 // Shared by attachment, card preview and projectile launch: opaque wrist
 // point (6,29) of the 64x44 image sits inside the native 17x27 lip opening.

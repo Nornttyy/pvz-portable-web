@@ -29,6 +29,7 @@
 #include "../MemeAdventure.h"
 #include "../SandboxUIRules.h"
 #include "../SandboxPlants.h"
+#include "../NukeShroom.h"
 #include "../SandboxZombies.h"
 #include "LawnCommon.h"
 #include "System/Music.h"
@@ -7531,6 +7532,7 @@ void Board::Draw(Graphics* g)
 
 	mDrawCount++;
 	DrawGameObjects(g);
+	NukeShroom::DrawScreen(g,this);
 }
 
 void Board::SetMustacheMode(bool theEnableMustache)
@@ -9328,6 +9330,7 @@ void Board::UpdateGridItems()
 
 		if (aGridItem->mGridItemType == GridItemType::GRIDITEM_CRATER && mApp->mGameScene == GameScenes::SCENE_PLAYING)
 		{
+			NukeShroom::UpdateCrater(aGridItem);
 			if (aGridItem->mGridItemCounter > 0)
 			{
 				aGridItem->mGridItemCounter--;

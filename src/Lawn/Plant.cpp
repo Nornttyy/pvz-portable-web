@@ -21,6 +21,7 @@
 
 #include "Coin.h"
 #include "Plant.h"
+#include "../NukeShroom.h"
 #include "Board.h"
 #include "Zombie.h"
 #include "Cutscene.h"
@@ -4195,6 +4196,11 @@ void Plant::DrawSeedType(Graphics* g, SeedType theSeedType, SeedType theImitater
 		aSeedG.mScaleX *= MemeCharacters::SmallNutScale;
 		aSeedG.mScaleY *= MemeCharacters::SmallNutScale;
 	}
+	if (aSeedType == SeedType::SEED_DOOMSHROOM && (gSandboxEnabled || MemeAdventure::RosterEnabled()))
+	{
+		SandboxPlants::DrawNukePreview(&aSeedG,thePosX,thePosY,aDrawVariation==VARIATION_IMITATER);
+		return;
+	}
 	if (aSeedType == SeedType::SEED_LEFTPEATER)
 	{
 		aOffsetX += aSeedG.mScaleX * 80.0f;
@@ -4391,6 +4397,7 @@ void Plant::DoSpecial()
 	}
 	case SeedType::SEED_DOOMSHROOM:
 	{
+		if (NukeShroom::Detonate(this)) break;
 		mApp->PlaySample(SOUND_DOOMSHROOM);
 
 		mBoard->KillAllZombiesInRadius(mRow, aPosX, aPosY, 250, 3, true, aDamageRangeFlags);

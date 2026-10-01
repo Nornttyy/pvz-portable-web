@@ -2,8 +2,26 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Nine abstract plants and eight independent zombies (212..219). Tiny Puff replaces native Puff-shroom: one-third scale, 2-second planting recharge, 10 damage and up to five independently posed mushrooms per tile in adventure and sandbox. Other combat, progression and saves are preserved.",
-  "almanacCopy": "All nine original plants and eight original zombies show explicit numeric statistics separately from surreal character-specific flavour text. Native cost/recharge footer and full supplemental Chinese glyphs.",
+  "mode": "Ten abstract plants and eight independent zombies (212..219). Nuclear Shroom replaces native Doom-shroom: five full-board green explosions, a persistent 3x3 crater, 250 sun and a 30-second planting recharge. Adventure and sandbox share the same replacement. Other combat, progression and saves are preserved.",
+  "almanacCopy": "All ten original plants and eight original zombies show explicit numeric statistics separately from surreal character-specific flavour text. Native cost/recharge footer and full supplemental Chinese glyphs.",
+  "nukeShroom": {
+    "id": 526,
+    "nativeSlot": 15,
+    "name": "核爆菇",
+    "cost": 250,
+    "rechargeTicks": 3000,
+    "pulses": 5,
+    "pulseIntervalTicks": 80,
+    "damage": "Native ApplyBurn per pulse (1800), enemies on the board only",
+    "craterSize": [
+      3,
+      3
+    ],
+    "craterLifeTicks": 18000,
+    "art": "Native rig with animated green energy veins and green native mushroom clouds; mild green screen wash. Nine cells form one large crater, including at board edges.",
+    "save": "Remaining pulses and crater lifetime use portable native GridItem fields",
+    "nativeRules": "Daytime sleep, coffee awakening and detonation windup preserved"
+  },
   "tinyPuff": {
     "id": 525,
     "nativeSlot": 8,
@@ -146,13 +164,13 @@
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 278926,
-      "sha256": "50489f32734fbcc88f62c1081ffe076614dcbee22053d9a09d3b1328f1a6c967"
+      "size": 278999,
+      "sha256": "16d27614ce9fac626121caab9d3b3d90bbe891bb8b15ff0486f748907fcffc1e"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7836698,
-      "sha256": "4fa49b4f3b6c6fc9b7304d8b84d25774f95d7cb21e819296693bb853f104d333"
+      "size": 7859972,
+      "sha256": "70f9515b3b19dbb990a311920be323f41bed0eafead49f71d31aa8297eac29d0"
     }
   ]
 }

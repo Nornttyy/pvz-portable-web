@@ -75,7 +75,7 @@ void OffsetLocal(ReanimatorTransform& t,float x,float y){
 }
 void Scope::Add(Reanimation*,int,int){}
 Scope::Scope(const Plant* p):mark(poses.size()){
- if((MemeCharacters::Type(p)!=500&&MemeCharacters::Type(p)!=MemeCharacters::ShooterPea&&MemeCharacters::Type(p)!=MemeCharacters::TuckingSunflower&&MemeCharacters::Type(p)!=MemeCharacters::TinyPuff)||p->mSquished)return;
+ if((MemeCharacters::Type(p)!=500&&MemeCharacters::Type(p)!=MemeCharacters::ShooterPea&&MemeCharacters::Type(p)!=MemeCharacters::TuckingSunflower&&MemeCharacters::Type(p)!=MemeCharacters::TinyPuff&&MemeCharacters::Type(p)!=MemeCharacters::NukeShroom)||p->mSquished)return;
  const auto state=MemeCharacters::Save(p);int part=0;
  for(auto id:{p->mBodyReanimID,p->mHeadReanimID,p->mHeadReanimID2,p->mHeadReanimID3,p->mBlinkReanimID}){
   if(auto* a=gLawnApp->ReanimationTryToGet(id))poses.push_back({a,p,state,part});
@@ -96,12 +96,18 @@ Scope::Scope(Reanimation* a,int type):mark(poses.size()){
  if(type==SandboxZombies::ConeWrap)ConePose(*this,a,SandboxZombies::ConeCount*SandboxZombies::ConeHealth);
  if(type==SandboxZombies::GiantImp)GiantImpPose(*this,a,0);
  if(a&&type==MemeCharacters::ShooterPea){std::array<int,10> state{};state[0]=type;poses.push_back({a,nullptr,state,1});}
+ if(a&&type==MemeCharacters::NukeShroom){std::array<int,10> state{};state[0]=type;poses.push_back({a,nullptr,state,0});}
  // Cards always show the standing pose; only live plants can tuck their head.
 }
 Scope::~Scope(){for(auto& [track,image]:images)track->mImageOverride=image;for(auto& [track,group]:groups)track->mRenderGroup=group;poses.resize(mark);}
 void Transform(Reanimation* a,int track,ReanimatorTransform& t){
  const Pose* p=nullptr;for(auto i=poses.rbegin();i!=poses.rend();++i)if(i->anim==a){p=&*i;break;}
  if(!p)return;
+ if(p->state[0]==MemeCharacters::NukeShroom){
+  const std::string_view name=a->mDefinition->mTracks.tracks[track].mName;
+  if(name.starts_with("DoomShroom_")&&t.mImage&&t.mFrame>=0&&t.mAlpha>0){const auto file=std::string(name)+".png";t.mImage=SandboxArt::NukeNative(file.c_str(),p->state[6]/12);}
+  return;
+ }
  if(p->state[0]==MemeCharacters::TinyPuff){
   const auto pose=TinyPuffRules::At(p->state[9]);
   const std::string_view name=a->mDefinition->mTracks.tracks[track].mName;
