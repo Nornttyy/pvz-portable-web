@@ -13,6 +13,7 @@ namespace SandboxArt {
 Sexy::Image* Image(const char*,const char*){return nullptr;}
 Sexy::Image* NativeImage(const char*){return nullptr;}
 Sexy::Image* Phone(int){return nullptr;}
+Sexy::Image* Palm(){return nullptr;}
 Sexy::Image* PhoneHands(const char*){return nullptr;}
 Sexy::Image* WarmNative(const char*,int){return nullptr;}
 Sexy::Image* PowerNative(const char*,int,int){return nullptr;}
@@ -28,6 +29,35 @@ struct World:Board {
  void step(int count=1){while(count--){SandboxPlants::Tick(this);SandboxZombies::Tick(this);if(!mPaused)++mMainCounter;}}
 };
 int main(){
+ // Real production palm combat: five seconds, one independent crit roll,
+ // native armor, exact tile displacement, frozen clocks and save round trips.
+ {World w;auto* p=w.add(524);p->mState=STATE_CACTUS_LOW;auto* z=w.enemy();
+  for(int tick=1;tick<=1500;++tick){w.step();assert(w.mProjectiles.mSize==tick/500);}
+  const auto saved=SandboxPlants::SavePower(p);w.mPaused=true;w.step(750);assert(SandboxPlants::SavePower(p)==saved);w.mPaused=false;
+  SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved));w.step(499);assert(w.mProjectiles.mSize==3);w.step();assert(w.mProjectiles.mSize==4);
+  auto bad=SandboxPlants::SavePower(p);bad[5]=501;assert(!SandboxPlants::RestorePower(p,bad));
+  z->mDead=true;w.step(700);assert(w.mProjectiles.mSize==4);z->mDead=false;w.step();assert(w.mProjectiles.mSize==5);
+  p->mIsAsleep=true;const auto asleep=SandboxPlants::SavePower(p);w.step(600);assert(SandboxPlants::SavePower(p)==asleep);p->mIsAsleep=false;
+  int crits=0;
+  for(int roll=0;roll<100;++roll){
+   Sexy::forcedRoll=roll;p->Fire(z,2,WEAPON_SECONDARY);auto* shot=w.mProjectiles.values.back();
+   const int style=roll<20?300:299;crits+=roll<20;assert(MemeCharacters::ShotStyle(shot)==style&&MemeCharacters::CanHit(shot));
+   assert(shot->mProjectileType==PROJECTILE_SPIKE&&SandboxPlants::UsesCustomShotArt(shot));
+   const int packed=SandboxPlants::SaveShot(shot);SandboxPlants::ForgetShot(shot);SandboxPlants::RestoreShot(shot,packed);
+   assert(SandboxPlants::SaveShot(shot)==packed&&SandboxPlants::ShotDamage(shot,20)==(roll<20?110:80));
+   for(auto type:{ZOMBIE_NORMAL,ZOMBIE_IMP,ZOMBIE_GARGANTUAR,ZOMBIE_REDEYE_GARGANTUAR}){
+    auto* victim=w.enemy(400,2,type);victim->mIsEating=true;victim->mHelmHealth=200;
+    assert(SandboxPlants::Impact(shot,victim));assert(victim->mBodyHealth==1000&&victim->mHelmHealth==200-(roll<20?110:80));
+    const int distance=(type==23||type==32)?(roll<20?60:40):(roll<20?180:120);
+    assert(victim->mPosX==400+distance&&victim->mX==400+distance&&!victim->mIsEating);
+   }
+   auto* dead=w.enemy(400);dead->mBodyHealth=50;assert(SandboxPlants::Impact(shot,dead)&&dead->mPosX==400);
+   shot->mProjectileType=PROJECTILE_PEA;assert(!MemeCharacters::RestoreShotStyle(shot,style));
+  }
+  assert(crits==20);Sexy::forcedRoll=-1;
+  auto* native=w.AddProjectile(0,0,0,0,PROJECTILE_SPIKE);const auto x=z->mPosX;const auto hp=z->mBodyHealth;
+  assert(!SandboxPlants::Impact(native,z)&&z->mPosX==x&&z->mBodyHealth==hp&&SandboxPlants::ShotDamage(native,20)==20);
+ }
  // A small nut is a separate passive defender, not a cheaper biting nut.
  {World w;auto* p=w.add(MemeCharacters::SmallNut);p->mPlantHealth=p->mPlantMaxHealth=MemeCharacters::SmallNutHealth;
   auto* z=w.enemy(p->mX-30);z->mIsEating=true;const int enemyHP=z->mBodyHealth;p->mRecentlyEatenCountdown=50;
@@ -325,7 +355,7 @@ int main(){
  }
 
  // Removed originals cannot be assigned, restored or re-entered through legacy powers.
- static_assert(MemeCharacters::Definitions.size()==7&&SandboxPlants::Definitions.size()==7);
+ static_assert(MemeCharacters::Definitions.size()==8&&SandboxPlants::Definitions.size()==8);
  {World w;auto* p=w.add(519);const int x=p->mX,y=p->mY;w.step(100);assert(w.mProjectiles.mSize==0);
   auto* z=w.enemy();w.step();assert(w.mProjectiles.mSize==1);w.step(149);assert(w.mProjectiles.mSize==1);w.step();assert(w.mProjectiles.mSize==2);
   auto* shot=w.mProjectiles.values[0];assert(shot->mVelX>0&&shot->mVelY==0&&shot->mMotionType==MOTION_STAR);
@@ -352,7 +382,7 @@ int main(){
   if(id==504||id==518)assert(p->mX==80&&p->mY==200);
   if(id==502)assert(p->mIsAsleep==!night);
  }
- for(int id:{500,501,519,520,521,522,523}){World w;auto* p=w.add(id);w.step(100);const auto saved=SandboxPlants::SavePower(p);
+ for(int id:{500,501,519,520,521,522,523,524}){World w;auto* p=w.add(id);w.step(100);const auto saved=SandboxPlants::SavePower(p);
   for(int field=0;field<10;++field){auto bad=saved;bad[field]=-999;assert(!SandboxPlants::RestorePower(p,bad));assert(SandboxPlants::SavePower(p)==saved);}
   SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved)&&SandboxPlants::SavePower(p)==saved);
  }

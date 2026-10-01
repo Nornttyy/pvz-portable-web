@@ -959,6 +959,7 @@ void Plant::StarFruitFire()
 
 void Plant::UpdateShooter()
 {
+	if (MemeCharacters::Type(this) == MemeCharacters::CactusPalm) return; // Exact five-second clock; raising must not create a free shot.
 	if (mLaunchCounter<=1 && !SandboxPlants::NativeCanAct(this)) return;
 	// Let an existing native shooting animation finish before starting another.
 	if (SandboxPlants::IsCustom(this) && !SandboxMemeRules::LegacyBase(SandboxPlants::EffectiveBase(this)) && mShootingCounter > 0 && mLaunchCounter <= 1) mLaunchCounter = 2;
@@ -4180,6 +4181,11 @@ void Plant::DrawSeedType(Graphics* g, SeedType theSeedType, SeedType theImitater
 	if (aSeedType == SeedType::SEED_LEFTPEATER && (gSandboxEnabled || MemeAdventure::RosterEnabled()))
 	{
 		SandboxPlants::DrawPeaHeadPreview(&aSeedG, thePosX, thePosY, aDrawVariation == VARIATION_IMITATER);
+		return;
+	}
+	if (aSeedType == SeedType::SEED_CACTUS && (gSandboxEnabled || MemeAdventure::RosterEnabled()))
+	{
+		SandboxPlants::DrawPalmPreview(&aSeedG, thePosX, thePosY, aDrawVariation == VARIATION_IMITATER);
 		return;
 	}
 	if (aSeedType == SeedType::SEED_SMALL_NUT)

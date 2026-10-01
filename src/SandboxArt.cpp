@@ -2,6 +2,7 @@
 #include "SandboxArt.h"
 #include "SandboxMemeRules.h"
 #include "AbstractPhonePixels.h"
+#include "CactusPalmPixels.h"
 #include "LawnApp.h"
 #include "graphics/GLImage.h"
 #include "graphics/Graphics.h"
@@ -13,6 +14,12 @@
 #include <algorithm>
 #include <cmath>
 namespace SandboxArt {
+Sexy::Image* Palm(){
+ static std::unique_ptr<Sexy::MemoryImage> image;if(!image){
+  using namespace CactusPalmPixels;image=std::make_unique<Sexy::MemoryImage>();image->Create(Width,Height);
+  std::copy(Pixels,Pixels+Width*Height,image->GetBits());image->BitsChanged();
+ }return image.get();
+}
 Sexy::Image* Phone(int damage){
  damage=std::clamp(damage,0,2);static std::unique_ptr<Sexy::MemoryImage> images[3];auto& im=images[damage];if(im)return im.get();
  using namespace AbstractPhonePixels;im=std::make_unique<Sexy::MemoryImage>();im->Create(Width,Height);auto* out=im->GetBits();std::copy(Pixels,Pixels+Width*Height,out);

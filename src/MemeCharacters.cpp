@@ -51,12 +51,18 @@ bool Producing(const Plant* p){return Type(p)==TuckingSunflower&&!Hiding(p);}
 void Reset(){states.clear();shotStyles.clear();}
 void Forget(Plant* p){states.erase(p);}
 void Assign(Plant* p,int id){const auto* d=Find(id);if(!d||int(p->mSeedType)!=d->base)return;
- State s;s.id=id;s.health=p->mPlantHealth;s.timer=0;if(id==500)s.direction=2;if(id==GatlingShooter)s.delay=GatlingInterval;states[p]=s;
+ State s;s.id=id;s.health=p->mPlantHealth;s.timer=0;if(id==500)s.direction=2;if(id==GatlingShooter)s.delay=GatlingInterval;if(id==CactusPalm)s.delay=PalmInterval;states[p]=s;
  if(id==TuckingSunflower){states[p].delay=0;states[p].direction=3;return;}
  p->mLaunchCounter=9999;p->mShootingCounter=0;
 }
 std::array<int,10> Save(const Plant* p){auto it=states.find(p);if(it==states.end())return {};const auto& s=it->second;return {s.id,s.health,s.phase,s.heat,s.timer,s.delay,s.age,s.pulse,s.remaining,s.direction};}
 bool Restore(Plant* p,const std::array<int,10>& a){
+ if(a[0]==CactusPalm){
+  if(int(p->mSeedType)!=26||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]||a[3]||a[4]||a[5]<0||a[5]>PalmInterval||a[6]<0||a[6]>=1000000||a[7]||a[8]||a[9]!=1)return false;
+  states[p]={a[0],a[1],0,0,0,a[5],a[6],0,0,1};p->mLaunchCounter=9999;
+  // Native rig/save owns the recovery animation. Never restart its shot.
+  p->mShootingCounter=std::min(p->mShootingCounter,1);return true;
+ }
  if(a[0]==TuckingSunflower){
   if((int(p->mSeedType)!=Find(a[0])->base&&int(p->mSeedType)!=53)||p->mDead||a[1]<0||a[1]>p->mPlantMaxHealth||a[2]<0||a[2]>1||a[6]<0||a[6]>=1000000)return false;
   if(a[9]==1){
@@ -118,7 +124,7 @@ void Tick(Board* b){
    }
    if(!supported){p->Die();continue;} // Die erases s via SandboxPlants::Forget.
   }
-  if(s.id!=TuckingSunflower){p->mLaunchCounter=9999;p->mShootingCounter=0;}
+  if(s.id!=TuckingSunflower){p->mLaunchCounter=9999;if(s.id!=CactusPalm)p->mShootingCounter=0;}
   if(p->mIsAsleep||p->mSquished||p->NotOnGround()||p->mPlantHealth<=0){if(s.id==TuckingSunflower)s.phase=0;continue;}
   s.age=(s.age+1)%1000000;if(s.pulse)--s.pulse;if(s.delay)--s.delay;if(s.timer)--s.timer;
   if(s.id==TuckingSunflower){
@@ -144,6 +150,16 @@ void Tick(Board* b){
     if(auto* target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY)){
      Shoot(p,target);s.heat+=MemeShooterRules::PerShot;s.delay=MemeShooterRules::NormalDelay;
      if(s.heat>=MemeShooterRules::MaxRage)Burst(s);
+    }
+   }
+  }else if(s.id==CactusPalm){
+   if(!s.delay&&(p->mState==STATE_CACTUS_LOW||p->mState==STATE_CACTUS_HIGH)&&b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8){
+    const bool high=p->mState==STATE_CACTUS_HIGH;const auto weapon=high?WEAPON_PRIMARY:WEAPON_SECONDARY;
+    if(auto* target=p->FindTargetZombie(p->mRow,weapon)){
+     p->Fire(target,p->mRow,weapon);s.delay=PalmInterval;
+     p->PlayBodyReanim(high?"anim_shootinghigh":"anim_shooting",REANIM_PLAY_ONCE_AND_HOLD,3,35);
+     // 1 only runs native recovery; it cannot fire a second projectile.
+     p->mShootingCounter=1;
     }
    }
   }else if(s.id==GatlingShooter){
@@ -217,6 +233,15 @@ void Card(Sexy::Graphics* g,int x,int y,int id){const auto* d=Find(id);if(!d)ret
  PvzpDrawString(g,std::to_string(d->cost),x+23,y+65,Sexy::FONT_BRIANNETOD12,Sexy::Color(75,51,20),DS_ALIGN_CENTER);
 }
 void OnFired(Plant* p,Projectile* shot){
+ if(Type(p)==CactusPalm){
+  shotStyles[shot]=Sexy::Rand(100)<20?CriticalPalmProjectile:PalmProjectile;
+  AbstractRigVisuals::Scope pose(p);auto* image=SandboxArt::Palm();float x,y;
+  if(image&&SandboxArt::TrackPoint(gLawnApp->ReanimationTryToGet(p->mBodyReanimID),"Cactus_mouth",image->mWidth,image->mHeight,image->mWidth*.5f,image->mHeight*.5f,x,y)){
+   shot->mPosX=p->mX+x-12;shot->mPosY=p->mY+y-12-shot->mPosZ;
+   shot->mX=int(shot->mPosX);shot->mY=int(shot->mPosY+shot->mPosZ);
+  }
+  return;
+ }
  if(Type(p)==GatlingShooter){shotStyles[shot]=GatlingProjectile;return;}
  if(Type(p)==LongRepeater){shotStyles[shot]=WeakProjectile;return;}
  if(Type(p)==ShooterPea){
@@ -248,7 +273,7 @@ void OnImpact(Projectile*,Zombie*){}
 bool RestoreShotStyle(const Projectile* shot,int style){
  // Keep the new projectile distinct from retired self-thrower save records.
  if(style<0||(style>20&&style!=ShooterProjectile&&!IsStraightShot(style)&&!MemeShooterRules::IsFloating(style)&&!MemeShooterRules::IsBoundedBurst(style))||style==19||shot->mDead)return false;
- if(style&&(shot->mMotionType!=(IsStraightShot(style)?MOTION_STRAIGHT:MOTION_STAR)||(shot->mProjectileType!=PROJECTILE_PEA&&shot->mProjectileType!=PROJECTILE_SNOWPEA&&shot->mProjectileType!=PROJECTILE_FIREBALL)))return false;
+ if(style&&(shot->mMotionType!=(IsStraightShot(style)?MOTION_STRAIGHT:MOTION_STAR)||(IsPalmShot(style)?shot->mProjectileType!=PROJECTILE_SPIKE:(shot->mProjectileType!=PROJECTILE_PEA&&shot->mProjectileType!=PROJECTILE_SNOWPEA&&shot->mProjectileType!=PROJECTILE_FIREBALL))))return false;
  // Legacy bursts did not save a firing row; anchor them to the loaded lane.
  if(style==9)style=MemeShooterRules::BurstStyle(std::clamp(shot->mRow,0,5));
  if(style)shotStyles[shot]=style;else shotStyles.erase(shot);return true;

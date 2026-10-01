@@ -15,6 +15,31 @@
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
+ // Generated palm is attached by its wrist, underneath the native lip rim.
+ // It follows idle/tall/recoil transforms without inheriting tube stretching.
+ {SandboxPlants::Reset();Board w;auto* plant=w.plant(2,2);plant->mSeedType=static_cast<SeedType>(26);SandboxPlants::Assign(plant,524);
+  Reanimation body;Track tracks[]={{"Cactus_mouth"},{"Cactus_lips"},{"anim_face"}};TrackInstance instances[3];body.def.mTracks={3,tracks};body.mTrackInstances=instances;
+  body.track="Cactus_lips";app.reanims[92]=&body;plant->mBodyReanimID=92;
+  for(float y:{19.5f,-54.5f,25.f})for(float angle:{0.f,10.f,-12.f}){
+   body.pose.mTransX=50.4f;body.pose.mTransY=y;body.pose.mScaleX=.8f;body.pose.mScaleY=.84f;body.pose.mSkewX=body.pose.mSkewY=angle;
+   {AbstractRigVisuals::Scope scope(plant);auto palm=body.pose;palm.mScaleX=3.33f;auto lips=body.pose;
+    AbstractRigVisuals::Transform(&body,0,palm);AbstractRigVisuals::Transform(&body,1,lips);
+    assert(palm.mImage==SandboxArt::Palm());near(palm.mScaleX*palm.mImage->mWidth,32.f);near(palm.mScaleY*palm.mImage->mHeight,.84f*27.5f);
+    const float a=angle*3.14159265f/180,dx=4,dy=13.5f-27.5f*.65f;
+    near(palm.mTransX,body.pose.mTransX+dx*.8f*std::cos(a)-dy*.84f*std::sin(a));
+    near(palm.mTransY,y+dx*.8f*std::sin(a)+dy*.84f*std::cos(a));near(lips.mTransY,y);near(lips.mScaleX,.8f);
+   }
+   {AbstractRigVisuals::Scope preview(&body,524);auto palm=body.pose;AbstractRigVisuals::Transform(&body,0,palm);assert(palm.mImage==SandboxArt::Palm());}
+  }
+  auto* shot=w.AddProjectile(352.7f,221.3f,0,2,PROJECTILE_SPIKE);shot->mX=352;shot->mY=221;
+  for(int style:{299,300}){
+   assert(MemeCharacters::RestoreShotStyle(shot,style));Sexy::Graphics g(nullptr);g.mTransX=576;g.mTransY=221;
+   testBlits.clear();assert(SandboxPlants::DrawShot(&g,shot));assert(testBlits.size()==1);
+   // Sprite origin was translated by the game already; no double world offset.
+   near(testBlits.back().matrix.m02,588.7f);near(testBlits.back().matrix.m12,233.3f);
+  }
+  app.reanims.clear();
+ }
  // Giant head/jaw share the imp's neck. All transforms and native image
  // overrides remain local to the new identity, including previews/death.
  {SandboxZombies::Reset();Board w;auto* z=w.AddZombieInRow(ZOMBIE_IMP,1,-1);SandboxZombies::Assign(z,215);

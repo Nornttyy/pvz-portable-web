@@ -108,6 +108,7 @@ void TorchPower(Plant*,Projectile*){}
 void NativeTint(const Plant* p,Sexy::Color& color){MemeCharacters::Tint(p,color);}
 int ShotDamage(const Projectile* shot,int damage){
  const int style=MemeCharacters::ShotStyle(shot);
+ if(MemeCharacters::IsPalmShot(style))return MemeCharacters::PalmDamage(style);
  if(style==MemeCharacters::WeakProjectile)return std::max(1,damage/20);
  if(style==MemeCharacters::GatlingProjectile)return damage*15/20;
  auto it=damageShots.find(shot);return it==damageShots.end()?damage:damage*it->second/100;
@@ -133,17 +134,32 @@ float ShotScale(const Projectile* shot){
   (shot->mProjectileType==PROJECTILE_PEA||shot->mProjectileType==PROJECTILE_SNOWPEA)?0.6f:1.0f;
 }
 bool HasShot(const Projectile* p){return MemeCharacters::ShotStyle(p)!=0;}
-bool UsesCustomShotArt(const Projectile*){return false;}
+bool UsesCustomShotArt(const Projectile* shot){return MemeCharacters::IsPalmShot(MemeCharacters::ShotStyle(shot));}
 int ShotRadius(const Projectile*){return 12;}
 int NextShot(Plant*){return 0;}
 void OnFired(Plant* p,Projectile* shot,Zombie*){MemeCharacters::OnFired(p,shot);}
 void UpdateShot(Projectile* p){MemeCharacters::UpdateShot(p);}
-bool Impact(Projectile*,Zombie*){return false;}
+bool Impact(Projectile* shot,Zombie* zombie){
+ const int style=MemeCharacters::ShotStyle(shot);if(!MemeCharacters::IsPalmShot(style))return false;
+ if(!zombie||zombie->mDead||zombie->IsDeadOrDying())return true;
+ zombie->TakeDamage(MemeCharacters::PalmDamage(style),shot->GetDamageFlags(zombie));
+ if(!zombie->IsDeadOrDying()){
+  const bool giant=zombie->mZombieType==ZOMBIE_GARGANTUAR||zombie->mZombieType==ZOMBIE_REDEYE_GARGANTUAR;
+  zombie->mPosX+=MemeCharacters::PalmPush(style,giant);zombie->mX=int(zombie->mPosX);zombie->StopEating();
+ }
+ return true; // Native armor/shields took one hit, never double-apply damage.
+}
 void Tick(Board* b){MemeCharacters::Tick(b);}
 void DrawEffects(Sexy::Graphics* graphics,Board* b,int row){
  Sexy::Graphics clipped(*graphics);clipped.ClipRect(0,82,800,518);MemeCharacters::Effects(&clipped,b,row);
 }
 bool DrawShot(Sexy::Graphics* g,const Projectile* shot){
+ if(MemeCharacters::IsPalmShot(MemeCharacters::ShotStyle(shot))){
+  auto* image=SandboxArt::Palm();if(!image)return false;
+  Sexy::SexyTransform2D m;m.LoadIdentity();m.m00=40.f/image->mWidth;m.m11=27.5f/image->mHeight;
+  m.m02=shot->mPosX-shot->mX+12+g->mTransX;m.m12=shot->mPosY+shot->mPosZ-shot->mY+12+g->mTransY;
+  PvzpBltMatrix(g,image,m,g->mClipRect,Sexy::Color(255,255,255),g->mDrawMode,Sexy::Rect(0,0,image->mWidth,image->mHeight));return true;
+ }
  if(MemeCharacters::ShotStyle(shot)!=MemeCharacters::ShooterProjectile)return false;
  // A whole original peashooter, including its stem/leaves/mouth. This cache
  // is intentionally the native seed 0, never the pea-headed preview.
@@ -170,6 +186,16 @@ void DrawPeaHeadPreview(Sexy::Graphics* g,float x,float y,bool imitater){
    if(imitater)gLawnApp->mReanimatorCache->UpdateReanimationForVariation(&anim,VARIATION_IMITATER);
    AbstractRigVisuals::Scope pose(&anim,MemeCharacters::ShooterPea);anim.Draw(&canvas);
   }
+ }
+ PvzpDrawImageScaledF(g,cached.get(),x-20*g->mScaleX,y-20*g->mScaleY,g->mScaleX,g->mScaleY);
+}
+void DrawPalmPreview(Sexy::Graphics* g,float x,float y,bool imitater){
+ static std::unique_ptr<Sexy::MemoryImage> previews[2];auto& cached=previews[imitater?1:0];
+ if(!cached){
+  cached=gLawnApp->mReanimatorCache->MakeBlankMemoryImage(120,120);Sexy::Graphics canvas(cached.get());canvas.SetLinearBlend(true);
+  Reanimation anim;anim.ReanimationInitializeType(20,20,REANIM_CACTUS);anim.SetFramesForLayer("anim_idle");
+  if(imitater)gLawnApp->mReanimatorCache->UpdateReanimationForVariation(&anim,VARIATION_IMITATER);
+  AbstractRigVisuals::Scope pose(&anim,MemeCharacters::CactusPalm);anim.Draw(&canvas);
  }
  PvzpDrawImageScaledF(g,cached.get(),x-20*g->mScaleX,y-20*g->mScaleY,g->mScaleX,g->mScaleY);
 }

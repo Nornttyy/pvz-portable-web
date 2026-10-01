@@ -82,7 +82,7 @@ struct Card {int mPacketType=3,mImitaterType=-1,mRefreshTime=1200,mRefreshCounte
 void RestoreCooldown(Card& card){using namespace MemeAdventure;${restore}}
 int main(){
  definitions[3].mRefreshTime=3000;definitions[23].mRefreshTime=3000;
- for(const auto& d:MemeCharacters::Definitions){const int expected=d.id==501?1200:d.id==523?600:300;assert(Plant::GetRefreshTime(SeedType(d.base),SEED_NONE)==expected);assert(Plant::GetRefreshTime(SEED_IMITATER,SeedType(d.base))==expected);}
+ for(const auto& d:MemeCharacters::Definitions){const int expected=d.id==501?1200:d.id==523?600:d.id==524?750:300;assert(Plant::GetRefreshTime(SeedType(d.base),SEED_NONE)==expected);assert(Plant::GetRefreshTime(SEED_IMITATER,SeedType(d.base))==expected);}
  assert(Plant::GetRefreshTime(SeedType(23),SEED_NONE)==3000);
  for(int seed:{3,48}){
   Card fresh;fresh.mPacketType=seed;fresh.mImitaterType=seed==48?3:-1;
@@ -121,10 +121,10 @@ namespace MemeAdventure {${mapping}\n${translate}}
 int main(){using namespace MemeAdventure;
  for(const auto& d:MemeCharacters::Definitions){assert(Replacement(d.base,-1)->id==d.id);assert(Replacement(48,d.base)->id==d.id);assert(Translate(d.key,"old")==d.name);assert(Translate(std::string(d.key)+"_TOOLTIP","old")==d.hint);assert(Translate(std::string(d.key)+"_DESCRIPTION","old")==d.description);}
  assert(!Replacement(48,-1)&&!Replacement(2,-1)&&!Replacement(503,-1));
- assert(MemeCharacters::Definitions.size()==7);
+ assert(MemeCharacters::Definitions.size()==8);
  assert(Translate("ADVICE_QA","向日葵和双子向日葵") == "向日葵和双子向日葵");
  assert(Translate("SEED_CHOOSER_QA","豌豆射手、小喷菇、坚果墙") == "红温豌豆、小喷菇、反咬坚果");
- for(int seed=0;seed<54;++seed)if(seed!=0&&seed!=1&&seed!=3&&seed!=7&&seed!=40&&seed!=52&&seed!=53)assert(!Replacement(seed,-1));
+ for(int seed=0;seed<54;++seed)if(seed!=0&&seed!=1&&seed!=3&&seed!=7&&seed!=26&&seed!=40&&seed!=52&&seed!=53)assert(!Replacement(seed,-1));
  for(const char* key:{"FLAG_ZOMBIE","BUCKETHEAD_ZOMBIE","POLE_VAULTING_ZOMBIE","CONEHEAD_ZOMBIE","ZOMBIE","SCREEN_DOOR_ZOMBIE","FOOTBALL_ZOMBIE","BALLOON_ZOMBIE","NEWSPAPER_ZOMBIE","IMP","LADDER_ZOMBIE"})
   assert(Translate(key,"native")=="native"&&Translate(std::string(key)+"_DESCRIPTION","native")=="native");
  assert(Translate("GOLD_SUNFLOWER_TROPHY","金色向日葵奖杯") == "金色向日葵奖杯");

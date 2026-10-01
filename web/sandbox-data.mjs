@@ -161,6 +161,7 @@ export const ORIGINAL_PLANTS = [
   [521,7,'双----------双发射手','每轮连射50发 · 单发1伤害'],
   [522,40,'加特林射手','每0.1秒1发 · 过热休息3.5秒'],
   [523,53,'小·坚果','800生命 · 冷却6秒'],
+  [524,26,'仙人的掌','5秒一掌 · 80伤害 · 20%暴击'],
 ].map(([id,base,name,note])=>({id,base,name,note}));
 export const nativeBase = id => ORIGINAL_PLANTS.find(p=>p.id===id)?.base ?? RETIRED_CHARACTERS.find(p=>p.id===id)?.base ?? RETIRED_PLANTS.find(p=>p.id===id)?.base ?? id;
 export const PLANTS = [...plantNames.map((name,id) => ORIGINAL_PLANTS.find(p=>p.base===id) ?? ({id,name,note:notes[id] ?? '免费 · 无冷却'})),...ORIGINAL_PLANTS.filter(p=>p.base>=48)];
