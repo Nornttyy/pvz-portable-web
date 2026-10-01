@@ -15,8 +15,22 @@
 #include <string_view>
 namespace AbstractRigVisuals {
 namespace {
-struct Pose {Reanimation* anim;const Plant* plant;std::array<int,10> state;int part;};
+struct Pose {Reanimation* anim;const Plant* plant;std::array<int,10> state;int part;ReanimatorTransform head;};
 std::vector<Pose> poses;
+void GiantImpPose(Scope& scope,Reanimation* a,int counter){
+ if(!a)return;
+ // Read the native head once, BEFORE installing our scoped transforms.
+ // Both replacement parts share that bone; no recursive pose sampling or
+ // independent jaw drift as the little body walks, eats, falls or turns.
+ ReanimatorTransform head;a->GetCurrentTransform(a->FindTrackIndex("anim_head1"),&head);
+ std::array<int,10> state{};state[0]=SandboxZombies::GiantImp;state[1]=counter;
+ poses.push_back({a,nullptr,state,0,head});
+ for(int i=0;i<a->mDefinition->mTracks.count;++i){
+  const std::string_view name=a->mDefinition->mTracks.tracks[i].mName;
+  if(name!="anim_head1"&&name!="anim_head2")continue;
+  auto* track=&a->mTrackInstances[i];scope.images.push_back({track,track->mImageOverride});track->mImageOverride=nullptr;
+ }
+}
 void ConePose(Scope& scope,Reanimation* a,int armor){
  if(!a)return; // Even with zero armor, the body remains made of cones.
  std::array<int,10> state{};state[0]=SandboxZombies::ConeWrap;state[1]=armor;poses.push_back({a,nullptr,state,0});
@@ -33,6 +47,11 @@ void Warp(ReanimatorTransform& t,float x,float y,float sx,float sy,float angle=0
  const float a=sx*std::cos(kx)*t.mScaleX,c=sy*std::sin(kx)*t.mScaleX,b=-sx*std::sin(ky)*t.mScaleY,d=sy*std::cos(ky)*t.mScaleY;
  t.mTransX=x+sx*(t.mTransX-x);t.mTransY=y+sy*(t.mTransY-y);t.mScaleX=std::hypot(a,c);t.mScaleY=std::hypot(b,d);t.mSkewX=std::atan2(c,a)*180/3.14159265f;t.mSkewY=std::atan2(-b,d)*180/3.14159265f;Rotate(t,x,y,angle);
 }
+void OffsetLocal(ReanimatorTransform& t,float x,float y){
+ const float kx=t.mSkewX*3.14159265f/180,ky=t.mSkewY*3.14159265f/180;
+ t.mTransX+=x*t.mScaleX*std::cos(kx)-y*t.mScaleY*std::sin(ky);
+ t.mTransY+=x*t.mScaleX*std::sin(kx)+y*t.mScaleY*std::cos(ky);
+}
 }
 void Scope::Add(Reanimation*,int,int){}
 Scope::Scope(const Plant* p):mark(poses.size()){
@@ -46,9 +65,11 @@ Scope::Scope(const Plant* p):mark(poses.size()){
 // Identity gates keep ordinary coneheads and unrelated cached previews intact.
 Scope::Scope(Zombie* z):mark(poses.size()){
  if(SandboxZombies::IsConeWrap(z))ConePose(*this,gLawnApp->ReanimationTryToGet(z->mBodyReanimID),z->mHelmHealth);
+ if(SandboxZombies::IsGiantImp(z))GiantImpPose(*this,gLawnApp->ReanimationTryToGet(z->mBodyReanimID),int(z->mZombiePhase)==SandboxZombies::JawSmash?z->mPhaseCounter:0);
 }
 Scope::Scope(Reanimation* a,int type):mark(poses.size()){
  if(type==SandboxZombies::ConeWrap)ConePose(*this,a,SandboxZombies::ConeCount*SandboxZombies::ConeHealth);
+ if(type==SandboxZombies::GiantImp)GiantImpPose(*this,a,0);
  if(a&&type==MemeCharacters::ShooterPea){std::array<int,10> state{};state[0]=type;poses.push_back({a,nullptr,state,1});}
  // Cards always show the standing pose; only live plants can tuck their head.
 }
@@ -56,6 +77,27 @@ Scope::~Scope(){for(auto& [track,image]:images)track->mImageOverride=image;for(a
 void Transform(Reanimation* a,int track,ReanimatorTransform& t){
  const Pose* p=nullptr;for(auto i=poses.rbegin();i!=poses.rend();++i)if(i->anim==a){p=&*i;break;}
  if(!p)return;
+ if(p->state[0]==SandboxZombies::GiantImp){
+  const std::string_view name=a->mDefinition->mTracks.tracks[track].mName;
+  if((name!="anim_head1"&&name!="anim_head2")||t.mFrame<0)return;
+  const bool jaw=name=="anim_head2";
+  auto* image=SandboxArt::NativeImage(jaw?"Zombie_gargantuar_jaw.png":"Zombie_gargantuar_head.png");if(!image)return;
+  const float alpha=t.mAlpha,frame=t.mFrame;t=p->head;t.mAlpha=alpha;t.mFrame=frame;t.mImage=image;
+  // Imp neck (24,34) == gargantuar neck (43,64), in native artwork pixels.
+  OffsetLocal(t,-19,-30);
+  const int counter=p->state[1];
+  const float strike=counter>SandboxZombies::JawImpact&&counter<=55?float(55-counter)/20:counter>0&&counter<=SandboxZombies::JawImpact?float(counter)/SandboxZombies::JawImpact:0;
+  const float windup=counter>55?float(SandboxZombies::JawTicks-counter)/35:counter>SandboxZombies::JawImpact?1-strike:0;
+  auto neck=t;OffsetLocal(neck,43,64);
+  Rotate(t,neck.mTransX,neck.mTransY,.09f*windup-.32f*strike);
+  if(jaw){
+   // Native giant jaw is 8.3,54.1 from the head. Swing around its right
+   // hinge, not its image centre; this keeps the cheek connection intact.
+   OffsetLocal(t,8.3f,54.1f);auto hinge=t;OffsetLocal(hinge,34,4);
+   Rotate(t,hinge.mTransX,hinge.mTransY,-.15f*windup-.85f*strike);
+  }
+  return;
+ }
  if(p->state[0]==SandboxZombies::ConeWrap){
   const int part=ConeBodyRules::Index(a->mDefinition->mTracks.tracks[track].mName);
   if(part<0){t.mAlpha=0;return;}

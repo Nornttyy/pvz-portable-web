@@ -626,6 +626,8 @@ bool AlmanacDialog::ZombieHasDescription(ZombieType theZombieType)
 
 void AlmanacDialog::GetZombiePosition(ZombieType theZombieType, int& x, int& y)
 {
+	if (int(theZombieType) == SandboxZombies::ConeWrap) {x=22;y=486;return;}
+	if (int(theZombieType) == SandboxZombies::GiantImp) {x=107;y=486;return;}
 	if (int(theZombieType) == SandboxZombies::Louis) {x=277;y=486;return;} // Existing free last-row cell, beside the boss.
 	if (int(theZombieType) == SandboxZombies::Runner) {x=362;y=486;return;}
 	if (theZombieType == ZombieType::ZOMBIE_BOSS)

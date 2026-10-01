@@ -66,6 +66,13 @@ void Draw(Board* b,Sexy::Graphics*){
  if(Visible(b)&&!fontsReady){SandboxRepairFonts();fontsReady=true;}
  // No second tray or floating menu: native cards now own every planting action.
 }
+int PickWaveZombie(Board* b,int base,int row,int wave){
+ // Select before native initialization so the new unit gets a real imp rig.
+ // A giant's throw requests base 24 directly, so it can never enter here.
+ if(!RosterEnabled()||!b||!SandboxZombies::GiantImpWave(b->mLevel,base,wave)||b->IsPoolSquare(0,row))return base;
+ for(auto* z:b->mZombies)if(SandboxZombies::IsGiantImp(z)&&z->mFromWave==wave)return base;
+ return SandboxZombies::GiantImp;
+}
 std::string_view Translate(std::string_view key,std::string_view original){
  const auto* tucking=MemeCharacters::Find(MemeCharacters::TuckingSunflower);
  if(key=="AWKWARD_SUNFLOWER")return tucking->name; // Legacy ID 53, never a second selectable card.

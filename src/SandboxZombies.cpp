@@ -35,6 +35,7 @@ int Type(const Zombie* z){if(!z)return -1;const auto it=identities.find(z);retur
 bool IsLouis(const Zombie* z){return z&&Type(z)==Louis;}
 bool IsRunner(const Zombie* z){return z&&Type(z)==Runner;}
 bool IsConeWrap(const Zombie* z){return z&&Type(z)==ConeWrap;}
+bool IsGiantImp(const Zombie* z){return z&&Type(z)==GiantImp;}
 bool IsRunning(const Zombie* z){return IsRunner(z)&&!z->mDead&&z->mHasHead&&int(z->mZombiePhase)>=RunIn&&int(z->mZombiePhase)<=RunOut;}
 void Reset(){identities.clear();}
 void Forget(Zombie* z){identities.erase(z);}
@@ -122,7 +123,7 @@ void DrawPortrait(Sexy::Graphics* g,int x,int y,int w,int h,int id){
  auto& portrait=portraits[Find(id)-Definitions.data()];
  if(!portrait){
   portrait=gLawnApp->mReanimatorCache->MakeBlankMemoryImage(200,210);Sexy::Graphics canvas(portrait.get());canvas.SetLinearBlend(true);
-  Reanimation anim;anim.ReanimationInitializeType(40,40,REANIM_ZOMBIE);anim.SetFramesForLayer(id==Runner?"anim_walk2":"anim_idle");Zombie::SetupReanimLayers(&anim,static_cast<ZombieType>(Base(id)));
+  Reanimation anim;anim.ReanimationInitializeType(40,40,id==GiantImp?REANIM_IMP:REANIM_ZOMBIE);anim.SetFramesForLayer(id==GiantImp?"anim_walk":id==Runner?"anim_walk2":"anim_idle");Zombie::SetupReanimLayers(&anim,static_cast<ZombieType>(Base(id)));
   if(id==Louis)for(const char* prefix:{"anim_head","anim_hair","anim_tongue"})anim.AssignRenderGroupToPrefix(prefix,RENDER_GROUP_HIDDEN);
   if(id==Runner){anim.mAnimTime=0.35f;anim.mOverlayMatrix.m01=0.13f;anim.mOverlayMatrix.m02-=15.6f;}
   AbstractRigVisuals::Scope pose(&anim,id);anim.Draw(&canvas);
@@ -143,4 +144,5 @@ void ForgetPlant(Plant*){}
 bool AttackSlowed(const Plant*){return false;}
 void RefreshDamageArt(Zombie* z){if(IsLouis(z))z->SetupReanimForLostHead();}
 Sexy::Image* DetachedArmor(const Zombie*){return nullptr;}
+Sexy::Image* DetachedHead(const Zombie* z){return IsGiantImp(z)?SandboxArt::NativeImage("Zombie_gargantuar_head.png"):nullptr;}
 }

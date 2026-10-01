@@ -25,6 +25,7 @@ bool MouseDown(Board* board,int x,int y,int clicks);
 bool Cancel();
 void OnPlanted(Plant* plant);
 void OnZombieSpawned(Zombie* zombie);
+int PickWaveZombie(Board* board,int base,int row,int wave);
 Save Capture(Board* board);
 void Load(const Save& save);
 void LoadShots(const std::vector<SavedShot>& shots);

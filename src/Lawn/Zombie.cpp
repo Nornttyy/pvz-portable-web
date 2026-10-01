@@ -2292,6 +2292,32 @@ void Zombie::UpdateZombieGargantuar()
 
 void Zombie::UpdateZombieImp()
 {
+	if (SandboxZombies::IsGiantImp(this) && int(mZombiePhase) == SandboxZombies::JawSmash)
+	{
+		// Native phase counter is saved and pauses under ice/butter. UpdateActions
+		// only reaches this function while mobile, preventing frozen impacts.
+		if (!mHasHead || mMindControlled)
+		{
+			mZombiePhase = ZombiePhase::PHASE_ZOMBIE_NORMAL;
+			mPhaseCounter = 0;
+			StopEating();
+			return;
+		}
+		if (mPhaseCounter == SandboxZombies::JawImpact)
+		{
+			// Recheck native melee targeting at impact; never hit removed plants,
+			// another lane, tucked sunflowers or everything stacked in the cell.
+			if (Plant* target = FindPlantTarget(ZombieAttackType::ATTACKTYPE_CHEW))
+				EatPlant(target);
+			mApp->PlayFoley(FoleyType::FOLEY_THUMP);
+		}
+		if (mPhaseCounter == 0)
+		{
+			mZombiePhase = ZombiePhase::PHASE_ZOMBIE_NORMAL;
+			StopEating();
+		}
+		return;
+	}
 	if (mZombiePhase == ZombiePhase::PHASE_IMP_GETTING_THROWN)
 	{
 		mVelZ -= THOWN_ZOMBIE_GRAVITY;
@@ -3614,7 +3640,7 @@ void Zombie::DropHead(unsigned int theDamageFlags)
 		}
 		else if (mZombieType == ZombieType::ZOMBIE_IMP)
 		{
-			aParticle->OverrideImage(nullptr, IMAGE_ZOMBIEIMPHEAD);
+			aParticle->OverrideImage(nullptr, SandboxZombies::IsGiantImp(this) ? SandboxZombies::DetachedHead(this) : IMAGE_ZOMBIEIMPHEAD);
 		}
 		else if (mZombieType == ZombieType::ZOMBIE_FOOTBALL)
 		{
@@ -6850,6 +6876,7 @@ void Zombie::StopEating()
 void Zombie::CheckIfPreyCaught()
 {
 	if (SandboxZombies::IsRunner(this)) { StopEating(); return; }
+	if (SandboxZombies::IsGiantImp(this) && int(mZombiePhase) == SandboxZombies::JawSmash) return;
 	if (SandboxZombies::IsRetreating(this) || SandboxZombies::IsFeigning(this) || SandboxZombies::IsResting(this)) { StopEating(); return; }
 	if (mZombieType == ZombieType::ZOMBIE_BUNGEE ||
 		mZombieType == ZombieType::ZOMBIE_GARGANTUAR ||
@@ -7118,7 +7145,17 @@ void Zombie::EatPlant(Plant* thePlant)
 		return;
 	}
 
-	if (mChilledCounter > 0 && mZombieAge % 2 == 1)
+	if (SandboxZombies::IsGiantImp(this))
+	{
+		if (int(mZombiePhase) != SandboxZombies::JawSmash)
+		{
+			mZombiePhase = static_cast<ZombiePhase>(SandboxZombies::JawSmash);
+			mPhaseCounter = SandboxZombies::JawTicks;
+			return;
+		}
+		if (mPhaseCounter != SandboxZombies::JawImpact) return;
+	}
+	else if (mChilledCounter > 0 && mZombieAge % 2 == 1)
 		return;
 
 	if (mApp->IsIZombieLevel() && thePlant->mSeedType == SeedType::SEED_SUNFLOWER)
@@ -7131,7 +7168,7 @@ void Zombie::EatPlant(Plant* thePlant)
 		}
 	}
 
-	thePlant->mPlantHealth -= DAMAGE_PER_EAT;
+	thePlant->mPlantHealth -= SandboxZombies::IsGiantImp(this) ? thePlant->mPlantHealth : DAMAGE_PER_EAT;
 	thePlant->mRecentlyEatenCountdown = 50;
 	if (mApp->IsIZombieLevel() && mJustGotShotCounter < -500)
 	{
@@ -8745,7 +8782,7 @@ void Zombie::ApplyBurn()
 	{
 		DieWithLoot();
 	}
-	else if (mZombieType == ZOMBIE_BUNGEE || mZombieType == ZOMBIE_YETI || Zombie::IsZombotany(mZombieType) || IsBobsledTeamWithSled() || IsFlying() || !mHasHead || SandboxZombies::IsConeWrap(this))
+	else if (mZombieType == ZOMBIE_BUNGEE || mZombieType == ZOMBIE_YETI || Zombie::IsZombotany(mZombieType) || IsBobsledTeamWithSled() || IsFlying() || !mHasHead || SandboxZombies::IsConeWrap(this) || SandboxZombies::IsGiantImp(this))
 	{
 		SetAnimRate(0.0f);
 		Reanimation* aHeadReanim = mApp->ReanimationTryToGet(mSpecialHeadReanimID);

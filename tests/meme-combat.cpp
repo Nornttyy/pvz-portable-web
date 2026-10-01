@@ -357,8 +357,17 @@ int main(){
   SandboxPlants::Forget(p);assert(SandboxPlants::RestorePower(p,saved)&&SandboxPlants::SavePower(p)==saved);
  }
  // Every formerly modified native zombie retains its armor, position and phase.
- static_assert(SandboxZombies::Definitions.size()==3&&SandboxZombies::Find(212)->base==0&&SandboxZombies::Find(213)->base==0&&SandboxZombies::Find(214)->base==2);
+ static_assert(SandboxZombies::Definitions.size()==4&&SandboxZombies::Find(212)->base==0&&SandboxZombies::Find(213)->base==0&&SandboxZombies::Find(214)->base==2&&SandboxZombies::Find(215)->base==24);
  for(int id=200;id<212;++id)assert(!SandboxZombies::Find(id));
+ {World w;auto* z=w.enemy(600,1,ZOMBIE_IMP);z->mBodyHealth=173;SandboxZombies::Assign(z,215);
+  assert(SandboxZombies::IsGiantImp(z)&&z->mBodyHealth==173&&SandboxZombies::Speed(z)==1);
+  z->mZombiePhase=SandboxZombies::JawSmash;z->mPhaseCounter=35;z->mIsEating=true;z->mIceTrapCounter=240;
+  SandboxZombies::Forget(z);assert(SandboxZombies::Type(z)==24);assert(SandboxZombies::Restore(z,215));
+  assert(z->mZombiePhase==SandboxZombies::JawSmash&&z->mPhaseCounter==35&&z->mIsEating&&z->mIceTrapCounter==240&&z->mBodyHealth==173);
+  assert(!SandboxZombies::Restore(w.enemy(),215));auto* thrown=w.enemy(600,1,ZOMBIE_IMP);assert(SandboxZombies::Type(thrown)==24&&!SandboxZombies::IsGiantImp(thrown));
+  z->mHasHead=false;SandboxZombies::Forget(z);assert(SandboxZombies::Restore(z,215)&&!z->mHasHead);
+  z->mDead=true;assert(!SandboxZombies::Restore(z,215));
+ }
  for(int level:{1,2,3,8,20,50})for(int base:{0,1,2,4,23})for(int wave=-3;wave<30;++wave){
   assert(SandboxZombies::LouisWave(level,base,wave)==(level>=3&&base==0&&wave>=0&&wave%3==0));
   assert(SandboxZombies::RunnerWave(level,base,wave)==(level>=6&&base==0&&wave>=0&&wave%4==1));

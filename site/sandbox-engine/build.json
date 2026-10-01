@@ -2,7 +2,18 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Seven abstract plants (500,501,519,520,521,522,523), Louis XVI (212), Runaway Zombie (213), and Cone Wrap (214). Small Nut is an independent passive defender in adventure and the unified sandbox catalogue. Both extra cards fit inside native chooser and almanac grids. Save-version migration preserves legacy sunflowers and shooter cards; other mechanics and campaign progress are unchanged.",
+  "mode": "Seven abstract plants (500,501,519,520,521,522,523) and four independent zombies (212,213,214,215). Giant Imp uses the native imp body with an articulated gargantuar head/jaw, one-hit melee and independent adventure land waves from 3-2. Giant-carried/thrown imps remain native. Both catalogues and all almanac cards fit the native layout; existing progression and saves are preserved.",
+  "giantImp": {
+    "id": 215,
+    "nativeBase": 24,
+    "adventureUnlock": 22,
+    "bodyHealth": 270,
+    "attackTicks": 90,
+    "impactAtRemainingTicks": 35,
+    "art": "Native imp rig and body; native giant head and independent jaw share one neck anchor and hinged jaw strike. Scoped transforms preserve ordinary imps, giant-carried imps, previews and death art.",
+    "spawn": "First eligible ordinary land-lane entry in waves 2,6,10,...; never converts native or thrown imps.",
+    "attack": "Kills the current native melee target at impact, with a visible windup/recovery and normal freeze, targeting and plant-interaction gates. No area kill, extra armor, throwing or knockback."
+  },
   "smallNut": {
     "id": 523,
     "nativeSlot": 53,
@@ -60,12 +71,12 @@
     {
       "name": "pvz-portable.js",
       "size": 278906,
-      "sha256": "28fe9ccd881054aff9ab5c188d2079f26455802843847e306f14b25ed1910415"
+      "sha256": "e2ea000dfc7c7704138c9b9740029bad4af9252a773d4639c3dff5674d2677af"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7583987,
-      "sha256": "6ff58505c9b0713901f2d8abad8af523219752ffaa79cb6415450e80d34a7759"
+      "size": 7589652,
+      "sha256": "b11424a7a1de0055cafb340ee8bc9ede5f6227f2edbf3da1c794871b6563f899"
     }
   ]
 }

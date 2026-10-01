@@ -15,6 +15,36 @@
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
+ // Giant head/jaw share the imp's neck. All transforms and native image
+ // overrides remain local to the new identity, including previews/death.
+ {SandboxZombies::Reset();Board w;auto* z=w.AddZombieInRow(ZOMBIE_IMP,1,-1);SandboxZombies::Assign(z,215);
+  Reanimation body;Track tracks[]={{"anim_head1"},{"anim_head2"},{"Zombie_imp_body1"}};TrackInstance instances[3];body.def.mTracks={3,tracks};body.mTrackInstances=instances;
+  auto* original=SandboxArt::NativeImage("Zombie_imp_head.png");for(auto& i:instances)i.mImageOverride=original;
+  body.pose.mTransX=34.3f;body.pose.mTransY=41.9f;body.pose.mSkewX=body.pose.mSkewY=12.6f;body.pose.mScaleX=body.pose.mScaleY=.999f;
+  app.reanims[91]=&body;z->mBodyReanimID=91;
+  for(int counter:{0,90,75,56,55,45,36,35,20,1}){
+   z->mZombiePhase=counter?SandboxZombies::JawSmash:PHASE_ZOMBIE_NORMAL;z->mPhaseCounter=counter;
+   {AbstractRigVisuals::Scope scope(z);auto head=body.pose,jaw=body.pose,torso=body.pose;
+    AbstractRigVisuals::Transform(&body,0,head);AbstractRigVisuals::Transform(&body,1,jaw);AbstractRigVisuals::Transform(&body,2,torso);
+    assert(head.mImage==SandboxArt::NativeImage("Zombie_gargantuar_head.png")&&jaw.mImage==SandboxArt::NativeImage("Zombie_gargantuar_jaw.png"));
+    assert(instances[0].mImageOverride==nullptr&&instances[1].mImageOverride==nullptr&&instances[2].mImageOverride==original);
+    near(torso.mTransX,body.pose.mTransX);near(torso.mScaleX,body.pose.mScaleX);
+    const float hk=head.mSkewX*3.14159265f/180,jk=jaw.mSkewX*3.14159265f/180;
+    const float nk=body.pose.mSkewX*3.14159265f/180;
+    near(head.mTransX+43*head.mScaleX*std::cos(hk)-64*head.mScaleY*std::sin(hk),body.pose.mTransX+24*body.pose.mScaleX*std::cos(nk)-34*body.pose.mScaleY*std::sin(nk));
+    near(head.mTransY+43*head.mScaleX*std::sin(hk)+64*head.mScaleY*std::cos(hk),body.pose.mTransY+24*body.pose.mScaleX*std::sin(nk)+34*body.pose.mScaleY*std::cos(nk));
+    // Hinge (34,4) on the jaw must stay at (42.3,58.1) on the head,
+    // regardless of windup, strike, walking rotation or recovery.
+    near(jaw.mTransX+34*jaw.mScaleX*std::cos(jk)-4*jaw.mScaleY*std::sin(jk),head.mTransX+42.3f*head.mScaleX*std::cos(hk)-58.1f*head.mScaleY*std::sin(hk));
+    near(jaw.mTransY+34*jaw.mScaleX*std::sin(jk)+4*jaw.mScaleY*std::cos(jk),head.mTransY+42.3f*head.mScaleX*std::sin(hk)+58.1f*head.mScaleY*std::cos(hk));
+    auto hidden=body.pose;hidden.mFrame=-1;AbstractRigVisuals::Transform(&body,0,hidden);assert(hidden.mFrame==-1&&hidden.mImage==body.pose.mImage);
+   }
+   for(auto& i:instances)assert(i.mImageOverride==original);
+  }
+  {AbstractRigVisuals::Scope preview(&body,215);auto head=body.pose;AbstractRigVisuals::Transform(&body,0,head);assert(head.mImage==SandboxArt::NativeImage("Zombie_gargantuar_head.png"));}
+  SandboxZombies::Forget(z);{AbstractRigVisuals::Scope ordinary(z);auto head=body.pose;AbstractRigVisuals::Transform(&body,0,head);assert(head.mImage==body.pose.mImage);}
+  app.reanims.clear();
+ }
  // Exactly twenty cones, never flesh/clothing/duck art, even at zero armor.
  // Hidden hair/tongue bones are visible only inside this character's scope.
  {SandboxZombies::Reset();Board w;auto* z=w.AddZombieInRow(static_cast<ZombieType>(2),2,-1);SandboxZombies::Assign(z,214);

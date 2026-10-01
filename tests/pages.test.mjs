@@ -6,6 +6,7 @@ import './automatic-resources.test.mjs';
 import './font-repair.test.mjs';
 import './expansion.test.mjs';
 import './adventure-replacements.test.mjs';
+import './giant-imp.test.mjs';
 import './sandbox-placement.test.mjs';
 import './sun-hover.test.mjs';
 import './sun-production.test.mjs';

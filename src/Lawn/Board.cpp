@@ -2631,9 +2631,12 @@ Zombie* Board::AddZombieInRow(ZombieType theZombieType, int theRow, int theFromW
 	}
 
 	bool aVariant = !Rand(5);
+	const int aWaveIdentity = MemeAdventure::PickWaveZombie(this, int(theZombieType), theRow, theFromWave);
+	theZombieType = static_cast<ZombieType>(SandboxZombies::Base(aWaveIdentity));
 	Zombie* aZombie = mZombies.DataArrayAlloc();
 	aZombie->ZombieInitialize(theRow, theZombieType, aVariant, nullptr, theFromWave);
-	MemeAdventure::OnZombieSpawned(aZombie);
+	if (SandboxZombies::Find(aWaveIdentity)) SandboxZombies::Assign(aZombie, aWaveIdentity);
+	else MemeAdventure::OnZombieSpawned(aZombie);
 	if (theZombieType == ZombieType::ZOMBIE_BOBSLED && aZombie->IsOnBoard())
 	{
 		for (int _i = 0; _i < 3; _i++)
