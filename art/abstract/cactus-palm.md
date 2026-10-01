@@ -9,8 +9,10 @@ alpha pixels are embedded in the shipped game binary.
 - Runtime raster: `cactus-palm-native-v1.png` (64×44, genuine alpha)
 - Reproducible alpha trim/resample: `scripts/register-cactus-palm.swift`
 - Embedded pixels: `src/CactusPalmPixels.h`
-- Registration: native `Cactus_lips` bone, wrist underneath the lip rim;
-  projectile uses the same transformed palm centre, including raised/roof poses.
+- Registration: opaque wrist pixel `(6,29)` sits at `(5,13.5)` inside the native
+  `Cactus_lips` opening. Draw after the native body/tube/rim, so its dark fill
+  cannot cut off the wrist. No replacement/deletion of `Cactus_mouth`.
+  Preview and projectile use the same transform, including raised/roof poses.
 
 ## Final prompt
 

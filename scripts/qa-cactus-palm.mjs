@@ -32,6 +32,12 @@ try{
   await wait(()=>[299,300].includes(Module._pvz_projectile_data(0,0)));await api(4,1);
   results.firstShots=await page.evaluate(()=>Array.from({length:5},(_,i)=>Array.from({length:9},(_,f)=>Module._pvz_projectile_data(i,f))));await snap('palms-low-and-raised');
   assert.ok(results.firstShots.filter(p=>p[0]>0).every(p=>[299,300].includes(p[0])&&p[8]===8));
+  if(process.env.PVZ_QA_ATTACHMENT_PROOF){
+   for(let frame=0;frame<6;++frame){
+    for(let tick=0;tick<8;++tick){await api(13);await page.waitForTimeout(35);}
+    await snap('palm-mouth-recoil-'+frame);
+   }
+  }
   results.impacts=[];await api(4,0);let previous=await zombies();
   const deadline=Date.now()+25000;
   while(Date.now()<deadline&&results.impacts.length<16){

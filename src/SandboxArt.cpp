@@ -20,6 +20,25 @@ Sexy::Image* Palm(){
   std::copy(Pixels,Pixels+Width*Height,image->GetBits());image->BitsChanged();
  }return image.get();
 }
+bool PalmMatrix(Reanimation* anim,Sexy::SexyTransform2D& matrix){
+ if(!anim||!anim->TrackExists("Cactus_lips"))return false;
+ const int track=anim->FindTrackIndex("Cactus_lips");ReanimatorTransform pose;anim->GetCurrentTransform(track,&pose);
+ if(pose.mFrame<0||pose.mAlpha<=0)return false;
+ anim->GetTrackMatrix(track,matrix);
+ // Native lip opening (5,13.5), actual opaque wrist (6,29). Register skin,
+ // not transparent image bounds, while leaving the green tube/rim untouched.
+ const float sx=40.f/64,sy=27.5f/44,dx=5-17*.5f+(64*.5f-6)*sx,dy=(44*.5f-29)*sy;
+ matrix.m02+=matrix.m00*dx+matrix.m01*dy;matrix.m12+=matrix.m10*dx+matrix.m11*dy;
+ matrix.m00*=sx;matrix.m10*=sx;matrix.m01*=sy;matrix.m11*=sy;
+ return std::isfinite(matrix.m02)&&std::isfinite(matrix.m12);
+}
+void DrawPalm(Sexy::Graphics* g,Reanimation* anim){
+ Sexy::SexyTransform2D m;if(!PalmMatrix(anim,m))return;auto* image=Palm();
+ m.m02+=g->mTransX;m.m12+=g->mTransY;
+ // Draw the wrist over the dark opening, not behind the opaque entire rim
+ // image. The native body/tube/lips have already been drawn unchanged.
+ PvzpBltMatrix(g,image,m,g->mClipRect,Sexy::Color(255,255,255),g->mDrawMode,Sexy::Rect(0,0,image->mWidth,image->mHeight));
+}
 Sexy::Image* Phone(int damage){
  damage=std::clamp(damage,0,2);static std::unique_ptr<Sexy::MemoryImage> images[3];auto& im=images[damage];if(im)return im.get();
  using namespace AbstractPhonePixels;im=std::make_unique<Sexy::MemoryImage>();im->Create(Width,Height);auto* out=im->GetBits();std::copy(Pixels,Pixels+Width*Height,out);

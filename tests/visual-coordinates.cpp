@@ -15,22 +15,29 @@
 LawnApp app;LawnApp* gLawnApp=&app;bool gSandboxEnabled=true;
 void near(float a,float b){assert(std::abs(a-b)<0.01f);}
 int main(){
- // Generated palm is attached by its wrist, underneath the native lip rim.
- // It follows idle/tall/recoil transforms without inheriting tube stretching.
+ // Opaque wrist pixels sit INSIDE the opening, on top of its dark fill.
+ // Original green connector/rim stay present throughout idle/rise/recoil.
  {SandboxPlants::Reset();Board w;auto* plant=w.plant(2,2);plant->mSeedType=static_cast<SeedType>(26);SandboxPlants::Assign(plant,524);
   Reanimation body;Track tracks[]={{"Cactus_mouth"},{"Cactus_lips"},{"anim_face"}};TrackInstance instances[3];body.def.mTracks={3,tracks};body.mTrackInstances=instances;
   body.track="Cactus_lips";app.reanims[92]=&body;plant->mBodyReanimID=92;
-  for(float y:{19.5f,-54.5f,25.f})for(float angle:{0.f,10.f,-12.f}){
-   body.pose.mTransX=50.4f;body.pose.mTransY=y;body.pose.mScaleX=.8f;body.pose.mScaleY=.84f;body.pose.mSkewX=body.pose.mSkewY=angle;
-   {AbstractRigVisuals::Scope scope(plant);auto palm=body.pose;palm.mScaleX=3.33f;auto lips=body.pose;
-    AbstractRigVisuals::Transform(&body,0,palm);AbstractRigVisuals::Transform(&body,1,lips);
-    assert(palm.mImage==SandboxArt::Palm());near(palm.mScaleX*palm.mImage->mWidth,32.f);near(palm.mScaleY*palm.mImage->mHeight,.84f*27.5f);
-    const float a=angle*3.14159265f/180,dx=4,dy=13.5f-27.5f*.65f;
-    near(palm.mTransX,body.pose.mTransX+dx*.8f*std::cos(a)-dy*.84f*std::sin(a));
-    near(palm.mTransY,y+dx*.8f*std::sin(a)+dy*.84f*std::cos(a));near(lips.mTransY,y);near(lips.mScaleX,.8f);
-   }
-   {AbstractRigVisuals::Scope preview(&body,524);auto palm=body.pose;AbstractRigVisuals::Transform(&body,0,palm);assert(palm.mImage==SandboxArt::Palm());}
+  auto* palmImage=dynamic_cast<Sexy::MemoryImage*>(SandboxArt::Palm());assert(palmImage&&(palmImage->GetBits()[29*64+6]>>24)>240);
+  for(float y:{19.5f,-54.5f,25.f})for(float angle:{0.f,10.f,-12.f})for(float offset:{0.f,224.f}){
+   const float a=angle*3.14159265f/180;
+   body.matrix={.8f*std::cos(a),-.84f*std::sin(a),50.4f+offset,.8f*std::sin(a),.84f*std::cos(a),y};
+   Sexy::SexyTransform2D palm;assert(SandboxArt::PalmMatrix(&body,palm));
+   const float mouthX=body.matrix.m02+body.matrix.m00*(5-17*.5f),mouthY=body.matrix.m12+body.matrix.m10*(5-17*.5f);
+   near(palm.m02+palm.m00*(6-32)+palm.m01*(29-22),mouthX);
+   near(palm.m12+palm.m10*(6-32)+palm.m11*(29-22),mouthY);
+   near(std::hypot(palm.m00,palm.m10)*64,32);near(std::hypot(palm.m01,palm.m11)*44,.84f*27.5f);
+   {AbstractRigVisuals::Scope scope(plant);for(int track=0;track<3;++track){auto part=body.pose;
+    AbstractRigVisuals::Transform(&body,track,part);assert(part.mImage==body.pose.mImage);near(part.mTransX,body.pose.mTransX);near(part.mScaleX,body.pose.mScaleX);
+   }}
+   Sexy::Graphics g(nullptr);g.mTransX=71;g.mTransY=93;testBlits.clear();assert(SandboxPlants::DrawBody(&g,plant,0,0));assert(testBlits.size()==1);
+   near(testBlits.back().matrix.m02,palm.m02+71);near(testBlits.back().matrix.m12,palm.m12+93);
+   auto* emitted=w.AddProjectile(0,0,0,2,PROJECTILE_SPIKE);emitted->mPosZ=-10;MemeCharacters::OnFired(plant,emitted);
+   near(emitted->mPosX+12,plant->mX+palm.m02);near(emitted->mPosY+emitted->mPosZ+12,plant->mY+palm.m12);
   }
+  Sexy::SexyTransform2D hidden;body.pose.mFrame=-1;assert(!SandboxArt::PalmMatrix(&body,hidden));body.pose.mFrame=0;
   auto* shot=w.AddProjectile(352.7f,221.3f,0,2,PROJECTILE_SPIKE);shot->mX=352;shot->mY=221;
   for(int style:{299,300}){
    assert(MemeCharacters::RestoreShotStyle(shot,style));Sexy::Graphics g(nullptr);g.mTransX=576;g.mTransY=221;

@@ -14,6 +14,8 @@ Sexy::Image* Image(const char*,const char*){return nullptr;}
 Sexy::Image* NativeImage(const char*){return nullptr;}
 Sexy::Image* Phone(int){return nullptr;}
 Sexy::Image* Palm(){return nullptr;}
+bool PalmMatrix(Reanimation*,Sexy::SexyTransform2D&){return false;}
+void DrawPalm(Sexy::Graphics*,Reanimation*){}
 Sexy::Image* PhoneHands(const char*){return nullptr;}
 Sexy::Image* WarmNative(const char*,int){return nullptr;}
 Sexy::Image* PowerNative(const char*,int,int){return nullptr;}

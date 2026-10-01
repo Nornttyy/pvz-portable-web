@@ -17,11 +17,6 @@ namespace AbstractRigVisuals {
 namespace {
 struct Pose {Reanimation* anim;const Plant* plant;std::array<int,10> state;int part;ReanimatorTransform head;};
 std::vector<Pose> poses;
-void PalmPose(Reanimation* a,const Plant* plant=nullptr){
- if(!a||!a->TrackExists("Cactus_lips"))return;
- ReanimatorTransform lips;a->GetCurrentTransform(a->FindTrackIndex("Cactus_lips"),&lips);
- std::array<int,10> state{};state[0]=MemeCharacters::CactusPalm;poses.push_back({a,plant,state,0,lips});
-}
 void GiantImpPose(Scope& scope,Reanimation* a,int counter){
  if(!a)return;
  // Read the native head once, BEFORE installing our scoped transforms.
@@ -60,7 +55,6 @@ void OffsetLocal(ReanimatorTransform& t,float x,float y){
 }
 void Scope::Add(Reanimation*,int,int){}
 Scope::Scope(const Plant* p):mark(poses.size()){
- if(MemeCharacters::Type(p)==MemeCharacters::CactusPalm){PalmPose(gLawnApp->ReanimationTryToGet(p->mBodyReanimID),p);return;}
  if((MemeCharacters::Type(p)!=500&&MemeCharacters::Type(p)!=MemeCharacters::ShooterPea&&MemeCharacters::Type(p)!=MemeCharacters::TuckingSunflower)||p->mSquished)return;
  const auto state=MemeCharacters::Save(p);int part=0;
  for(auto id:{p->mBodyReanimID,p->mHeadReanimID,p->mHeadReanimID2,p->mHeadReanimID3,p->mBlinkReanimID}){
@@ -74,7 +68,6 @@ Scope::Scope(Zombie* z):mark(poses.size()){
  if(SandboxZombies::IsGiantImp(z))GiantImpPose(*this,gLawnApp->ReanimationTryToGet(z->mBodyReanimID),int(z->mZombiePhase)==SandboxZombies::JawSmash?z->mPhaseCounter:0);
 }
 Scope::Scope(Reanimation* a,int type):mark(poses.size()){
- if(type==MemeCharacters::CactusPalm)PalmPose(a);
  if(type==SandboxZombies::ConeWrap)ConePose(*this,a,SandboxZombies::ConeCount*SandboxZombies::ConeHealth);
  if(type==SandboxZombies::GiantImp)GiantImpPose(*this,a,0);
  if(a&&type==MemeCharacters::ShooterPea){std::array<int,10> state{};state[0]=type;poses.push_back({a,nullptr,state,1});}
@@ -84,15 +77,6 @@ Scope::~Scope(){for(auto& [track,image]:images)track->mImageOverride=image;for(a
 void Transform(Reanimation* a,int track,ReanimatorTransform& t){
  const Pose* p=nullptr;for(auto i=poses.rbegin();i!=poses.rend();++i)if(i->anim==a){p=&*i;break;}
  if(!p)return;
- if(p->state[0]==MemeCharacters::CactusPalm){
-  if(std::string_view(a->mDefinition->mTracks.tracks[track].mName)!="Cactus_mouth"||t.mFrame<0)return;
-  auto* image=SandboxArt::Palm();if(!image)return;
-  // Wrist lives behind the native lip rim. Use that bone, NOT the native
-  // tube's extreme stretch during recoil, so fingers never stretch/drift.
-  const float alpha=t.mAlpha;t=p->head;t.mAlpha=alpha;t.mImage=image;
-  OffsetLocal(t,4,13.5f-27.5f*.65f);t.mScaleX*=40.f/image->mWidth;t.mScaleY*=27.5f/image->mHeight;
-  return;
- }
  if(p->state[0]==SandboxZombies::GiantImp){
   const std::string_view name=a->mDefinition->mTracks.tracks[track].mName;
   if((name!="anim_head1"&&name!="anim_head2")||t.mFrame<0)return;

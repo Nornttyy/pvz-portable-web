@@ -195,7 +195,7 @@ void DrawPalmPreview(Sexy::Graphics* g,float x,float y,bool imitater){
   cached=gLawnApp->mReanimatorCache->MakeBlankMemoryImage(120,120);Sexy::Graphics canvas(cached.get());canvas.SetLinearBlend(true);
   Reanimation anim;anim.ReanimationInitializeType(20,20,REANIM_CACTUS);anim.SetFramesForLayer("anim_idle");
   if(imitater)gLawnApp->mReanimatorCache->UpdateReanimationForVariation(&anim,VARIATION_IMITATER);
-  AbstractRigVisuals::Scope pose(&anim,MemeCharacters::CactusPalm);anim.Draw(&canvas);
+  anim.Draw(&canvas);SandboxArt::DrawPalm(&canvas,&anim);
  }
  PvzpDrawImageScaledF(g,cached.get(),x-20*g->mScaleX,y-20*g->mScaleY,g->mScaleX,g->mScaleY);
 }
@@ -215,6 +215,10 @@ void DrawTuckingPreview(Sexy::Graphics* g,float x,float y,bool imitater){
 }
 bool DrawBody(Sexy::Graphics* g,const Plant* p,float,float,bool squished){
  AbstractRigVisuals::Scope allPoses(p);
+ if(MemeCharacters::Type(p)==MemeCharacters::CactusPalm&&!squished){
+  auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID);if(!body)return false;
+  body->Draw(g);SandboxArt::DrawPalm(g,body);return true;
+ }
  if(MemeCharacters::Type(p)==501&&MemeCharacters::Data(p,0)==1&&!squished){
   auto* body=gLawnApp->ReanimationTryToGet(p->mBodyReanimID);if(!body)return false;
   body->Draw(g);NutBrows(g,body,std::min(255,MemeCharacters::Save(p)[7]*32));return true;

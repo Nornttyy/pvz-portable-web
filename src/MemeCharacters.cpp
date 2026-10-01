@@ -235,9 +235,9 @@ void Card(Sexy::Graphics* g,int x,int y,int id){const auto* d=Find(id);if(!d)ret
 void OnFired(Plant* p,Projectile* shot){
  if(Type(p)==CactusPalm){
   shotStyles[shot]=Sexy::Rand(100)<20?CriticalPalmProjectile:PalmProjectile;
-  AbstractRigVisuals::Scope pose(p);auto* image=SandboxArt::Palm();float x,y;
-  if(image&&SandboxArt::TrackPoint(gLawnApp->ReanimationTryToGet(p->mBodyReanimID),"Cactus_mouth",image->mWidth,image->mHeight,image->mWidth*.5f,image->mHeight*.5f,x,y)){
-   shot->mPosX=p->mX+x-12;shot->mPosY=p->mY+y-12-shot->mPosZ;
+  Sexy::SexyTransform2D palm;
+  if(SandboxArt::PalmMatrix(gLawnApp->ReanimationTryToGet(p->mBodyReanimID),palm)){
+   shot->mPosX=p->mX+palm.m02-12;shot->mPosY=p->mY+palm.m12-12-shot->mPosZ;
    shot->mX=int(shot->mPosX);shot->mY=int(shot->mPosY+shot->mPosZ);
   }
   return;

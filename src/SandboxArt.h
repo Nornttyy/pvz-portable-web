@@ -1,5 +1,5 @@
 #pragma once
-namespace Sexy { class Image;class MemoryImage;class Graphics; }
+namespace Sexy { class Image;class MemoryImage;class Graphics;class SexyTransform2D; }
 class Reanimation;
 namespace SandboxArt {
 Sexy::Image* Image(const char* family,const char* part);
@@ -9,6 +9,10 @@ Sexy::Image* PowerNative(const char* file,int level,int power);
 Sexy::Image* WarmNative(const char* file,int level);
 Sexy::Image* Phone(int damage=0);
 Sexy::Image* Palm();
+// Shared by attachment, card preview and projectile launch: opaque wrist
+// point (6,29) of the 64x44 image sits inside the native 17x27 lip opening.
+bool PalmMatrix(Reanimation*,Sexy::SexyTransform2D&);
+void DrawPalm(Sexy::Graphics*,Reanimation*);
 Sexy::Image* PhoneHands(const char* file);
 void DrawFit(Sexy::Graphics* g,Sexy::MemoryImage* image,int x,int y,int width,int height,float scale=1.0f);
 // Coordinates are relative to the caller's Graphics frame, exactly once.
