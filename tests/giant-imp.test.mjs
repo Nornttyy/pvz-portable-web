@@ -48,7 +48,7 @@ struct AlmanacDialog{static void GetZombiePosition(ZombieType,int&,int&);};
 ${position}
 int main(){std::set<std::pair<int,int>> cells;
  for(int id=0;id<26;++id){int x,y;AlmanacDialog::GetZombiePosition(ZombieType(id),x,y);assert(cells.emplace(x,y).second);}
- for(auto d:SandboxZombies::Definitions){int x,y;AlmanacDialog::GetZombiePosition(ZombieType(d.id),x,y);assert(cells.emplace(x,y).second);assert(x>=22&&x+76<=440&&y>=86&&y+76<567);}
+ for(auto d:SandboxZombies::Definitions){int x,y;AlmanacDialog::GetZombiePosition(ZombieType(d.id),x,y);assert(cells.emplace(x,y).second);assert(x>=22&&x+63<=440&&y>=86&&y+63<567);}
  std::cout<<"Native almanac cells fit all originals\\n";
 }`),/Native almanac cells/);
 });
@@ -72,7 +72,7 @@ struct Board {Challenge challenge;Challenge* mChallenge=&challenge;int mPlantsEa
 class Zombie {public:int id=215,mPhaseCounter=0,mZombieAge=0,mChilledCounter=0,mUseLadderCol=-1,mJustGotShotCounter=0;bool mHasHead=true,mMindControlled=false,mYuckyFace=false,mIsEating=false;ZombiePhase mZombiePhase=PHASE_ZOMBIE_NORMAL;ZombieHeight mZombieHeight=HEIGHT_ZOMBIE_NORMAL;ZombieType mZombieType=ZOMBIE_IMP;Board* mBoard;App* mApp;Plant* target=nullptr;
  void StopEating(){mIsEating=false;}void StartEating(){mIsEating=true;}Plant* FindPlantTarget(ZombieAttackType){return target&&!target->mDead?target:nullptr;}
  void EatPlant(Plant*);void UpdateZombieImp();void Tick(bool ice=false){++mZombieAge;if(ice)return;if(mPhaseCounter>0)--mPhaseCounter;UpdateZombieImp();}};
-namespace SandboxZombies {bool IsGiantImp(const Zombie* z){return z->id==215;}}
+namespace SandboxZombies {bool IsGiantImp(const Zombie* z){return z->id==215;}bool StealPlant(Zombie*,Plant*){return false;}}
 ${eat}
 void Zombie::UpdateZombieImp(){${update}}
 int main(){

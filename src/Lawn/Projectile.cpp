@@ -239,7 +239,7 @@ Zombie* Projectile::FindCollisionTarget()
 
 	for (Zombie* aZombie : mBoard->mZombies)
 	{
-		if (aZombie->mDead || !MemeCharacters::CanHitRow(this, aZombie->mRow))
+		if (aZombie->mDead || !MemeCharacters::CanHitRow(this, aZombie->mRow) || SandboxZombies::SkipsProjectile(this,aZombie))
 			continue;
 		if ((aZombie->mZombieType == ZombieType::ZOMBIE_BOSS || aZombie->mRow == mRow || freeAim) && aZombie->EffectedByDamage(static_cast<unsigned int>(mDamageRangeFlags)))
 		{
@@ -838,6 +838,7 @@ void Projectile::PlayImpactSound(Zombie* theZombie)
 
 void Projectile::DoImpact(Zombie* theZombie)
 {
+	if (SandboxZombies::DodgeProjectile(this,theZombie)) return;
 	PlayImpactSound(theZombie);
 
     const bool sandboxImpact=SandboxPlants::Impact(this,theZombie);

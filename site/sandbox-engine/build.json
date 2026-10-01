@@ -2,7 +2,26 @@
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
   "openmpt": "0.8.4",
-  "mode": "Eight abstract plants (500,501,519,520,521,522,523,524) and four independent zombies (212,213,214,215). Cactus Palm replaces native cactus in adventure, sandbox and almanac; the generated palm follows the native lip bone. Existing progression, giant/imp behavior and saves are preserved.",
+  "mode": "Eight abstract plants and six independent zombies (212..217). Clever zombies dodge, backflip, change lanes, swim and steal plants. Cactus Palm knockback reduced by 60%. Existing progression and saves are preserved.",
+  "cleverZombies": {
+    "ids": [
+      216,
+      217
+    ],
+    "adventureUnlocks": [
+      23,
+      26
+    ],
+    "bodyHealth": 270,
+    "coneArmor": 370,
+    "walkMultiplier": 1.25,
+    "escapeMultiplier": 3,
+    "dodgePercentWhenReady": 50,
+    "flipTicks": 90,
+    "recoveryTicks": 120,
+    "laneChangePercent": 25,
+    "animation": "Native sunglasses, zombie rig and duck ring. Local slow-motion backflip; no global time scaling. Carries the stolen native plant frame. No bucket variant."
+  },
   "cactusPalm": {
     "id": 524,
     "nativeSlot": 26,
@@ -11,8 +30,8 @@
     "criticalPercent": 20,
     "criticalDamage": 110,
     "knockbackTiles": {
-      "normal": 1.5,
-      "giant": 0.5
+      "normal": 0.6,
+      "giant": 0.2
     },
     "criticalKnockbackMultiplier": 1.5,
     "cost": 125,
@@ -87,12 +106,12 @@
     {
       "name": "pvz-portable.js",
       "size": 278906,
-      "sha256": "6a94d195a3ec5949a9ee9eee10bc4e70abf0d656082497e934d3145a9f4b55f3"
+      "sha256": "7d632bace37e45cd1a57af9dbc8202f297d93fc2ef87c3547ae92c6aa7720b5a"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 7605855,
-      "sha256": "8d1372772e9c8864e53a2f56fcb5ff728db1cf07859eb25319da92f3adaeeb16"
+      "size": 7616875,
+      "sha256": "74237ae3d4b3a9e6d8c536d16b42e9742c1dda284c97798c195ba48f15ce9650"
     }
   ]
 }

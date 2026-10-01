@@ -382,6 +382,7 @@ void AlmanacDialog::DrawZombies(Graphics* g)
 		ZombieType aZombieType = GetZombieType(i);
 		int aPosX, aPosY;
 		GetZombiePosition(aZombieType, aPosX, aPosY);
+		auto drawCard = [&](Graphics* g) {
 		if (aZombieType != ZombieType::ZOMBIE_INVALID)
 		{
 			if (!ZombieIsShown(aZombieType))
@@ -401,10 +402,10 @@ void AlmanacDialog::DrawZombies(Graphics* g)
 
 				ZombieType aZombieTypeToDraw = aZombieType;
 				Graphics aZombieGraphics = Graphics(*g);
-				aZombieGraphics.SetClipRect(aPosX + 2, aPosY + 2, 72, 72);
+				aZombieGraphics.SetClipRect(aPosX + 2, aPosY + 2, 59, 59);
 				aZombieGraphics.Translate(aPosX + 1, aPosY - 6);
-				aZombieGraphics.mScaleX = 0.5f;
-				aZombieGraphics.mScaleY = 0.5f;
+				aZombieGraphics.mScaleX *= 0.5f;
+				aZombieGraphics.mScaleY *= 0.5f;
 				switch (aZombieType)
 				{
 				case ZombieType::ZOMBIE_POLEVAULTER:
@@ -434,7 +435,7 @@ void AlmanacDialog::DrawZombies(Graphics* g)
 					aZombieGraphics.SetColor(Color(0, 0, 0, 40));
 					aZombieGraphics.SetColorizeImages(true);
 				}
-				if (SandboxZombies::Find(int(aZombieType))) SandboxZombies::DrawPortrait(g,aPosX,aPosY,76,76,int(aZombieType));
+				if (SandboxZombies::Find(int(aZombieType))) SandboxZombies::DrawPortrait(g,aPosX,aPosY,63,63,int(aZombieType));
 				else mApp->mReanimatorCache->DrawCachedZombie(&aZombieGraphics, 0, 0, aZombieTypeToDraw);
 				aZombieGraphics.SetColorizeImages(false);
 
@@ -450,6 +451,8 @@ void AlmanacDialog::DrawZombies(Graphics* g)
 				}
 			}
 		}
+		};
+		Graphics card(*g);card.SetScale(0.82f,0.82f,aPosX,aPosY);drawCard(&card);
 	}
 
 	g->DrawImage(mZombie->mZombieType == ZombieType::ZOMBIE_ZAMBONI || mZombie->mZombieType == ZombieType::ZOMBIE_BOBSLED ?
@@ -626,17 +629,9 @@ bool AlmanacDialog::ZombieHasDescription(ZombieType theZombieType)
 
 void AlmanacDialog::GetZombiePosition(ZombieType theZombieType, int& x, int& y)
 {
-	if (int(theZombieType) == SandboxZombies::ConeWrap) {x=22;y=486;return;}
-	if (int(theZombieType) == SandboxZombies::GiantImp) {x=107;y=486;return;}
-	if (int(theZombieType) == SandboxZombies::Louis) {x=277;y=486;return;} // Existing free last-row cell, beside the boss.
-	if (int(theZombieType) == SandboxZombies::Runner) {x=362;y=486;return;}
-	if (theZombieType == ZombieType::ZOMBIE_BOSS)
-		x = 192, y = 486;
-	else
-	{
-		x = theZombieType % 5 * 85 + 22;
-		y = theZombieType / 5 * 80 + 86;
-	}
+	const auto* original=SandboxZombies::Find(int(theZombieType));
+	const int slot=original?26+int(original-SandboxZombies::Definitions.data()):int(theZombieType);
+	x=22+slot%6*71;y=86+slot/6*80;
 }
 
 ZombieType AlmanacDialog::ZombieHitTest(int x, int y)
@@ -650,7 +645,7 @@ ZombieType AlmanacDialog::ZombieHitTest(int x, int y)
 			{
 				int aZombieX, aZombieY;
 				GetZombiePosition(aZombieType, aZombieX, aZombieY);
-				if (Rect(aZombieX, aZombieY, 76, 76).Contains(x, y))
+				if (Rect(aZombieX, aZombieY, 63, 63).Contains(x, y))
 					return aZombieType;
 			}
 		}

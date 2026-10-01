@@ -29,6 +29,7 @@ struct Zombie {bool mDead=false;int mRow=0,mX=0;ZombieType mZombieType=ZombieTyp
 struct Board {std::vector<Zombie*> mZombies;};
 struct Projectile {Board* mBoard;int style=0,mRow=0,mDamageRangeFlags=0,mProjectileAge=100;float mPosZ=0,mVelX=4;ProjectileType mProjectileType=ProjectileType::PROJECTILE_PEA;Rect rect;
  bool PeaAboutToHitTorchwood(){return false;}Rect GetProjectileRect(){return rect;}Zombie* FindCollisionTarget();bool IsZombieHitBySplash(Zombie*);};
+namespace SandboxZombies {bool SkipsProjectile(const Projectile*,const Zombie*){return false;}}
 namespace MemeCharacters {
 int ShotStyle(Projectile* p){return p->style;}int BaseShotStyle(int style){return style&511;}
 bool CanHit(Projectile* p){return MemeShooterRules::CanHit(p->style);}bool CanHitRow(Projectile* p,int row){return MemeShooterRules::CanHitRow(p->style,row);}}
@@ -100,7 +101,7 @@ test('native projectile integration retains splats, centered scaling and fire at
  assert.ok(plant.indexOf('aProjectile->ConvertToFireball(mPlantCol)')>plant.indexOf('SandboxPlants::OnFired(this,aProjectile,theTargetZombie)'),'fire attaches only after muzzle correction');
 });
 test('eight originals remain; retired formations migrate without losing native plants',async()=>{
- assert.equal(ORIGINAL_PLANTS.length,8);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,519,520,521,522,523,524]);assert.deepEqual(ORIGINAL_ZOMBIES.map(z=>z.id),[212,213,214,215]);assert.equal(ZOMBIES.length,27);
+ assert.equal(ORIGINAL_PLANTS.length,8);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,519,520,521,522,523,524]);assert.deepEqual(ORIGINAL_ZOMBIES.map(z=>z.id),[212,213,214,215,216,217]);assert.equal(ZOMBIES.length,29);
  const bases=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
  for(let id=100;id<120;++id)assert.equal(validateLayout({schema:1,map:0,plants:[{type:id,col:0,row:0}]}).plants[0].type,bases[id-100]);
  for(const p of [...RETIRED_PLANTS,...RETIRED_CHARACTERS]){
@@ -201,7 +202,8 @@ test('retired zombie art and extra seed cannot leak into native previews or menu
  assert.doesNotMatch(ui,/"新卡"|"新增植物"|"原版"|catalog==4/);
  const app=(await read('src/LawnApp.cpp')).toString();assert.match(app,/if \(theSeedType == SEED_LEFTPEATER\) return MemeAdventure::RosterEnabled\(\)/);
  assert.match(app,/MemeCharacters::Find\(MemeCharacters::ShooterPea\)->unlock/);
- const z=(await read('src/SandboxZombies.cpp')).toString();assert.doesNotMatch(z,/AddZombieInRow|PlayMemeCue|TakeDamage|SetImageOverride/);
+ const z=(await read('src/SandboxZombies.cpp')).toString();assert.doesNotMatch(z,/AddZombieInRow|PlayMemeCue|TakeDamage|bucket-glove|squash-headband/);
+ for(const call of z.matchAll(/SetImageOverride\(([^;]+)\)/g))assert.match(call[1],/"anim_head1",SandboxArt::NativeImage\("Zombie_head_sunglasses1.png"\)/);
  const wasm=await read('site/sandbox-engine/pvz-portable.wasm');
  assert.equal(wasm.includes(await read('addons/art/bucket-glove.png')),false);
  assert.equal(wasm.includes(await read('addons/art/squash-headband.png')),false);

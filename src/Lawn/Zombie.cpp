@@ -5708,7 +5708,7 @@ void Zombie::DrawReanim(Graphics* g, const ZombieDrawPosition& theDrawPos, int t
 		return;
 	}
 
-	if (theDrawPos.mClipHeight > CLIP_HEIGHT_LIMIT)
+	if (theDrawPos.mClipHeight > CLIP_HEIGHT_LIMIT && !SandboxZombies::IsDodging(this))
 	{
 		float aDrawHeight = 120.0f - theDrawPos.mClipHeight + 71.0f;
 		g->SetClipRect(theDrawPos.mImageOffsetX - 200.0f, theDrawPos.mImageOffsetY + theDrawPos.mBodyY - 78.0f, 520, aDrawHeight);
@@ -5794,6 +5794,7 @@ void Zombie::DrawReanim(Graphics* g, const ZombieDrawPosition& theDrawPos, int t
 		aBodyReanim->DrawRenderGroup(g, theBaseRenderGroup);
 	}
 
+	SandboxZombies::DrawCarriedPlant(g,this);
 	if (mShieldType != ShieldType::SHIELDTYPE_NONE)
 	{
 		if (mZombiePhase == ZombiePhase::PHASE_ZOMBIE_BURNED)
@@ -6718,6 +6719,7 @@ void Zombie::UpdateAnimSpeed()
 		ApplyAnimRate(int(mZombiePhase) == SandboxZombies::RunBrake ? 0.0f : SandboxZombies::RunAnimRate);
 		return;
 	}
+	if (SandboxZombies::IsDodging(this)) { ApplyAnimRate(0.0f); return; }
 
 	if (mIsEating)
 	{
@@ -7145,6 +7147,12 @@ void Zombie::EatPlant(Plant* thePlant)
 		return;
 	}
 
+	if (SandboxZombies::StealPlant(this,thePlant))
+	{
+		mBoard->mPlantsEaten++;
+		mBoard->mChallenge->ZombieAtePlant(thePlant);
+		return;
+	}
 	if (SandboxZombies::IsGiantImp(this))
 	{
 		if (int(mZombiePhase) != SandboxZombies::JawSmash)

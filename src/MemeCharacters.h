@@ -16,7 +16,7 @@ inline constexpr float SmallNutScale=0.6f;
 inline constexpr int CactusPalm=524, PalmProjectile=299, CriticalPalmProjectile=300, PalmInterval=500;
 constexpr bool IsPalmShot(int style){return style==PalmProjectile||style==CriticalPalmProjectile;}
 constexpr int PalmDamage(int style){return style==CriticalPalmProjectile?110:80;}
-constexpr int PalmPush(int style,bool giant){return (giant?40:120)*(style==CriticalPalmProjectile?3:2)/2;}
+constexpr int PalmPush(int style,bool giant){return (giant?16:48)*(style==CriticalPalmProjectile?3:2)/2;}
 // Seed-card recharge, separate from each character's combat cooldown.
 constexpr int PlantingCooldown(int id){return id==501?1200:id==SmallNut?600:id==CactusPalm?750:300;}
 constexpr bool IsStraightShot(int style){return style==WeakProjectile||style==GatlingProjectile||IsPalmShot(style);}
@@ -30,7 +30,7 @@ inline constexpr std::array<Definition,8> Definitions{{
  {521,7,200,9,"双----------双发射手","双----------双发射手","每轮连射50发 · 单发1伤害","REPEATER","每轮连续射出50颗低伤害豌豆，每颗造成1伤害。约1秒射完，之后休息1.5秒。保留普通豌豆的弹速与直线弹道，不击退。替换双发射手。"},
  {522,40,250,0,"加特林射手","加特林","每0.1秒1发 · 过热休息3.5秒","GATLING_PEA","每0.1秒射出1颗豌豆，造成15伤害。连续射击12秒（120发）后过热，停火冷却3.5秒，再自动恢复攻击。保留原版外观、弹速和升级方式，种在双----------双发射手上。"},
  {523,53,25,4,"小·坚果","小·坚果","800生命 · 冷却6秒","SMALL_NUT","生命800，为坚果的五分之一。冷却6秒，需要25阳光。只挡路，不反咬。冒险1-4解锁。"},
- {524,26,125,33,"仙人的掌","仙人的掌","5秒一掌 · 击退僵尸","CACTUS","每5秒射出一只手掌，造成80伤害，普通僵尸后退1.5格，巨人后退0.5格。20%暴击，伤害110，击退距离增加50%。保留升高攻击气球的能力。"},
+ {524,26,125,33,"仙人的掌","仙人的掌","5秒一掌 · 击退僵尸","CACTUS","每5秒射出一只手掌，造成80伤害，普通僵尸后退0.6格，巨人后退0.2格。20%暴击，伤害110，击退距离增加50%。保留升高攻击气球的能力。"},
 }};
 // Retired IDs are migration-only, never playable definitions.
 inline constexpr std::array<int,17> RetiredBases{8,1,0,5,7,4,26,6,32,29,34,13,10,28,21,18,17};

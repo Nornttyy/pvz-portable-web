@@ -19,7 +19,7 @@ constexpr int PHASE_BALLOON_FLYING=8;
 constexpr int STATE_NOTREADY=0,STATE_SQUASH_DONE_FALLING=50;
 enum ReanimationType {REANIM_ZOMBIE,REANIM_FLAG,REANIM_REPEATER,REANIM_SUNFLOWER,REANIM_IMP,REANIM_CACTUS};
 enum DrawVariation {VARIATION_NORMAL,VARIATION_IMITATER};
-enum ProjectileType {PROJECTILE_PEA,PROJECTILE_SNOWPEA,PROJECTILE_FIREBALL,PROJECTILE_ZOMBIE_PEA,PROJECTILE_SPIKE,PROJECTILE_BUTTER,PROJECTILE_KERNEL,PROJECTILE_CABBAGE,PROJECTILE_STAR,PROJECTILE_PUFF};
+enum ProjectileType {PROJECTILE_PEA,PROJECTILE_SNOWPEA,PROJECTILE_FIREBALL,PROJECTILE_ZOMBIE_PEA,PROJECTILE_SPIKE,PROJECTILE_BUTTER,PROJECTILE_KERNEL,PROJECTILE_CABBAGE,PROJECTILE_STAR,PROJECTILE_PUFF,PROJECTILE_COBBIG,PROJECTILE_BASKETBALL};
 enum ProjectileMotion {MOTION_STRAIGHT,MOTION_STAR,MOTION_HOMING,MOTION_THREEPEATER,MOTION_BACKWARDS};
 constexpr int REANIM_PLAY_ONCE_AND_HOLD=0,REANIM_LOOP=1;
 constexpr int FOLEY_THROW=0;
@@ -82,6 +82,8 @@ public:
  bool mDead=false,mMindControlled=false,mHasHead=true,mHasArm=true,mIsEating=false,mBlowingAway=false;int chill=0,mIceTrapCounter=0,mButteredCounter=0,mRenderOrder=0;
  bool mHasObject=false;Sexy::Rect mZombieAttackRect{50,0,20,115};int mTargetRow=-1,mSummonCounter=0;
  int mZombiePhase=0,mZombieHeight=0;bool mInPool=false;
+ int mBossStompCounter=0,mBossHeadCounter=0,mBossBungeeCounter=0;
+ void ReanimIgnoreClipRect(const char*,bool){}void SetupWaterTrack(const char*){}void CheckForBoardEdge(){if(mPosX>850)mDead=true;}
  int mPhaseCounter=0,mShieldHealth=0,mShieldMaxHealth=0,mShieldType=0,mZombieAge=0,mFromWave=0;float mAltitude=0;bool flying=false;
  bool IsFlying(){return flying;}
  Sexy::Rect GetZombieAttackRect(){auto r=mZombieAttackRect;r.mX+=int(mPosX);r.mY+=int(mPosY);return r;}

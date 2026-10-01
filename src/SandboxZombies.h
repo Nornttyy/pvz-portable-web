@@ -12,11 +12,16 @@ inline constexpr int GiantImp=215,GiantImpUnlock=22,JawSmash=1043,JawTicks=90,Ja
 inline constexpr float ConeWrapSpeed=0.60f;
 inline constexpr int RunIn=1040,RunBrake=1041,RunOut=1042,BrakeTicks=8;
 inline constexpr float RunInSpeed=5.6f,RunOutSpeed=7.2f,RunAnimRate=68.0f;
-inline constexpr std::array<Definition,4> Definitions{{
+inline constexpr int Clever=216,CleverCone=217,CleverUnlock=23,CleverConeUnlock=26;
+inline constexpr int CleverFlip=1044,CleverFlee=1045,FlipTicks=90,DodgeRecovery=120;
+inline constexpr float CleverSpeed=1.25f,CleverFleeSpeed=3.0f;
+inline constexpr std::array<Definition,6> Definitions{{
  {Louis,0,"路易十六","天生无头，照常走路啃咬。",nullptr,270,0,LouisUnlock},
  {Runner,0,"跑路僵尸","冲到后排，转身就跑。",nullptr,270,0,RunnerUnlock},
  {ConeWrap,2,"雪糕桶包裹我","20桶组成，7桶耐久。",nullptr,270,ConeCount*ConeHealth,ConeWrapUnlock},
- {GiantImp,24,"巨人小鬼","巨人头，小鬼身。一击秒杀植物。",nullptr,270,0,GiantImpUnlock}
+ {GiantImp,24,"巨人小鬼","巨人头，小鬼身。一击秒杀植物。",nullptr,270,0,GiantImpUnlock},
+ {Clever,0,"智斗僵尸","半数机会翻身闪弹，偶尔换路。偷到植物就跑。",nullptr,270,0,CleverUnlock},
+ {CleverCone,2,"路障智斗僵尸","戴路障的智斗僵尸。入水套泳圈，偷完就跑。",nullptr,270,ConeHealth,CleverConeUnlock}
 }};
 constexpr const Definition* Find(int id){for(const auto& d:Definitions)if(d.id==id)return &d;return nullptr;}
 constexpr int Base(int id){auto* d=Find(id);return d?d->base:id;}
@@ -25,6 +30,7 @@ constexpr bool RunnerWave(int level,int base,int wave){return level>=RunnerUnloc
 constexpr bool ConeWrapWave(int level,int base,int wave){return level>=ConeWrapUnlock&&base==2&&wave>=3&&wave%4==3;}
 // Only regular land-lane wave entries qualify, NEVER native/thrown imps.
 constexpr bool GiantImpWave(int level,int base,int wave){return level>=GiantImpUnlock&&base==0&&wave>=2&&wave%4==2;}
+constexpr int CleverWave(int level,int base,int wave){return wave>=1&&wave%4==0&&level>=CleverUnlock&&base==0?Clever:wave>=1&&wave%4==2&&level>=CleverConeUnlock&&base==2?CleverCone:-1;}
 // Armor stays worth seven cones; the twenty visual parts are not extra HP.
 constexpr int ConePartHealth(int armor,int part){const int hp=armor-part*ConeHealth;return hp<=0?0:hp>=ConeHealth?ConeHealth:hp;}
 constexpr int ConeVisualHealth(int armor,int part){const int hp=(armor*ConeVisualCount-part*ConeCount*ConeHealth)/ConeCount;return hp<=0?0:hp>=ConeHealth?ConeHealth:hp;}
@@ -32,6 +38,14 @@ constexpr int ConeDamageStage(int health){return health>2*ConeHealth/3?0:health>
 int Type(const Zombie*);
 bool IsConeWrap(const Zombie*);
 bool IsGiantImp(const Zombie*);
+bool IsClever(const Zombie*);
+bool IsDodging(const Zombie*);
+bool SkipsProjectile(const Projectile*,const Zombie*);
+bool DodgeProjectile(Projectile*,Zombie*);
+bool StealPlant(Zombie*,Plant*);
+bool UpdateClever(Zombie*);
+void RefreshCleverRig(Zombie*);
+void DrawCarriedPlant(Sexy::Graphics*,Zombie*);
 bool IsLouis(const Zombie*);
 bool IsRunner(const Zombie*);
 bool IsRunning(const Zombie*);

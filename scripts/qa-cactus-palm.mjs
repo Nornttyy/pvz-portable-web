@@ -46,13 +46,13 @@ try{
     const a=previous[i],b=current[i];if(a[0]!==b[0]||a[1]!==b[1])continue;
     const damage=a[4]+a[5]+a[7]-b[4]-b[5]-b[7],push=b[2]-a[2];
     if((damage===80||damage===110)&&push>0){
-     const giant=[23,32].includes(b[15]),expected=(giant?40:120)*(damage===110?1.5:1);
+     const giant=[23,32].includes(b[15]),expected=(giant?16:48)*(damage===110?1.5:1);
      assert.ok(Math.abs(push-expected)<=12,JSON.stringify({damage,push,expected,type:b[0]}));results.impacts.push({damage,push,expected,type:b[0]});
     }
    }
    previous=current;
   }
-  await api(4,1);assert.ok(results.impacts.some(v=>v.damage===80));assert.ok(results.impacts.some(v=>v.damage===110));assert.ok(results.impacts.some(v=>v.expected===40));await snap('palm-knockback');
+  await api(4,1);assert.ok(results.impacts.some(v=>v.damage===80));assert.ok(results.impacts.some(v=>v.damage===110));assert.ok(results.impacts.some(v=>v.expected===16));await snap('palm-knockback');
   await page.setViewportSize({width:844,height:390});await page.waitForTimeout(1000);await snap('palm-phone');await page.setViewportSize({width:1100,height:750});
   console.log('Sandbox palm damage, crit, giant and normal knockback passed',results.impacts);
   await api(15);await page.waitForTimeout(1800);
