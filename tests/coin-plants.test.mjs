@@ -11,6 +11,8 @@ test('production coin plants keep sandbox free at zero balance and preserve adve
  const source=await read('src/CoinPlants.cpp'),dir=await mkdtemp(join(tmpdir(),'pvz-coin-plants-')),binary=join(dir,'combat');
  await writeFile(join(dir,'coin-helpers.inc'),source.slice(source.indexOf('float Height('),source.indexOf('Sexy::Image* CoinImage(')));
  await writeFile(join(dir,'coin-production.inc'),source.slice(source.indexOf('bool ShooterSlot('),source.indexOf('bool DrawShot(')));
+ const save=await read('src/Lawn/System/SaveGame.cpp');
+ await writeFile(join(dir,'coin-save.inc'),save.slice(save.indexOf('static void SyncCoinPlantsPortable('),save.indexOf('static ChunkSyncFn GetChunkSyncFn(')));
  await run(process.env.CXX||'c++',['-std=c++20','-Isrc','-I'+dir,'tests/coin-plants-native.cpp','-o',binary],{cwd:root});
  assert.match((await run(binary)).stdout,/exact odds and debit, clocks, zero funds, pending rolls, save restore, cap and one-hit orbit contacts passed/);
 });
@@ -18,7 +20,7 @@ test('money ammunition is not collectible, area damage or a second peashooter re
  assert.equal(PLANTS.find(p=>p.id===530).base,50);assert.equal(PLANTS.find(p=>p.id===531).base,38);assert.equal(PLANTS.find(p=>p.id===500).base,0);
  const source=await read('src/CoinPlants.cpp'),plant=await read('src/Lawn/Plant.cpp'),shot=await read('src/Lawn/Projectile.cpp'),save=await read('src/Lawn/System/SaveGame.cpp');
  assert.doesNotMatch(source,/AddCoin\(|KillAllZombiesInRadius|DoSplashDamage|mSunMoney|WriteCurrentUserConfig/);
- assert.match(source,/AddCoins\(-Units\(kind\)\)/);assert.match(source,/s\.coins\[slot\]=0/);
+ assert.match(source,/AddCoins\(-cost\)/);assert.match(source,/s\.touching\[slot\]!=contact/);assert.doesNotMatch(source,/s\.coins\[slot\]=0/);
  assert.match(shot,/if \(CoinPlants::Impact\(this,theZombie\)\) return;/);assert.match(shot,/if \(CoinPlants::DrawShot\(g,this\)\) return;/);
  assert.match(plant,/CoinPlants::DrawOrbit\(g,this,false\)/);assert.match(plant,/CoinPlants::DrawOrbit\(g,this,true\)/);
  assert.match(source,/OnBone\(g,head,"idle_mouth"/);assert.match(source,/OnBone\(g,head,"anim_face"/);
@@ -26,4 +28,12 @@ test('money ammunition is not collectible, area damage or a second peashooter re
  assert.match(await read('src/Sandbox.cpp'),/sandboxProfile->mCoins = adventureProfile->mCoins/);
  const chooser=await read('src/Lawn/Widget/SeedChooserScreen.cpp');
  assert.match(chooser,/SeedType aSeedType = SeedHitTest\(x, y\);\s*if \(aSeedType == SEED_NONE && !mBoard->mSeedBank->ContainsPoint/);
+});
+test('coin plant almanac and build manifest share current odds, damage, prices and retained stock',async()=>{
+ const definitions=await read('src/MemeCharacters.h'),build=JSON.parse(await read('site/sandbox-engine/build.json')).coinPlants;
+ assert.deepEqual(build.shooter.odds,{silver:65,gold:30,diamond:5});assert.deepEqual(build.flower.odds,build.shooter.odds);
+ assert.deepEqual(build.shooter.walletDebit,{silver:10,gold:10,diamond:50});assert.deepEqual(build.flower.walletDebit,{silver:10,gold:20,diamond:100});
+ assert.deepEqual(build.damage,{silver:80,gold:400,diamond:4000});assert.equal(build.flower.capacity,50);assert.equal(build.flower.consumeOnContact,false);
+ assert.match(definitions,/每枚扣10 \/ 10 \/ 50金币/);assert.match(definitions,/每枚扣10 \/ 20 \/ 100金币/);
+ assert.match(definitions,/伤害80 \/ 400 \/ 4000，命中不消失/);assert.match(definitions,/最多50枚，不能拾取/);
 });

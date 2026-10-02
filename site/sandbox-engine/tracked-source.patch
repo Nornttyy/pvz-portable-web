@@ -1663,7 +1663,7 @@ index ca72b0b..1701ac9 100644
  	}
  	else if (aZombieDef.mReanimationType == ReanimationType::REANIM_BOSS)
 diff --git a/src/Lawn/System/SaveGame.cpp b/src/Lawn/System/SaveGame.cpp
-index 804aeba..aea303c 100644
+index 804aeba..e8f6c7b 100644
 --- a/src/Lawn/System/SaveGame.cpp
 +++ b/src/Lawn/System/SaveGame.cpp
 @@ -25,6 +25,10 @@
@@ -1691,7 +1691,7 @@ index 804aeba..aea303c 100644
  };
  
  static constexpr const uint32_t SAVE4_CHUNK_VERSION = 1U;
-@@ -1962,6 +1971,66 @@ static void SyncBoardPortable(PortableSaveContext& theContext, Board* theBoard)
+@@ -1962,6 +1971,79 @@ static void SyncBoardPortable(PortableSaveContext& theContext, Board* theBoard)
  
  typedef void (*ChunkSyncFn)(PortableSaveContext&, Board*);
  
@@ -1744,12 +1744,25 @@ index 804aeba..aea303c 100644
 +static void SyncCoinPlantsPortable(PortableSaveContext& c,Board* board)
 +{
 +	auto save=c.mReading?CoinPlants::Save{}:CoinPlants::Capture(board);
-+	int count=static_cast<int>(save.size());c.SyncInt32(count);
++	// Negative marker distinguishes this layout from the original 100-slot records.
++	int format=-2;c.SyncInt32(format);
++	const bool legacy=format>=0;
++	if(!legacy&&format!=-2){c.mFailed=true;return;}
++	int count=legacy?format:static_cast<int>(save.size());if(!legacy)c.SyncInt32(count);
 +	if(count<0||count>1024){c.mFailed=true;return;}
 +	if(c.mReading)save.resize(count);
 +	for(auto& p:save){
 +		c.SyncUInt32(p.key);c.SyncInt32(p.state.id);c.SyncInt32(p.state.delay);c.SyncInt32(p.state.phase);c.SyncInt32(p.state.pending);
-+		for(int& kind:p.state.coins)c.SyncInt32(kind);
++		if(legacy){
++			std::array<int,100> old{};
++			for(int& kind:old){c.SyncInt32(kind);if(kind<0||kind>CoinPlantRules::Diamond||(p.state.id==CoinPlantRules::Shooter&&kind)){c.mFailed=true;return;}}
++			// Keep the most valuable 50 paid coins, including sparse high-numbered slots.
++			std::sort(old.begin(),old.end(),std::greater<int>());
++			std::copy_n(old.begin(),CoinPlantRules::Limit,p.state.coins.begin());
++		}else{
++			for(int& kind:p.state.coins)c.SyncInt32(kind);
++			for(unsigned& key:p.state.touching)c.SyncUInt32(key);
++		}
 +		if(c.mReading&&!CoinPlantRules::Valid(p.state)){c.mFailed=true;return;}
 +	}
 +	if(c.mReading&&!c.mFailed)CoinPlants::Load(save);
@@ -1758,7 +1771,7 @@ index 804aeba..aea303c 100644
  static ChunkSyncFn GetChunkSyncFn(uint32_t theChunkType)
  {
  	switch (theChunkType)
-@@ -2006,6 +2075,16 @@ static ChunkSyncFn GetChunkSyncFn(uint32_t theChunkType)
+@@ -2006,6 +2088,16 @@ static ChunkSyncFn GetChunkSyncFn(uint32_t theChunkType)
  		return SyncChallengePortable;
  	case SAVE4_CHUNK_MUSIC:
  		return SyncMusicPortable;
@@ -1775,7 +1788,7 @@ index 804aeba..aea303c 100644
  	default:
  		return nullptr;
  	}
-@@ -2288,6 +2367,9 @@ static bool LawnLoadGameV4(Board* theBoard, const std::string& theFilePath)
+@@ -2288,6 +2380,9 @@ static bool LawnLoadGameV4(Board* theBoard, const std::string& theFilePath)
  		return false;
  
  	FixBoardAfterLoad(theBoard);
@@ -1785,7 +1798,7 @@ index 804aeba..aea303c 100644
  	theBoard->mApp->mGameScene = GameScenes::SCENE_PLAYING;
  	return true;
  }
-@@ -2757,6 +2839,9 @@ static void SyncBoard(SaveGameContext& theContext, Board* theBoard)
+@@ -2757,6 +2852,9 @@ static void SyncBoard(SaveGameContext& theContext, Board* theBoard)
  
  bool LawnLoadGame(Board* theBoard, const std::string& theFilePath)
  {
@@ -1795,7 +1808,7 @@ index 804aeba..aea303c 100644
  	if (LawnLoadGameV4(theBoard, theFilePath))
  	{
  		PvzpLogLn("Loaded save game (v4)");
-@@ -2792,6 +2877,7 @@ bool LawnLoadGame(Board* theBoard, const std::string& theFilePath)
+@@ -2792,6 +2890,7 @@ bool LawnLoadGame(Board* theBoard, const std::string& theFilePath)
  
  bool LawnSaveGame(Board* theBoard, const std::string& theFilePath)
  {
@@ -1803,7 +1816,7 @@ index 804aeba..aea303c 100644
  	std::vector<unsigned char> aPayload;
  	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_BOARD_BASE, theBoard)) return false;
  	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_ZOMBIES, theBoard)) return false;
-@@ -2813,6 +2899,11 @@ bool LawnSaveGame(Board* theBoard, const std::string& theFilePath)
+@@ -2813,6 +2912,11 @@ bool LawnSaveGame(Board* theBoard, const std::string& theFilePath)
  	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_SEEDPACKETS, theBoard)) return false;
  	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_CHALLENGE, theBoard)) return false;
  	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_MUSIC, theBoard)) return false;

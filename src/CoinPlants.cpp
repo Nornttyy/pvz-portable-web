@@ -27,12 +27,14 @@ std::map<const Plant*,State> states;
 Save pending;
 int fired[3]{},hits[3]{};
 float Height(const Plant* p){return PlantDrawHeightOffset(p->mBoard,const_cast<Plant*>(p),p->mSeedType,p->mPlantCol,p->mRow);}
+float RowHeight(const Plant* p){return p->mBoard->StageHasPool()||p->mBoard->StageHasRoof()?85.f:100.f;}
 bool Spend(Plant* p,int kind){
  if(!Kind(kind))return false;
  if(gSandboxEnabled)return true; // Sandbox ammunition is free, even with a zero balance.
  auto* wallet=p->mApp->mPlayerInfo;
- if(!wallet||wallet->mCoins<Units(kind))return false;
- wallet->AddCoins(-Units(kind));p->mBoard->ShowCoinBank();return true;
+ const int cost=Units(kind,MemeCharacters::Type(p)==Flower);
+ if(!wallet||wallet->mCoins<cost)return false;
+ wallet->AddCoins(-cost);p->mBoard->ShowCoinBank();return true;
 }
 bool Active(const Plant* p){return !p->mDead&&!p->mSquished&&!p->mIsAsleep&&p->mPlantHealth>0&&!const_cast<Plant*>(p)->NotOnGround()&&p->mOnBungeeState==NOT_ON_BUNGEE;}
 Sexy::Image* CoinImage(int kind){return kind==Silver?Sexy::IMAGE_REANIM_COIN_SILVER_DOLLAR:kind==Gold?Sexy::IMAGE_REANIM_COIN_GOLD_DOLLAR:Sexy::IMAGE_REANIM_DIAMOND;}
@@ -71,15 +73,20 @@ void Update(Plant* p){
  if(s.id!=id)return;
  s.phase=(s.phase+1)%OrbitPeriod;
  if(id==Flower){
-  // Actual coin contacts, not an invisible aura. Each orbit coin hits only once.
+  // Persistent money: one single-target hit per contact, rearmed only on separation.
   for(int slot=0;slot<Limit;++slot)if(s.coins[slot]){
-   const auto pt=Orbit(slot,s.phase);const float x=p->mX+pt.x,y=p->mY+Height(p)+pt.y;
+   const auto pt=Orbit(slot,s.phase,RowHeight(p));const float x=p->mX+pt.x,y=p->mY+Height(p)+pt.y;
+   unsigned contact=0;
    for(auto* z:p->mBoard->mZombies){
     if(z->mDead||!z->IsOnBoard()||z->IsDeadOrDying()||z->mMindControlled||SandboxZombies::IsHeld(z)||!z->EffectedByDamage(1))continue;
     const auto r=z->GetZombieRect();
+    if(std::abs(z->mRow-p->mRow)>1||r.mX+r.mWidth*.5f<p->mX-80||r.mX+r.mWidth*.5f>=p->mX+160)continue;
     if(x+9<r.mX||x-9>r.mX+r.mWidth||y+9<r.mY||y-9>r.mY+r.mHeight)continue;
-    const int kind=s.coins[slot];z->TakeDamage(Damage(kind),0);s.coins[slot]=0;++hits[kind-1];p->mApp->PlayFoley(FOLEY_SPLAT);break;
+    contact=p->mBoard->mZombies.DataArrayGetID(z);
+    if(s.touching[slot]!=contact){const int kind=s.coins[slot];z->TakeDamage(Damage(kind),0);++hits[kind-1];p->mApp->PlayFoley(FOLEY_SPLAT);}
+    break;
    }
+   s.touching[slot]=contact;
   }
  }
  if(s.delay>0)--s.delay;if(s.delay>0)return;
@@ -132,7 +139,7 @@ void DrawPlant(Sexy::Graphics* g,const Plant* p){
 }
 void DrawOrbit(Sexy::Graphics* g,const Plant* p,bool front){
  const auto it=states.find(p);if(it==states.end()||it->second.id!=Flower||!Active(p))return;const auto& s=it->second;
- for(int i=0;i<Limit;++i)if(s.coins[i]){const auto pt=Orbit(i,s.phase);if((pt.y>=40)==front)DrawCoin(g,s.coins[i],pt.x,Height(p)+pt.y,s.phase+i*9);}
+ for(int i=0;i<Limit;++i)if(s.coins[i]){const auto pt=Orbit(i,s.phase,RowHeight(p));if((pt.y>=40)==front)DrawCoin(g,s.coins[i],pt.x,Height(p)+pt.y,s.phase+i*9);}
 }
 void DrawPreview(Sexy::Graphics* g,float x,float y,bool flower,bool imitater){
  static std::unique_ptr<Sexy::MemoryImage> images[4];auto& im=images[(flower?2:0)+(imitater?1:0)];

@@ -16,9 +16,14 @@
       "intervalTicks": 150,
       "adventureUnlock": 12,
       "odds": {
-        "silver": 69,
+        "silver": 65,
         "gold": 30,
-        "diamond": 1
+        "diamond": 5
+      },
+      "walletDebit": {
+        "silver": 10,
+        "gold": 10,
+        "diamond": 50
       }
     },
     "flower": {
@@ -27,9 +32,15 @@
       "nativeSlot": 38,
       "sunCost": 50,
       "intervalTicks": 1000,
-      "capacity": 100,
+      "capacity": 50,
       "orbitTicks": 600,
-      "consumeOnContact": true,
+      "consumeOnContact": false,
+      "range": "Current and eight adjacent cells; actual orbit contact, not aura damage",
+      "walletDebit": {
+        "silver": 10,
+        "gold": 20,
+        "diamond": 100
+      },
       "odds": {
         "silver": 65,
         "gold": 30,
@@ -38,19 +49,14 @@
     },
     "health": 300,
     "rechargeTicks": 750,
-    "walletDebit": {
-      "silver": 10,
-      "gold": 50,
-      "diamond": 1000
-    },
     "damage": {
-      "silver": 20,
-      "gold": 60,
-      "diamond": 300
+      "silver": 80,
+      "gold": 400,
+      "diamond": 4000
     },
     "art": "Original peashooter and marigold rigs, original coin and diamond images; pixel black sunglasses follow the face bone, cigarette follows the pea muzzle. Battle and card previews share the same accessory artwork and registration.",
-    "boundaries": "Money ammunition is not a pickup. Single-target damage only; no automatic refund or sun debit. Adventure charges the exact value and retains unaffordable pending rolls. Sandbox ammunition is free at any balance, including zero; existing probabilities, intervals, contact consumption and the 100-coin cap remain. Its disposable profile never changes adventure savings.",
-    "save": "Optional portable chunk 25 saves production clocks, pending rolls, orbit phases and all 100 stable coin slots. Restoring never charges the wallet again."
+    "boundaries": "Money ammunition is not a pickup. Single-target damage only; no automatic refund or sun debit. Adventure charges the reduced ammunition price and retains unaffordable pending rolls. Sandbox ammunition is free at any balance, including zero. Orbit coins persist after impact, with a contact latch preventing frame-by-frame damage; leaving and re-entering permits another hit. Its disposable profile never changes adventure savings.",
+    "save": "Optional portable chunk 25 uses a -2 format marker and saves production clocks, pending rolls, orbit phases, 50 coin slots and contact target IDs. Legacy 100-slot saves migrate, keeping up to 50 highest-value coins. Restoring never charges the wallet again."
   },
   "removedZombatar": "The Zombatar menu sign and button are removed, with no click target, editor construction or editor resource preload. Legacy entry points are inert. Existing player records, combat zombies, almanac and other menu functions are preserved.",
   "everythingShooter": {
@@ -268,12 +274,12 @@
     {
       "name": "pvz-portable.js",
       "size": 280214,
-      "sha256": "65589e7b8237d228430de4c17bc34612066dbc430e652103ab4306513e7c7626"
+      "sha256": "e18ebbd0769ef4a0c1eeed8b2900bd69946ec82fdb611b25b8db2781670a50f1"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 8433530,
-      "sha256": "596fe7ee7a5eddf01919252385d8cd93b3d9d1924d9b3dfd5090295ea2ced816"
+      "size": 8440781,
+      "sha256": "fef6991aae16262eca9dd04358522624afb955936f76e7b9af5f838a4d5e7d5a"
     }
   ]
 }

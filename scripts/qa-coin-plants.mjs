@@ -42,10 +42,10 @@ try{
   await wait(()=>Module._pvz_coinplant_data(2,0,4)>0,undefined,16000);await snap('adventure-orbit');
   await afford(150);await place(0,2,2);await wait(()=>{let n=0;while(Module._pvz_coinplant_data(2,n,0)>=0)++n;return n===2;});
   await page.waitForTimeout(1200);await click(748,14);results.beforeSave=await data();await snap('adventure-paused');
-  const slotsBefore=await page.evaluate(()=>Array.from({length:2},(_,i)=>Array.from({length:100},(_,s)=>Module._pvz_coinplant_data(3,i,s))));
+  const slotsBefore=await page.evaluate(()=>Array.from({length:2},(_,i)=>Array.from({length:50},(_,s)=>Module._pvz_coinplant_data(3,i,s))));
   await click(400,401);await click(305,394);await page.waitForTimeout(1800);await click(560,135);await wait(()=>Module._pvz_adventure_power_data(-1,5)===1);
   results.afterSave=await data();assert.deepEqual(results.afterSave.states,results.beforeSave.states);assert.equal(results.afterSave.wallet,results.beforeSave.wallet);
-  assert.deepEqual(await page.evaluate(()=>Array.from({length:2},(_,i)=>Array.from({length:100},(_,s)=>Module._pvz_coinplant_data(3,i,s)))),slotsBefore);
+  assert.deepEqual(await page.evaluate(()=>Array.from({length:2},(_,i)=>Array.from({length:50},(_,s)=>Module._pvz_coinplant_data(3,i,s)))),slotsBefore);
   await snap('adventure-restored');results.adventureSave=true;
  }else{
  await click(370,455);await click(208,366);await click(408,580);await click(259,127);await snap('almanac-shooter');
@@ -58,14 +58,20 @@ try{
  assert.equal(results.flower.states.reduce((s,p)=>s+p[4],0),results.flower.fired.reduce((s,n)=>s+n,0));
  const paused=await data();await page.waitForTimeout(500);assert.deepEqual(await data(),paused);await snap('orbit-and-glasses');
  await page.setViewportSize({width:844,height:390});await snap('phone');await page.setViewportSize({width:1100,height:750});
+ assert.equal(await api(2,219,3,2),1);await api(4,0);
+ await wait(()=>[0,1,2].reduce((n,i)=>n+Module._pvz_coinplant_data(1,i,1),0)>0,undefined,15000);await api(4,1);
+ results.flowerContact=await data();assert.equal(results.flowerContact.states.length,15);
+ assert.equal(results.flowerContact.states.reduce((s,p)=>s+p[4],0),results.flowerContact.fired.reduce((s,n)=>s+n,0),'orbit money remains after actual zombie impacts');
+ await snap('persistent-orbit-contact');await api(6);
  for(let row=0;row<5;row++)for(let col=0;col<3;col++)await api(3,0,col,row);
- const afterFlowers=(await data()).wallet;assert.equal(afterFlowers,results.flower.wallet,'removal does not refund ammunition');
+ const afterFlowers=(await data()).wallet;assert.equal(afterFlowers,results.flowerContact.wallet,'removal does not refund ammunition');
  for(let row=0;row<5;row++)for(let col=0;col<3;col++)assert.equal(await api(1,530,col,row),1);
  const refill=async()=>{await api(6);for(let row=0;row<5;row++)for(const col of [5,7])assert.equal(await api(2,219,col,row),1);};
  await refill();await api(4,0);const end=Date.now()+55000;let next=Date.now()+6000;
  while(Date.now()<end){if(Date.now()>=next){await refill();next=Date.now()+6000;}const d=await data();if(d.fired[2]>results.flower.fired[2]&&d.hits.every(n=>n>0)&&d.fired.reduce((s,n)=>s+n,0)>250)break;await page.waitForTimeout(100);}
  await api(4,1);results.shooter=await data();assert.ok(results.shooter.hits.every(n=>n>0),'all three money ammunition types hit actual zombies');
- assert.equal(results.shooter.wallet,walletUnits*10,'all silver, gold and diamond shots are free in sandbox');
+ results.earned=await page.evaluate(()=>Module._pvz_coin_data(-1,1)*10);
+ assert.equal(results.shooter.wallet,walletUnits*10+results.earned,'sandbox debits nothing; native zombie coin drops still credit normally');
  await snap('coin-shooter-combat');
  await click(833,24);await click(726,432);await click(305,366);await wait(()=>Module.canvas.width===800);await page.waitForTimeout(2200);
  const wallet=await page.evaluate(()=>{const b=Module.FS.readFile('/saves/userdata/user1.dat');return new DataView(b.buffer,b.byteOffset,b.byteLength).getUint32(8,true);});assert.equal(wallet,walletUnits,'adventure wallet unchanged by sandbox');

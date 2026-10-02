@@ -2020,12 +2020,25 @@ static void SyncStinkStatusPortable(PortableSaveContext& c,Board* board)
 static void SyncCoinPlantsPortable(PortableSaveContext& c,Board* board)
 {
 	auto save=c.mReading?CoinPlants::Save{}:CoinPlants::Capture(board);
-	int count=static_cast<int>(save.size());c.SyncInt32(count);
+	// Negative marker distinguishes this layout from the original 100-slot records.
+	int format=-2;c.SyncInt32(format);
+	const bool legacy=format>=0;
+	if(!legacy&&format!=-2){c.mFailed=true;return;}
+	int count=legacy?format:static_cast<int>(save.size());if(!legacy)c.SyncInt32(count);
 	if(count<0||count>1024){c.mFailed=true;return;}
 	if(c.mReading)save.resize(count);
 	for(auto& p:save){
 		c.SyncUInt32(p.key);c.SyncInt32(p.state.id);c.SyncInt32(p.state.delay);c.SyncInt32(p.state.phase);c.SyncInt32(p.state.pending);
-		for(int& kind:p.state.coins)c.SyncInt32(kind);
+		if(legacy){
+			std::array<int,100> old{};
+			for(int& kind:old){c.SyncInt32(kind);if(kind<0||kind>CoinPlantRules::Diamond||(p.state.id==CoinPlantRules::Shooter&&kind)){c.mFailed=true;return;}}
+			// Keep the most valuable 50 paid coins, including sparse high-numbered slots.
+			std::sort(old.begin(),old.end(),std::greater<int>());
+			std::copy_n(old.begin(),CoinPlantRules::Limit,p.state.coins.begin());
+		}else{
+			for(int& kind:p.state.coins)c.SyncInt32(kind);
+			for(unsigned& key:p.state.touching)c.SyncUInt32(key);
+		}
 		if(c.mReading&&!CoinPlantRules::Valid(p.state)){c.mFailed=true;return;}
 	}
 	if(c.mReading&&!c.mFailed)CoinPlants::Load(save);
