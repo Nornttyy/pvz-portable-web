@@ -28,8 +28,10 @@ Save pending;
 int fired[3]{},hits[3]{};
 float Height(const Plant* p){return PlantDrawHeightOffset(p->mBoard,const_cast<Plant*>(p),p->mSeedType,p->mPlantCol,p->mRow);}
 bool Spend(Plant* p,int kind){
+ if(!Kind(kind))return false;
+ if(gSandboxEnabled)return true; // Sandbox ammunition is free, even with a zero balance.
  auto* wallet=p->mApp->mPlayerInfo;
- if(!wallet||!Kind(kind)||wallet->mCoins<Units(kind))return false;
+ if(!wallet||wallet->mCoins<Units(kind))return false;
  wallet->AddCoins(-Units(kind));p->mBoard->ShowCoinBank();return true;
 }
 bool Active(const Plant* p){return !p->mDead&&!p->mSquished&&!p->mIsAsleep&&p->mPlantHealth>0&&!const_cast<Plant*>(p)->NotOnGround()&&p->mOnBungeeState==NOT_ON_BUNGEE;}
@@ -69,7 +71,7 @@ void Update(Plant* p){
  if(s.id!=id)return;
  s.phase=(s.phase+1)%OrbitPeriod;
  if(id==Flower){
-  // Actual coin contacts, not an invisible aura. Each paid coin hits only once.
+  // Actual coin contacts, not an invisible aura. Each orbit coin hits only once.
   for(int slot=0;slot<Limit;++slot)if(s.coins[slot]){
    const auto pt=Orbit(slot,s.phase);const float x=p->mX+pt.x,y=p->mY+Height(p)+pt.y;
    for(auto* z:p->mBoard->mZombies){
@@ -87,7 +89,7 @@ void Update(Plant* p){
   target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY);if(!target)return;
  }else if(Count(s)>=Limit)return;
  // Roll once per production, never reroll every frame when a rare coin is unaffordable.
- if(!p->mApp->mPlayerInfo||p->mApp->mPlayerInfo->mCoins<1)return;
+ if(!gSandboxEnabled&&(!p->mApp->mPlayerInfo||p->mApp->mPlayerInfo->mCoins<1))return;
  if(!s.pending)s.pending=Choose(Sexy::Rand(100),id==Flower);
  if(!Spend(p,s.pending))return;
  const int kind=s.pending;s.pending=0;s.delay=Interval(id);++fired[kind-1];

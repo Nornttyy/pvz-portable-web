@@ -7,7 +7,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {PLANTS} from '../web/sandbox-data.mjs';
 const root=new URL('../',import.meta.url).pathname,run=promisify(execFile),read=p=>readFile(join(root,p),'utf8');
-test('production coin plants preserve exact probabilities, wallet units, lifetime, cap and save state',async()=>{
+test('production coin plants keep sandbox free at zero balance and preserve adventure debit, odds, cap and saves',async()=>{
  const source=await read('src/CoinPlants.cpp'),dir=await mkdtemp(join(tmpdir(),'pvz-coin-plants-')),binary=join(dir,'combat');
  await writeFile(join(dir,'coin-helpers.inc'),source.slice(source.indexOf('float Height('),source.indexOf('Sexy::Image* CoinImage(')));
  await writeFile(join(dir,'coin-production.inc'),source.slice(source.indexOf('bool ShooterSlot('),source.indexOf('bool DrawShot(')));

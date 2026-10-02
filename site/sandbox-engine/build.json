@@ -49,7 +49,7 @@
       "diamond": 300
     },
     "art": "Original peashooter and marigold rigs, original coin and diamond images; pixel black sunglasses follow the face bone, cigarette follows the pea muzzle. Battle and card previews share the same accessory artwork and registration.",
-    "boundaries": "Money ammunition is not a pickup. Single-target damage only; no automatic refund, sun debit or free production. Each pending roll is retained when unaffordable. Sandbox copies the player's wallet into its disposable profile and does not change adventure savings.",
+    "boundaries": "Money ammunition is not a pickup. Single-target damage only; no automatic refund or sun debit. Adventure charges the exact value and retains unaffordable pending rolls. Sandbox ammunition is free at any balance, including zero; existing probabilities, intervals, contact consumption and the 100-coin cap remain. Its disposable profile never changes adventure savings.",
     "save": "Optional portable chunk 25 saves production clocks, pending rolls, orbit phases and all 100 stable coin slots. Restoring never charges the wallet again."
   },
   "removedZombatar": "The Zombatar menu sign and button are removed, with no click target, editor construction or editor resource preload. Legacy entry points are inert. Existing player records, combat zombies, almanac and other menu functions are preserved.",
@@ -268,12 +268,12 @@
     {
       "name": "pvz-portable.js",
       "size": 280214,
-      "sha256": "08ee6a2f3a8dbdcaa845b4fe90963ca4ee4640227cd428aefc0a3b26de94f80f"
+      "sha256": "65589e7b8237d228430de4c17bc34612066dbc430e652103ab4306513e7c7626"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 8433449,
-      "sha256": "8473ee4c862b1cd36797f2851eed1ff278cdb340f4519c17bfbf8b061a561753"
+      "size": 8433530,
+      "sha256": "596fe7ee7a5eddf01919252385d8cd93b3d9d1924d9b3dfd5090295ea2ced816"
     }
   ]
 }

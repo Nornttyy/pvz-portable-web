@@ -42,6 +42,23 @@ int main(){
  for(int roll=0;roll<100;++roll){++shotOdds[Choose(roll,false)];++flowerOdds[Choose(roll,true)];}
  assert(shotOdds[1]==69&&shotOdds[2]==30&&shotOdds[3]==1);
  assert(flowerOdds[1]==65&&flowerOdds[2]==30&&flowerOdds[3]==5);
+ // Sandbox has the same odds and cadence, but every currency is free even at zero.
+ gSandboxEnabled=true;
+ for(int wallet:{0,1,200})for(bool flower:{false,true})for(int roll=0;roll<100;++roll){
+  Reset();Board b;Zombie z;Plant p;p.mBoard=&b;p.custom=flower?Flower:Shooter;p.target=&z;b.mPlants={&p};app.player.mCoins=wallet;Sexy::roll=roll;
+  const int interval=Interval(p.custom),kind=Choose(roll,flower);tick(p,interval-1);
+  assert(app.player.mCoins==wallet&&b.mProjectiles.mSize==0&&Count(Capture(&b)[0].state)==0);tick(p,1);
+  assert(app.player.mCoins==wallet&&Capture(&b)[0].state.pending==0);
+  if(flower)assert(Count(Capture(&b)[0].state)==1&&Capture(&b)[0].state.coins[0]==kind);
+  else assert(b.mProjectiles.mSize==1&&b.mProjectiles.values[0].style==Style(kind));
+ }
+ // Infinite currency does not bypass capacity, pauses or target requirements.
+ Reset();{Board b;Zombie z;Plant p;p.mBoard=&b;p.custom=Flower;b.mPlants={&p};app.player.mCoins=0;Sexy::roll=0;
+  State ring;ring.id=Flower;ring.coins.fill(Diamond);Load({{1,ring}});Restore(&b);tick(p,FlowerInterval*2);
+  assert(Count(Capture(&b)[0].state)==100&&app.player.mCoins==0);Forget(&p);
+  p.custom=Shooter;tick(p,ShotInterval*2);assert(b.mProjectiles.mSize==0);p.target=&z;b.mPaused=true;tick(p,ShotInterval*2);assert(b.mProjectiles.mSize==0);
+ }
+ gSandboxEnabled=false; // All original adventure debit / insufficient-funds checks still apply.
  for(bool flower:{false,true})for(int roll=0;roll<100;++roll){
   Reset();Board b;Zombie z;Plant p;p.mBoard=&b;p.custom=flower?Flower:Shooter;p.target=&z;b.mPlants={&p};app.player.mCoins=200;Sexy::roll=roll;
   const int interval=Interval(p.custom),kind=Choose(roll,flower);tick(p,interval-1);assert(app.player.mCoins==200);tick(p,1);
