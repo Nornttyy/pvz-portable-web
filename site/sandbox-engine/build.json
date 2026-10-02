@@ -1,6 +1,7 @@
 {
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
+  "coinAutoCollect": "Silver and gold coins begin the original collection flight after 60 active game ticks, without mouse/touch input. Native scoring, amounts and sounds are unchanged. Pauses, dialogs, non-playing scenes and already-collected coins are guarded. Sun, diamonds, seeds, bags and awards keep their existing behavior; present-fanout coins keep their native 80-tick collection.",
   "branding": "Original logo retained with the same generated transparent NB版 badge on the web loader, native title and main menu. One short settling entrance on the title; no perpetual motion. Main menu art sits below the user signs in the left sky, follows the achievements slide, has no hit target and clears when starting adventure. Native sandbox entry is 138x38 at (650,8), with 18px bitmap text and matching mouse/touch bounds.",
   "openmpt": "0.8.4",
   "mode": "Thirteen abstract plants and eight independent zombies (212..219). Everything Shooter randomly fires all fourteen native projectiles plus three rare types; Ice Chili costs 125 sun. Adventure and sandbox share replacements; other progression and saves are preserved.",
@@ -221,13 +222,13 @@
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 279505,
-      "sha256": "8b3f6c2b512eeb4d220a1f7882d95a1ffd9c4e42137c8938926811f9e98f9a32"
+      "size": 279578,
+      "sha256": "b29c10a9af5bcfa70eec41f71b0f63614ea5af4cfdfba8c7264111ffdd9e2fd4"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 8341532,
-      "sha256": "e40484a02c20f702e6e24d4ecf15e2f239f31408ea1f566aeb6f87133ea20fa6"
+      "size": 8342225,
+      "sha256": "cf2904638c593e06415b7412de8718166b0c7d06c20d0f68e5cfaf653bf20711"
     }
   ]
 }

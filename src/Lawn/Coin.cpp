@@ -714,6 +714,22 @@ void Coin::UpdateCollected()
 	}
 }
 
+void Coin::TryAutoCollectCoin()
+{
+	// Leave the initial drop visible; then use the normal flight and scoring path.
+	// Gifts already fan out and collect themselves on their original 80-tick timer.
+	if (mDead || mIsBeingCollected || mCoinAge < 60 ||
+		(mType != CoinType::COIN_SILVER && mType != CoinType::COIN_GOLD) ||
+		mCoinMotion == CoinMotion::COIN_MOTION_FROM_PRESENT)
+		return;
+	if (!mBoard || mBoard->mPaused || !mApp->mPlayerInfo || mApp->GetDialogCount() > 0 ||
+		mApp->mGameScene != GameScenes::SCENE_PLAYING)
+		return;
+
+	PlayCollectSound();
+	Collect();
+}
+
 void Coin::Update()
 {
 	mCoinAge++;
@@ -722,6 +738,7 @@ void Coin::Update()
 		return;
 	}
 
+	TryAutoCollectCoin();
 	if (mFadeCount != 0)
 	{
 		UpdateFade();

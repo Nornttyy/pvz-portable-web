@@ -397,7 +397,7 @@ index 2293690..3388708 100644
  	bool							IsFlagWave(int theWaveNumber);
  	void							DrawHouseDoorTop(Graphics* g);
 diff --git a/src/Lawn/Coin.cpp b/src/Lawn/Coin.cpp
-index cdec611..194aa2c 100644
+index cdec611..a215cc3 100644
 --- a/src/Lawn/Coin.cpp
 +++ b/src/Lawn/Coin.cpp
 @@ -384,20 +384,7 @@ void Coin::CoinInitialize(int theX, int theY, CoinType theCoinType, CoinMotion t
@@ -422,7 +422,38 @@ index cdec611..194aa2c 100644
  
  	if (CoinGetsBouncyArrow())
  	{
-@@ -1291,7 +1278,11 @@ void Coin::Collect()
+@@ -727,6 +714,22 @@ void Coin::UpdateCollected()
+ 	}
+ }
+ 
++void Coin::TryAutoCollectCoin()
++{
++	// Leave the initial drop visible; then use the normal flight and scoring path.
++	// Gifts already fan out and collect themselves on their original 80-tick timer.
++	if (mDead || mIsBeingCollected || mCoinAge < 60 ||
++		(mType != CoinType::COIN_SILVER && mType != CoinType::COIN_GOLD) ||
++		mCoinMotion == CoinMotion::COIN_MOTION_FROM_PRESENT)
++		return;
++	if (!mBoard || mBoard->mPaused || !mApp->mPlayerInfo || mApp->GetDialogCount() > 0 ||
++		mApp->mGameScene != GameScenes::SCENE_PLAYING)
++		return;
++
++	PlayCollectSound();
++	Collect();
++}
++
+ void Coin::Update()
+ {
+ 	mCoinAge++;
+@@ -735,6 +738,7 @@ void Coin::Update()
+ 		return;
+ 	}
+ 
++	TryAutoCollectCoin();
+ 	if (mFadeCount != 0)
+ 	{
+ 		UpdateFade();
+@@ -1291,7 +1295,11 @@ void Coin::Collect()
  
  float Coin::GetSunScale()
  {
@@ -435,6 +466,18 @@ index cdec611..194aa2c 100644
  }
  
  int Coin::GetSunValue()
+diff --git a/src/Lawn/Coin.h b/src/Lawn/Coin.h
+index 77f937e..e686932 100644
+--- a/src/Lawn/Coin.h
++++ b/src/Lawn/Coin.h
+@@ -91,6 +91,7 @@ public:
+ 	void                    DroppedUsableSeed();
+ 	void                    PlayCollectSound();
+ 	void                    TryAutoCollectAfterLevelAward();
++	void                    TryAutoCollectCoin();
+ 	bool                    IsPresentWithAdvice();
+ 	void                    PlayLaunchSound();
+ 	void                    PlayGroundSound();
 diff --git a/src/Lawn/GridItem.cpp b/src/Lawn/GridItem.cpp
 index 197b1a1..b3e5575 100644
 --- a/src/Lawn/GridItem.cpp

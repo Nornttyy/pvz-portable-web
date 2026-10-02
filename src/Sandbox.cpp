@@ -343,6 +343,17 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
     }
 }
 
+// Read-only diagnostics: verify collection/credit without touching a player's balance.
+extern "C" EMSCRIPTEN_KEEPALIVE int pvz_coin_data(int index, int field) {
+    auto* board = gLawnApp ? gLawnApp->mBoard : nullptr;
+    if (!board || !gLawnApp->mPlayerInfo) return -1;
+    if (index == -1) return field == 0 ? gLawnApp->mPlayerInfo->mCoins : field == 1 ? board->mCoinsCollected : field == 2 ? board->mLevelCoinsCollected : -1;
+    if (index < 0) return -1;
+    for (auto* coin : board->mCoins) if (!coin->mDead && index-- == 0)
+        return field == 0 ? int(coin->mType) : field == 1 ? coin->mCoinAge : field == 2 ? int(coin->mIsBeingCollected) : field == 3 ? int(coin->mPosX) : field == 4 ? int(coin->mPosY) : field == 5 ? coin->mFadeCount : field == 6 ? Coin::GetCoinValue(coin->mType) : field == 7 ? int(board->mCoins.DataArrayGetID(coin)) : -1;
+    return -1;
+}
+
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_zombie_data(int index,int field) {
     // Read-only diagnostics also cover adventure save/resume. Commands remain
     // sandbox-only; this cannot spawn enemies or alter campaign progress.

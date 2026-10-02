@@ -91,6 +91,7 @@ public:
 	void                    DroppedUsableSeed();
 	void                    PlayCollectSound();
 	void                    TryAutoCollectAfterLevelAward();
+	void                    TryAutoCollectCoin();
 	bool                    IsPresentWithAdvice();
 	void                    PlayLaunchSound();
 	void                    PlayGroundSound();

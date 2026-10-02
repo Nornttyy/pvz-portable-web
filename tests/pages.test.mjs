@@ -17,6 +17,7 @@ import './giant-imp.test.mjs';
 import './clever-zombie.test.mjs';
 import './sandbox-placement.test.mjs';
 import './sun-hover.test.mjs';
+import './coin-auto-collect.test.mjs';
 import './sun-production.test.mjs';
 import './seed-chooser-layout.test.mjs';
 import './mobile-text-input.test.mjs';
