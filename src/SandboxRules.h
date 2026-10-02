@@ -2,10 +2,11 @@
 #include "SandboxPlants.h"
 #include "SandboxZombies.h"
 #include "SandboxMemeRules.h"
+#include "SandboxSceneRules.h"
 namespace SandboxRules {
 inline constexpr int MaxPlants = 180;
 inline constexpr int MaxZombies = 160;
-constexpr bool ValidMap(int map) { return map == 0 || map == 1; }
+constexpr bool ValidMap(int map) { return SandboxSceneRules::Valid(map); }
 constexpr bool ValidCell(int col, int row, bool pool) { return col >= 0 && col < 9 && row >= 0 && row < (pool ? 6 : 5); }
 constexpr bool ValidPlant(int type) { return (type >= 0 && type < 48) || MemeCharacters::Is(type); }
 constexpr bool ValidCard(int type) { return ValidPlant(type); }
@@ -25,6 +26,6 @@ constexpr bool StackTerrainAllows(int seed,int col,const StackSite& site) {
     return !((seed==21||seed==46)&&site.pot);
 }
 constexpr bool ValidZombie(int type) {
-    return (type >= 0 && type <= 24 && type != 9 && type != 13 && type != 20) || type == 32 || SandboxZombies::Find(type);
+    return (type >= 0 && type <= 32) || SandboxZombies::Find(type);
 }
 }

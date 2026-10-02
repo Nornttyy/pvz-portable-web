@@ -73,7 +73,7 @@ try{
  results.earned=await page.evaluate(()=>Module._pvz_coin_data(-1,1)*10);
  assert.equal(results.shooter.wallet,walletUnits*10+results.earned,'sandbox debits nothing; native zombie coin drops still credit normally');
  await snap('coin-shooter-combat');
- await click(833,24);await click(726,432);await click(305,366);await wait(()=>Module.canvas.width===800);await page.waitForTimeout(2200);
+ await click(783,24);await click(726,342);await click(305,366);await wait(()=>Module.canvas.width===800);await page.waitForTimeout(2200);
  const wallet=await page.evaluate(()=>{const b=Module.FS.readFile('/saves/userdata/user1.dat');return new DataView(b.buffer,b.byteOffset,b.byteLength).getUint32(8,true);});assert.equal(wallet,walletUnits,'adventure wallet unchanged by sandbox');
  results.sandboxWalletIsolated=true;
  }

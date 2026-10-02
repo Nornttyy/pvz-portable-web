@@ -44,7 +44,7 @@ try{
  assert.equal(await api(1,520,8,2),1);
  await page.waitForFunction(()=>Module._pvz_sun_data(0,0)===25,undefined,{timeout:15000});
  await page.waitForTimeout(800);const sun=(await live()).find(c=>c[0]===4);assert.ok(sun&&!sun[2],'sunflower suns still wait for their existing collection action');results.sunUnchanged=true;
- await click(833,24);await click(726,432);await click(305,366);await page.waitForFunction(()=>Module.canvas.width===800);await page.waitForTimeout(2200);
+ await click(783,24);await click(726,342);await click(305,366);await page.waitForFunction(()=>Module.canvas.width===800);await page.waitForTimeout(2200);
  const saved=await page.evaluate(()=>{const b=Module.FS.readFile('/saves/userdata/user1.dat');return new DataView(b.buffer,b.byteOffset,b.byteLength).getUint32(8,true);});assert.equal(saved,123,'sandbox test money must not alter adventure savings');results.adventureSavingsPreserved=true;
  assert.deepEqual(errors,[]);await writeFile(join(out,'report.json'),JSON.stringify({results,errors},null,2));console.log('Native automatic coin pickup passed',results);
 }catch(e){await snap('failure').catch(()=>{});await writeFile(join(out,'failure.json'),JSON.stringify({error:e.stack,results,errors},null,2));throw e;}finally{await browser.close();}

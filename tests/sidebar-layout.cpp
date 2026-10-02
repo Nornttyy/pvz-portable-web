@@ -1,5 +1,6 @@
 #include "SandboxUIRules.h"
 #include "MemeAdventureRules.h"
+#include "SandboxSceneRules.h"
 #include <cassert>
 #include <iostream>
 using namespace SandboxUIRules;
@@ -39,5 +40,9 @@ int main(){
  }
  assert(Cell(SidebarWidth-1-WorldOffset,150,false)==-1);
  assert(Cell(CanvasWidth-1-WorldOffset,150,false)==-1);
+ for(int map=0;map<6;++map)for(int row=0;row<SandboxSceneRules::Rows(map);++row)for(int col=0;col<9;++col){
+  assert(SandboxSceneRules::Cell(40+80*col+40,SandboxSceneRules::CellY(col,row,map)+40,map)==9*row+col);
+ }
+ for(int i=0;i<6;++i){const auto a=SceneCard(i);assert(a.x>=SidebarWidth&&a.y>=80&&a.x+a.w<=CanvasWidth&&a.y+a.h<Close.y);for(int j=0;j<i;++j)assert(!overlaps(a,SceneCard(j)));}
  std::cout<<"Native sidebar geometry and all 99 grass/pool cell mappings passed\n";
 }

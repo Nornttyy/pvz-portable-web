@@ -174,7 +174,7 @@ export const nativeBase = id => ORIGINAL_PLANTS.find(p=>p.id===id)?.base ?? RETI
 export const PLANTS = [...plantNames.map((name,id) => ORIGINAL_PLANTS.find(p=>p.base===id) ?? ({id,name,note:notes[id] ?? '免费 · 无冷却'})),...ORIGINAL_PLANTS.filter(p=>p.base>=48)];
 const validPlant = id => (id>=0&&id<48)||ORIGINAL_PLANTS.some(p=>p.id===id);
 export const ORIGINAL_ZOMBIES = [{id:212,base:0,name:'路易十六',note:'出场无头 · 普通僵尸血量和移速'}, {id:213,base:0,name:'跑路僵尸',note:'冲到后排 · 转身逃跑'}, {id:214,base:2,name:'雪糕桶包裹我',note:'20桶组成 · 7桶耐久 · 缓慢前进'}, {id:215,base:24,name:'巨人小鬼',note:'巨人脑袋 · 下颚秒杀 · 独立出场'}, {id:216,base:0,name:'智斗僵尸',note:'翻身闪弹 · 换路游泳 · 偷完就跑'}, {id:217,base:2,name:'路障智斗僵尸',note:'路障护身 · 翻身闪弹 · 偷完就跑'}, {id:218,base:2,name:'绿路障僵尸',note:'绿色路障 · 双倍耐久'}, {id:219,base:2,name:'路障叠叠高僵尸',note:'头顶20个路障 · 极慢 · 无法游泳'}];
-export const ZOMBIES = [[0,'普通僵尸'],[1,'旗帜僵尸'],[2,'路障僵尸'],[3,'撑杆僵尸'],[4,'铁桶僵尸'],[5,'读报僵尸'],[6,'铁门僵尸'],[7,'橄榄球僵尸'],[8,'舞王僵尸'],[10,'鸭子救生圈'],[11,'潜水僵尸'],[12,'冰车僵尸'],[14,'海豚骑士'],[15,'玩偶匣僵尸'],[16,'气球僵尸'],[17,'矿工僵尸'],[18,'跳跳僵尸'],[19,'雪人僵尸'],[21,'梯子僵尸'],[22,'投石车僵尸'],[23,'巨人僵尸'],[24,'小鬼僵尸'],[32,'红眼巨人']].map(([id,name])=>({id,name,note:[10,11,14].includes(id)?'仅限水路':'手动放置'}));
+export const ZOMBIES = [[0,'普通僵尸'],[1,'旗帜僵尸'],[2,'路障僵尸'],[3,'撑杆僵尸'],[4,'铁桶僵尸'],[5,'读报僵尸'],[6,'铁门僵尸'],[7,'橄榄球僵尸'],[8,'舞王僵尸'],[9,'伴舞僵尸'],[10,'鸭子救生圈'],[11,'潜水僵尸'],[12,'冰车僵尸'],[13,'雪橇僵尸'],[14,'海豚骑士'],[15,'玩偶匣僵尸'],[16,'气球僵尸'],[17,'矿工僵尸'],[18,'跳跳僵尸'],[19,'雪人僵尸'],[20,'蹦极僵尸'],[21,'梯子僵尸'],[22,'投石车僵尸'],[23,'巨人僵尸'],[24,'小鬼僵尸'],[25,'僵王博士'],[26,'豌豆僵尸'],[27,'坚果僵尸'],[28,'辣椒僵尸'],[29,'加特林僵尸'],[30,'窝瓜僵尸'],[31,'高坚果僵尸'],[32,'红眼巨人']].map(([id,name])=>({id,name,note:'手动放置 · 水路自动适配'}));
 ZOMBIES.push(...ORIGINAL_ZOMBIES);
 export function plantsFor(category) { return category === 'original' || category === 'all' ? PLANTS : (groups[category] ?? groups.common).map(id=>PLANTS[id]); }
 export function boardCell(x,y,pool=false) {
@@ -202,7 +202,8 @@ export function requiresStacking(plants) {
   return false;
 }
 export function validateLayout(value) {
-  if (value?.schema !== 1 || ![0,1].includes(value.map) || !Array.isArray(value.plants) || value.plants.length > 180) throw Error('不是支持的沙盒阵型文件');
+  if (value?.schema !== 1 || ![0,1,2,3,4,5].includes(value.map) || !Array.isArray(value.plants) || value.plants.length > (value.adapted===true?1016:180)) throw Error('不是支持的沙盒阵型文件');
+  if(value.adapted!==undefined&&typeof value.adapted!=='boolean')throw Error('地图适配设置无效');
   if(value.stacked!==undefined&&typeof value.stacked!=='boolean')throw Error('同格种植设置无效');
   if(value.fusion!==undefined&&typeof value.fusion!=='boolean')throw Error('融合设置无效');
   if(value.stacked&&value.fusion)throw Error('融合和同格种植不能同时开启');
@@ -213,7 +214,7 @@ export function validateLayout(value) {
     const retired=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
     if(Number.isInteger(p?.type)&&p.type>=100&&p.type<120)p={...p,type:retired[p.type-100]};
     if([...RETIRED_PLANTS,...RETIRED_CHARACTERS].some(old=>old.id===p?.type))p={...p,type:nativeBase(p.type)};
-    if (!p || ![p.type,p.col,p.row].every(Number.isInteger) || !validPlant(p.type) || p.col<0 || p.col>=9 || p.row<0 || p.row >= (value.map===1?6:5)) throw Error('阵型中有无效的植物或位置');
+    if (!p || ![p.type,p.col,p.row].every(Number.isInteger) || !validPlant(p.type) || p.col<0 || p.col>=9 || p.row<0 || p.row >= ([1,3].includes(value.map)?6:5)) throw Error('阵型中有无效的植物或位置');
     const key = `${p.type}:${p.col}:${p.row}`;
     if(nativeBase(p.type)===8){const cell=`${p.col}:${p.row}`,count=(puffCounts.get(cell)??0)+1;if(count>5)throw Error('真·小喷菇每格最多5只');puffCounts.set(cell,count);}
     if (!stacked&&seen.has(key)&&nativeBase(p.type)!==8) throw Error('阵型中有重复植物');
@@ -232,7 +233,8 @@ export function validateLayout(value) {
   }
   for(const original of plants) {
     const p={...original,type:nativeBase(original.type)};
-    const cell=occupied.get(`${p.col}:${p.row}`), water=value.map===1&&[2,3].includes(p.row);
+    const cell=occupied.get(`${p.col}:${p.row}`), water=[1,3].includes(value.map)&&[2,3].includes(p.row);
+    if(value.adapted){if(p.type===47&&p.col>=8)throw Error('玉米加农炮需要两格');continue;}
     if([16,19,24,43].includes(p.type)&&!water) throw Error('水生植物不在水路');
     if(water&&[4,21,33,46].includes(p.type)) throw Error('陆生植物不能放在水路');
     if(water&&![16,19,24,35,43].includes(p.type)&&!cell.types.has(16)&&!(p.type===30&&cell.types.has(43))) throw Error('水路植物缺少睡莲');
@@ -246,5 +248,5 @@ export function validateLayout(value) {
       if(water&&!right.types?.has(16)) throw Error('玉米加农炮的第二格缺少睡莲');
     }
   }
-  return {schema:1,map:value.map,...(stacked?{stacked:true}:{}),...(value.fusion!==undefined?{fusion:value.fusion}:{}),plants:plants.sort((a,b)=>layer(a)-layer(b))};
+  return {schema:1,map:value.map,...(value.adapted?{adapted:true}:{}),...(stacked?{stacked:true}:{}),...(value.fusion!==undefined?{fusion:value.fusion}:{}),plants:plants.sort((a,b)=>layer(a)-layer(b))};
 }

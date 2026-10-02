@@ -281,6 +281,33 @@ std::unique_ptr<MemoryImage> ReanimatorCache::MakeCachedZombieFrame(ZombieType t
 		aReanim.ReanimationInitializeType(aPosX, aPosY, aZombieDef.mReanimationType);
 		aReanim.SetFramesForLayer("anim_idle");
 		Zombie::SetupReanimLayers(&aReanim, aUseZombieType);
+		// ZomBotany previews use the same native head rigs and attachment
+		// transforms as live zombies, not a generic zombie portrait.
+		if (aUseZombieType >= ZOMBIE_PEA_HEAD && aUseZombieType <= ZOMBIE_TALLNUT_HEAD)
+		{
+			const bool pea = aUseZombieType == ZOMBIE_PEA_HEAD || aUseZombieType == ZOMBIE_GATLING_HEAD;
+			const bool squash = aUseZombieType == ZOMBIE_SQUASH_HEAD;
+			const bool bodyHead = !pea && !squash;
+			const char* anchor = bodyHead ? "Zombie_body" : "anim_head1";
+			aReanim.AssignRenderGroupToPrefix("anim_hair", RENDER_GROUP_HIDDEN);
+			aReanim.AssignRenderGroupToPrefix(bodyHead ? "anim_head" : "anim_head2", RENDER_GROUP_HIDDEN);
+			if (bodyHead) aReanim.AssignRenderGroupToPrefix("Zombie_tie", RENDER_GROUP_HIDDEN);
+			else aReanim.GetTrackInstanceByName("anim_head1")->mImageOverride = IMAGE_BLANK;
+			aReanim.mFrameBasePose = 0;
+			const ReanimationType heads[] = {REANIM_PEASHOOTER, REANIM_WALLNUT, REANIM_JALAPENO, REANIM_GATLINGPEA, REANIM_SQUASH, REANIM_TALLNUT};
+			Reanimation head;
+			head.ReanimationInitializeType(0, 0, heads[int(aUseZombieType) - int(ZOMBIE_PEA_HEAD)]);
+			head.SetFramesForLayer(pea ? "anim_head_idle" : "anim_idle");
+			SexyTransform2D anchorMatrix, offset;
+			aReanim.GetAttachmentOverlayMatrix(aReanim.FindTrackIndex(anchor), anchorMatrix);
+			const bool nut = aUseZombieType == ZOMBIE_WALLNUT_HEAD || aUseZombieType == ZOMBIE_TALLNUT_HEAD;
+			const float scale = nut ? .8f : squash ? .75f : 1.f;
+			PvzpScaleRotateTransformMatrix(offset, pea ? 65.f : aUseZombieType == ZOMBIE_WALLNUT_HEAD ? 50.f : aUseZombieType == ZOMBIE_TALLNUT_HEAD ? 37.f : 55.f, nut ? 0.f : squash ? -15.f : -5.f, .2f, -scale, scale);
+			head.mOverlayMatrix = anchorMatrix * offset;
+			aReanim.Draw(&aMemoryGraphics);
+			head.Draw(&aMemoryGraphics);
+			return aMemoryImage;
+		}
 
 		if (theZombieType == ZombieType::ZOMBIE_DOOR)
 			aReanim.AssignRenderGroupToTrack("anim_screendoor", RENDER_GROUP_NORMAL);

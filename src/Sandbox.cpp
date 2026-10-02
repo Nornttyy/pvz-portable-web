@@ -4,6 +4,7 @@
 #include "SandboxRules.h"
 #include "SandboxFusion.h"
 #include "SandboxUIRules.h"
+#include "SandboxScenes.h"
 #include "LawnApp.h"
 #include "Lawn/Board.h"
 #include "Lawn/Plant.h"
@@ -86,6 +87,7 @@ bool SandboxExit() {
     app->KillBoard();
     SandboxPlants::Reset();
     SandboxZombies::Reset();
+    SandboxScenes::Reset();
     app->mPlayerInfo = adventureProfile;
     adventureProfile = nullptr;
     app->mGameMode = previousMode;
@@ -111,18 +113,20 @@ void SandboxStart(int map) {
     app->KillBoard();
     SandboxPlants::Reset();
     SandboxZombies::Reset();
+    SandboxScenes::Reset();
     if (!sandboxProfile) sandboxProfile = std::make_unique<PlayerInfo>();
     auto* profile = sandboxProfile.get();
     profile->mName = "Sandbox";
     profile->mId = 1;
     profile->mFinishedAdventure = 1;
-    profile->mLevel = map == 1 ? 28 : 8;
+    profile->mLevel = SandboxSceneRules::Scenes[map].level;
     app->mPlayerInfo = profile;
     app->mGameMode = GAMEMODE_ADVENTURE;
     app->mEasyPlantingCheat = true;
     app->MakeNewBoard();
     auto* board = app->mBoard;
     board->InitLevel();
+    if(map!=0&&map!=1)SandboxScenes::Switch(board,map,awake);
     board->mCutScene->PreloadResources();
     board->mCutScene->mPlacedLawnItems = true;
     board->mCutScene->mPlacedZombies = true;
@@ -185,7 +189,7 @@ static void ClearEnemies(Board* board) {
 // Infuse in place. Prefer an unpowered main plant, then shell, then support.
 static Plant* FindFusionTarget(Board* board,int type,int col,int row,int& result) {
     result=0;
-    if(!fusionEnabled||stackPlants||!SandboxRules::ValidCard(type)||!SandboxRules::ValidCell(col,row,mapType==1))return nullptr;
+    if(!fusionEnabled||stackPlants||!SandboxRules::ValidCard(type)||!SandboxRules::ValidCell(col,row,SandboxSceneRules::Pool(mapType)))return nullptr;
     Plant* target=nullptr;
     for(auto* p:board->mPlants){
         if(p->mDead||p->mRow!=row||p->NotOnGround())continue;
@@ -200,8 +204,8 @@ static Plant* FindFusionTarget(Board* board,int type,int col,int row,int& result
     result=candidate;
     return target;
 }
-static int PlacePlant(Board* board, int type, int col, int row) {
-    if (!SandboxRules::ValidCard(type) || !SandboxRules::ValidCell(col, row, mapType == 1)) return -2;
+static int PlacePlant(Board* board, int type, int col, int row, bool preserved=false) {
+    if (!SandboxRules::ValidCard(type) || !SandboxRules::ValidCell(col, row, SandboxSceneRules::Pool(mapType))) return -2;
     int fusedType=0;
     if(auto* target=FindFusionTarget(board,type,col,row,fusedType)){
         if(SandboxMemeRules::IsPower(type)){
@@ -224,10 +228,11 @@ static int PlacePlant(Board* board, int type, int col, int row) {
     }
     if (SandboxMemeRules::IsPower(type)) return -6; // Powers never become standalone plants.
     if (board->mPlants.mSize >= board->mPlants.mMaxSize - 8) return -3;
-    if (PlantCount(board) >= SandboxRules::MaxPlants) return -3;
     const auto seed = static_cast<SeedType>(SandboxPlants::Base(type));
-    if (int(seed) == 8 && MemeCharacters::PuffCount(board,col,row) >= TinyPuffRules::Limit) return -4;
     if (seed == SEED_COBCANNON && col >= 8) return -4;
+    if (int(seed) == 8 && MemeCharacters::PuffCount(board,col,row) >= TinyPuffRules::Limit) return -4;
+    if(preserved){Plant::PreloadPlantResources(seed);auto* plant=board->AddPlant(col,row,seed,SEED_NONE);if(!plant)return -3;SandboxPlants::Assign(plant,type);if(awake&&plant->mIsAsleep)plant->SetSleeping(false);board->MarkAllDirty();return 1;}
+    if (PlantCount(board) >= SandboxRules::MaxPlants) return -3;
     if (seed == SEED_CATTAIL && !board->IsPoolSquare(col, row)) return -4;
     if (stackPlants && seed != SEED_GRAVEBUSTER && seed != SEED_INSTANT_COFFEE) {
         SandboxRules::StackSite site;
@@ -263,22 +268,18 @@ static int PlacePlant(Board* board, int type, int col, int row) {
     return 1;
 }
 static int Spawn(Board* board, int type, int col, int row) {
-    if (!SandboxRules::ValidZombie(type) || !SandboxRules::ValidCell(col, row, mapType == 1)) return -2;
+    if (!SandboxRules::ValidZombie(type) || !SandboxRules::ValidCell(col, row, SandboxSceneRules::Pool(mapType))) return -2;
     if (ZombieCount(board) >= SandboxRules::MaxZombies || board->mZombies.mSize >= board->mZombies.mMaxSize - 8) return -3;
     const auto requestedType = static_cast<ZombieType>(SandboxZombies::Base(type));
-    const bool water = board->IsPoolSquare(col, row);
-    if (water && !SandboxZombies::WaterAllowed(type)) return -5;
-    if (!water && (requestedType == ZOMBIE_SNORKEL || requestedType == ZOMBIE_DOLPHIN_RIDER || requestedType == ZOMBIE_DUCKY_TUBE)) return -5;
     // Native swimming is the ordinary zombie plus its row-dependent duck rig.
     // The catalogue-only DUCKY_TUBE type is not accepted by native pool motion.
     auto zombieType = requestedType == ZOMBIE_DUCKY_TUBE ? ZOMBIE_NORMAL : requestedType;
-    if (water && !Zombie::ZombieTypeCanGoInPool(zombieType) && zombieType != ZOMBIE_BALLOON) return -5;
     Zombie::PreloadZombieResources(zombieType);
     auto* zombie = board->AddZombieInRow(zombieType, row, Zombie::ZOMBIE_WAVE_DEBUG);
     if (!zombie) return -3;
-    zombie->mPosX = static_cast<float>(board->GridToPixelX(col, row) + 10);
-    zombie->mX = static_cast<int>(zombie->mPosX);
+    if(zombieType!=ZOMBIE_BOSS){const float oldX=zombie->mPosX;zombie->mPosX = static_cast<float>(board->GridToPixelX(col, row) + 10);zombie->mX = static_cast<int>(zombie->mPosX);SandboxScenes::MoveFollowers(zombie,zombie->mPosX-oldX);}
     SandboxZombies::Assign(zombie,type);
+    SandboxScenes::UpdateSwimmer(zombie);
     zombie->UpdateReanim();
     board->MarkAllDirty();
     return 1;
@@ -288,11 +289,11 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
     auto* board = ActiveBoard();
     if (!board) return -1;
     switch (command) {
-    case 0: return 1 | (paused ? 2 : 0) | (mapType == 1 ? 4 : 0) | (awake ? 8 : 0) | (stackPlants ? 16 : 0) | (continuousZombies ? 32 : 0) | (fusionEnabled ? 64 : 0);
+    case 0: return 1 | (paused ? 2 : 0) | (SandboxSceneRules::Pool(mapType) ? 4 : 0) | (awake ? 8 : 0) | (stackPlants ? 16 : 0) | (continuousZombies ? 32 : 0) | (fusionEnabled ? 64 : 0);
     case 1: return PlacePlant(board, type, col, row);
     case 2: return Spawn(board, type, col, row);
     case 3: {
-        if (!SandboxRules::ValidCell(col, row, mapType == 1)) return -2;
+        if (!SandboxRules::ValidCell(col, row, SandboxSceneRules::Pool(mapType))) return -2;
         Plant* top = nullptr;
         // The five-mushroom cluster is natural stacking: shovel one member,
         // not all five or their lily pad, even when global stacking is off.
@@ -315,13 +316,17 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
     case 6: ClearEnemies(board); return 1;
     case 7:
         SandboxStart(mapType); return 1; // Also resets ice, craters and ongoing instant effects.
-    case 8: if (!SandboxRules::ValidMap(type)) return -2; SandboxStart(type); return 1;
+    case 8:
+        if(!SandboxRules::ValidMap(type))return -2;
+        if(type==mapType)return 1;
+        if(!SandboxScenes::Switch(board,type,awake))return -3;
+        mapType=type;++sessionRevision;return 1;
     case 9: return PlantCount(board);
     case 10: return ZombieCount(board);
     case 11: {
         if (!SandboxRules::ValidZombie(type)) return -2;
         int added = 0;
-        for (int y = 0; y < (mapType == 1 ? 6 : 5); ++y) if (Spawn(board, type, 8, y) > 0) ++added;
+        for (int y = 0; y < SandboxSceneRules::Rows(mapType); ++y) if (Spawn(board, type, 8, y) > 0) ++added;
         return added ? added : -5;
     }
     case 12:
@@ -341,6 +346,9 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
     case 23:
         for(auto* p:board->mPlants)if(!p->mDead&&p->mPlantCol==col&&p->mRow==row&&MemeCharacters::Activate(p,type))return 1;
         return 0;
+    case 24: return mapType;
+    case 25: if(!SandboxRules::ValidMap(type))return -2;SandboxStart(type);return 1;
+    case 27: return PlacePlant(board,type,col,row,true);
     default: return -2;
     }
 }
@@ -409,10 +417,14 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_meme_audio_data(int field) {
 
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_plant_data(int index, int field) {
     auto* board = ActiveBoard();
-    if (!board || index < 0 || index >= SandboxRules::MaxPlants || field < 0 || field > 11) return -1;
+    if (!board || index < 0 || field < 0 || field > 15) return -1;
     for (auto* plant : board->mPlants) {
         if (plant->mDead) continue;
         if (index-- == 0) {
+            if(field==12)return int(board->mPlants.DataArrayGetID(plant));
+            if(field==13)return plant->mX;
+            if(field==14)return plant->mY;
+            if(field==15)return int(plant->mIsAsleep);
             if(field==11)return plant->mLaunchCounter; // Native production progress, read-only.
             if(field==10)return MemeCharacters::Data(plant,5); // Reserved legacy diagnostic.
             if(field==7)return MemeCharacters::Data(plant,4);

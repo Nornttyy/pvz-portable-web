@@ -59,8 +59,9 @@ int main(){
  using SandboxUIRules::RepeatPlacement;
  RepeatPlacement repeat;
  assert(!repeat.Poll(0,0,true,true));repeat.Begin(0,0);
- for(int ms=0;ms<300;++ms)assert(!repeat.Poll(0,ms,true,true));
- assert(repeat.Poll(0,300,true,true));assert(!repeat.Poll(0,300,true,true));
+ static_assert(RepeatPlacement::IntervalMs==60);
+ for(int ms=0;ms<60;++ms)assert(!repeat.Poll(0,ms,true,true));
+ assert(repeat.Poll(0,60,true,true));assert(!repeat.Poll(0,60,true,true));
  assert(repeat.Poll(1,301,true,true));assert(!repeat.Poll(-1,302,true,true));
  assert(repeat.Poll(1,303,true,true));assert(!repeat.Poll(1,1000,false,true));
  assert(!repeat.Poll(1,2000,true,true)); // no restart without a fresh press

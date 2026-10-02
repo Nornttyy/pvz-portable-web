@@ -4,6 +4,22 @@
   "coinAutoCollect": "Silver and gold coins begin the original collection flight after 60 active game ticks, without mouse/touch input. Native scoring, amounts and sounds are unchanged. Pauses, dialogs, non-playing scenes and already-collected coins are guarded. Sun, diamonds, seeds, bags and awards keep their existing behavior; present-fanout coins keep their native 80-tick collection.",
   "branding": "Original logo retained with the same generated transparent NB版 badge on the web loader, native title and main menu. One short settling entrance on the title; no perpetual motion. Main menu art sits below the user signs in the left sky, follows the achievements slide, has no hit target and clears when starting adventure. Native sandbox entry is 138x38 at (650,8), with 18px bitmap text and matching mouse/touch bounds.",
   "openmpt": "0.8.4",
+  "sandboxScenes": {
+    "maps": [
+      "day",
+      "pool",
+      "night",
+      "fog",
+      "roof",
+      "boss-roof"
+    ],
+    "switch": "In-place terrain change preserving live plant IDs, health, heat and coin stocks. Sixth-row occupants temporarily share row five on land and return when six lanes are restored. Real missing lily/pot supports are added without consuming existing plants.",
+    "selector": "Six original-background thumbnails with native pool overlays; dedicated top-bar map and every-lane buttons, separate from settings.",
+    "swimming": "Sandbox-only automatic native duck rings, including sized rings for nonstandard land rigs. Snorkel and dolphin keep native aquatic poses; flying units and the boss are not forced to swim.",
+    "repeatIntervalMs": 60,
+    "combo": "Successful held/clicked placements chain into a short, fading COMBO counter; release, focus loss and menus stop repetition.",
+    "zombieCatalogue": "All 33 native types, including Zomboss, plus eight originals; two pages. Linked bobsled followers use the chosen location. Sandbox boss deaths do not award adventure loot or wipe other enemies."
+  },
   "mode": "Fifteen abstract plants and eight independent zombies (212..219). Coin Shooter is an independent card unlocked at 2-2; Coin Flower replaces Marigold. Adventure and sandbox share replacements; other progression and saves are preserved.",
   "almanacCopy": "All fifteen original plants and eight original zombies show explicit numeric statistics separately from surreal character-specific flavour text. Native cost/recharge footer and full supplemental Chinese glyphs.",
   "almanacLayout": "Original eight-column 50x70 cards aligned to the printed book sockets. Native seed order on page one; five extra plants on page two. Native book arrows, mouse/touch/keyboard navigation and page-scoped hit tests.",
@@ -274,12 +290,12 @@
     {
       "name": "pvz-portable.js",
       "size": 280214,
-      "sha256": "e18ebbd0769ef4a0c1eeed8b2900bd69946ec82fdb611b25b8db2781670a50f1"
+      "sha256": "4c4a88590864552dba1335da158c417d5e2b9ba27dfc213a9221f936bc1dd5bd"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 8440781,
-      "sha256": "ecbaf44bbf67b15f5f06c806249394874d4832367d39ad0480df8aaeb9cddda3"
+      "size": 8467913,
+      "sha256": "bee2385c0d1146c1dc0224de0a60faaf50d0f0b5742b03a076dd6fddf773e2e2"
     }
   ]
 }

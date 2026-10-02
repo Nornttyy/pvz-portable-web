@@ -11,6 +11,22 @@ import {validateLayout,requiresStacking,LAYOUT_KEY} from '../web/sandbox-data.mj
 const root=fileURLToPath(new URL('../',import.meta.url)),run=promisify(execFile);
 const read=name=>readFile(join(root,name),'utf8');
 const plant=(type=0,col=0,row=0)=>({type,col,row});
+test('six scene formations retain adapted plants while rejecting malformed positions and identifiers',()=>{
+ for(const map of [0,1,2,3,4,5]){
+  const layout={schema:1,map,adapted:true,stacked:true,plants:[plant(16,1,2),plant(531,1,2),plant(33,1,2),plant(24,3,1)]};
+  assert.deepEqual(validateLayout(JSON.parse(JSON.stringify(validateLayout(layout)))),validateLayout(layout));
+  assert.equal(validateLayout(layout).map,map);
+  const last=[1,3].includes(map)?5:4;
+  assert.equal(validateLayout({...layout,plants:[plant(523,8,last)]}).plants[0].row,last);
+  assert.throws(()=>validateLayout({...layout,plants:[plant(523,8,last+1)]}));
+ }
+ const base={schema:1,map:0,adapted:true,plants:[]};
+ for(const map of [-1,6,'3',null])assert.throws(()=>validateLayout({...base,map}));
+ for(const adapted of [1,'true',null])assert.throws(()=>validateLayout({...base,adapted}));
+ for(const p of [plant(999),plant(0,-1),plant(0,9),plant(0,0,-1),plant(47,8)])assert.throws(()=>validateLayout({...base,plants:[p]}));
+ assert.equal(validateLayout({...base,stacked:true,plants:Array(181).fill(plant(523))}).plants.length,181,'terrain supports must not truncate a full formation');
+ assert.throws(()=>validateLayout({...base,stacked:true,plants:Array(1017).fill(plant(523))}));
+});
 test('production placement function and repeat state machine pass native tests',async()=>{
  const src=await read('src/Sandbox.cpp'),dir=await mkdtemp(join(tmpdir(),'pvz-placement-'));
  const start=src.indexOf('static Plant* FindFusionTarget('),end=src.indexOf('static int Spawn(',start);
@@ -21,7 +37,7 @@ test('production placement function and repeat state machine pass native tests',
  assert.match(result.stdout,/Production placement.*passed/);
  assert.match(result.stdout,/Fixed characters:.*passed/);
 });
-test('production zombie spawning normalizes duck swimmers without bypassing terrain or capacity',async()=>{
+test('production spawning accepts the full roster with swimming adaptation, bounds and capacity checks',async()=>{
  const src=await read('src/Sandbox.cpp'),dir=await mkdtemp(join(tmpdir(),'pvz-spawn-'));
  const start=src.indexOf('static int Spawn('),end=src.indexOf('extern "C"',start);
  assert.ok(start>0&&end>start);
@@ -55,10 +71,11 @@ test('storage bridge restores stacking before planting and detects stacks even a
  const Module={_pvz_sandbox_command(cmd,type,col,row){
    calls.push([cmd,type,col,row]);
    if(cmd===0)return flags;if(cmd===18)return 1;
-   if(cmd===8){plants=[];return 1;}
+   if(cmd===24)return 0;
+   if(cmd===25){plants=[];return 1;}
    if(cmd===19){flags=type?(flags|16)&~64:flags&~16;return 1;}
    if(cmd===21){flags=type?(flags|64)&~16:flags&~64;return 1;}
-   if(cmd===1){assert.ok(flags&16);assert.equal(flags&64,0);plants.push({type,col,row});return 1;}
+   if(cmd===1||cmd===27){assert.ok(flags&16);assert.equal(flags&64,0);plants.push({type,col,row});return 1;}
    return 1;
  },_pvz_sandbox_plant_data(i,field){const p=plants[i];return p?[p.type,p.col,p.row][field]:-1;}};
  const context=vm.createContext({Module,validateLayout,requiresStacking,LAYOUT_KEY,
@@ -69,7 +86,7 @@ test('storage bridge restores stacking before planting and detects stacks even a
  assert.equal(JSON.parse(storage.get(LAYOUT_KEY)).stacked,true);
  handlers.get('pvz-sandbox-action')({detail:2});
  assert.deepEqual(plants,[plant(),plant()]);
- const enable=calls.findIndex(([cmd,type])=>cmd===19&&type===1),place=calls.findIndex(([cmd])=>cmd===1);
+ const enable=calls.findIndex(([cmd,type])=>cmd===19&&type===1),place=calls.findIndex(([cmd])=>cmd===27);
  assert.ok(enable>=0&&place>enable);
  const noFusion=calls.findIndex(([cmd,type])=>cmd===21&&type===0);assert.ok(noFusion>=0&&noFusion<place);
 });

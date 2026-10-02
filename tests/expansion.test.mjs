@@ -101,7 +101,7 @@ test('native projectile integration retains splats, centered scaling and fire at
  assert.ok(plant.indexOf('aProjectile->ConvertToFireball(mPlantCol)')>plant.indexOf('SandboxPlants::OnFired(this,aProjectile,theTargetZombie)'),'fire attaches only after muzzle correction');
 });
 test('fifteen originals remain; retired formations migrate without losing native plants',async()=>{
- assert.equal(ORIGINAL_PLANTS.length,15);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,519,520,521,522,523,524,525,526,527,528,529,530,531]);assert.deepEqual(ORIGINAL_ZOMBIES.map(z=>z.id),[212,213,214,215,216,217,218,219]);assert.equal(ZOMBIES.length,31);
+ assert.equal(ORIGINAL_PLANTS.length,15);assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.id),[500,501,519,520,521,522,523,524,525,526,527,528,529,530,531]);assert.deepEqual(ORIGINAL_ZOMBIES.map(z=>z.id),[212,213,214,215,216,217,218,219]);assert.equal(ZOMBIES.length,41);
  const bases=[0,7,7,18,18,40,40,7,0,3,1,8,0,0,0,0,0,0,3,0];
  for(let id=100;id<120;++id)assert.equal(validateLayout({schema:1,map:0,plants:[{type:id,col:0,row:0}]}).plants[0].type,bases[id-100]);
  for(const p of [...RETIRED_PLANTS,...RETIRED_CHARACTERS]){
@@ -163,7 +163,7 @@ test('Louis remains visually headless without entering native terminal head-loss
  assert.match(adventure,/SandboxZombies::Restore\(z,saved.type\)/);assert.doesNotMatch(adventure,/pending=save/);
  const almanac=(await read('src/Lawn/Widget/AlmanacDialog.cpp')).toString();
  assert.match(almanac,/GetZombieDefinition\(static_cast<ZombieType>\(SandboxZombies::Base\(int\(mSelectedZombie\)\)\)\)/);
- assert.match((await read('src/SandboxUI.cpp')).toString(),/SandboxZombies::Definitions\[i-Zombies.size\(\)\].id/);
+ assert.match((await read('src/SandboxUI.cpp')).toString(),/SandboxZombies::Definitions\[index-Zombies.size\(\)\].id/);
 });
 test('cone-only body never leaks native head, arm or charred-body death art',async()=>{
  const z=(await read('src/Lawn/Zombie.cpp')).toString();

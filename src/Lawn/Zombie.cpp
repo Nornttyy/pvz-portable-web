@@ -27,6 +27,8 @@
 #include "../ConstEnums.h"
 #include "Zombie.h"
 #include "../StinkShroom.h"
+#include "../SandboxScenes.h"
+#include "../Sandbox.h"
 #include "Cutscene.h"
 #include "GridItem.h"
 #include "LawnMower.h"
@@ -6376,6 +6378,7 @@ void Zombie::Draw(Graphics* g)
 	{
 		DrawButter(g, aDrawPos);
 	}
+	SandboxScenes::DrawSwimRing(g,this);
 
 	if (mAttachmentID != AttachmentID::ATTACHMENTID_NULL)
 	{
@@ -6986,6 +6989,7 @@ void Zombie::PoolSplash(bool theInToPoolSound)
 
 void Zombie::CheckForPool()
 {
+    if(SandboxScenes::UpdateSwimmer(this))return;
 	if (!Zombie::ZombieTypeCanGoInPool(mZombieType) || IsFlying())
 	{
 		return;
@@ -7219,6 +7223,7 @@ void Zombie::EatZombie(Zombie* theZombie)
 
 bool Zombie::TrySpawnLevelAward()
 {
+    if(gSandboxEnabled)return false;
 	if (!IsOnBoard() || mBoard->HasLevelAwardDropped() || mBoard->mLevelComplete || mDroppedLoot)
 	{
 		return false;
@@ -10580,6 +10585,7 @@ void Zombie::BossDie()
 		BossDestroyFireball();
 	}
 
+	if(gSandboxEnabled){RemoveColdEffects();return;}
 	mApp->mMusic->FadeOut(200);
 
 	for (Zombie* aZombie : mBoard->mZombies)

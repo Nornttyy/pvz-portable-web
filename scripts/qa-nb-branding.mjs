@@ -10,7 +10,7 @@ page.on('response',r=>{if(r.status()>=400)badResponses.push(r.url()+':'+r.status
 async function snap(name){await page.mouse.move(0,0);await page.screenshot({path:join(out,name+'.png')});}
 async function click(x,y,touch=false){const box=await page.locator('#canvas').boundingBox(),s=await page.evaluate(()=>[Module.canvas.width,Module.canvas.height]);const px=box.x+x*box.width/s[0],py=box.y+y*box.height/s[1];if(touch)await page.touchscreen.tap(px,py);else await page.mouse.click(px,py);await page.waitForTimeout(250);}
 async function sandbox(touch=false){await click(719,27,touch);await page.waitForFunction(()=>Module.canvas.width===1024,undefined,{timeout:5000});}
-async function back(){await click(833,24);await click(726,432);await page.waitForFunction(()=>Module.canvas.width===800);await page.waitForTimeout(2200);}
+async function back(){await click(783,24);await click(726,342);await page.waitForFunction(()=>Module.canvas.width===800);await page.waitForTimeout(2200);}
 try{
  await page.goto(process.env.PVZ_QA_URL||'http://127.0.0.1:8097/');await page.waitForFunction(()=>!document.getElementById('start').disabled,undefined,{timeout:90000});
  assert.equal(await page.title(),'植物大战僵尸 NB版');
