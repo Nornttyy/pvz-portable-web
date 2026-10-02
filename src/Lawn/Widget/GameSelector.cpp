@@ -77,7 +77,6 @@ public:
 
 GameSelector::GameSelector(LawnApp* theApp)
 {
-	mLoadedResourceNames.push_back("DelayLoad_Zombatar");
 	mLoadedResourceNames.push_back("DelayLoad_Almanac");
 
 	for (std::string& resource : mLoadedResourceNames)
@@ -166,19 +165,9 @@ GameSelector::GameSelector(LawnApp* theApp)
 	mSurvivalButton->mPolygonShape[3] = SexyVector2(7.0f, 57.0f);
 	mSurvivalButton->mUsePolygonShape = true;
 
-	mZombatarButton = MakeNewButton(
-		GameSelector::GameSelector_Zombatar,
-		this,
-		"",
-		nullptr,
-		Sexy::IMAGE_BLANK,
-		Sexy::IMAGE_BLANK,
-		Sexy::IMAGE_BLANK
-	).release();
-	mZombatarButton->Resize(0, 0, Sexy::IMAGE_REANIM_SELECTORSCREEN_WOODSIGN3_PRESS->mWidth, Sexy::IMAGE_REANIM_SELECTORSCREEN_WOODSIGN3_PRESS->mHeight);
-	mZombatarButton->mClip = false;
-	mZombatarButton->mBtnNoDraw = true;
-	mZombatarButton->mMouseVisible = false;
+	// Retired menu feature: no button, hit area or off-screen editor is created.
+	// Keep the compatibility members null and leave saved avatar records intact.
+	mZombatarButton = nullptr;
 
 	mAchievementsButton = MakeNewButton(
 		GameSelector::GameSelector_Achievements,
@@ -317,6 +306,7 @@ GameSelector::GameSelector(LawnApp* theApp)
 	aSelectorReanim->PlayReanim("anim_open", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 0, 30.0f);
 	aSelectorReanim->AssignRenderGroupToPrefix("flower", RENDER_GROUP_HIDDEN);
 	aSelectorReanim->AssignRenderGroupToPrefix("leaf", RENDER_GROUP_HIDDEN);
+	aSelectorReanim->AssignRenderGroupToTrack("woodsign3", RENDER_GROUP_HIDDEN);
 	aSelectorReanim->AssignRenderGroupToTrack("SelectorScreen_BG", 1);
 	mSelectorReanimID = mApp->ReanimationGetID(aSelectorReanim);
 	mSelectorState = SelectorAnimState::SELECTOR_OPEN;
@@ -366,13 +356,11 @@ GameSelector::GameSelector(LawnApp* theApp)
 	mStartY = 0;
 	mDestX = 0;
 	mDestY = 0;
-	mZombatarWidget = std::make_unique<ZombatarWidget>(this);
 	mAchievementsWidget = std::make_unique<AchievementsWidget>(this->mApp);
 	mAchievementsWidget->Move(0, mApp->mHeight);
 
 	// Add as children in z-order (bottom to top).
 	AddWidget(mAchievementsButton);
-	AddWidget(mZombatarButton);
 	AddWidget(mChangeUserButton);
 	AddWidget(mSurvivalButton);
 	AddWidget(mZenGardenButton);
@@ -403,8 +391,6 @@ void GameSelector::SyncButtons()
 	mAlmanacButton->mVisible = aAlmanacAvailable;
 	mStoreButton->mDisabled = !aStoreOpen;
 	mStoreButton->mVisible = aStoreOpen;
-	mZombatarButton->mDisabled = false;
-	mZombatarButton->mVisible = true;
 
 	Reanimation* aSelectorReanim = mApp->ReanimationGet(mSelectorReanimID);
 	if (aAlmanacAvailable)
@@ -770,7 +756,6 @@ void GameSelector::Update()
 		int aNewY = PvzpAnimateCurve(75, 0, mSlideCounter, mStartY, mDestY, PvzpCurves::CURVE_EASE_IN_OUT);
 		Move(aNewX, aNewY);
 
-		mZombatarWidget->Move(aNewX + BOARD_WIDTH, aNewY);
 		mAchievementsWidget->mY = aNewY + mApp->mHeight;
 
 		mSlideCounter--;
@@ -843,7 +828,6 @@ void GameSelector::Update()
 			mHelpButton->mBtnNoDraw = false;
 			mOptionsButton->mBtnNoDraw = false;
 			mQuitButton->mBtnNoDraw = false;
-			mZombatarButton->mBtnNoDraw = false;
 			mAchievementsButton->mBtnNoDraw = false;
 			mAdventureButton->mMouseVisible = true;
 			mMinigameButton->mMouseVisible = true;
@@ -856,7 +840,6 @@ void GameSelector::Update()
 			mStoreButton->mMouseVisible = true;
 			mAlmanacButton->mMouseVisible = true;
 			mChangeUserButton->mMouseVisible = true;
-			mZombatarButton->mMouseVisible = true;
 			mAchievementsButton->mMouseVisible = true;
 
 			if (mApp->mPlayerInfo == nullptr)
@@ -953,10 +936,8 @@ void GameSelector::Update()
 	TrackButton(mAlmanacButton, "SelectorScreen_BG_Right", 256.0f, 387.0f);
 	TrackButton(mStoreButton, "SelectorScreen_BG_Right", 334.0f, 441.0f);
 	TrackButton(mChangeUserButton, "woodsign2", 24.0f, 10.0f);
-	TrackButton(mZombatarButton, "woodsign3", 0.f, 0.f);
 	TrackButton(mAchievementsButton, "SelectorScreen_BG_Left", 20.f, 480.f);
 	aSelectorReanim->SetImageOverride("woodsign2", (mChangeUserButton->mIsOver || mChangeUserButton->mIsDown) ? Sexy::IMAGE_REANIM_SELECTORSCREEN_WOODSIGN2_PRESS : nullptr);
-	aSelectorReanim->SetImageOverride("woodsign3", (mZombatarButton->mIsOver || mZombatarButton->mIsDown) ? Sexy::IMAGE_REANIM_SELECTORSCREEN_WOODSIGN3_PRESS : nullptr);
 }
 
 void GameSelector::TrackButton(DialogButton* theButton, const char* theTrackName, float theOffsetX, float theOffsetY)
@@ -974,7 +955,6 @@ void GameSelector::AddedToManager(WidgetManager* theWidgetManager)
 {
 	Widget::AddedToManager(theWidgetManager);
 
-	theWidgetManager->AddWidget(mZombatarWidget.get());
 	theWidgetManager->AddWidget(mAchievementsWidget.get());
 }
 
@@ -982,14 +962,12 @@ void GameSelector::RemovedFromManager(WidgetManager* theWidgetManager)
 {
 	Widget::RemovedFromManager(theWidgetManager);
 
-	theWidgetManager->RemoveWidget(mZombatarWidget.get());
 	theWidgetManager->RemoveWidget(mAchievementsWidget.get());
 }
 
 void GameSelector::OrderInManagerChanged()
 {
 	mWidgetManager->PutInfront(mAchievementsWidget.get(), this);
-	mWidgetManager->BringToFront(mZombatarWidget.get());
 }
 
 void GameSelector::KeyDown(KeyCode theKey)
@@ -1142,8 +1120,7 @@ void GameSelector::ButtonMouseEnter(int theId)
 void GameSelector::ButtonPress(int theId)
 {
 	if (theId == GameSelector::GameSelector_Adventure || theId == GameSelector::GameSelector_Minigame ||
-		theId == GameSelector::GameSelector_Puzzle || theId == GameSelector::GameSelector_Survival ||
-		theId == GameSelector::GameSelector_Zombatar)
+		theId == GameSelector::GameSelector_Puzzle || theId == GameSelector::GameSelector_Survival)
 		mApp->PlaySample(Sexy::SOUND_GRAVEBUTTON);
 	else
 		mApp->PlaySample(Sexy::SOUND_TAP);
@@ -1182,7 +1159,6 @@ void GameSelector::ClickedAdventure()
 	mAlmanacButton->SetDisabled(true);
 	mSurvivalButton->SetDisabled(true);
 	mZenGardenButton->SetDisabled(true);
-	mZombatarButton->SetDisabled(true);
 	mAchievementsButton->SetDisabled(true);
 	mSandboxButton->SetDisabled(true);
 
@@ -1279,8 +1255,7 @@ void GameSelector::ButtonDepress(int theId)
 			mApp->mZenGarden->SetupForZenTutorial();
 		break;
 	case GameSelector::GameSelector_Zombatar:
-		ShowZombatarScreen();
-		break;
+		return; // Retired ID must not open a hidden screen or become another action.
 	case GameSelector::GameSelector_Achievements:
 		ShowAchievementsScreen();
 		break;
@@ -1403,12 +1378,7 @@ void GameSelector::SlideTo(int theX, int theY)
 
 void GameSelector::ShowZombatarScreen()
 {
-	if (!mZombatarWidget)
-		return;
-	if (mApp->mPlayerInfo && !mApp->mPlayerInfo->mZombatarAccepted)
-		mApp->ShowZombatarTOS();
-	else
-		mZombatarWidget->Open();
+	// Compatibility entry point intentionally does nothing: the editor is retired.
 }
 
 void GameSelector::ShowAchievementsScreen()

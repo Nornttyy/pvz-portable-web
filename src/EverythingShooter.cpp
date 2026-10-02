@@ -35,7 +35,7 @@ bool IsSlot(int seed){return seed==EverythingShooterRules::Base&&(gSandboxEnable
 bool Fire(Plant* p,Zombie* target){
  if(MemeCharacters::Type(p)!=EverythingShooterRules::Id)return false;
  auto* b=p->mBoard;if(!b||!target||target->mDead||b->mProjectiles.mSize>=b->mProjectiles.mMaxSize-8)return true;
- const int style=EverythingShooterRules::Choose(Sexy::Rand(100),Sexy::Rand(EverythingShooterRules::NativeCount));
+ const int style=EverythingShooterRules::Choose(Sexy::Rand(100),Sexy::Rand(EverythingShooterRules::OtherNativeCount));
  const int type=EverythingShooterRules::NativeType(style);
  // Use the real interpolated muzzle, including its attached moving head.
  float x=58,y=34;SandboxArt::TrackPoint(p->mApp->ReanimationTryToGet(p->mHeadReanimID),"idle_mouth",35,49,32,24.5f,x,y);
@@ -59,7 +59,7 @@ bool Fire(Plant* p,Zombie* target){
 bool Impact(Projectile* shot,Zombie* target){
  const int style=MemeCharacters::ShotStyle(shot);if(!EverythingShooterRules::Own(style))return false;
  ++impacts[style-EverythingShooterRules::First];
- if(!EverythingShooterRules::Special(style))return false; // Preserve native damage, butter, chill and splashes.
+ if(!EverythingShooterRules::Special(style))return false; // Native visuals/status remain; Projectile scopes all damage to one target.
  auto* b=shot->mBoard;const float x=shot->mPosX+20,y=shot->mPosY+shot->mPosZ+20;
  if(style==EverythingShooterRules::Poop){
   if(target&&!target->mDead&&!target->IsDeadOrDying())target->TakeDamage(EverythingShooterRules::PoopDamage,shot->GetDamageFlags(target));
@@ -67,7 +67,7 @@ bool Impact(Projectile* shot,Zombie* target){
   shot->mApp->PlayFoley(FOLEY_SPLAT);
  }else{
   const bool doom=style==EverythingShooterRules::Doom;
-  b->KillAllZombiesInRadius(shot->mRow,x,y,doom?250:115,doom?3:1,true,127,EverythingShooterRules::BlastDamage(style));
+  if(target&&!target->mDead&&!target->IsDeadOrDying())target->TakeDamage(EverythingShooterRules::BlastDamage(style),18U);
   shot->mApp->AddPvzpParticle(x,y,RENDER_LAYER_TOP,doom?PARTICLE_DOOM:PARTICLE_POWIE);
   if(doom)shot->mApp->PlaySample(Sexy::SOUND_DOOMSHROOM);else shot->mApp->PlayFoley(FOLEY_CHERRYBOMB);
   b->ShakeBoard(doom?3:2,doom?-4:-2);

@@ -472,6 +472,14 @@ bool Projectile::IsZombieHitBySplash(Zombie* theZombie)
 void Projectile::DoSplashDamage(Zombie* theZombie)
 {
 	const ProjectileDefinition& aProjectileDef = GetProjectileDef();
+	// Keep melon/fire impact art and target status effects, but this shooter's
+	// ammunition never splashes another zombie, even after passing torchwood.
+	if (EverythingShooterRules::Own(MemeCharacters::ShotStyle(this)))
+	{
+		if (theZombie && !theZombie->mDead && !theZombie->IsDeadOrDying())
+			theZombie->TakeDamage(SandboxPlants::ShotDamage(this,aProjectileDef.mDamage), GetDamageFlags(theZombie));
+		return;
+	}
 
 	int aZombiesGetSplashed = 0;
 	for (Zombie* aZombie : mBoard->mZombies)
@@ -632,11 +640,10 @@ void Projectile::UpdateLobMotion()
 			Die();
 		}
 	}
-	else if (mProjectileType == ProjectileType::PROJECTILE_COBBIG)
+	else if (mProjectileType == ProjectileType::PROJECTILE_COBBIG && !EverythingShooterRules::Own(MemeCharacters::ShotStyle(this)))
 	{
 		int aBeforeGargantuarCount = mBoard->GetLiveGargantuarCount();
-		mBoard->KillAllZombiesInRadius(mRow, mPosX + 80, mPosY + 40, SandboxPlants::ShotBlastRadius(this,115), 1, true, mDamageRangeFlags,
-			EverythingShooterRules::BlastDamage(MemeCharacters::ShotStyle(this)));
+		mBoard->KillAllZombiesInRadius(mRow, mPosX + 80, mPosY + 40, SandboxPlants::ShotBlastRadius(this,115), 1, true, mDamageRangeFlags);
 		int aAfterGargantuarCount = mBoard->GetLiveGargantuarCount();
 		mBoard->mGargantuarsKillsByCornCob += aBeforeGargantuarCount - aAfterGargantuarCount;
 		if (mBoard->mGargantuarsKillsByCornCob >= 2)
@@ -856,8 +863,9 @@ void Projectile::DoImpact(Zombie* theZombie)
 	}
 	else if (!sandboxImpact && theZombie)
 	{
-		unsigned int aDamageFlags = GetDamageFlags(theZombie);
-		theZombie->TakeDamage(SandboxPlants::ShotDamage(this,GetProjectileDef().mDamage), aDamageFlags);
+		const bool aSingleCob = MemeCharacters::ShotStyle(this) == EverythingShooterRules::Cob;
+		unsigned int aDamageFlags = aSingleCob ? 18U : GetDamageFlags(theZombie);
+		theZombie->TakeDamage(aSingleCob ? EverythingShooterRules::CobDamage : SandboxPlants::ShotDamage(this,GetProjectileDef().mDamage), aDamageFlags);
 	}
 
     // Artwork ownership is not damage ownership. Reused peas still need the

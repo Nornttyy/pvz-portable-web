@@ -6,12 +6,12 @@
 #include <cmath>
 #include <iostream>
 constexpr int FOLEY_PUFF=1,FOLEY_THROW=2,FOLEY_SPLAT=3,FOLEY_CHERRYBOMB=4;
-namespace Sexy {int rare=99,native=0;int Rand(int n){return n==100?rare:native;}constexpr int SOUND_DOOMSHROOM=888;struct Color{int r,g,b;Color(int r,int g,int b):r(r),g(g),b(b){}};}
+namespace Sexy {int rare=99,native=0;int Rand(int n){assert(n==100||n==13);assert(native>=0&&native<13);return n==100?rare:native;}constexpr int SOUND_DOOMSHROOM=888;struct Color{int r,g,b;Color(int r,int g,int b):r(r),g(g),b(b){}};}
 struct Reanimation{};
 namespace SandboxArt {bool tracked=false;bool TrackPoint(Reanimation*,const char*,float,float,float,float,float& x,float& y){if(!tracked)return false;x=70;y=40;return true;}}
 struct Particle {int colors=0;void OverrideColor(const char*,Sexy::Color c){assert(c.r==120&&c.g==83&&c.b==43);++colors;}};
 struct App {int sounds=0,particles=0,effect=-1;Particle puff;Reanimation* ReanimationTryToGet(int){return nullptr;}void PlayFoley(int){++sounds;}void PlaySample(int){++sounds;}Particle* AddPvzpParticle(float,float,int,int e){++particles;effect=e;return &puff;}};
-struct Zombie {bool mDead=false,dying=false;int health=6000,hits=0;float x=600;struct Rect{int mY;};Rect GetZombieRect(){return {240};}float ZombieTargetLeadX(int){return x;}bool IsDeadOrDying(){return dying;}void TakeDamage(int n,int flags){assert(flags==1);health-=n;++hits;}};
+struct Zombie {bool mDead=false,dying=false;int health=6000,hits=0,lastFlags=0;float x=600;struct Rect{int mY;};Rect GetZombieRect(){return {240};}float ZombieTargetLeadX(int){return x;}bool IsDeadOrDying(){return dying;}void TakeDamage(int n,int flags){assert(flags==1||flags==18);lastFlags=flags;health-=n;++hits;}};
 struct Board;
 struct Projectile {Board* mBoard=nullptr;App* mApp=nullptr;bool mDead=false;int style=0,mDamageRangeFlags=0,mRenderOrder=0,mRow=0,mCobTargetRow=0,converted=0;float mPosX=0,mPosY=0,mPosZ=0,mVelX=0,mVelY=0,mVelZ=0,mAccZ=0,mCobTargetX=0;ProjectileType mProjectileType=PROJECTILE_PEA;ProjectileMotion mMotionType=MOTION_STRAIGHT;void ConvertToFireball(int){mProjectileType=PROJECTILE_FIREBALL;++converted;}int GetDamageFlags(Zombie*){return 1;}void Die(){mDead=true;}};
 struct Board {struct {int mSize=0,mMaxSize=1024;} mProjectiles;App app;Projectile last;int shots=0,blasts=0,shakes=0,row=-1,radius=0,rows=0,flags=0,damage=0;float x=0,y=0;bool burn=false;
@@ -30,9 +30,10 @@ int main(){
  using namespace EverythingShooterRules;
  static_assert(Cost==250&&Recharge==750&&Interval==150&&Unlock==27&&Base==49&&Id==529);
  static_assert(BlastDamage(Doom)==600&&BlastDamage(Cherry)==400&&BlastDamage(First+11)==600&&BlastDamage(0)==1800);
+ static_assert(DoomPercent==2&&CherryPercent==2&&CobPercent==2&&PoopPercent==20&&OtherNativePercent==74&&OtherNativeCount==13);
  for(bool sandbox:{false,true})for(bool adventure:{false,true}){gSandboxEnabled=sandbox;MemeAdventure::enabled=adventure;for(int seed=0;seed<54;++seed)assert(EverythingShooter::IsSlot(seed)==(seed==49&&(sandbox||adventure)));}
  std::array<int,17> distribution{};
- for(int roll=0;roll<100;++roll)for(int native=0;native<14;++native){
+ for(int roll=0;roll<100;++roll)for(int native=0;native<13;++native){
   const int style=Choose(roll,native);++distribution[style-First];Sexy::rare=roll;Sexy::native=native;
   Board b;Plant p{&b,&b.app};Zombie z;SandboxArt::tracked=roll%2;
   assert(EverythingShooter::Fire(&p,&z)&&b.shots==1);auto& shot=b.last;
@@ -47,10 +48,12 @@ int main(){
   assert(EverythingShooter::Impact(&shot,&z)==Special(style));
   if(!Special(style))assert(!shot.mDead&&z.health==6000&&!b.blasts&&!b.app.particles);
   else if(style==Poop)assert(shot.mDead&&z.health==5920&&z.hits==1&&!b.blasts&&b.app.effect==PARTICLE_PUFF_SPLAT&&b.app.puff.colors==1);
-  else assert(shot.mDead&&b.blasts==1&&b.row==2&&b.radius==(style==Doom?250:115)&&b.rows==(style==Doom?3:1)&&b.burn&&b.flags==127&&b.damage==(style==Doom?600:400)&&b.shakes==1&&b.app.effect==(style==Doom?PARTICLE_DOOM:PARTICLE_POWIE));
+  else assert(shot.mDead&&!b.blasts&&z.hits==1&&z.health==6000-(style==Doom?600:400)&&z.lastFlags==18&&b.shakes==1&&b.app.effect==(style==Doom?PARTICLE_DOOM:PARTICLE_POWIE));
  }
- for(int i=0;i<14;++i)assert(distribution[i]==80);
- assert(distribution[14]==70&&distribution[15]==70&&distribution[16]==140);
+ for(int i=0;i<14;++i)assert(distribution[i]==(i==11?26:74));
+ assert(distribution[14]==26&&distribution[15]==26&&distribution[16]==260);
+ for(int i=0;i<17;++i)assert(EverythingShooter::fired[i]==distribution[i]);
+ for(int style:{Doom,Cherry,Poop})for(int state=0;state<3;++state){Board b;auto* shot=b.AddProjectile(10,20,0,2,PROJECTILE_CABBAGE);shot->style=style;Zombie z;z.mDead=state==1;z.dying=state==2;assert(EverythingShooter::Impact(shot,state==0?nullptr:&z)&&shot->mDead&&!b.blasts&&z.hits==0);}
  for(int style=First;style<=Poop;++style){const int type=NativeType(style),motion=Lob(style)?1:type==4?5:0;assert(Valid(style,type,motion));assert(!Valid(style,type,(motion+1)%10));if(type==0||type==1)assert(Valid(style,6,motion));else assert(!Valid(style,(type+1)%14,motion));}
  assert(!Valid(319,0,0)&&!Valid(337,0,0));
  {Board b;Plant p{&b,&b.app};Zombie z;p.id=500;assert(!EverythingShooter::Fire(&p,&z)&&!b.shots);p.id=529;assert(EverythingShooter::Fire(&p,nullptr)&&!b.shots);z.mDead=true;assert(EverythingShooter::Fire(&p,&z)&&!b.shots);z.mDead=false;b.mProjectiles.mSize=1016;assert(EverythingShooter::Fire(&p,&z)&&!b.shots);p.mBoard=nullptr;assert(EverythingShooter::Fire(&p,&z));assert(!EverythingShooter::Fire(nullptr,&z));}

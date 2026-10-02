@@ -1222,7 +1222,7 @@ index c934659..3713689 100644
  	if (aPlantDef.mReanimationType != ReanimationType::REANIM_NONE)
  	{
 diff --git a/src/Lawn/Projectile.cpp b/src/Lawn/Projectile.cpp
-index 4500f46..9c00a14 100644
+index 4500f46..fc4531c 100644
 --- a/src/Lawn/Projectile.cpp
 +++ b/src/Lawn/Projectile.cpp
 @@ -25,6 +25,11 @@
@@ -1297,7 +1297,22 @@ index 4500f46..9c00a14 100644
  	Rect aProjectileRect = GetProjectileRect();
  	if (mProjectileType == ProjectileType::PROJECTILE_FIREBALL)
  	{
-@@ -472,8 +484,8 @@ void Projectile::DoSplashDamage(Zombie* theZombie)
+@@ -460,6 +472,14 @@ bool Projectile::IsZombieHitBySplash(Zombie* theZombie)
+ void Projectile::DoSplashDamage(Zombie* theZombie)
+ {
+ 	const ProjectileDefinition& aProjectileDef = GetProjectileDef();
++	// Keep melon/fire impact art and target status effects, but this shooter's
++	// ammunition never splashes another zombie, even after passing torchwood.
++	if (EverythingShooterRules::Own(MemeCharacters::ShotStyle(this)))
++	{
++		if (theZombie && !theZombie->mDead && !theZombie->IsDeadOrDying())
++			theZombie->TakeDamage(SandboxPlants::ShotDamage(this,aProjectileDef.mDamage), GetDamageFlags(theZombie));
++		return;
++	}
+ 
+ 	int aZombiesGetSplashed = 0;
+ 	for (Zombie* aZombie : mBoard->mZombies)
+@@ -472,8 +492,8 @@ void Projectile::DoSplashDamage(Zombie* theZombie)
  		}
  	}
  
@@ -1308,7 +1323,7 @@ index 4500f46..9c00a14 100644
  	int aMaxSplashDamageAmount = aOriginalDamage * 7;
  	if (mProjectileType == ProjectileType::PROJECTILE_FIREBALL)
  	{
-@@ -545,7 +557,7 @@ void Projectile::UpdateLobMotion()
+@@ -545,7 +565,7 @@ void Projectile::UpdateLobMotion()
  		{
  			aMinCollisionZ = -32.0f;
  		}
@@ -1317,7 +1332,7 @@ index 4500f46..9c00a14 100644
  		{
  			aMinCollisionZ = 60.0f;
  		}
-@@ -574,7 +586,7 @@ void Projectile::UpdateLobMotion()
+@@ -574,7 +594,7 @@ void Projectile::UpdateLobMotion()
  
  	Plant* aPlant = nullptr;
  	Zombie* aZombie = nullptr;
@@ -1326,17 +1341,20 @@ index 4500f46..9c00a14 100644
  	{
  		aPlant = FindCollisionTargetPlant();
  	}
-@@ -623,7 +635,8 @@ void Projectile::UpdateLobMotion()
- 	else if (mProjectileType == ProjectileType::PROJECTILE_COBBIG)
+@@ -620,10 +640,10 @@ void Projectile::UpdateLobMotion()
+ 			Die();
+ 		}
+ 	}
+-	else if (mProjectileType == ProjectileType::PROJECTILE_COBBIG)
++	else if (mProjectileType == ProjectileType::PROJECTILE_COBBIG && !EverythingShooterRules::Own(MemeCharacters::ShotStyle(this)))
  	{
  		int aBeforeGargantuarCount = mBoard->GetLiveGargantuarCount();
 -		mBoard->KillAllZombiesInRadius(mRow, mPosX + 80, mPosY + 40, 115, 1, true, mDamageRangeFlags);
-+		mBoard->KillAllZombiesInRadius(mRow, mPosX + 80, mPosY + 40, SandboxPlants::ShotBlastRadius(this,115), 1, true, mDamageRangeFlags,
-+			EverythingShooterRules::BlastDamage(MemeCharacters::ShotStyle(this)));
++		mBoard->KillAllZombiesInRadius(mRow, mPosX + 80, mPosY + 40, SandboxPlants::ShotBlastRadius(this,115), 1, true, mDamageRangeFlags);
  		int aAfterGargantuarCount = mBoard->GetLiveGargantuarCount();
  		mBoard->mGargantuarsKillsByCornCob += aBeforeGargantuarCount - aAfterGargantuarCount;
  		if (mBoard->mGargantuarsKillsByCornCob >= 2)
-@@ -732,6 +745,11 @@ void Projectile::UpdateNormalMotion()
+@@ -732,6 +752,11 @@ void Projectile::UpdateNormalMotion()
  		mPosY += mVelZ;
  	}
  
@@ -1348,7 +1366,7 @@ index 4500f46..9c00a14 100644
  	CheckForCollision();
  	CheckForHighGround();
  }
-@@ -822,9 +840,12 @@ void Projectile::PlayImpactSound(Zombie* theZombie)
+@@ -822,9 +847,12 @@ void Projectile::PlayImpactSound(Zombie* theZombie)
  
  void Projectile::DoImpact(Zombie* theZombie)
  {
@@ -1362,16 +1380,18 @@ index 4500f46..9c00a14 100644
  	{
  		if (mProjectileType == ProjectileType::PROJECTILE_FIREBALL && theZombie)
  		{
-@@ -833,12 +854,15 @@ void Projectile::DoImpact(Zombie* theZombie)
+@@ -833,12 +861,16 @@ void Projectile::DoImpact(Zombie* theZombie)
  
  		DoSplashDamage(theZombie);
  	}
 -	else if (theZombie)
 +	else if (!sandboxImpact && theZombie)
  	{
- 		unsigned int aDamageFlags = GetDamageFlags(theZombie);
+-		unsigned int aDamageFlags = GetDamageFlags(theZombie);
 -		theZombie->TakeDamage(GetProjectileDef().mDamage, aDamageFlags);
-+		theZombie->TakeDamage(SandboxPlants::ShotDamage(this,GetProjectileDef().mDamage), aDamageFlags);
++		const bool aSingleCob = MemeCharacters::ShotStyle(this) == EverythingShooterRules::Cob;
++		unsigned int aDamageFlags = aSingleCob ? 18U : GetDamageFlags(theZombie);
++		theZombie->TakeDamage(aSingleCob ? EverythingShooterRules::CobDamage : SandboxPlants::ShotDamage(this,GetProjectileDef().mDamage), aDamageFlags);
  	}
  
 +    // Artwork ownership is not damage ownership. Reused peas still need the
@@ -1380,7 +1400,7 @@ index 4500f46..9c00a14 100644
  	float aLastPosX = mPosX - mVelX;
  	float aLastPosY = mPosY + mPosZ - mVelY - mVelZ;
  	ParticleEffect aEffect = ParticleEffect::PARTICLE_NONE;
-@@ -939,6 +963,8 @@ void Projectile::DoImpact(Zombie* theZombie)
+@@ -939,6 +971,8 @@ void Projectile::DoImpact(Zombie* theZombie)
  
  void Projectile::Update()
  {
@@ -1389,7 +1409,7 @@ index 4500f46..9c00a14 100644
  	mProjectileAge++;
  	if (mApp->mGameScene != GameScenes::SCENE_PLAYING && !mBoard->mCutScene->ShouldRunUpsellBoard())
  		return;
-@@ -969,15 +995,24 @@ void Projectile::Update()
+@@ -969,15 +1003,24 @@ void Projectile::Update()
  	mRotation += mRotationSpeed;
  
  	UpdateMotion();
@@ -1414,7 +1434,7 @@ index 4500f46..9c00a14 100644
  	switch (mProjectileType)
  	{
  	case ProjectileType::PROJECTILE_COBBIG:
-@@ -1034,6 +1069,7 @@ void Projectile::Draw(Graphics* g)
+@@ -1034,6 +1077,7 @@ void Projectile::Draw(Graphics* g)
  	}
  
  	bool aMirror = false;
@@ -1422,7 +1442,7 @@ index 4500f46..9c00a14 100644
  	if (mMotionType == ProjectileMotion::MOTION_BEE_BACKWARDS)
  	{
  		aMirror = true;
-@@ -1047,7 +1083,7 @@ void Projectile::Draw(Graphics* g)
+@@ -1047,7 +1091,7 @@ void Projectile::Draw(Graphics* g)
  		int aCelWidth = aImage->GetCelWidth();
  		int aCelHeight = aImage->GetCelHeight();
  		Rect aSrcRect(aCelWidth * mFrame, aCelHeight * aProjectileDef.mImageRow, aCelWidth, aCelHeight);
@@ -1431,7 +1451,7 @@ index 4500f46..9c00a14 100644
  		{
  			Rect aDestRect(0, 0, aCelWidth, aCelHeight);
  			g->DrawImageMirror(aImage, aDestRect, aSrcRect, aMirror);
-@@ -1056,8 +1092,13 @@ void Projectile::Draw(Graphics* g)
+@@ -1056,8 +1100,13 @@ void Projectile::Draw(Graphics* g)
  		{
  			float aOffsetX = mPosX + aCelWidth * 0.5f;
  			float aOffsetY = mPosZ + mPosY + aCelHeight * 0.5f;
@@ -1446,7 +1466,7 @@ index 4500f46..9c00a14 100644
  			PvzpBltMatrix(g, aImage, aTransform, g->mClipRect, Color::White, g->mDrawMode, aSrcRect);
  		}
  	}
-@@ -1146,11 +1187,18 @@ void Projectile::DrawShadow(Graphics* g)
+@@ -1146,11 +1195,18 @@ void Projectile::DrawShadow(Graphics* g)
  		aScale *= 200.0f / (aHeight + 200.0f);
  	}
  
@@ -1465,7 +1485,7 @@ index 4500f46..9c00a14 100644
  	mDead = true;
  
  	if (mProjectileType == ProjectileType::PROJECTILE_PUFF || mProjectileType == ProjectileType::PROJECTILE_SNOWPEA)
-@@ -1166,6 +1214,10 @@ void Projectile::Die()
+@@ -1166,6 +1222,10 @@ void Projectile::Die()
  
  Rect Projectile::GetProjectileRect()
  {
@@ -2062,7 +2082,7 @@ index f53e4ac..2f109fa 100644
  	void						Draw(Graphics* g) override;
  	void						GetSeedPosition(SeedType theSeedType, int& x, int& y);
 diff --git a/src/Lawn/Widget/GameSelector.cpp b/src/Lawn/Widget/GameSelector.cpp
-index e30bd35..c34de83 100644
+index e30bd35..9a281a0 100644
 --- a/src/Lawn/Widget/GameSelector.cpp
 +++ b/src/Lawn/Widget/GameSelector.cpp
 @@ -27,6 +27,9 @@
@@ -2075,7 +2095,7 @@ index e30bd35..c34de83 100644
  #include "AlmanacDialog.h"
  #include "../../Resources.h"
  #include "../System/Music.h"
-@@ -60,6 +63,18 @@ GameSelectorOverlay::GameSelectorOverlay(GameSelector* theGameSelector)
+@@ -60,9 +63,20 @@ GameSelectorOverlay::GameSelectorOverlay(GameSelector* theGameSelector)
  	mHasAlpha = true;
  }
  
@@ -2093,8 +2113,34 @@ index e30bd35..c34de83 100644
 +
  GameSelector::GameSelector(LawnApp* theApp)
  {
- 	mLoadedResourceNames.push_back("DelayLoad_Zombatar");
-@@ -254,6 +269,13 @@ GameSelector::GameSelector(LawnApp* theApp)
+-	mLoadedResourceNames.push_back("DelayLoad_Zombatar");
+ 	mLoadedResourceNames.push_back("DelayLoad_Almanac");
+ 
+ 	for (std::string& resource : mLoadedResourceNames)
+@@ -151,19 +165,9 @@ GameSelector::GameSelector(LawnApp* theApp)
+ 	mSurvivalButton->mPolygonShape[3] = SexyVector2(7.0f, 57.0f);
+ 	mSurvivalButton->mUsePolygonShape = true;
+ 
+-	mZombatarButton = MakeNewButton(
+-		GameSelector::GameSelector_Zombatar,
+-		this,
+-		"",
+-		nullptr,
+-		Sexy::IMAGE_BLANK,
+-		Sexy::IMAGE_BLANK,
+-		Sexy::IMAGE_BLANK
+-	).release();
+-	mZombatarButton->Resize(0, 0, Sexy::IMAGE_REANIM_SELECTORSCREEN_WOODSIGN3_PRESS->mWidth, Sexy::IMAGE_REANIM_SELECTORSCREEN_WOODSIGN3_PRESS->mHeight);
+-	mZombatarButton->mClip = false;
+-	mZombatarButton->mBtnNoDraw = true;
+-	mZombatarButton->mMouseVisible = false;
++	// Retired menu feature: no button, hit area or off-screen editor is created.
++	// Keep the compatibility members null and leave saved avatar records intact.
++	mZombatarButton = nullptr;
+ 
+ 	mAchievementsButton = MakeNewButton(
+ 		GameSelector::GameSelector_Achievements,
+@@ -254,6 +258,13 @@ GameSelector::GameSelector(LawnApp* theApp)
  	mOverlayWidget = new GameSelectorOverlay(this);
  	mOverlayWidget->Resize(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
  
@@ -2108,7 +2154,29 @@ index e30bd35..c34de83 100644
  	mStoreButton = MakeNewButton(
  		GameSelector::GameSelector_Store,
  		this,
-@@ -362,6 +384,7 @@ GameSelector::GameSelector(LawnApp* theApp)
+@@ -295,6 +306,7 @@ GameSelector::GameSelector(LawnApp* theApp)
+ 	aSelectorReanim->PlayReanim("anim_open", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 0, 30.0f);
+ 	aSelectorReanim->AssignRenderGroupToPrefix("flower", RENDER_GROUP_HIDDEN);
+ 	aSelectorReanim->AssignRenderGroupToPrefix("leaf", RENDER_GROUP_HIDDEN);
++	aSelectorReanim->AssignRenderGroupToTrack("woodsign3", RENDER_GROUP_HIDDEN);
+ 	aSelectorReanim->AssignRenderGroupToTrack("SelectorScreen_BG", 1);
+ 	mSelectorReanimID = mApp->ReanimationGetID(aSelectorReanim);
+ 	mSelectorState = SelectorAnimState::SELECTOR_OPEN;
+@@ -344,13 +356,11 @@ GameSelector::GameSelector(LawnApp* theApp)
+ 	mStartY = 0;
+ 	mDestX = 0;
+ 	mDestY = 0;
+-	mZombatarWidget = std::make_unique<ZombatarWidget>(this);
+ 	mAchievementsWidget = std::make_unique<AchievementsWidget>(this->mApp);
+ 	mAchievementsWidget->Move(0, mApp->mHeight);
+ 
+ 	// Add as children in z-order (bottom to top).
+ 	AddWidget(mAchievementsButton);
+-	AddWidget(mZombatarButton);
+ 	AddWidget(mChangeUserButton);
+ 	AddWidget(mSurvivalButton);
+ 	AddWidget(mZenGardenButton);
+@@ -362,6 +372,7 @@ GameSelector::GameSelector(LawnApp* theApp)
  	AddWidget(mHelpButton);
  	AddWidget(mStoreButton);
  	AddWidget(mAlmanacButton);
@@ -2116,7 +2184,16 @@ index e30bd35..c34de83 100644
  	AddWidget(mOverlayWidget);
  }
  
-@@ -735,6 +758,9 @@ void GameSelector::UpdateTooltip()
+@@ -380,8 +391,6 @@ void GameSelector::SyncButtons()
+ 	mAlmanacButton->mVisible = aAlmanacAvailable;
+ 	mStoreButton->mDisabled = !aStoreOpen;
+ 	mStoreButton->mVisible = aStoreOpen;
+-	mZombatarButton->mDisabled = false;
+-	mZombatarButton->mVisible = true;
+ 
+ 	Reanimation* aSelectorReanim = mApp->ReanimationGet(mSelectorReanimID);
+ 	if (aAlmanacAvailable)
+@@ -735,6 +744,9 @@ void GameSelector::UpdateTooltip()
  
  void GameSelector::Update()
  {
@@ -2126,15 +2203,85 @@ index e30bd35..c34de83 100644
  	Widget::Update();
  	MarkDirty();
  	UpdateTooltip();
-@@ -1158,6 +1184,7 @@ void GameSelector::ClickedAdventure()
+@@ -744,7 +756,6 @@ void GameSelector::Update()
+ 		int aNewY = PvzpAnimateCurve(75, 0, mSlideCounter, mStartY, mDestY, PvzpCurves::CURVE_EASE_IN_OUT);
+ 		Move(aNewX, aNewY);
+ 
+-		mZombatarWidget->Move(aNewX + BOARD_WIDTH, aNewY);
+ 		mAchievementsWidget->mY = aNewY + mApp->mHeight;
+ 
+ 		mSlideCounter--;
+@@ -817,7 +828,6 @@ void GameSelector::Update()
+ 			mHelpButton->mBtnNoDraw = false;
+ 			mOptionsButton->mBtnNoDraw = false;
+ 			mQuitButton->mBtnNoDraw = false;
+-			mZombatarButton->mBtnNoDraw = false;
+ 			mAchievementsButton->mBtnNoDraw = false;
+ 			mAdventureButton->mMouseVisible = true;
+ 			mMinigameButton->mMouseVisible = true;
+@@ -830,7 +840,6 @@ void GameSelector::Update()
+ 			mStoreButton->mMouseVisible = true;
+ 			mAlmanacButton->mMouseVisible = true;
+ 			mChangeUserButton->mMouseVisible = true;
+-			mZombatarButton->mMouseVisible = true;
+ 			mAchievementsButton->mMouseVisible = true;
+ 
+ 			if (mApp->mPlayerInfo == nullptr)
+@@ -927,10 +936,8 @@ void GameSelector::Update()
+ 	TrackButton(mAlmanacButton, "SelectorScreen_BG_Right", 256.0f, 387.0f);
+ 	TrackButton(mStoreButton, "SelectorScreen_BG_Right", 334.0f, 441.0f);
+ 	TrackButton(mChangeUserButton, "woodsign2", 24.0f, 10.0f);
+-	TrackButton(mZombatarButton, "woodsign3", 0.f, 0.f);
+ 	TrackButton(mAchievementsButton, "SelectorScreen_BG_Left", 20.f, 480.f);
+ 	aSelectorReanim->SetImageOverride("woodsign2", (mChangeUserButton->mIsOver || mChangeUserButton->mIsDown) ? Sexy::IMAGE_REANIM_SELECTORSCREEN_WOODSIGN2_PRESS : nullptr);
+-	aSelectorReanim->SetImageOverride("woodsign3", (mZombatarButton->mIsOver || mZombatarButton->mIsDown) ? Sexy::IMAGE_REANIM_SELECTORSCREEN_WOODSIGN3_PRESS : nullptr);
+ }
+ 
+ void GameSelector::TrackButton(DialogButton* theButton, const char* theTrackName, float theOffsetX, float theOffsetY)
+@@ -948,7 +955,6 @@ void GameSelector::AddedToManager(WidgetManager* theWidgetManager)
+ {
+ 	Widget::AddedToManager(theWidgetManager);
+ 
+-	theWidgetManager->AddWidget(mZombatarWidget.get());
+ 	theWidgetManager->AddWidget(mAchievementsWidget.get());
+ }
+ 
+@@ -956,14 +962,12 @@ void GameSelector::RemovedFromManager(WidgetManager* theWidgetManager)
+ {
+ 	Widget::RemovedFromManager(theWidgetManager);
+ 
+-	theWidgetManager->RemoveWidget(mZombatarWidget.get());
+ 	theWidgetManager->RemoveWidget(mAchievementsWidget.get());
+ }
+ 
+ void GameSelector::OrderInManagerChanged()
+ {
+ 	mWidgetManager->PutInfront(mAchievementsWidget.get(), this);
+-	mWidgetManager->BringToFront(mZombatarWidget.get());
+ }
+ 
+ void GameSelector::KeyDown(KeyCode theKey)
+@@ -1116,8 +1120,7 @@ void GameSelector::ButtonMouseEnter(int theId)
+ void GameSelector::ButtonPress(int theId)
+ {
+ 	if (theId == GameSelector::GameSelector_Adventure || theId == GameSelector::GameSelector_Minigame ||
+-		theId == GameSelector::GameSelector_Puzzle || theId == GameSelector::GameSelector_Survival ||
+-		theId == GameSelector::GameSelector_Zombatar)
++		theId == GameSelector::GameSelector_Puzzle || theId == GameSelector::GameSelector_Survival)
+ 		mApp->PlaySample(Sexy::SOUND_GRAVEBUTTON);
+ 	else
+ 		mApp->PlaySample(Sexy::SOUND_TAP);
+@@ -1156,8 +1159,8 @@ void GameSelector::ClickedAdventure()
+ 	mAlmanacButton->SetDisabled(true);
+ 	mSurvivalButton->SetDisabled(true);
  	mZenGardenButton->SetDisabled(true);
- 	mZombatarButton->SetDisabled(true);
+-	mZombatarButton->SetDisabled(true);
  	mAchievementsButton->SetDisabled(true);
 +	mSandboxButton->SetDisabled(true);
  
  	Reanimation* aHandReanim = mApp->AddReanimation(-70.0f, 10.0f, 0, ReanimationType::REANIM_ZOMBIE_HAND);
  	aHandReanim->mLoopType = ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD;
-@@ -1196,6 +1223,9 @@ void GameSelector::ButtonDepress(int theId)
+@@ -1196,6 +1199,9 @@ void GameSelector::ButtonDepress(int theId)
  
  	switch (theId)
  	{
@@ -2144,6 +2291,30 @@ index e30bd35..c34de83 100644
  	case GameSelector::GameSelector_Adventure:
  		ClickedAdventure();
  		break;
+@@ -1249,8 +1255,7 @@ void GameSelector::ButtonDepress(int theId)
+ 			mApp->mZenGarden->SetupForZenTutorial();
+ 		break;
+ 	case GameSelector::GameSelector_Zombatar:
+-		ShowZombatarScreen();
+-		break;
++		return; // Retired ID must not open a hidden screen or become another action.
+ 	case GameSelector::GameSelector_Achievements:
+ 		ShowAchievementsScreen();
+ 		break;
+@@ -1373,12 +1378,7 @@ void GameSelector::SlideTo(int theX, int theY)
+ 
+ void GameSelector::ShowZombatarScreen()
+ {
+-	if (!mZombatarWidget)
+-		return;
+-	if (mApp->mPlayerInfo && !mApp->mPlayerInfo->mZombatarAccepted)
+-		mApp->ShowZombatarTOS();
+-	else
+-		mZombatarWidget->Open();
++	// Compatibility entry point intentionally does nothing: the editor is retired.
+ }
+ 
+ void GameSelector::ShowAchievementsScreen()
 diff --git a/src/Lawn/Widget/GameSelector.h b/src/Lawn/Widget/GameSelector.h
 index d017de9..260efd1 100644
 --- a/src/Lawn/Widget/GameSelector.h

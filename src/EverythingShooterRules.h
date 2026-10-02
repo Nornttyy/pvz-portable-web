@@ -1,13 +1,22 @@
 #pragma once
 namespace EverythingShooterRules {
 inline constexpr int Id=529,Base=49,Cost=250,Recharge=750,Interval=150,Unlock=27;
-inline constexpr int First=320,NativeCount=14,Doom=334,Cherry=335,Poop=336;
-inline constexpr int DoomPercent=5,CherryPercent=5,PoopPercent=10,PoopDamage=80;
+inline constexpr int First=320,NativeCount=14,Cob=331,Doom=334,Cherry=335,Poop=336;
+inline constexpr int DoomPercent=2,CherryPercent=2,CobPercent=2,PoopPercent=20,PoopDamage=80;
+inline constexpr int OtherNativeCount=NativeCount-1,OtherNativePercent=100-DoomPercent-CherryPercent-CobPercent-PoopPercent;
 inline constexpr int DoomDamage=600,CherryDamage=400,CobDamage=600;
 constexpr int BlastDamage(int style){return style==Doom?DoomDamage:style==Cherry?CherryDamage:style==First+11?CobDamage:1800;}
 constexpr bool Own(int style){return style>=First&&style<=Poop;}
 constexpr bool Special(int style){return style>=Doom&&style<=Poop;}
-constexpr int Choose(int rareRoll,int nativeRoll){return rareRoll<DoomPercent?Doom:rareRoll<DoomPercent+CherryPercent?Cherry:rareRoll<DoomPercent+CherryPercent+PoopPercent?Poop:First+nativeRoll%NativeCount;}
+constexpr int Choose(int roll,int nativeRoll){
+ if(roll<DoomPercent)return Doom;
+ if(roll<DoomPercent+CherryPercent)return Cherry;
+ if(roll<DoomPercent+CherryPercent+PoopPercent)return Poop;
+ if(roll<DoomPercent+CherryPercent+PoopPercent+CobPercent)return Cob;
+ // Corn cob has its own fixed probability, never a second chance in this pool.
+ const int index=nativeRoll%OtherNativeCount;
+ return First+index+(index>=Cob-First?1:0);
+}
 constexpr int NativeType(int style){return Special(style)?2:style-First;}
 constexpr bool Lob(int style){const int t=NativeType(style);return t==2||t==3||t==5||t==9||t==10||t==11||t==12;}
 // Validate the saved identity without rerolling it. Ordinary pea and snow pea
