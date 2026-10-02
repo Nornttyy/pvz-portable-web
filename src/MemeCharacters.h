@@ -5,6 +5,7 @@
 #include "StinkShroomRules.h"
 #include "IceChiliRules.h"
 #include "EverythingShooterRules.h"
+#include "CoinPlantRules.h"
 class Plant; class Board; class Zombie; class Projectile;
 namespace Sexy {class Graphics;class Color;}
 namespace MemeCharacters {
@@ -28,11 +29,11 @@ constexpr bool IsPalmShot(int style){return style==PalmProjectile||style==Critic
 constexpr int PalmDamage(int style){return style==CriticalPalmProjectile?110:80;}
 constexpr int PalmPush(int style,bool giant){return (giant?16:48)*(style==CriticalPalmProjectile?3:2)/2;}
 // Seed-card recharge, separate from each character's combat cooldown.
-constexpr int PlantingCooldown(int id){return id==501?1200:id==SmallNut?600:id==CactusPalm?750:id==TinyPuff?TinyPuffRules::Recharge:id==NukeShroom?NukeShroomRules::Recharge:id==StinkShroom?StinkShroomRules::Recharge:id==IceChili?IceChiliRules::Recharge:id==EverythingShooter?EverythingShooterRules::Recharge:300;}
+constexpr int PlantingCooldown(int id){return CoinPlantRules::IsPlant(id)?CoinPlantRules::Recharge:id==501?1200:id==SmallNut?600:id==CactusPalm?750:id==TinyPuff?TinyPuffRules::Recharge:id==NukeShroom?NukeShroomRules::Recharge:id==StinkShroom?StinkShroomRules::Recharge:id==IceChili?IceChiliRules::Recharge:id==EverythingShooter?EverythingShooterRules::Recharge:300;}
 constexpr bool IsStraightShot(int style){return style==WeakProjectile||style==GatlingProjectile||IsPalmShot(style);}
 constexpr int BaseShotStyle(int style){return style&(ReflectedShot-1);}
 struct Definition {int id,base,cost,unlock;const char* name;const char* shortName;const char* hint;const char* key;const char* description;};
-inline constexpr std::array<Definition,13> Definitions{{
+inline constexpr std::array<Definition,15> Definitions{{
  {500,0,100,1,"红温豌豆","红温","满300怒气 · 3秒乱射40发","PEASHOOTER","生命300 / 单发伤害20\n普攻1.5秒/发，命中判定10%\n每发怒气+20，满300自动红温\n红温3秒40发，结束休息3秒\n红温范围：本行及上下各1行\n不耗血，不击退，不能手动释放\n\n{KEYWORD}上次打中僵尸，僵尸报警称被空气殴打。他急得把准星吃了，申请转职电风扇。现在风扇要求退货。"},
  {501,3,50,4,"反咬坚果","反咬","被啃后反击 · 冷却3秒","WALL_NUT","生命4000 / 反击伤害80\n被啃后反击，反击冷却3秒\n不击退；种植冷却另计\n\n{KEYWORD}被啃一口后，他连夜把食物链倒过来贴。第二天申请当僵尸，被拒：你太坚果了。于是他把拒信也咬了。"},
  {519,52,125,8,"射手豌豆","射手豌豆","头是豌豆 · 发射射手","SHOOTER_PEA","生命300 / 单发伤害20\n攻速1.5秒/发，不击退\n发射完整的小豌豆射手\n\n{KEYWORD}豌豆射手把工牌戴反了，头成了弹药，弹药成了同事。嘴里查出三个编制，目前正在申请扩招。"},
@@ -46,6 +47,8 @@ inline constexpr std::array<Definition,13> Definitions{{
  {527,10,75,13,"喷粪菇","喷粪菇","深棕喷射 · 周围植物也犯恶心","FUME_SHROOM","生命300 / 伤害20，保留原版穿透\n每2秒喷射，白天睡觉\n50%眩晕0.5秒 / 5%转身跑路\n10%击退：普通0.5格 / 巨人0.2格\n周围八格待20秒：生产和射速-30%\n离开即恢复；75阳光，冷却7.5秒\n\n{KEYWORD}别人用嘴输出观点，他用嘴输出肥料。僵尸说没有意见，鼻子已经连夜辞职。隔壁向日葵要求搬家，房东说这是有机小区。"},
  {528,51,125,26,"冰爆辣椒","冰爆辣椒","整行冰爆 · 冻结幸存僵尸","ICE_CHILI","生命300 / 整行伤害1200\n种下1秒后爆炸，一次性植物\n幸存僵尸冻结3秒，不击退\n不缩短已有冻结，不额外减速\n125阳光，冷却50秒；3-6解锁\n\n{KEYWORD}火爆辣椒去冷库上了一天班，回来把整行僵尸做成了冰棍。僵尸问辣不辣，他说先别问，你的下巴已经粘在冰箱门上了。"},
  {529,49,250,27,"万物皆可射射手","万物皆可射射手","随机子弹 · 只伤命中的单个僵尸","EVERYTHING_SHOOTER","生命300 / 每1.5秒射击，全部单体\n74%随机13种其他原版子弹\n2%玉米炮600 / 2%毁灭菇弹600\n2%樱桃弹400 / 20%大粪：伤害80\n无范围伤害、不挖坑；大粪无控制\n250阳光，冷却7.5秒；3-7解锁\n\n{KEYWORD}他把弹药库、菜市场和厕所接到了同一根水管。僵尸以为下一发还是豌豆，结果收到一颗毁灭菇。对此他表示：嘴里有什么，就先发什么。"},
+ {530,50,150,12,"撒比射手","撒比射手","扣金币射击 · 没钱停火","COIN_SHOOTER","生命300 / 每1.5秒射一枚钱币\n银币69% / 金币30% / 钻石1%\n伤害20 / 60 / 300，全部单体\n每枚扣10 / 50 / 1000金币\n余额不足等补款；150阳光，冷却7.5秒\n2-2解锁，不替换红温豌豆\n\n{KEYWORD}他把银行卡插进炮嘴，坚持认为这是充值口。僵尸挨了一枚银币，准备找零，他已经戴上墨镜宣布破产。那根烟是财务最后的倔强。"},
+ {531,38,50,49,"撒币花","撒币花","花钱造钱币 · 环绕碰撞","MARIGOLD","生命300 / 每10秒花钱造一枚\n银币65% / 金币30% / 钻石5%\n扣10 / 50 / 1000金币，没钱停产\n伤害20 / 60 / 300，命中后消耗\n周围最多100枚，不能拾取\n50阳光，冷却7.5秒；替换金盏花\n\n{KEYWORD}别人的钱在银行转，他的钱围着脑袋转。自称拥有一百条资金链，僵尸碰一条断一条。戴墨镜不是为了耍帅，是不想看余额。"},
 }};
 // Retired IDs are migration-only, never playable definitions.
 inline constexpr std::array<int,17> RetiredBases{8,1,0,5,7,4,26,6,32,29,34,13,10,28,21,18,17};

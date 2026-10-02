@@ -65,6 +65,8 @@ bool SandboxEnter() {
     previousEasyPlanting = app->mEasyPlantingCheat;
     previousSpeed = app->mUpdateMultiplier;
     sandboxProfile = std::make_unique<PlayerInfo>();
+    // Practice with a disposable copy, never debit the actual adventure wallet.
+    if (adventureProfile) sandboxProfile->mCoins = adventureProfile->mCoins;
     gSandboxEnabled = true;
     awake = true;
     stackPlants = false;

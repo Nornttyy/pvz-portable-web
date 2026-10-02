@@ -387,7 +387,7 @@ void SeedChooserScreen::Draw(Graphics* g)
 		}
 	}
 
-	for (SeedType extra : {SEED_LEFTPEATER, SEED_SMALL_NUT, SEED_SPROUT, SEED_EXPLODE_O_NUT}) if (AbstractChooserExpanded())
+	for (SeedType extra : {SEED_LEFTPEATER, SEED_SMALL_NUT, SEED_SPROUT, SEED_EXPLODE_O_NUT, SEED_GIANT_WALLNUT}) if (AbstractChooserExpanded())
 	{
 		int x, y;
 		GetSeedPositionInChooser(extra, x, y);
@@ -1043,7 +1043,11 @@ void SeedChooserScreen::MouseDown(int x, int y, int theClickCount)
 	}
 	else
 	{
-		if (!mBoard->mSeedBank->ContainsPoint(x, y) && !mAlmanacButton->IsMouseOver() && !mStoreButton->IsMouseOver() && mApp->CanShowAlmanac())
+		// The expanded last column can overlap a preview zombie's hit rectangle.
+		// A visible seed owns its click; the zombie behind the panel must not
+		// open the almanac instead of selecting the new card.
+		SeedType aSeedType = SeedHitTest(x, y);
+		if (aSeedType == SEED_NONE && !mBoard->mSeedBank->ContainsPoint(x, y) && !mAlmanacButton->IsMouseOver() && !mStoreButton->IsMouseOver() && mApp->CanShowAlmanac())
 		{
 			Zombie* aZombie = mBoard->ZombieHitTest(x - mBoard->mX, y - mBoard->mY);
 			if (aZombie && aZombie->mFromWave == Zombie::ZOMBIE_WAVE_CUTSCENE && aZombie->mZombieType != ZOMBIE_REDEYE_GARGANTUAR)
@@ -1055,7 +1059,6 @@ void SeedChooserScreen::MouseDown(int x, int y, int theClickCount)
 			}
 		}
 
-		SeedType aSeedType = SeedHitTest(x, y);
 		if (aSeedType != SEED_NONE && !SeedNotAllowedToPick(aSeedType))
 		{
 			if (SeedNotAllowedDuringTrial(aSeedType))

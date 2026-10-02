@@ -34,11 +34,13 @@ test('production plant definition and unlock gate preserve native sprout outside
  await writeFile(cpp,`#include "ConstEnums.h"
 #include "IceChiliRules.h"
 #include "EverythingShooterRules.h"
+#include "CoinPlantRules.h"
 #include <cassert>
 #define PVZP_ASSERT assert
 namespace MemeAdventure {bool enabled=false;bool RosterEnabled(){return enabled;}}
 bool gSandboxEnabled=false;
 namespace EverythingShooter {bool IsSlot(int){return false;}}
+namespace CoinPlants {bool ShooterSlot(int){return false;}}
 enum PlantSubClass {SUBCLASS_NORMAL,SUBCLASS_SHOOTER};
 struct PlantDefinition {SeedType mSeedType=SEED_NONE;void* mPlantImage=nullptr;ReanimationType mReanimationType=REANIM_NONE;int mPacketIndex=0,mSeedCost=0,mRefreshTime=0;PlantSubClass mSubClass=SUBCLASS_NORMAL;int mLaunchRate=0;const char* mPlantName="";};
 PlantDefinition gPlantDefs[NUM_SEED_TYPES];

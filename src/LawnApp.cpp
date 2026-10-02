@@ -2297,6 +2297,8 @@ int LawnApp::GetSeedsAvailable()
 
 bool LawnApp::HasSeedType(SeedType theSeedType)
 {
+	if (theSeedType == SEED_GIANT_WALLNUT) return MemeAdventure::RosterEnabled() && mPlayerInfo &&
+		(HasFinishedAdventure() || mPlayerInfo->GetLevel() >= CoinPlantRules::Unlock);
 	if (theSeedType == SEED_EXPLODE_O_NUT) return MemeAdventure::RosterEnabled() && mPlayerInfo &&
 		(HasFinishedAdventure() || mPlayerInfo->GetLevel() >= EverythingShooterRules::Unlock);
 	if (theSeedType == SEED_SPROUT) return MemeAdventure::RosterEnabled() && mPlayerInfo &&

@@ -1,5 +1,6 @@
 // Individual character mechanics using the native rigs and seed bank.
 #include "MemeCharacters.h"
+#include "CoinPlants.h"
 #include "StinkShroom.h"
 #include "MemeShooterRules.h"
 #include "SandboxPlants.h"
@@ -59,8 +60,8 @@ bool PuffMuzzle(const Plant* p,float& x,float& y){
  auto* tip=SandboxArt::NativeImage("PuffShroom_tip.png");
  return tip&&SandboxArt::TrackPoint(gLawnApp->ReanimationTryToGet(p->mBodyReanimID),"PuffShroom_tip",tip->mWidth,tip->mHeight,tip->mWidth*.92f,tip->mHeight*.5f,x,y);
 }
-void Reset(){states.clear();shotStyles.clear();}
-void Forget(Plant* p){states.erase(p);}
+void Reset(){states.clear();shotStyles.clear();CoinPlants::Reset();}
+void Forget(Plant* p){states.erase(p);CoinPlants::Forget(p);}
 void Assign(Plant* p,int id){const auto* d=Find(id);if(!d||int(p->mSeedType)!=d->base)return;
  if(id==NukeShroom||id==IceChili){State s;s.id=id;s.health=p->mPlantHealth;s.delay=0;states[p]=s;return;}
  if(id==StinkShroom){State s;s.id=id;s.health=p->mPlantHealth;s.delay=0;states[p]=s;p->mLaunchRate=p->mLaunchCounter=StinkShroomRules::Interval;return;}
@@ -156,6 +157,11 @@ void Tick(Board* b){
    if(!supported){p->Die();continue;} // Die erases s via SandboxPlants::Forget.
   }
   if(s.id==TinyPuff){s.health=p->mPlantHealth;continue;}
+  if(CoinPlantRules::IsPlant(s.id)){
+   p->mLaunchCounter=9999;p->mShootingCounter=0;
+   if(::StinkShroom::WorkTick(p))CoinPlants::Update(p);
+   s.health=p->mPlantHealth;continue;
+  }
   if(s.id==NukeShroom||s.id==StinkShroom||s.id==IceChili){s.health=p->mPlantHealth;if(!p->mIsAsleep)s.age=(s.age+1)%1000000;continue;}
   if(s.id!=TuckingSunflower){p->mLaunchCounter=9999;if(s.id!=CactusPalm)p->mShootingCounter=0;}
   if(p->mIsAsleep||p->mSquished||p->NotOnGround()||p->mPlantHealth<=0){if(s.id==TuckingSunflower)s.phase=0;continue;}
@@ -311,6 +317,10 @@ bool CanHit(const Projectile* shot){return IsStraightShot(ShotStyle(shot))||Shot
 bool CanHitRow(const Projectile* shot,int row){return MemeShooterRules::CanHitRow(BaseShotStyle(ShotStyle(shot)),row);}
 void OnImpact(Projectile*,Zombie*){}
 bool RestoreShotStyle(const Projectile* shot,int style){
+ if(CoinPlantRules::Shot(style)){
+  if(shot->mDead||shot->mProjectileType!=PROJECTILE_SPIKE||shot->mMotionType!=MOTION_STRAIGHT)return false;
+  shotStyles[shot]=style;return true;
+ }
  if(EverythingShooterRules::Own(style)){
   if(shot->mDead||!EverythingShooterRules::Valid(style,int(shot->mProjectileType),int(shot->mMotionType)))return false;
   shotStyles[shot]=style;return true;

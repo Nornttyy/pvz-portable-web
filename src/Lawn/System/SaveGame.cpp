@@ -28,6 +28,7 @@
 #include "../../Sandbox.h"
 #include "../../MemeAdventure.h"
 #include "../../StinkShroom.h"
+#include "../../CoinPlants.h"
 #include "../CursorObject.h"
 #include "../../Resources.h"
 #include "../../ConstEnums.h"
@@ -96,7 +97,8 @@ enum SaveChunkTypeV4
 	SAVE4_CHUNK_MEME_POWERS = 21,
 	SAVE4_CHUNK_MEME_PROJECTILES = 22,
 	SAVE4_CHUNK_MEME_ZOMBIES = 23,
-	SAVE4_CHUNK_STINK_STATUS = 24
+	SAVE4_CHUNK_STINK_STATUS = 24,
+	SAVE4_CHUNK_COIN_PLANTS = 25
 };
 
 static constexpr const uint32_t SAVE4_CHUNK_VERSION = 1U;
@@ -2015,6 +2017,20 @@ static void SyncStinkStatusPortable(PortableSaveContext& c,Board* board)
 	if(c.mReading&&!c.mFailed)StinkShroom::Load(save);
 }
 
+static void SyncCoinPlantsPortable(PortableSaveContext& c,Board* board)
+{
+	auto save=c.mReading?CoinPlants::Save{}:CoinPlants::Capture(board);
+	int count=static_cast<int>(save.size());c.SyncInt32(count);
+	if(count<0||count>1024){c.mFailed=true;return;}
+	if(c.mReading)save.resize(count);
+	for(auto& p:save){
+		c.SyncUInt32(p.key);c.SyncInt32(p.state.id);c.SyncInt32(p.state.delay);c.SyncInt32(p.state.phase);c.SyncInt32(p.state.pending);
+		for(int& kind:p.state.coins)c.SyncInt32(kind);
+		if(c.mReading&&!CoinPlantRules::Valid(p.state)){c.mFailed=true;return;}
+	}
+	if(c.mReading&&!c.mFailed)CoinPlants::Load(save);
+}
+
 static ChunkSyncFn GetChunkSyncFn(uint32_t theChunkType)
 {
 	switch (theChunkType)
@@ -2067,6 +2083,8 @@ static ChunkSyncFn GetChunkSyncFn(uint32_t theChunkType)
 		return SyncMemeZombiesPortable;
 	case SAVE4_CHUNK_STINK_STATUS:
 		return SyncStinkStatusPortable;
+	case SAVE4_CHUNK_COIN_PLANTS:
+		return SyncCoinPlantsPortable;
 	default:
 		return nullptr;
 	}
@@ -2351,6 +2369,7 @@ static bool LawnLoadGameV4(Board* theBoard, const std::string& theFilePath)
 	FixBoardAfterLoad(theBoard);
 	MemeAdventure::Restore(theBoard);
 	StinkShroom::Restore(theBoard);
+	CoinPlants::Restore(theBoard);
 	theBoard->mApp->mGameScene = GameScenes::SCENE_PLAYING;
 	return true;
 }
@@ -2884,6 +2903,7 @@ bool LawnSaveGame(Board* theBoard, const std::string& theFilePath)
 	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_MEME_PROJECTILES, theBoard)) return false;
 	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_MEME_ZOMBIES, theBoard)) return false;
 	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_STINK_STATUS, theBoard)) return false;
+	if (!WriteChunkV4(aPayload, SAVE4_CHUNK_COIN_PLANTS, theBoard)) return false;
 
 	SaveFileHeaderV4 aHeader{};
 	memcpy(aHeader.mMagic, SAVE_FILE_MAGIC_V4, sizeof(aHeader.mMagic));

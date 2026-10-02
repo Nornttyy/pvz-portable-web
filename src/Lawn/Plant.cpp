@@ -26,6 +26,7 @@
 #include "../AbstractRigVisuals.h"
 #include "../IceChili.h"
 #include "../EverythingShooter.h"
+#include "../CoinPlants.h"
 #include "Board.h"
 #include "Zombie.h"
 #include "Cutscene.h"
@@ -208,7 +209,7 @@ void Plant::PlantInitialize(int theGridX, int theGridY, SeedType theSeedType, Se
 	else
 		mLaunchCounter = 0;
 
-	switch (EverythingShooter::IsSlot(theSeedType) ? SEED_PEASHOOTER : theSeedType)
+	switch ((EverythingShooter::IsSlot(theSeedType) || CoinPlants::ShooterSlot(theSeedType)) ? SEED_PEASHOOTER : theSeedType)
 	{
 	case SeedType::SEED_BLOVER:
 	{
@@ -626,6 +627,7 @@ void Plant::SetSleeping(bool theIsAsleep)
 
 int Plant::GetDamageRangeFlags(PlantWeapon thePlantWeapon)
 {
+	if (CoinPlants::ShooterSlot(mSeedType)) return 1;
 	switch (mSeedType)
 	{
 	case SeedType::SEED_CACTUS:
@@ -2813,7 +2815,7 @@ void Plant::UpdateReanim()
 		aOffsetX -= 20.0f;
 		aOffsetY -= 40.0f;
 	}
-	if (mSeedType == SeedType::SEED_GIANT_WALLNUT)
+	if (mSeedType == SeedType::SEED_GIANT_WALLNUT && !CoinPlants::ShooterSlot(mSeedType))
 	{
 		aScaleX = 2.0f;
 		aScaleY = 2.0f;
@@ -2956,7 +2958,7 @@ Reanimation* Plant::AttachBlinkAnim(Reanimation* theReanimBody)
 	const char* aTrackToAttach = nullptr;
 
 	if (mSeedType == SeedType::SEED_WALLNUT || mSeedType == SeedType::SEED_SMALL_NUT || mSeedType == SeedType::SEED_TALLNUT ||
-		(mSeedType == SeedType::SEED_EXPLODE_O_NUT && !EverythingShooter::IsSlot(mSeedType)) || mSeedType == SeedType::SEED_GIANT_WALLNUT)
+		(mSeedType == SeedType::SEED_EXPLODE_O_NUT && !EverythingShooter::IsSlot(mSeedType)) || (mSeedType == SeedType::SEED_GIANT_WALLNUT && !CoinPlants::ShooterSlot(mSeedType)))
 	{
 		int aHit = Rand(10);
 		if (aHit < 1 && theReanimBody->TrackExists("anim_blink_twitch"))
@@ -3021,7 +3023,7 @@ Reanimation* Plant::AttachBlinkAnim(Reanimation* theReanimBody)
 			aTrackToAttach = "anim_face2";
 		}
 	}
-	else if (EverythingShooter::IsSlot(mSeedType) || mSeedType == SeedType::SEED_PEASHOOTER || mSeedType == SeedType::SEED_SNOWPEA || mSeedType == SeedType::SEED_REPEATER || mSeedType == SeedType::SEED_LEFTPEATER || mSeedType == SeedType::SEED_GATLINGPEA)
+	else if (CoinPlants::ShooterSlot(mSeedType) || EverythingShooter::IsSlot(mSeedType) || mSeedType == SeedType::SEED_PEASHOOTER || mSeedType == SeedType::SEED_SNOWPEA || mSeedType == SeedType::SEED_REPEATER || mSeedType == SeedType::SEED_LEFTPEATER || mSeedType == SeedType::SEED_GATLINGPEA)
 	{
 		if (theReanimBody->TrackExists("anim_stem"))
 		{
@@ -3095,7 +3097,7 @@ void Plant::DoBlink()
 		return;
 
 	if (mSeedType == SeedType::SEED_WALLNUT || mSeedType == SeedType::SEED_SMALL_NUT || mSeedType == SeedType::SEED_TALLNUT ||
-		(mSeedType == SeedType::SEED_EXPLODE_O_NUT && !EverythingShooter::IsSlot(mSeedType)) || mSeedType == SeedType::SEED_GIANT_WALLNUT)
+		(mSeedType == SeedType::SEED_EXPLODE_O_NUT && !EverythingShooter::IsSlot(mSeedType)) || (mSeedType == SeedType::SEED_GIANT_WALLNUT && !CoinPlants::ShooterSlot(mSeedType)))
 	{
 		mBlinkCountdown = 1000 + Rand(1000);
 	}
@@ -3972,7 +3974,7 @@ void Plant::DrawShadow(Sexy::Graphics* g, float theOffsetX, float theOffsetY)
 	{
 		aShadowOffsetY = 71.0f;
 	}
-	else if (mSeedType == SeedType::SEED_GIANT_WALLNUT)
+	else if (mSeedType == SeedType::SEED_GIANT_WALLNUT && !CoinPlants::ShooterSlot(mSeedType))
 	{
 		aShadowOffsetX = -33.0f;
 		aShadowOffsetY = 56.0f;
@@ -4000,6 +4002,7 @@ void Plant::DrawShadow(Sexy::Graphics* g, float theOffsetX, float theOffsetY)
 void Plant::Draw(Graphics* g)
 {
 	AbstractRigVisuals::NauseaScope nausea(this);
+	CoinPlants::DrawOrbit(g,this,false);
 	float aOffsetX = 0.0f;
 	float aOffsetY = PlantDrawHeightOffset(mBoard, this, mSeedType, mPlantCol, mRow);
 	if (Plant::IsFlying(mSeedType) && mSquished)
@@ -4160,6 +4163,8 @@ void Plant::Draw(Graphics* g)
 
 		SandboxPlants::DrawNausea(g,this);
 		EverythingShooter::DrawPlant(g,this);
+		CoinPlants::DrawPlant(g,this);
+		CoinPlants::DrawOrbit(g,this,true);
 		if (mSeedType == SeedType::SEED_MAGNETSHROOM && !DrawMagnetItemsOnTop())
 		{
 			DrawMagnetItems(g);
@@ -4228,6 +4233,11 @@ void Plant::DrawSeedType(Graphics* g, SeedType theSeedType, SeedType theImitater
 	if (aSeedType == SeedType::SEED_SPROUT && (gSandboxEnabled || MemeAdventure::RosterEnabled()))
 	{
 		SandboxPlants::DrawIceChiliPreview(&aSeedG,thePosX,thePosY,aDrawVariation==VARIATION_IMITATER);
+		return;
+	}
+	if (CoinPlants::ShooterSlot(aSeedType) || CoinPlants::FlowerSlot(aSeedType))
+	{
+		CoinPlants::DrawPreview(&aSeedG,thePosX,thePosY,CoinPlants::FlowerSlot(aSeedType),aDrawVariation==VARIATION_IMITATER);
 		return;
 	}
 	if (EverythingShooter::IsSlot(aSeedType))
@@ -5116,6 +5126,13 @@ void Plant::Die()
 
 const PlantDefinition& GetPlantDefinition(SeedType theSeedType)
 {
+	if (CoinPlants::ShooterSlot(theSeedType))
+	{
+		static const PlantDefinition coin{.mSeedType=SEED_GIANT_WALLNUT,.mPlantImage=nullptr,.mReanimationType=REANIM_PEASHOOTER,
+			.mPacketIndex=0,.mSeedCost=CoinPlantRules::ShooterCost,.mRefreshTime=CoinPlantRules::Recharge,
+			.mSubClass=SUBCLASS_NORMAL,.mLaunchRate=0,.mPlantName="COIN_SHOOTER"};
+		return coin;
+	}
 	if (EverythingShooter::IsSlot(theSeedType))
 	{
 		static const PlantDefinition everything{.mSeedType=SEED_EXPLODE_O_NUT,.mPlantImage=nullptr,.mReanimationType=REANIM_PEASHOOTER,

@@ -4,9 +4,54 @@
   "coinAutoCollect": "Silver and gold coins begin the original collection flight after 60 active game ticks, without mouse/touch input. Native scoring, amounts and sounds are unchanged. Pauses, dialogs, non-playing scenes and already-collected coins are guarded. Sun, diamonds, seeds, bags and awards keep their existing behavior; present-fanout coins keep their native 80-tick collection.",
   "branding": "Original logo retained with the same generated transparent NB版 badge on the web loader, native title and main menu. One short settling entrance on the title; no perpetual motion. Main menu art sits below the user signs in the left sky, follows the achievements slide, has no hit target and clears when starting adventure. Native sandbox entry is 138x38 at (650,8), with 18px bitmap text and matching mouse/touch bounds.",
   "openmpt": "0.8.4",
-  "mode": "Thirteen abstract plants and eight independent zombies (212..219). Everything Shooter randomly fires all fourteen native projectiles plus three rare types; Ice Chili costs 125 sun. Adventure and sandbox share replacements; other progression and saves are preserved.",
-  "almanacCopy": "All thirteen original plants and eight original zombies show explicit numeric statistics separately from surreal character-specific flavour text. Native cost/recharge footer and full supplemental Chinese glyphs.",
-  "almanacLayout": "Original eight-column 50x70 cards aligned to the printed book sockets. Native seed order on page one; four extra plants on page two. Native book arrows, mouse/touch/keyboard navigation and page-scoped hit tests.",
+  "mode": "Fifteen abstract plants and eight independent zombies (212..219). Coin Shooter is an independent card unlocked at 2-2; Coin Flower replaces Marigold. Adventure and sandbox share replacements; other progression and saves are preserved.",
+  "almanacCopy": "All fifteen original plants and eight original zombies show explicit numeric statistics separately from surreal character-specific flavour text. Native cost/recharge footer and full supplemental Chinese glyphs.",
+  "almanacLayout": "Original eight-column 50x70 cards aligned to the printed book sockets. Native seed order on page one; five extra plants on page two. Native book arrows, mouse/touch/keyboard navigation and page-scoped hit tests.",
+  "coinPlants": {
+    "shooter": {
+      "id": 530,
+      "name": "撒比射手",
+      "nativeSlot": 50,
+      "sunCost": 150,
+      "intervalTicks": 150,
+      "adventureUnlock": 12,
+      "odds": {
+        "silver": 69,
+        "gold": 30,
+        "diamond": 1
+      }
+    },
+    "flower": {
+      "id": 531,
+      "name": "撒币花",
+      "nativeSlot": 38,
+      "sunCost": 50,
+      "intervalTicks": 1000,
+      "capacity": 100,
+      "orbitTicks": 600,
+      "consumeOnContact": true,
+      "odds": {
+        "silver": 65,
+        "gold": 30,
+        "diamond": 5
+      }
+    },
+    "health": 300,
+    "rechargeTicks": 750,
+    "walletDebit": {
+      "silver": 10,
+      "gold": 50,
+      "diamond": 1000
+    },
+    "damage": {
+      "silver": 20,
+      "gold": 60,
+      "diamond": 300
+    },
+    "art": "Original peashooter and marigold rigs, original coin and diamond images; pixel black sunglasses follow the face bone, cigarette follows the pea muzzle. Battle and card previews share the same accessory artwork and registration.",
+    "boundaries": "Money ammunition is not a pickup. Single-target damage only; no automatic refund, sun debit or free production. Each pending roll is retained when unaffordable. Sandbox copies the player's wallet into its disposable profile and does not change adventure savings.",
+    "save": "Optional portable chunk 25 saves production clocks, pending rolls, orbit phases and all 100 stable coin slots. Restoring never charges the wallet again."
+  },
   "removedZombatar": "The Zombatar menu sign and button are removed, with no click target, editor construction or editor resource preload. Legacy entry points are inert. Existing player records, combat zombies, almanac and other menu functions are preserved.",
   "everythingShooter": {
     "id": 529,
@@ -222,13 +267,13 @@
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 279578,
-      "sha256": "b29c10a9af5bcfa70eec41f71b0f63614ea5af4cfdfba8c7264111ffdd9e2fd4"
+      "size": 280214,
+      "sha256": "08ee6a2f3a8dbdcaa845b4fe90963ca4ee4640227cd428aefc0a3b26de94f80f"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 8342225,
-      "sha256": "cf2904638c593e06415b7412de8718166b0c7d06c20d0f68e5cfaf653bf20711"
+      "size": 8433449,
+      "sha256": "8473ee4c862b1cd36797f2851eed1ff278cdb340f4519c17bfbf8b061a561753"
     }
   ]
 }

@@ -27,6 +27,7 @@
 #include "../LawnApp.h"
 #include "../SandboxPlants.h"
 #include "../EverythingShooter.h"
+#include "../CoinPlants.h"
 #include "../MemeShooterRules.h"
 #include "../SandboxVisualRules.h"
 #include "../SandboxZombies.h"
@@ -848,6 +849,7 @@ void Projectile::PlayImpactSound(Zombie* theZombie)
 void Projectile::DoImpact(Zombie* theZombie)
 {
 	if (SandboxZombies::DodgeProjectile(this,theZombie)) return;
+	if (CoinPlants::Impact(this,theZombie)) return;
 	if (EverythingShooter::Impact(this,theZombie)) return;
 	PlayImpactSound(theZombie);
 
@@ -1010,6 +1012,7 @@ void Projectile::Update()
 
 void Projectile::Draw(Graphics* g)
 {
+	if (CoinPlants::DrawShot(g,this)) return;
 	if (EverythingShooter::DrawShot(g,this)) return;
     if (SandboxZombies::DrawShot(g,this)) return;
     if (SandboxPlants::DrawShot(g,this)) return;

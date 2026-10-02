@@ -34,7 +34,7 @@ test('everything shooter production launch and impact functions preserve all 14 
 test('new independent card does not replace bowling; native cold preloading and friendly enemy ammunition are scoped',async()=>{
  assert.equal(PLANTS.find(p=>p.id===529).base,49);
  const plant=await read('src/Lawn/Plant.cpp'),app=await read('src/LawnApp.cpp'),shot=await read('src/Lawn/Projectile.cpp'),source=await read('src/EverythingShooter.cpp');
- assert.match(plant,/switch \(EverythingShooter::IsSlot\(theSeedType\) \? SEED_PEASHOOTER : theSeedType\)/);
+ assert.match(plant,/switch \(\(EverythingShooter::IsSlot\(theSeedType\) \|\| CoinPlants::ShooterSlot\(theSeedType\)\) \? SEED_PEASHOOTER : theSeedType\)/);
  assert.match(plant,/mSubClass=SUBCLASS_NORMAL,.mLaunchRate=0,.mPlantName="EVERYTHING_SHOOTER"/);
  assert.match(plant,/if \(EverythingShooter::Fire\(this,theTargetZombie\)\) return/);
  assert.match(plant,/PreloadPlantResources\(ammo\)/);assert.match(plant,/ZOMBIE_CATAPULT/);
@@ -53,12 +53,14 @@ test('actual new plant definition and 3-7 unlock retain explosive bowling nuts i
  await writeFile(cpp,`#include "ConstEnums.h"
 #include "IceChiliRules.h"
 #include "EverythingShooterRules.h"
+#include "CoinPlantRules.h"
 #include <cassert>
 #include <initializer_list>
 #define PVZP_ASSERT assert
 namespace MemeAdventure {bool enabled=false;bool RosterEnabled(){return enabled;}}
 bool gSandboxEnabled=false;
 namespace EverythingShooter {bool IsSlot(int seed){return seed==49&&(gSandboxEnabled||MemeAdventure::RosterEnabled());}}
+namespace CoinPlants {bool ShooterSlot(int seed){return seed==50&&(gSandboxEnabled||MemeAdventure::RosterEnabled());}}
 enum PlantSubClass {SUBCLASS_NORMAL,SUBCLASS_SHOOTER};
 struct PlantDefinition {SeedType mSeedType=SEED_NONE;void* mPlantImage=nullptr;ReanimationType mReanimationType=REANIM_NONE;int mPacketIndex=0,mSeedCost=0,mRefreshTime=0;PlantSubClass mSubClass=SUBCLASS_NORMAL;int mLaunchRate=0;const char* mPlantName="";};
 PlantDefinition gPlantDefs[NUM_SEED_TYPES];

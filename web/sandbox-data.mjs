@@ -167,6 +167,8 @@ export const ORIGINAL_PLANTS = [
   [527,10,'喷粪菇','深棕喷射 · 周围植物也犯恶心'],
   [528,51,'冰爆辣椒','整行伤害1200 · 冻结3秒'],
   [529,49,'万物皆可射射手','随机14种原版子弹 · 稀有爆炸弹与大粪'],
+  [530,50,'撒比射手','扣金币射击 · 没钱停火'],
+  [531,38,'撒币花','花钱造钱币 · 环绕碰撞'],
 ].map(([id,base,name,note])=>({id,base,name,note}));
 export const nativeBase = id => ORIGINAL_PLANTS.find(p=>p.id===id)?.base ?? RETIRED_CHARACTERS.find(p=>p.id===id)?.base ?? RETIRED_PLANTS.find(p=>p.id===id)?.base ?? id;
 export const PLANTS = [...plantNames.map((name,id) => ORIGINAL_PLANTS.find(p=>p.base===id) ?? ({id,name,note:notes[id] ?? '免费 · 无冷却'})),...ORIGINAL_PLANTS.filter(p=>p.base>=48)];

@@ -24,6 +24,7 @@
 #include "Cutscene.h"
 #include "Challenge.h"
 #include "SeedPacket.h"
+#include "../CoinPlants.h"
 #include "../LawnApp.h"
 #include "CursorObject.h"
 #include "../Resources.h"
@@ -534,7 +535,7 @@ void DrawSeedPacket(Graphics* g, float x, float y, SeedType theSeedType, SeedTyp
 			aOffsetY = 34.0f;
 		}
 	}
-	if (aSeedType == SeedType::SEED_GIANT_WALLNUT)
+	if (aSeedType == SeedType::SEED_GIANT_WALLNUT && !CoinPlants::ShooterSlot(aSeedType))
 	{
 		aScale *= 0.75f;
 		aOffsetX = 52.0f;

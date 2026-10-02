@@ -54,9 +54,9 @@ test('published sandbox engine matches the recorded build and really initializes
 });
 
 test('sandbox replaces native cards in one catalogue, without duplicate originals', async () => {
-  assert.equal(ORIGINAL_PLANTS.length,13);assert.equal(new Set(ORIGINAL_PLANTS.map(p=>p.id)).size,13);
-  assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.base),[0,3,52,1,7,40,53,26,8,15,10,51,49]);
-  assert.equal(PLANTS.length,52);assert.equal(new Set(PLANTS.map(p=>p.id)).size,52);
+  assert.equal(ORIGINAL_PLANTS.length,15);assert.equal(new Set(ORIGINAL_PLANTS.map(p=>p.id)).size,15);
+  assert.deepEqual(ORIGINAL_PLANTS.map(p=>p.base),[0,3,52,1,7,40,53,26,8,15,10,51,49,50,38]);
+  assert.equal(PLANTS.length,53);assert.equal(new Set(PLANTS.map(p=>p.id)).size,53);
   for(const [slot,id] of [[0,500],[1,520],[3,501],[7,521],[8,525],[10,527],[15,526],[26,524],[40,522]]){assert.equal(PLANTS[slot].id,id);assert.ok(!PLANTS.some(p=>p.id===slot));}
   assert.deepEqual(plantsFor('original'),plantsFor('all'));
   const layout = {schema: 1, map: 0, plants: [{type: 500, col: 2, row: 2}]};
