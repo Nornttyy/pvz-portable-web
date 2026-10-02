@@ -34,6 +34,7 @@ test('coin plant almanac and build manifest share current odds, damage, prices a
  assert.deepEqual(build.shooter.odds,{silver:65,gold:30,diamond:5});assert.deepEqual(build.flower.odds,build.shooter.odds);
  assert.deepEqual(build.shooter.walletDebit,{silver:10,gold:10,diamond:50});assert.deepEqual(build.flower.walletDebit,{silver:10,gold:20,diamond:100});
  assert.deepEqual(build.damage,{silver:80,gold:400,diamond:4000});assert.equal(build.flower.capacity,50);assert.equal(build.flower.consumeOnContact,false);
+ assert.equal(build.flower.sunCost,200);assert.match(definitions,/\{531,38,200,49,/);assert.match(definitions,/离开再碰再伤；200阳光，冷却7.5秒/);
  assert.match(definitions,/每枚扣10 \/ 10 \/ 50金币/);assert.match(definitions,/每枚扣10 \/ 20 \/ 100金币/);
  assert.match(definitions,/伤害80 \/ 400 \/ 4000，命中不消失/);assert.match(definitions,/最多50枚，不能拾取/);
 });

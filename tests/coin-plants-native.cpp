@@ -49,6 +49,7 @@ int main(){
  int shotOdds[4]{},flowerOdds[4]{};
  for(int roll=0;roll<100;++roll){++shotOdds[Choose(roll,false)];++flowerOdds[Choose(roll,true)];}
  static_assert(Limit==50&&Damage(Silver)==80&&Damage(Gold)==400&&Damage(Diamond)==4000);
+ static_assert(FlowerCost==200&&ShooterCost==150);
  static_assert(Units(Silver)==1&&Units(Gold)==1&&Units(Diamond)==5);
  static_assert(Units(Silver,true)==1&&Units(Gold,true)==2&&Units(Diamond,true)==10);
  assert(shotOdds[1]==65&&shotOdds[2]==30&&shotOdds[3]==5);

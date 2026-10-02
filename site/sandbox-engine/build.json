@@ -30,7 +30,7 @@
       "id": 531,
       "name": "撒币花",
       "nativeSlot": 38,
-      "sunCost": 50,
+      "sunCost": 200,
       "intervalTicks": 1000,
       "capacity": 50,
       "orbitTicks": 600,
@@ -279,7 +279,7 @@
     {
       "name": "pvz-portable.wasm",
       "size": 8440781,
-      "sha256": "fef6991aae16262eca9dd04358522624afb955936f76e7b9af5f838a4d5e7d5a"
+      "sha256": "ecbaf44bbf67b15f5f06c806249394874d4832367d39ad0480df8aaeb9cddda3"
     }
   ]
 }

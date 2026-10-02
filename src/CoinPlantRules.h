@@ -3,7 +3,7 @@
 #include <cmath>
 namespace CoinPlantRules {
 inline constexpr int Shooter=530,Flower=531,ShooterBase=50,FlowerBase=38;
-inline constexpr int ShooterCost=150,FlowerCost=50,Recharge=750,Unlock=12;
+inline constexpr int ShooterCost=150,FlowerCost=200,Recharge=750,Unlock=12;
 inline constexpr int ShotInterval=150,FlowerInterval=1000,Limit=50,OrbitPeriod=600;
 inline constexpr int Silver=1,Gold=2,Diamond=3,FirstShot=340;
 constexpr bool IsPlant(int id){return id==Shooter||id==Flower;}

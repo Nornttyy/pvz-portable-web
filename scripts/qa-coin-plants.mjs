@@ -36,9 +36,9 @@ try{
   for(const base of [50,38,1,33,3,26]){const slot=base===50?44:base>=8?base+2:base;await click(47+slot%9*53,163+Math.floor(slot/9)*73);await page.waitForTimeout(400);await snap('selected-'+base);}
   await snap('adventure-chooser');await click(258,566);await wait(()=>Module._pvz_adventure_power_data(-1,5)===1);
   const bank=await page.evaluate(()=>Array.from({length:6},(_,i)=>[0,1,2].map(f=>Module._pvz_adventure_seed_data(i,f))));
-  assert.deepEqual(bank[0],[530,150,750]);assert.deepEqual(bank[1],[531,50,750]);results.adventureBank=bank;await snap('adventure-start');
+  assert.deepEqual(bank[0],[530,150,750]);assert.deepEqual(bank[1],[531,200,750]);results.adventureBank=bank;await snap('adventure-start');
   // Roof levels provide existing pots in the left columns. All sun is earned normally.
-  await afford(50);await place(2,0,0);await afford(50);await place(1,1,2);
+  await afford(50);await place(2,0,0);await afford(50);await place(2,1,0);await afford(200);await place(1,1,2);
   await wait(()=>Module._pvz_coinplant_data(2,0,4)>0,undefined,16000);await snap('adventure-orbit');
   await afford(150);await place(0,2,2);await wait(()=>{let n=0;while(Module._pvz_coinplant_data(2,n,0)>=0)++n;return n===2;});
   await page.waitForTimeout(1200);await click(748,14);results.beforeSave=await data();await snap('adventure-paused');
