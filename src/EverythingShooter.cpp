@@ -67,7 +67,7 @@ bool Impact(Projectile* shot,Zombie* target){
   shot->mApp->PlayFoley(FOLEY_SPLAT);
  }else{
   const bool doom=style==EverythingShooterRules::Doom;
-  b->KillAllZombiesInRadius(shot->mRow,x,y,doom?250:115,doom?3:1,true,127);
+  b->KillAllZombiesInRadius(shot->mRow,x,y,doom?250:115,doom?3:1,true,127,EverythingShooterRules::BlastDamage(style));
   shot->mApp->AddPvzpParticle(x,y,RENDER_LAYER_TOP,doom?PARTICLE_DOOM:PARTICLE_POWIE);
   if(doom)shot->mApp->PlaySample(Sexy::SOUND_DOOMSHROOM);else shot->mApp->PlayFoley(FOLEY_CHERRYBOMB);
   b->ShakeBoard(doom?3:2,doom?-4:-2);

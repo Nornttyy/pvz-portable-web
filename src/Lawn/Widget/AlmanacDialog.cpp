@@ -207,7 +207,10 @@ void AlmanacDialog::SetPage(AlmanacPage thePage)
 	else
 	{
 		if (mOpenPage == AlmanacPage::ALMANAC_PAGE_PLANTS)
+		{
+			mPlantPage = std::max(0, AlmanacPlantLayout::Page(mSelectedSeed, MemeAdventure::RosterEnabled() && AbstractAlmanacExpanded()));
 			SetupPlant();
+		}
 		else if (mOpenPage == AlmanacPage::ALMANAC_PAGE_ZOMBIES)
 			SetupZombie();
 		else return;
@@ -249,6 +252,7 @@ void AlmanacDialog::Update()
 	int aMouseX = mApp->mWidgetManager->mLastMouseX;
 	int aMouseY = mApp->mWidgetManager->mLastMouseY;
 	if (SeedHitTest(aMouseX, aMouseY) != SeedType::SEED_NONE || ZombieHitTest(aMouseX, aMouseY) != ZombieType::ZOMBIE_INVALID ||
+		PlantPageHitTest(aMouseX, aMouseY) != 0 ||
 		mCloseButton->IsMouseOver() || mIndexButton->IsMouseOver() || mPlantButton->IsMouseOver() || mZombieButton->IsMouseOver())
 	{
 		mApp->SetCursor(CURSOR_HAND);
@@ -295,6 +299,7 @@ void AlmanacDialog::DrawPlants(Graphics* g)
 	SeedType aSeedMouseOn = SeedHitTest(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY);
 	for (SeedType aSeedType = SeedType::SEED_PEASHOOTER; aSeedType < AbstractAlmanacCount(); aSeedType = (SeedType)(aSeedType + 1))
 	{
+		if (!PlantOnPage(aSeedType)) continue;
 		int aPosX, aPosY;
 		GetSeedPosition(aSeedType, aPosX, aPosY);
 		if (mApp->HasSeedType(aSeedType))
@@ -316,6 +321,7 @@ void AlmanacDialog::DrawPlants(Graphics* g)
 			}
 		}
 	}
+	DrawPlantPages(g);
 
 	if (mSelectedSeed == SeedType::SEED_LILYPAD || mSelectedSeed == SeedType::SEED_TANGLEKELP ||
 		mSelectedSeed == SeedType::SEED_CATTAIL || mSelectedSeed == SeedType::SEED_SEASHROOM)
@@ -551,13 +557,65 @@ void AlmanacDialog::GetSeedPosition(SeedType theSeedType, int& x, int& y)
 	x = aBox.x; y = aBox.y;
 }
 
+int AlmanacDialog::PlantPageCount() const
+{
+	if (MemeAdventure::RosterEnabled() && AbstractAlmanacExpanded())
+		for (int seed : AlmanacPlantLayout::Extras) if (mApp->HasSeedType(SeedType(seed))) return 2;
+	return 1;
+}
+
+bool AlmanacDialog::PlantOnPage(SeedType seed) const
+{
+	return AlmanacPlantLayout::Visible(seed, MemeAdventure::RosterEnabled() && AbstractAlmanacExpanded(), mPlantPage);
+}
+
+int AlmanacDialog::PlantPageHitTest(int x, int y) const
+{
+	if (!mMouseVisible || mOpenPage != ALMANAC_PAGE_PLANTS) return 0;
+	return AlmanacPlantLayout::TurnAt(x, y, mPlantPage, PlantPageCount());
+}
+
+void AlmanacDialog::ChangePlantPage(int direction)
+{
+	const int next = mPlantPage + direction;
+	if (next < 0 || next >= PlantPageCount()) return;
+	mPlantPage = next;
+	for (int seed = 0; seed < AbstractAlmanacCount(); ++seed)
+		if (PlantOnPage(SeedType(seed)) && mApp->HasSeedType(SeedType(seed)))
+		{
+			mSelectedSeed = SeedType(seed); SetupPlant(); break;
+		}
+	mApp->PlaySample(Sexy::SOUND_TAP);
+	MarkDirty();
+}
+
+void AlmanacDialog::DrawPlantPages(Graphics* g)
+{
+	const int count = PlantPageCount(); if (count < 2) return;
+	const int mx = mApp->mWidgetManager->mLastMouseX, my = mApp->mWidgetManager->mLastMouseY;
+	for (int direction : {-1,1})
+	{
+		const bool forward = direction > 0;
+		const auto box = forward ? AlmanacPlantLayout::Next : AlmanacPlantLayout::Previous;
+		const bool enabled = forward ? mPlantPage + 1 < count : mPlantPage > 0;
+		auto* image = enabled && box.Contains(mx,my) ? Sexy::IMAGE_ALMANAC_INDEXBUTTONHIGHLIGHT : Sexy::IMAGE_ALMANAC_INDEXBUTTON;
+		Graphics button(*g);
+		if (!enabled) {button.SetColorizeImages(true);button.SetColor(Color(150,150,150));}
+		// Reuse the native book button's arrow and rounded end. No new skin,
+		// stretched lettering or resource pack is needed for the page controls.
+		button.DrawImageMirror(image, box.x + (forward ? 8 : 0), box.y, Rect(0,0,36,26), forward);
+		button.DrawImageMirror(image, box.x + (forward ? 0 : 36), box.y, Rect(image->mWidth-8,0,8,26), forward);
+	}
+	PvzpDrawString(g, std::format("{} / {}",mPlantPage+1,count), 344, 585, Sexy::FONT_BRIANNETOD12, Color(42,42,90), DS_ALIGN_CENTER);
+}
+
 SeedType AlmanacDialog::SeedHitTest(int x, int y)
 {
 	if (mMouseVisible && mOpenPage == AlmanacPage::ALMANAC_PAGE_PLANTS)
 	{
 		for (SeedType aSeedType = SeedType::SEED_PEASHOOTER; aSeedType < AbstractAlmanacCount(); aSeedType = (SeedType)(aSeedType + 1))
 		{
-			if (mApp->HasSeedType(aSeedType))
+			if (PlantOnPage(aSeedType) && mApp->HasSeedType(aSeedType))
 			{
 				int aSeedX, aSeedY;
 				GetSeedPosition(aSeedType, aSeedX, aSeedY);
@@ -666,6 +724,7 @@ void AlmanacDialog::MouseUp([[maybe_unused]] int x, [[maybe_unused]] int y, [[ma
 
 void AlmanacDialog::MouseDown(int x, int y, [[maybe_unused]] int theClickCount)
 {
+	if (const int direction = PlantPageHitTest(x,y)) {ChangePlantPage(direction);return;}
 	if (mPlantButton->IsMouseOver() || mCloseButton->IsMouseOver() || mIndexButton->IsMouseOver())
 		mApp->PlaySample(Sexy::SOUND_TAP);
 	if (mZombieButton->IsMouseOver())
@@ -689,6 +748,10 @@ void AlmanacDialog::MouseDown(int x, int y, [[maybe_unused]] int theClickCount)
 
 void AlmanacDialog::KeyDown(KeyCode theKey)
 {
+	if (mOpenPage == ALMANAC_PAGE_PLANTS && (theKey == KEYCODE_LEFT || theKey == KEYCODE_RIGHT))
+	{
+		ChangePlantPage(theKey == KEYCODE_LEFT ? -1 : 1); return;
+	}
 	if (theKey == KeyCode::KEYCODE_ESCAPE)
 	{
 		if (mOpenPage == AlmanacPage::ALMANAC_PAGE_INDEX)
@@ -711,3 +774,20 @@ void AlmanacPlayerDefeatedZombie(ZombieType theZombieType)
 {
 	gZombieDefeated[theZombieType] = true;
 }
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+// Read-only UI diagnostics used to verify real mouse/touch navigation.
+extern "C" EMSCRIPTEN_KEEPALIVE int pvz_almanac_data(int field, int seed)
+{
+	if (!gLawnApp) return -1;
+	auto* dialog = dynamic_cast<AlmanacDialog*>(gLawnApp->GetDialog(DIALOG_ALMANAC));
+	if (!dialog || dialog->mOpenPage != ALMANAC_PAGE_PLANTS) return -1;
+	if (field == 0) return dialog->mPlantPage;
+	if (field == 1) return dialog->mSelectedSeed;
+	if (field == 2) return dialog->PlantPageCount();
+	if (seed < 0 || seed >= NUM_SEED_TYPES) return -1;
+	if (field == 3) return dialog->PlantOnPage(SeedType(seed)) && gLawnApp->HasSeedType(SeedType(seed));
+	return -1;
+}
+#endif

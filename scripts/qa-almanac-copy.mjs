@@ -5,8 +5,18 @@ import {join} from 'node:path';
 const {chromium}=await import(process.env.PVZ_PLAYWRIGHT||'playwright-core');
 const out=process.env.PVZ_QA_OUT||'/tmp/pvz-almanac-copy';await mkdir(out,{recursive:true});
 const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true,args:['--no-sandbox']});
-const page=await browser.newPage({viewport:{width:1100,height:750}}),errors=[],pages=[];page.on('pageerror',e=>errors.push(e.message));
+const page=await browser.newPage({viewport:{width:1100,height:750},hasTouch:true}),errors=[],pages=[];page.on('pageerror',e=>errors.push(e.message));
 async function click(x,y){const b=await page.locator('#canvas').boundingBox(),s=await page.evaluate(()=>[Module.canvas.width,Module.canvas.height]);await page.mouse.click(b.x+x*b.width/s[0],b.y+y*b.height/s[1]);await page.waitForTimeout(220);}
+async function tap(x,y){const b=await page.locator('#canvas').boundingBox();await page.touchscreen.tap(b.x+x*b.width/800,b.y+y*b.height/600);await page.waitForTimeout(220);}
+const ui=(field,seed=0)=>page.evaluate(([f,s])=>Module._pvz_almanac_data(f,s),[field,seed]);
+const extras=[52,53,51,49];
+async function plantCard(seed){
+ const target=extras.includes(seed)?1:0;
+ if(await ui(0)!==target)await click(target?408:280,580);
+ const slot=target?extras.indexOf(seed):seed;
+ await click(51+slot%8*52,127+Math.floor(slot/8)*78);
+ assert.equal(await ui(1),seed,'selected the exact visible card');
+}
 const snap=name=>page.screenshot({path:join(out,name+'.png')});
 async function phoneSnap(name){
  await page.setViewportSize({width:844,height:390});await page.waitForTimeout(250);await snap(name+'-phone');
@@ -24,11 +34,29 @@ try{
  });
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);
  await click(370,455);await click(208,366);
+ assert.equal(await ui(2),2);assert.equal(await ui(0),0);await snap('aligned-first-page');
+ for(let bookPage=0;bookPage<2;++bookPage){
+  if(await ui(0)!==bookPage)await click(bookPage?408:280,580);
+  for(let seed=0;seed<54;++seed)if(seed!==48&&await ui(3,seed))await plantCard(seed);
+ }
+ await snap('aligned-extra-page');const selected=await ui(1);
+ await click(415,517);assert.equal(await ui(1),selected,'hidden first-page card cannot be selected');
+ await click(408,580);assert.equal(await ui(0),1,'last-page arrow does not wrap');
+ await page.keyboard.press('ArrowLeft');await page.waitForFunction(()=>Module._pvz_almanac_data(0,0)===0);
+ await click(280,580);assert.equal(await ui(0),0,'first-page arrow does not wrap');
+ await page.keyboard.press('ArrowRight');await page.waitForFunction(()=>Module._pvz_almanac_data(0,0)===1);
  for(const [id,base]of [[500,0],[501,3],[519,52],[520,1],[521,7],[522,40],[523,53],[524,26],[525,8],[526,15],[527,10],[528,51],[529,49]]){
-  const slot=base===52?8:base===53?9:base===51?50:base===49?51:base>=8?base+2:base;
-  await click(48+slot%9*46,123+Math.floor(slot/9)*76);await snap('plant-'+id);pages.push(id);
+  await plantCard(base);await snap('plant-'+id);pages.push(id);
   if(id===500||id===524)await phoneSnap('plant-'+id);
  }
+ for(const [name,width,height]of [['landscape',844,390],['portrait',390,844]]){
+  await page.setViewportSize({width,height});await page.waitForTimeout(300);
+  await tap(280,580);assert.equal(await ui(0),0);await tap(415,127);assert.equal(await ui(1),7);
+  await tap(408,580);assert.equal(await ui(0),1);await tap(207,127);assert.equal(await ui(1),49);
+  await snap('touch-'+name);
+ }
+ await page.setViewportSize({width:1100,height:750});await page.waitForTimeout(250);
+ await click(110,580);await click(208,366);assert.equal(await ui(0),1,'return from index preserves selected extra card');
  await click(110,580);await click(590,366);
  for(let i=0;i<8;++i){const slot=26+i;await click(53+slot%6*71,117+Math.floor(slot/6)*80);await snap('zombie-'+(212+i));pages.push(212+i);if(i===4||i===5)await phoneSnap('zombie-'+(212+i));}
  await page.setViewportSize({width:844,height:390});await page.waitForTimeout(500);await snap('phone');

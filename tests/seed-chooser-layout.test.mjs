@@ -20,4 +20,8 @@ test('extra adventure card shares the native grid at every unlock stage',async()
  const almanac=await readFile(join(root,'src/Lawn/Widget/AlmanacDialog.cpp'),'utf8');
  assert.doesNotMatch(almanac,/x=82;y=15/);
  assert.match(almanac,/AlmanacPlantLayout::Card/);assert.match(almanac,/aCard.SetScale/);
+ assert.match(almanac,/if \(!PlantOnPage\(aSeedType\)\) continue/);
+ assert.match(almanac,/if \(PlantOnPage\(aSeedType\) && mApp->HasSeedType\(aSeedType\)\)/);
+ assert.match(almanac,/PlantPageHitTest\(x,y\)/);
+ assert.match(almanac,/ChangePlantPage\(theKey == KEYCODE_LEFT \? -1 : 1\)/);
 });

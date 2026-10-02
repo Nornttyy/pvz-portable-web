@@ -25,8 +25,8 @@ try{
   await new Promise((r,j)=>FS.syncfs(false,e=>e?j(e):r()));
  });
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);
- await click(370,455);await click(208,366);await click(48+5*46,123+5*76);await snap('almanac-ice');
- await click(48+4*46,123+2*76);await snap('almanac-original-fire');await click(690,580);await page.waitForTimeout(1000);
+ await click(370,455);await click(208,366);await click(408,580);await click(155,127);await snap('almanac-ice');
+ await click(280,580);await click(259,283);await snap('almanac-original-fire');await click(690,580);await page.waitForTimeout(1000);
  await click(260,348);await wait(()=>Module.canvas.width===1024);await api(8,0);await api(4,1);
  for(const row of [2,1])assert.equal(await api(2,32,7,row),1);
  assert.equal(await api(1,528,2,2),1);await snap('ice-windup');

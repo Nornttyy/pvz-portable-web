@@ -7,6 +7,13 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {PLANTS} from '../web/sandbox-data.mjs';
 const root=new URL('../',import.meta.url).pathname,run=promisify(execFile),read=p=>readFile(join(root,p),'utf8');
+test('only Everything Shooter blasts are reduced; native bombs and cannon remain unchanged',async()=>{
+ const source=await read('src/Lawn/Board.cpp'),dir=await mkdtemp(join(tmpdir(),'pvz-reduced-blast-')),binary=join(dir,'blast');
+ await writeFile(join(dir,'blast-production.inc'),source.slice(source.indexOf('int Board::KillAllZombiesInRadius('),source.indexOf('int Board::GetNumWavesPerSurvivalStage()')));
+ await run(process.env.CXX||'c++',['-std=c++20','-I'+dir,'tests/reduced-blast-native.cpp','-o',binary],{cwd:root});
+ assert.match((await run(binary)).stdout,/reduced blasts respect armor, area, boss and native 1800 defaults/);
+ assert.match(await read('src/Lawn/Projectile.cpp'),/EverythingShooterRules::BlastDamage\(MemeCharacters::ShotStyle\(this\)\)/);
+});
 test('everything shooter production launch and impact functions preserve all 14 native types and exact rare odds',async()=>{
  const source=await read('src/EverythingShooter.cpp'),dir=await mkdtemp(join(tmpdir(),'pvz-everything-native-')),binary=join(dir,'combat');
  await writeFile(join(dir,'everything-production.inc'),source.slice(source.indexOf('bool IsSlot('),source.indexOf('bool DrawShot(')));

@@ -25,7 +25,7 @@ try{
   await new Promise((r,j)=>FS.syncfs(false,e=>e?j(e):r()));
  });
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);
- await click(370,455);await click(208,366);await click(48+3*46,123+76);await snap('almanac');await click(690,580);await page.waitForTimeout(1000);
+ await click(370,455);await click(208,366);await click(155,205);await snap('almanac');await click(690,580);await page.waitForTimeout(1000);
  if(!process.env.PVZ_QA_ADVENTURE_ONLY){
   await click(260,348);await wait(()=>Module.canvas.width===1024);await api(8,0);await api(4,1);await api(12,1);
   assert.equal(await api(1,527,2,2),1);assert.equal(await api(1,520,2,1),1);assert.equal(await api(1,520,0,0),1);

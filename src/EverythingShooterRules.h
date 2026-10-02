@@ -3,6 +3,8 @@ namespace EverythingShooterRules {
 inline constexpr int Id=529,Base=49,Cost=250,Recharge=750,Interval=150,Unlock=27;
 inline constexpr int First=320,NativeCount=14,Doom=334,Cherry=335,Poop=336;
 inline constexpr int DoomPercent=5,CherryPercent=5,PoopPercent=10,PoopDamage=80;
+inline constexpr int DoomDamage=600,CherryDamage=400,CobDamage=600;
+constexpr int BlastDamage(int style){return style==Doom?DoomDamage:style==Cherry?CherryDamage:style==First+11?CobDamage:1800;}
 constexpr bool Own(int style){return style>=First&&style<=Poop;}
 constexpr bool Special(int style){return style>=Doom&&style<=Poop;}
 constexpr int Choose(int rareRoll,int nativeRoll){return rareRoll<DoomPercent?Doom:rareRoll<DoomPercent+CherryPercent?Cherry:rareRoll<DoomPercent+CherryPercent+PoopPercent?Poop:First+nativeRoll%NativeCount;}

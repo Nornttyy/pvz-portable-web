@@ -25,6 +25,9 @@ int main(){
  includes(plant(EverythingShooter),number(EverythingShooterRules::NativeCount)+"种原版子弹");
  includes(plant(EverythingShooter),number(EverythingShooterRules::DoomPercent)+"%毁灭菇弹");
  includes(plant(EverythingShooter),number(EverythingShooterRules::CherryPercent)+"%樱桃弹");
+ includes(plant(EverythingShooter),"毁灭菇弹"+number(EverythingShooterRules::DoomDamage));
+ includes(plant(EverythingShooter),"樱桃弹"+number(EverythingShooterRules::CherryDamage));
+ includes(plant(EverythingShooter),"玉米炮"+number(EverythingShooterRules::CobDamage));
  includes(plant(EverythingShooter),number(100-EverythingShooterRules::DoomPercent-EverythingShooterRules::CherryPercent-EverythingShooterRules::PoopPercent)+"%随机");
  includes(plant(EverythingShooter),number(EverythingShooterRules::PoopPercent)+"%大粪：伤害"+number(EverythingShooterRules::PoopDamage));
  includes(plant(IceChili),"整行伤害"+number(IceChiliRules::Damage));

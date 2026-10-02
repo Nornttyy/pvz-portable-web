@@ -49,10 +49,10 @@ try{
  results.saveAfter=await plants();assert.deepEqual(results.saveAfter,results.saveBefore);await snap('adventure-restored');await click(280,371);
  await click(748,14);await click(400,401);await click(305,394);await page.waitForTimeout(1800);results.adventure=true;console.log('Cold adventure, normal sun spending and save/restore passed');
  }
- await click(370,455);await click(208,366);await click(48+6*46,123+5*76);await snap('almanac-everything');
- {const b=await page.locator('#canvas').boundingBox();await page.screenshot({path:join(out,'new-card-detail.png'),clip:{x:b.x+302*b.width/800,y:b.y+472*b.height/600,width:50*b.width/800,height:64*b.height/600}});}
- await click(48+8*46,123+1*76);await snap('almanac-nuke-325');
- await click(48+5*46,123+5*76);await snap('almanac-ice-125');await click(690,580);await page.waitForTimeout(1000);
+ await click(370,455);await click(208,366);await click(408,580);await click(207,127);await snap('almanac-everything');
+ {const b=await page.locator('#canvas').boundingBox();await page.screenshot({path:join(out,'new-card-detail.png'),clip:{x:b.x+182*b.width/800,y:b.y+92*b.height/600,width:50*b.width/800,height:70*b.height/600}});}
+ await click(280,580);await click(415,205);await snap('almanac-nuke-325');
+ await click(408,580);await click(155,127);await snap('almanac-ice-125');await click(690,580);await page.waitForTimeout(1000);
  await click(260,348);await wait(()=>Module.canvas.width===1024);await api(8,0);await api(4,1);await api(5,4);
  for(const row of [0,2,4])assert.equal(await api(1,529,1,row),1);
  // Slow armored targets do not throw imps onto the shooters (which would

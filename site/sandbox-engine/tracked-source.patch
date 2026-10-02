@@ -45,7 +45,7 @@ index c263ab4..ab853a9 100644
  	SEED_SLOT_MACHINE_SUN,
  	SEED_SLOT_MACHINE_DIAMOND,
 diff --git a/src/Lawn/Board.cpp b/src/Lawn/Board.cpp
-index 665fcca..bf71aef 100644
+index 665fcca..10c5ece 100644
 --- a/src/Lawn/Board.cpp
 +++ b/src/Lawn/Board.cpp
 @@ -25,6 +25,13 @@
@@ -345,8 +345,37 @@ index 665fcca..bf71aef 100644
  			if (aGridItem->mGridItemCounter > 0)
  			{
  				aGridItem->mGridItemCounter--;
+@@ -9289,7 +9363,7 @@ bool Board::PlantingRequirementsMet(SeedType theSeedType)
+ 	}
+ }
+ 
+-int Board::KillAllZombiesInRadius(int theRow, int theX, int theY, int theRadius, int theRowRange, bool theBurn, int theDamageRangeFlags)
++int Board::KillAllZombiesInRadius(int theRow, int theX, int theY, int theRadius, int theRowRange, bool theBurn, int theDamageRangeFlags, int theDamage)
+ {
+ 	int aKilledZombies = 0;
+ 	for (Zombie* aZombie : mZombies)
+@@ -9307,13 +9381,17 @@ int Board::KillAllZombiesInRadius(int theRow, int theX, int theY, int theRadius,
+ 
+ 			if (aRowDist <= theRowRange && aRowDist >= -theRowRange && GetCircleRectOverlap(theX, theY, theRadius, aZombieRect))
+ 			{
+-				if (theBurn)
++				// Vanilla blasts keep their original burn path. Reduced custom
++				// blasts may only char a target they can actually kill, including
++				// its armor; a 600-damage hit must not erase a full bucket helmet.
++				if (theBurn && (theDamage == 1800 || (aZombie->mZombieType != ZOMBIE_BOSS &&
++					aZombie->mBodyHealth + std::max(0,aZombie->mHelmHealth) + std::max(0,aZombie->mShieldHealth) <= theDamage)))
+ 				{
+ 					aZombie->ApplyBurn();
+ 				}
+ 				else
+ 				{
+-					aZombie->TakeDamage(1800, 18U);
++					aZombie->TakeDamage(theDamage, 18U);
+ 				}
+ 
+ 				aKilledZombies++;
 diff --git a/src/Lawn/Board.h b/src/Lawn/Board.h
-index 2293690..543a195 100644
+index 2293690..3388708 100644
 --- a/src/Lawn/Board.h
 +++ b/src/Lawn/Board.h
 @@ -279,6 +279,7 @@ public:
@@ -357,6 +386,15 @@ index 2293690..543a195 100644
  	void							MouseDrag(int x, int y) override;
  	void							MouseDown(int x, int y, int theClickCount) override;
  	void							MouseUp(int x, int y, int theClickCount) override;
+@@ -417,7 +418,7 @@ public:
+ 	bool							IsValidCobCannonSpot(int theGridX, int theGridY);
+ 	bool							IsValidCobCannonSpotHelper(int theGridX, int theGridY);
+ 	void							MouseDownCobcannonFire(int x, int y, int theClickCount);
+-	int								KillAllZombiesInRadius(int theRow, int theX, int theY, int theRadius, int theRowRange, bool theBurn, int theDamageRangeFlags);
++	int								KillAllZombiesInRadius(int theRow, int theX, int theY, int theRadius, int theRowRange, bool theBurn, int theDamageRangeFlags, int theDamage = 1800);
+ 	int					GetSeedBankExtraWidth();
+ 	bool							IsFlagWave(int theWaveNumber);
+ 	void							DrawHouseDoorTop(Graphics* g);
 diff --git a/src/Lawn/Coin.cpp b/src/Lawn/Coin.cpp
 index cdec611..194aa2c 100644
 --- a/src/Lawn/Coin.cpp
@@ -1184,7 +1222,7 @@ index c934659..3713689 100644
  	if (aPlantDef.mReanimationType != ReanimationType::REANIM_NONE)
  	{
 diff --git a/src/Lawn/Projectile.cpp b/src/Lawn/Projectile.cpp
-index 4500f46..1acfc3a 100644
+index 4500f46..9c00a14 100644
 --- a/src/Lawn/Projectile.cpp
 +++ b/src/Lawn/Projectile.cpp
 @@ -25,6 +25,11 @@
@@ -1288,16 +1326,17 @@ index 4500f46..1acfc3a 100644
  	{
  		aPlant = FindCollisionTargetPlant();
  	}
-@@ -623,7 +635,7 @@ void Projectile::UpdateLobMotion()
+@@ -623,7 +635,8 @@ void Projectile::UpdateLobMotion()
  	else if (mProjectileType == ProjectileType::PROJECTILE_COBBIG)
  	{
  		int aBeforeGargantuarCount = mBoard->GetLiveGargantuarCount();
 -		mBoard->KillAllZombiesInRadius(mRow, mPosX + 80, mPosY + 40, 115, 1, true, mDamageRangeFlags);
-+		mBoard->KillAllZombiesInRadius(mRow, mPosX + 80, mPosY + 40, SandboxPlants::ShotBlastRadius(this,115), 1, true, mDamageRangeFlags);
++		mBoard->KillAllZombiesInRadius(mRow, mPosX + 80, mPosY + 40, SandboxPlants::ShotBlastRadius(this,115), 1, true, mDamageRangeFlags,
++			EverythingShooterRules::BlastDamage(MemeCharacters::ShotStyle(this)));
  		int aAfterGargantuarCount = mBoard->GetLiveGargantuarCount();
  		mBoard->mGargantuarsKillsByCornCob += aBeforeGargantuarCount - aAfterGargantuarCount;
  		if (mBoard->mGargantuarsKillsByCornCob >= 2)
-@@ -732,6 +744,11 @@ void Projectile::UpdateNormalMotion()
+@@ -732,6 +745,11 @@ void Projectile::UpdateNormalMotion()
  		mPosY += mVelZ;
  	}
  
@@ -1309,7 +1348,7 @@ index 4500f46..1acfc3a 100644
  	CheckForCollision();
  	CheckForHighGround();
  }
-@@ -822,9 +839,12 @@ void Projectile::PlayImpactSound(Zombie* theZombie)
+@@ -822,9 +840,12 @@ void Projectile::PlayImpactSound(Zombie* theZombie)
  
  void Projectile::DoImpact(Zombie* theZombie)
  {
@@ -1323,7 +1362,7 @@ index 4500f46..1acfc3a 100644
  	{
  		if (mProjectileType == ProjectileType::PROJECTILE_FIREBALL && theZombie)
  		{
-@@ -833,12 +853,15 @@ void Projectile::DoImpact(Zombie* theZombie)
+@@ -833,12 +854,15 @@ void Projectile::DoImpact(Zombie* theZombie)
  
  		DoSplashDamage(theZombie);
  	}
@@ -1341,7 +1380,7 @@ index 4500f46..1acfc3a 100644
  	float aLastPosX = mPosX - mVelX;
  	float aLastPosY = mPosY + mPosZ - mVelY - mVelZ;
  	ParticleEffect aEffect = ParticleEffect::PARTICLE_NONE;
-@@ -939,6 +962,8 @@ void Projectile::DoImpact(Zombie* theZombie)
+@@ -939,6 +963,8 @@ void Projectile::DoImpact(Zombie* theZombie)
  
  void Projectile::Update()
  {
@@ -1350,7 +1389,7 @@ index 4500f46..1acfc3a 100644
  	mProjectileAge++;
  	if (mApp->mGameScene != GameScenes::SCENE_PLAYING && !mBoard->mCutScene->ShouldRunUpsellBoard())
  		return;
-@@ -969,15 +994,24 @@ void Projectile::Update()
+@@ -969,15 +995,24 @@ void Projectile::Update()
  	mRotation += mRotationSpeed;
  
  	UpdateMotion();
@@ -1375,7 +1414,7 @@ index 4500f46..1acfc3a 100644
  	switch (mProjectileType)
  	{
  	case ProjectileType::PROJECTILE_COBBIG:
-@@ -1034,6 +1068,7 @@ void Projectile::Draw(Graphics* g)
+@@ -1034,6 +1069,7 @@ void Projectile::Draw(Graphics* g)
  	}
  
  	bool aMirror = false;
@@ -1383,7 +1422,7 @@ index 4500f46..1acfc3a 100644
  	if (mMotionType == ProjectileMotion::MOTION_BEE_BACKWARDS)
  	{
  		aMirror = true;
-@@ -1047,7 +1082,7 @@ void Projectile::Draw(Graphics* g)
+@@ -1047,7 +1083,7 @@ void Projectile::Draw(Graphics* g)
  		int aCelWidth = aImage->GetCelWidth();
  		int aCelHeight = aImage->GetCelHeight();
  		Rect aSrcRect(aCelWidth * mFrame, aCelHeight * aProjectileDef.mImageRow, aCelWidth, aCelHeight);
@@ -1392,7 +1431,7 @@ index 4500f46..1acfc3a 100644
  		{
  			Rect aDestRect(0, 0, aCelWidth, aCelHeight);
  			g->DrawImageMirror(aImage, aDestRect, aSrcRect, aMirror);
-@@ -1056,8 +1091,13 @@ void Projectile::Draw(Graphics* g)
+@@ -1056,8 +1092,13 @@ void Projectile::Draw(Graphics* g)
  		{
  			float aOffsetX = mPosX + aCelWidth * 0.5f;
  			float aOffsetY = mPosZ + mPosY + aCelHeight * 0.5f;
@@ -1407,7 +1446,7 @@ index 4500f46..1acfc3a 100644
  			PvzpBltMatrix(g, aImage, aTransform, g->mClipRect, Color::White, g->mDrawMode, aSrcRect);
  		}
  	}
-@@ -1146,11 +1186,18 @@ void Projectile::DrawShadow(Graphics* g)
+@@ -1146,11 +1187,18 @@ void Projectile::DrawShadow(Graphics* g)
  		aScale *= 200.0f / (aHeight + 200.0f);
  	}
  
@@ -1426,7 +1465,7 @@ index 4500f46..1acfc3a 100644
  	mDead = true;
  
  	if (mProjectileType == ProjectileType::PROJECTILE_PUFF || mProjectileType == ProjectileType::PROJECTILE_SNOWPEA)
-@@ -1166,6 +1213,10 @@ void Projectile::Die()
+@@ -1166,6 +1214,10 @@ void Projectile::Die()
  
  Rect Projectile::GetProjectileRect()
  {
@@ -1627,7 +1666,7 @@ index 804aeba..96ef2ff 100644
  	SaveFileHeaderV4 aHeader{};
  	memcpy(aHeader.mMagic, SAVE_FILE_MAGIC_V4, sizeof(aHeader.mMagic));
 diff --git a/src/Lawn/Widget/AlmanacDialog.cpp b/src/Lawn/Widget/AlmanacDialog.cpp
-index 8fb1d2a..63a32ca 100644
+index 8fb1d2a..0f27ce7 100644
 --- a/src/Lawn/Widget/AlmanacDialog.cpp
 +++ b/src/Lawn/Widget/AlmanacDialog.cpp
 @@ -35,12 +35,20 @@
@@ -1674,7 +1713,26 @@ index 8fb1d2a..63a32ca 100644
  }
  
  void AlmanacDialog::SetPage(AlmanacPage thePage)
-@@ -251,6 +264,7 @@ void AlmanacDialog::Update()
+@@ -194,7 +207,10 @@ void AlmanacDialog::SetPage(AlmanacPage thePage)
+ 	else
+ 	{
+ 		if (mOpenPage == AlmanacPage::ALMANAC_PAGE_PLANTS)
++		{
++			mPlantPage = std::max(0, AlmanacPlantLayout::Page(mSelectedSeed, MemeAdventure::RosterEnabled() && AbstractAlmanacExpanded()));
+ 			SetupPlant();
++		}
+ 		else if (mOpenPage == AlmanacPage::ALMANAC_PAGE_ZOMBIES)
+ 			SetupZombie();
+ 		else return;
+@@ -236,6 +252,7 @@ void AlmanacDialog::Update()
+ 	int aMouseX = mApp->mWidgetManager->mLastMouseX;
+ 	int aMouseY = mApp->mWidgetManager->mLastMouseY;
+ 	if (SeedHitTest(aMouseX, aMouseY) != SeedType::SEED_NONE || ZombieHitTest(aMouseX, aMouseY) != ZombieType::ZOMBIE_INVALID ||
++		PlantPageHitTest(aMouseX, aMouseY) != 0 ||
+ 		mCloseButton->IsMouseOver() || mIndexButton->IsMouseOver() || mPlantButton->IsMouseOver() || mZombieButton->IsMouseOver())
+ 	{
+ 		mApp->SetCursor(CURSOR_HAND);
+@@ -251,6 +268,7 @@ void AlmanacDialog::Update()
  
  ZombieType AlmanacDialog::GetZombieType(int theIndex)
  {
@@ -1682,16 +1740,18 @@ index 8fb1d2a..63a32ca 100644
  	return theIndex < NUM_ZOMBIE_TYPES ? (ZombieType)theIndex : ZOMBIE_INVALID;
  }
  
-@@ -279,7 +293,7 @@ void AlmanacDialog::DrawPlants(Graphics* g)
+@@ -279,8 +297,9 @@ void AlmanacDialog::DrawPlants(Graphics* g)
  	PvzpDrawString(g, "[SUBURBAN_ALMANAC_PLANTS]", BOARD_WIDTH / 2, 48, Sexy::FONT_HOUSEOFTERROR20, Color(213, 159, 43), DrawStringJustification::DS_ALIGN_CENTER);
  
  	SeedType aSeedMouseOn = SeedHitTest(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY);
 -	for (SeedType aSeedType = SeedType::SEED_PEASHOOTER; aSeedType < NUM_ALMANAC_SEEDS; aSeedType = (SeedType)(aSeedType + 1))
 +	for (SeedType aSeedType = SeedType::SEED_PEASHOOTER; aSeedType < AbstractAlmanacCount(); aSeedType = (SeedType)(aSeedType + 1))
  	{
++		if (!PlantOnPage(aSeedType)) continue;
  		int aPosX, aPosY;
  		GetSeedPosition(aSeedType, aPosX, aPosY);
-@@ -293,9 +307,12 @@ void AlmanacDialog::DrawPlants(Graphics* g)
+ 		if (mApp->HasSeedType(aSeedType))
+@@ -293,12 +312,16 @@ void AlmanacDialog::DrawPlants(Graphics* g)
  			}
  			else
  			{
@@ -1706,7 +1766,11 @@ index 8fb1d2a..63a32ca 100644
  			}
  		}
  	}
-@@ -335,20 +352,24 @@ void AlmanacDialog::DrawPlants(Graphics* g)
++	DrawPlantPages(g);
+ 
+ 	if (mSelectedSeed == SeedType::SEED_LILYPAD || mSelectedSeed == SeedType::SEED_TANGLEKELP ||
+ 		mSelectedSeed == SeedType::SEED_CATTAIL || mSelectedSeed == SeedType::SEED_SEASHROOM)
+@@ -335,20 +358,24 @@ void AlmanacDialog::DrawPlants(Graphics* g)
  	const PlantDefinition& aPlantDef = GetPlantDefinition(mSelectedSeed);
  	std::string aName = Plant::GetNameString(mSelectedSeed, SEED_NONE);
  	std::string aDescriptionName = std::format("[{}_DESCRIPTION]", aPlantDef.mPlantName);
@@ -1734,7 +1798,7 @@ index 8fb1d2a..63a32ca 100644
  		PvzpDrawStringWrapped(g, aRechargeStr, Rect(600, 520, 139, 50), Sexy::FONT_BRIANNETOD12, Color(40, 50, 90), DS_ALIGN_RIGHT);
  	}
  }
-@@ -359,11 +380,12 @@ void AlmanacDialog::DrawZombies(Graphics* g)
+@@ -359,11 +386,12 @@ void AlmanacDialog::DrawZombies(Graphics* g)
  	PvzpDrawString(g, "[SUBURBAN_ALMANAC_ZOMBIES]", BOARD_WIDTH / 2, 54, Sexy::FONT_DWARVENTODCRAFT24, Color(0, 196, 0), DS_ALIGN_CENTER);
  
  	ZombieType aZombieMouseOn = ZombieHitTest(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY);
@@ -1748,7 +1812,7 @@ index 8fb1d2a..63a32ca 100644
  		if (aZombieType != ZombieType::ZOMBIE_INVALID)
  		{
  			if (!ZombieIsShown(aZombieType))
-@@ -383,10 +405,10 @@ void AlmanacDialog::DrawZombies(Graphics* g)
+@@ -383,10 +411,10 @@ void AlmanacDialog::DrawZombies(Graphics* g)
  
  				ZombieType aZombieTypeToDraw = aZombieType;
  				Graphics aZombieGraphics = Graphics(*g);
@@ -1762,7 +1826,7 @@ index 8fb1d2a..63a32ca 100644
  				switch (aZombieType)
  				{
  				case ZombieType::ZOMBIE_POLEVAULTER:
-@@ -416,7 +438,8 @@ void AlmanacDialog::DrawZombies(Graphics* g)
+@@ -416,7 +444,8 @@ void AlmanacDialog::DrawZombies(Graphics* g)
  					aZombieGraphics.SetColor(Color(0, 0, 0, 40));
  					aZombieGraphics.SetColorizeImages(true);
  				}
@@ -1772,7 +1836,7 @@ index 8fb1d2a..63a32ca 100644
  				aZombieGraphics.SetColorizeImages(false);
  
  				g->DrawImage(Sexy::IMAGE_ALMANAC_ZOMBIEWINDOW2, aPosX, aPosY);
-@@ -431,6 +454,8 @@ void AlmanacDialog::DrawZombies(Graphics* g)
+@@ -431,6 +460,8 @@ void AlmanacDialog::DrawZombies(Graphics* g)
  				}
  			}
  		}
@@ -1781,7 +1845,7 @@ index 8fb1d2a..63a32ca 100644
  	}
  
  	g->DrawImage(mZombie->mZombieType == ZombieType::ZOMBIE_ZAMBONI || mZombie->mZombieType == ZombieType::ZOMBIE_BOBSLED ?
-@@ -458,15 +483,16 @@ void AlmanacDialog::DrawZombies(Graphics* g)
+@@ -458,15 +489,16 @@ void AlmanacDialog::DrawZombies(Graphics* g)
  	}
  	g->DrawImage(Sexy::IMAGE_ALMANAC_ZOMBIECARD, 455, 78);
  
@@ -1801,19 +1865,69 @@ index 8fb1d2a..63a32ca 100644
  		aAlign = DS_ALIGN_LEFT;
  	}
  	else
-@@ -521,26 +547,22 @@ void AlmanacDialog::Draw(Graphics* g)
+@@ -521,26 +553,74 @@ void AlmanacDialog::Draw(Graphics* g)
  
  void AlmanacDialog::GetSeedPosition(SeedType theSeedType, int& x, int& y)
  {
 -	if (theSeedType == SeedType::SEED_IMITATER)
 -		x = 20, y = 23;
 -	else
--	{
--		x = theSeedType % 8 * 52 + 26;
--		y = theSeedType / 8 * 78 + 92;
--	}
 +	const auto aBox = AlmanacPlantLayout::Card(theSeedType, MemeAdventure::RosterEnabled() && AbstractAlmanacExpanded());
 +	x = aBox.x; y = aBox.y;
++}
++
++int AlmanacDialog::PlantPageCount() const
++{
++	if (MemeAdventure::RosterEnabled() && AbstractAlmanacExpanded())
++		for (int seed : AlmanacPlantLayout::Extras) if (mApp->HasSeedType(SeedType(seed))) return 2;
++	return 1;
++}
++
++bool AlmanacDialog::PlantOnPage(SeedType seed) const
++{
++	return AlmanacPlantLayout::Visible(seed, MemeAdventure::RosterEnabled() && AbstractAlmanacExpanded(), mPlantPage);
++}
++
++int AlmanacDialog::PlantPageHitTest(int x, int y) const
++{
++	if (!mMouseVisible || mOpenPage != ALMANAC_PAGE_PLANTS) return 0;
++	return AlmanacPlantLayout::TurnAt(x, y, mPlantPage, PlantPageCount());
++}
++
++void AlmanacDialog::ChangePlantPage(int direction)
++{
++	const int next = mPlantPage + direction;
++	if (next < 0 || next >= PlantPageCount()) return;
++	mPlantPage = next;
++	for (int seed = 0; seed < AbstractAlmanacCount(); ++seed)
++		if (PlantOnPage(SeedType(seed)) && mApp->HasSeedType(SeedType(seed)))
++		{
++			mSelectedSeed = SeedType(seed); SetupPlant(); break;
++		}
++	mApp->PlaySample(Sexy::SOUND_TAP);
++	MarkDirty();
++}
++
++void AlmanacDialog::DrawPlantPages(Graphics* g)
++{
++	const int count = PlantPageCount(); if (count < 2) return;
++	const int mx = mApp->mWidgetManager->mLastMouseX, my = mApp->mWidgetManager->mLastMouseY;
++	for (int direction : {-1,1})
+ 	{
+-		x = theSeedType % 8 * 52 + 26;
+-		y = theSeedType / 8 * 78 + 92;
++		const bool forward = direction > 0;
++		const auto box = forward ? AlmanacPlantLayout::Next : AlmanacPlantLayout::Previous;
++		const bool enabled = forward ? mPlantPage + 1 < count : mPlantPage > 0;
++		auto* image = enabled && box.Contains(mx,my) ? Sexy::IMAGE_ALMANAC_INDEXBUTTONHIGHLIGHT : Sexy::IMAGE_ALMANAC_INDEXBUTTON;
++		Graphics button(*g);
++		if (!enabled) {button.SetColorizeImages(true);button.SetColor(Color(150,150,150));}
++		// Reuse the native book button's arrow and rounded end. No new skin,
++		// stretched lettering or resource pack is needed for the page controls.
++		button.DrawImageMirror(image, box.x + (forward ? 8 : 0), box.y, Rect(0,0,36,26), forward);
++		button.DrawImageMirror(image, box.x + (forward ? 0 : 36), box.y, Rect(image->mWidth-8,0,8,26), forward);
+ 	}
++	PvzpDrawString(g, std::format("{} / {}",mPlantPage+1,count), 344, 585, Sexy::FONT_BRIANNETOD12, Color(42,42,90), DS_ALIGN_CENTER);
  }
  
  SeedType AlmanacDialog::SeedHitTest(int x, int y)
@@ -1823,7 +1937,8 @@ index 8fb1d2a..63a32ca 100644
 -		for (SeedType aSeedType = SeedType::SEED_PEASHOOTER; aSeedType < NUM_ALMANAC_SEEDS; aSeedType = (SeedType)(aSeedType + 1))
 +		for (SeedType aSeedType = SeedType::SEED_PEASHOOTER; aSeedType < AbstractAlmanacCount(); aSeedType = (SeedType)(aSeedType + 1))
  		{
- 			if (mApp->HasSeedType(aSeedType))
+-			if (mApp->HasSeedType(aSeedType))
++			if (PlantOnPage(aSeedType) && mApp->HasSeedType(aSeedType))
  			{
  				int aSeedX, aSeedY;
  				GetSeedPosition(aSeedType, aSeedX, aSeedY);
@@ -1833,7 +1948,7 @@ index 8fb1d2a..63a32ca 100644
  				if (aSeedRect.Contains(x, y)) return aSeedType;
  			}
  		}
-@@ -560,6 +582,7 @@ bool AlmanacDialog::ZombieHasSilhouette(ZombieType theZombieType)
+@@ -560,6 +640,7 @@ bool AlmanacDialog::ZombieHasSilhouette(ZombieType theZombieType)
  
  bool AlmanacDialog::ZombieIsShown(ZombieType theZombieType)
  {
@@ -1841,7 +1956,7 @@ index 8fb1d2a..63a32ca 100644
  	// trial mode only shows zombies up to the Snorkel Zombie
  	if (mApp->IsTrialStageLocked() && theZombieType > ZombieType::ZOMBIE_SNORKEL)
  		return false;
-@@ -586,6 +609,7 @@ bool AlmanacDialog::ZombieIsShown(ZombieType theZombieType)
+@@ -586,6 +667,7 @@ bool AlmanacDialog::ZombieIsShown(ZombieType theZombieType)
  
  bool AlmanacDialog::ZombieHasDescription(ZombieType theZombieType)
  {
@@ -1849,7 +1964,7 @@ index 8fb1d2a..63a32ca 100644
  	int aLevel = mApp->mPlayerInfo->GetLevel();
  	int aStart = GetZombieDefinition(theZombieType).mStartingLevel;
  
-@@ -608,27 +632,23 @@ bool AlmanacDialog::ZombieHasDescription(ZombieType theZombieType)
+@@ -608,27 +690,23 @@ bool AlmanacDialog::ZombieHasDescription(ZombieType theZombieType)
  
  void AlmanacDialog::GetZombiePosition(ZombieType theZombieType, int& x, int& y)
  {
@@ -1882,6 +1997,70 @@ index 8fb1d2a..63a32ca 100644
  					return aZombieType;
  			}
  		}
+@@ -646,6 +724,7 @@ void AlmanacDialog::MouseUp([[maybe_unused]] int x, [[maybe_unused]] int y, [[ma
+ 
+ void AlmanacDialog::MouseDown(int x, int y, [[maybe_unused]] int theClickCount)
+ {
++	if (const int direction = PlantPageHitTest(x,y)) {ChangePlantPage(direction);return;}
+ 	if (mPlantButton->IsMouseOver() || mCloseButton->IsMouseOver() || mIndexButton->IsMouseOver())
+ 		mApp->PlaySample(Sexy::SOUND_TAP);
+ 	if (mZombieButton->IsMouseOver())
+@@ -669,6 +748,10 @@ void AlmanacDialog::MouseDown(int x, int y, [[maybe_unused]] int theClickCount)
+ 
+ void AlmanacDialog::KeyDown(KeyCode theKey)
+ {
++	if (mOpenPage == ALMANAC_PAGE_PLANTS && (theKey == KEYCODE_LEFT || theKey == KEYCODE_RIGHT))
++	{
++		ChangePlantPage(theKey == KEYCODE_LEFT ? -1 : 1); return;
++	}
+ 	if (theKey == KeyCode::KEYCODE_ESCAPE)
+ 	{
+ 		if (mOpenPage == AlmanacPage::ALMANAC_PAGE_INDEX)
+@@ -691,3 +774,20 @@ void AlmanacPlayerDefeatedZombie(ZombieType theZombieType)
+ {
+ 	gZombieDefeated[theZombieType] = true;
+ }
++
++#ifdef __EMSCRIPTEN__
++#include <emscripten.h>
++// Read-only UI diagnostics used to verify real mouse/touch navigation.
++extern "C" EMSCRIPTEN_KEEPALIVE int pvz_almanac_data(int field, int seed)
++{
++	if (!gLawnApp) return -1;
++	auto* dialog = dynamic_cast<AlmanacDialog*>(gLawnApp->GetDialog(DIALOG_ALMANAC));
++	if (!dialog || dialog->mOpenPage != ALMANAC_PAGE_PLANTS) return -1;
++	if (field == 0) return dialog->mPlantPage;
++	if (field == 1) return dialog->mSelectedSeed;
++	if (field == 2) return dialog->PlantPageCount();
++	if (seed < 0 || seed >= NUM_SEED_TYPES) return -1;
++	if (field == 3) return dialog->PlantOnPage(SeedType(seed)) && gLawnApp->HasSeedType(SeedType(seed));
++	return -1;
++}
++#endif
+diff --git a/src/Lawn/Widget/AlmanacDialog.h b/src/Lawn/Widget/AlmanacDialog.h
+index f53e4ac..2f109fa 100644
+--- a/src/Lawn/Widget/AlmanacDialog.h
++++ b/src/Lawn/Widget/AlmanacDialog.h
+@@ -61,6 +61,7 @@ public:
+ 	std::unique_ptr<GameButton>	mPlantButton;
+ 	std::unique_ptr<GameButton>	mZombieButton;
+ 	AlmanacPage					mOpenPage;
++	int                         mPlantPage = 0;
+ 	Reanimation*				mReanim[4];
+ 	SeedType					mSelectedSeed;
+ 	ZombieType					mSelectedZombie;
+@@ -80,6 +81,11 @@ public:
+ 	void						Update() override;
+ 	void						DrawIndex(Graphics* g);
+ 	void						DrawPlants(Graphics* g);
++	int                         PlantPageCount() const;
++	bool                        PlantOnPage(SeedType seed) const;
++	int                         PlantPageHitTest(int x, int y) const;
++	void                        ChangePlantPage(int direction);
++	void                        DrawPlantPages(Graphics* g);
+ 	void						DrawZombies(Graphics* g);
+ 	void						Draw(Graphics* g) override;
+ 	void						GetSeedPosition(SeedType theSeedType, int& x, int& y);
 diff --git a/src/Lawn/Widget/GameSelector.cpp b/src/Lawn/Widget/GameSelector.cpp
 index e30bd35..c34de83 100644
 --- a/src/Lawn/Widget/GameSelector.cpp

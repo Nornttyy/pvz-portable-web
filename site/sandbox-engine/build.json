@@ -4,6 +4,7 @@
   "openmpt": "0.8.4",
   "mode": "Thirteen abstract plants and eight independent zombies (212..219). Everything Shooter randomly fires all fourteen native projectiles plus three rare types; Ice Chili costs 125 sun. Adventure and sandbox share replacements; other progression and saves are preserved.",
   "almanacCopy": "All thirteen original plants and eight original zombies show explicit numeric statistics separately from surreal character-specific flavour text. Native cost/recharge footer and full supplemental Chinese glyphs.",
+  "almanacLayout": "Original eight-column 50x70 cards aligned to the printed book sockets. Native seed order on page one; four extra plants on page two. Native book arrows, mouse/touch/keyboard navigation and page-scoped hit tests.",
   "everythingShooter": {
     "id": 529,
     "nativeSlot": 49,
@@ -19,11 +20,12 @@
     },
     "nativeProjectiles": 14,
     "rareDamage": {
-      "doom": 1800,
-      "cherry": 1800,
+      "doom": 600,
+      "cherry": 400,
+      "cornCob": 600,
       "poop": 80
     },
-    "boundaries": "Plant-owned basketballs and zombie peas hit zombies only. Native plant damage, lob paths, corn-cob drops, butter and chill retained. Rare bombs do not crater terrain or harm friendly plants; poop has no extra control. Saved projectile identity never rerolls.",
+    "boundaries": "Plant-owned basketballs and zombie peas hit zombies only. Other native projectile damage, lob paths, corn-cob drops, butter and chill retained; this shooter's corn-cob blast alone is reduced to 600. Rare bombs do not crater terrain or harm friendly plants; poop has no extra control. Original plants' explosions remain unchanged. Saved projectile identity never rerolls.",
     "art": "Original peashooter rig and native projectile/plant artwork reused. Ammunition follows the head bone. One generated transparent dung sprite, documented in art/everything-shooter/generation.json."
   },
   "iceChili": {
@@ -216,13 +218,13 @@
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 279423,
-      "sha256": "bd2d30ada6e0fa98d7a5c4820a4d91fc3a81b91ac1665bf0ef11eb8f34de3330"
+      "size": 279505,
+      "sha256": "cf98168b8b3052e6289000a105c6c0b58013729a42c88da324ad4f8836e2d2e1"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 8340377,
-      "sha256": "344144ca87419303ca3c9ac1957801a05d35042b85e103fc69327b0e1bea39b4"
+      "size": 8345612,
+      "sha256": "e68b78c51f75aa745f79fb7b8d5cb5795716d9f33e7bd9f6bae7b68cc5957999"
     }
   ]
 }

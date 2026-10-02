@@ -14,9 +14,9 @@ struct App {int sounds=0,particles=0,effect=-1;Particle puff;Reanimation* Reanim
 struct Zombie {bool mDead=false,dying=false;int health=6000,hits=0;float x=600;struct Rect{int mY;};Rect GetZombieRect(){return {240};}float ZombieTargetLeadX(int){return x;}bool IsDeadOrDying(){return dying;}void TakeDamage(int n,int flags){assert(flags==1);health-=n;++hits;}};
 struct Board;
 struct Projectile {Board* mBoard=nullptr;App* mApp=nullptr;bool mDead=false;int style=0,mDamageRangeFlags=0,mRenderOrder=0,mRow=0,mCobTargetRow=0,converted=0;float mPosX=0,mPosY=0,mPosZ=0,mVelX=0,mVelY=0,mVelZ=0,mAccZ=0,mCobTargetX=0;ProjectileType mProjectileType=PROJECTILE_PEA;ProjectileMotion mMotionType=MOTION_STRAIGHT;void ConvertToFireball(int){mProjectileType=PROJECTILE_FIREBALL;++converted;}int GetDamageFlags(Zombie*){return 1;}void Die(){mDead=true;}};
-struct Board {struct {int mSize=0,mMaxSize=1024;} mProjectiles;App app;Projectile last;int shots=0,blasts=0,shakes=0,row=-1,radius=0,rows=0,flags=0;float x=0,y=0;bool burn=false;
+struct Board {struct {int mSize=0,mMaxSize=1024;} mProjectiles;App app;Projectile last;int shots=0,blasts=0,shakes=0,row=-1,radius=0,rows=0,flags=0,damage=0;float x=0,y=0;bool burn=false;
  Projectile* AddProjectile(float x,float y,int order,int row,ProjectileType type){assert(type!=PROJECTILE_FIREBALL);last={};last.mBoard=this;last.mApp=&app;last.mProjectileType=type;last.mPosX=x;last.mPosY=y;last.mRow=row;last.mRenderOrder=order;++shots;return &last;}
- void KillAllZombiesInRadius(int r,float px,float py,int range,int lanes,bool b,int f){++blasts;row=r;x=px;y=py;radius=range;rows=lanes;burn=b;flags=f;}
+ void KillAllZombiesInRadius(int r,float px,float py,int range,int lanes,bool b,int f,int d=1800){++blasts;row=r;x=px;y=py;radius=range;rows=lanes;burn=b;flags=f;damage=d;}
  void ShakeBoard(int,int){++shakes;}
 };
 struct Plant {Board* mBoard=nullptr;App* mApp=nullptr;int id=529,mX=120,mY=250,mRow=2,mRenderOrder=100,mHeadReanimID=1,mPlantCol=1;};
@@ -29,6 +29,7 @@ namespace EverythingShooter {int fired[17]{},impacts[17]{};
 int main(){
  using namespace EverythingShooterRules;
  static_assert(Cost==250&&Recharge==750&&Interval==150&&Unlock==27&&Base==49&&Id==529);
+ static_assert(BlastDamage(Doom)==600&&BlastDamage(Cherry)==400&&BlastDamage(First+11)==600&&BlastDamage(0)==1800);
  for(bool sandbox:{false,true})for(bool adventure:{false,true}){gSandboxEnabled=sandbox;MemeAdventure::enabled=adventure;for(int seed=0;seed<54;++seed)assert(EverythingShooter::IsSlot(seed)==(seed==49&&(sandbox||adventure)));}
  std::array<int,17> distribution{};
  for(int roll=0;roll<100;++roll)for(int native=0;native<14;++native){
@@ -46,7 +47,7 @@ int main(){
   assert(EverythingShooter::Impact(&shot,&z)==Special(style));
   if(!Special(style))assert(!shot.mDead&&z.health==6000&&!b.blasts&&!b.app.particles);
   else if(style==Poop)assert(shot.mDead&&z.health==5920&&z.hits==1&&!b.blasts&&b.app.effect==PARTICLE_PUFF_SPLAT&&b.app.puff.colors==1);
-  else assert(shot.mDead&&b.blasts==1&&b.row==2&&b.radius==(style==Doom?250:115)&&b.rows==(style==Doom?3:1)&&b.burn&&b.flags==127&&b.shakes==1&&b.app.effect==(style==Doom?PARTICLE_DOOM:PARTICLE_POWIE));
+  else assert(shot.mDead&&b.blasts==1&&b.row==2&&b.radius==(style==Doom?250:115)&&b.rows==(style==Doom?3:1)&&b.burn&&b.flags==127&&b.damage==(style==Doom?600:400)&&b.shakes==1&&b.app.effect==(style==Doom?PARTICLE_DOOM:PARTICLE_POWIE));
  }
  for(int i=0;i<14;++i)assert(distribution[i]==80);
  assert(distribution[14]==70&&distribution[15]==70&&distribution[16]==140);

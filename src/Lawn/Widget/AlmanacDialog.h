@@ -61,6 +61,7 @@ public:
 	std::unique_ptr<GameButton>	mPlantButton;
 	std::unique_ptr<GameButton>	mZombieButton;
 	AlmanacPage					mOpenPage;
+	int                         mPlantPage = 0;
 	Reanimation*				mReanim[4];
 	SeedType					mSelectedSeed;
 	ZombieType					mSelectedZombie;
@@ -80,6 +81,11 @@ public:
 	void						Update() override;
 	void						DrawIndex(Graphics* g);
 	void						DrawPlants(Graphics* g);
+	int                         PlantPageCount() const;
+	bool                        PlantOnPage(SeedType seed) const;
+	int                         PlantPageHitTest(int x, int y) const;
+	void                        ChangePlantPage(int direction);
+	void                        DrawPlantPages(Graphics* g);
 	void						DrawZombies(Graphics* g);
 	void						Draw(Graphics* g) override;
 	void						GetSeedPosition(SeedType theSeedType, int& x, int& y);

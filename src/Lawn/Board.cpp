@@ -9363,7 +9363,7 @@ bool Board::PlantingRequirementsMet(SeedType theSeedType)
 	}
 }
 
-int Board::KillAllZombiesInRadius(int theRow, int theX, int theY, int theRadius, int theRowRange, bool theBurn, int theDamageRangeFlags)
+int Board::KillAllZombiesInRadius(int theRow, int theX, int theY, int theRadius, int theRowRange, bool theBurn, int theDamageRangeFlags, int theDamage)
 {
 	int aKilledZombies = 0;
 	for (Zombie* aZombie : mZombies)
@@ -9381,13 +9381,17 @@ int Board::KillAllZombiesInRadius(int theRow, int theX, int theY, int theRadius,
 
 			if (aRowDist <= theRowRange && aRowDist >= -theRowRange && GetCircleRectOverlap(theX, theY, theRadius, aZombieRect))
 			{
-				if (theBurn)
+				// Vanilla blasts keep their original burn path. Reduced custom
+				// blasts may only char a target they can actually kill, including
+				// its armor; a 600-damage hit must not erase a full bucket helmet.
+				if (theBurn && (theDamage == 1800 || (aZombie->mZombieType != ZOMBIE_BOSS &&
+					aZombie->mBodyHealth + std::max(0,aZombie->mHelmHealth) + std::max(0,aZombie->mShieldHealth) <= theDamage)))
 				{
 					aZombie->ApplyBurn();
 				}
 				else
 				{
-					aZombie->TakeDamage(1800, 18U);
+					aZombie->TakeDamage(theDamage, 18U);
 				}
 
 				aKilledZombies++;
