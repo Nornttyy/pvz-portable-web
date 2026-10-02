@@ -10,6 +10,10 @@ int main(){
  static_assert(MenuEntry.x>=640&&MenuEntry.x+MenuEntry.w<=788&&MenuEntry.y>=8&&MenuEntry.y+MenuEntry.h<=48);
  static_assert(MenuEntry.w>=120&&MenuEntry.w<=144&&MenuEntry.h>=36&&MenuEntry.h<=40);
  assert(MenuEntry.Contains(719,27)&&!MenuEntry.Contains(260,348));
+ for(auto art:{MenuLogo,MenuLogoBadge}){
+  assert(art.x>=24&&art.x+art.w<=382&&art.y>=190&&art.y+art.h<=284);
+  for(auto ui:{MenuEntry,Box{20,0,350,180},Box{400,55,380,380},Box{320,430,110,100}})assert(!overlaps(art,ui));
+ }
  for(int shake:{0,4,-3,2,-1,0}){assert(BoardX(true,shake)==WorldOffset+shake);assert(BoardX(false,shake)==shake);}
  assert(BoardX(true)==WorldOffset);assert(BoardX(false)==0);
  for(int i=0;i<35;++i){const auto a=SidebarZombie(i);assert(a.x>=0&&a.x+a.w<SidebarWidth&&a.y>=80&&a.y+a.h<=550);for(int j=0;j<i;++j)assert(!overlaps(a,SidebarZombie(j)));}

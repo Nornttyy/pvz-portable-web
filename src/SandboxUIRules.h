@@ -9,6 +9,9 @@ constexpr Box CenterInk(Box button,Box ink,bool down=false) {
     return {button.x+(button.w-ink.w)/2-ink.x+(down?1:0),button.y+(button.h-ink.h)/2-ink.y+(down?1:0),ink.w,ink.h};
 }
 inline constexpr Box MenuEntry{650, 8, 138, 38};
+// The open sky below the user signs, left of the mode buttons. Art only: no hit target.
+inline constexpr Box MenuLogo{32, 201, 340, 56};
+inline constexpr Box MenuLogoBadge{298, 246, 78, 31};
 inline constexpr int CanvasWidth=1024, CanvasHeight=600, WorldOffset=224, SidebarWidth=264;
 // Screen shake is relative to the layout origin, never an absolute board position.
 constexpr int BoardX(bool sandbox,int shake=0) { return (sandbox ? WorldOffset:0)+shake; }

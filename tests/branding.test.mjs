@@ -21,3 +21,12 @@ test('compact sandbox entry renders the small native font and shares its hitbox'
  assert.match(button,/SandboxDrawButton[\s\S]*mIsOver,\s*false/);
  assert.match(selector,/SandboxUIRules::MenuEntry/);
 });
+test('main menu reuses the original logo and badge without adding an interactive overlay',async()=>{
+ const source=(await read('src/Lawn/Widget/GameSelector.cpp')).toString();
+ const draw=source.slice(source.indexOf('void GameSelector::Draw(Graphics* g)'),source.indexOf('void GameSelector::DrawOverlay('));
+ assert.match(draw,/mSelectorState == SELECTOR_IDLE && !mStartingGame && IMAGE_PVZ_LOGO/);
+ assert.match(draw,/SandboxUIRules::MenuLogo/);assert.match(draw,/DrawImage\(IMAGE_PVZ_LOGO, logo.x, logo.y, logo.w, logo.h\)/);
+ assert.match(draw,/GetImage\("\/addons\/images\/nb-edition.png"\)/);assert.match(draw,/SandboxUIRules::MenuLogoBadge/);
+ assert.match(draw,/badge.x[^\n]*g->mTransX/);assert.match(draw,/badge.y[^\n]*g->mTransY/);
+ assert.doesNotMatch(draw,/new.*Button|AddWidget|GetImage\([^\n]*original-logo/);
+});

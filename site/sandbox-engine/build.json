@@ -1,7 +1,7 @@
 {
   "base": "147ce06c5ad08ac7975c4cc20e90978c724be8c4",
   "emscripten": "4.0.16",
-  "branding": "Original logo retained with a generated transparent NB版 badge at its lower-right; one short settling entrance, no perpetual motion. Shared on web loader and native title. Native sandbox entry is 138x38 at (650,8), with 18px bitmap text and matching mouse/touch bounds.",
+  "branding": "Original logo retained with the same generated transparent NB版 badge on the web loader, native title and main menu. One short settling entrance on the title; no perpetual motion. Main menu art sits below the user signs in the left sky, follows the achievements slide, has no hit target and clears when starting adventure. Native sandbox entry is 138x38 at (650,8), with 18px bitmap text and matching mouse/touch bounds.",
   "openmpt": "0.8.4",
   "mode": "Thirteen abstract plants and eight independent zombies (212..219). Everything Shooter randomly fires all fourteen native projectiles plus three rare types; Ice Chili costs 125 sun. Adventure and sandbox share replacements; other progression and saves are preserved.",
   "almanacCopy": "All thirteen original plants and eight original zombies show explicit numeric statistics separately from surreal character-specific flavour text. Native cost/recharge footer and full supplemental Chinese glyphs.",
@@ -226,8 +226,8 @@
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 8340662,
-      "sha256": "6d2356e73216191c5ea120f1fa8a7d0b024fb9a1eadd6495b3039b0a232f70c8"
+      "size": 8341532,
+      "sha256": "e40484a02c20f702e6e24d4ecf15e2f239f31408ea1f566aeb6f87133ea20fa6"
     }
   ]
 }

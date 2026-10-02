@@ -35,6 +35,7 @@ class ZombatarWidget;
 namespace Sexy
 {
 	class DialogButton;
+	class GLImage;
 }
 
 using namespace Sexy;
@@ -104,6 +105,7 @@ public:
 	int                         mLevel;
 	bool                        mLoading;
 	std::unique_ptr<ToolTipWidget>      mToolTip;
+	std::unique_ptr<Sexy::GLImage>      mMenuEditionLogo;
 	bool                        mHasTrophy;
 	bool                        mUnlockSelectorCheat;
 	int                         mSlideCounter;              //+0x154

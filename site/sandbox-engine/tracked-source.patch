@@ -2083,7 +2083,7 @@ index f53e4ac..2f109fa 100644
  	void						Draw(Graphics* g) override;
  	void						GetSeedPosition(SeedType theSeedType, int& x, int& y);
 diff --git a/src/Lawn/Widget/GameSelector.cpp b/src/Lawn/Widget/GameSelector.cpp
-index e30bd35..61e0441 100644
+index e30bd35..61395f8 100644
 --- a/src/Lawn/Widget/GameSelector.cpp
 +++ b/src/Lawn/Widget/GameSelector.cpp
 @@ -27,6 +27,9 @@
@@ -2096,7 +2096,15 @@ index e30bd35..61e0441 100644
  #include "AlmanacDialog.h"
  #include "../../Resources.h"
  #include "../System/Music.h"
-@@ -60,9 +63,20 @@ GameSelectorOverlay::GameSelectorOverlay(GameSelector* theGameSelector)
+@@ -39,6 +42,7 @@
+ #include "../../PvzpLib/PvzpFoley.h"
+ #include "../../PvzpLib/PvzpDebug.h"
+ #include "graphics/Font.h"
++#include "graphics/GLImage.h"
+ #include "../../PvzpLib/Reanimator.h"
+ #include "../../PvzpLib/PvzpParticle.h"
+ #include "widget/Dialog.h"
+@@ -60,9 +64,20 @@ GameSelectorOverlay::GameSelectorOverlay(GameSelector* theGameSelector)
  	mHasAlpha = true;
  }
  
@@ -2118,7 +2126,7 @@ index e30bd35..61e0441 100644
  	mLoadedResourceNames.push_back("DelayLoad_Almanac");
  
  	for (std::string& resource : mLoadedResourceNames)
-@@ -151,19 +165,9 @@ GameSelector::GameSelector(LawnApp* theApp)
+@@ -151,19 +166,9 @@ GameSelector::GameSelector(LawnApp* theApp)
  	mSurvivalButton->mPolygonShape[3] = SexyVector2(7.0f, 57.0f);
  	mSurvivalButton->mUsePolygonShape = true;
  
@@ -2141,7 +2149,7 @@ index e30bd35..61e0441 100644
  
  	mAchievementsButton = MakeNewButton(
  		GameSelector::GameSelector_Achievements,
-@@ -254,6 +258,13 @@ GameSelector::GameSelector(LawnApp* theApp)
+@@ -254,6 +259,13 @@ GameSelector::GameSelector(LawnApp* theApp)
  	mOverlayWidget = new GameSelectorOverlay(this);
  	mOverlayWidget->Resize(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
  
@@ -2155,7 +2163,7 @@ index e30bd35..61e0441 100644
  	mStoreButton = MakeNewButton(
  		GameSelector::GameSelector_Store,
  		this,
-@@ -295,6 +306,7 @@ GameSelector::GameSelector(LawnApp* theApp)
+@@ -295,6 +307,7 @@ GameSelector::GameSelector(LawnApp* theApp)
  	aSelectorReanim->PlayReanim("anim_open", ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD, 0, 30.0f);
  	aSelectorReanim->AssignRenderGroupToPrefix("flower", RENDER_GROUP_HIDDEN);
  	aSelectorReanim->AssignRenderGroupToPrefix("leaf", RENDER_GROUP_HIDDEN);
@@ -2163,7 +2171,7 @@ index e30bd35..61e0441 100644
  	aSelectorReanim->AssignRenderGroupToTrack("SelectorScreen_BG", 1);
  	mSelectorReanimID = mApp->ReanimationGetID(aSelectorReanim);
  	mSelectorState = SelectorAnimState::SELECTOR_OPEN;
-@@ -344,13 +356,11 @@ GameSelector::GameSelector(LawnApp* theApp)
+@@ -344,13 +357,11 @@ GameSelector::GameSelector(LawnApp* theApp)
  	mStartY = 0;
  	mDestX = 0;
  	mDestY = 0;
@@ -2177,7 +2185,7 @@ index e30bd35..61e0441 100644
  	AddWidget(mChangeUserButton);
  	AddWidget(mSurvivalButton);
  	AddWidget(mZenGardenButton);
-@@ -362,6 +372,7 @@ GameSelector::GameSelector(LawnApp* theApp)
+@@ -362,6 +373,7 @@ GameSelector::GameSelector(LawnApp* theApp)
  	AddWidget(mHelpButton);
  	AddWidget(mStoreButton);
  	AddWidget(mAlmanacButton);
@@ -2185,7 +2193,7 @@ index e30bd35..61e0441 100644
  	AddWidget(mOverlayWidget);
  }
  
-@@ -380,8 +391,6 @@ void GameSelector::SyncButtons()
+@@ -380,8 +392,6 @@ void GameSelector::SyncButtons()
  	mAlmanacButton->mVisible = aAlmanacAvailable;
  	mStoreButton->mDisabled = !aStoreOpen;
  	mStoreButton->mVisible = aStoreOpen;
@@ -2194,7 +2202,33 @@ index e30bd35..61e0441 100644
  
  	Reanimation* aSelectorReanim = mApp->ReanimationGet(mSelectorReanimID);
  	if (aAlmanacAvailable)
-@@ -735,6 +744,9 @@ void GameSelector::UpdateTooltip()
+@@ -553,6 +563,25 @@ void GameSelector::Draw(Graphics* g)
+ 		mApp->ReanimationGet(mCloudReanimID[i])->Draw(g);
+ 	aSelectorReanim->DrawRenderGroup(g, RENDER_GROUP_NORMAL);
+ 
++	// Share the title's original lettering and NB badge, without another button
++	// or plaque. Widget-relative coordinates also follow the achievements slide.
++	if (mSelectorState == SELECTOR_IDLE && !mStartingGame && IMAGE_PVZ_LOGO)
++	{
++		const auto logo = SandboxUIRules::MenuLogo;
++		g->DrawImage(IMAGE_PVZ_LOGO, logo.x, logo.y, logo.w, logo.h);
++		if (!mMenuEditionLogo) mMenuEditionLogo.reset(mApp->GetImage("/addons/images/nb-edition.png"));
++		if (mMenuEditionLogo)
++		{
++			const auto badge = SandboxUIRules::MenuLogoBadge;
++			SexyTransform2D transform;
++			PvzpScaleRotateTransformMatrix(transform, badge.x + badge.w * 0.5f + g->mTransX,
++				badge.y + badge.h * 0.5f + g->mTransY, 0.10f,
++				float(badge.w) / mMenuEditionLogo->mWidth, float(badge.h) / mMenuEditionLogo->mHeight);
++			PvzpBltMatrix(g, mMenuEditionLogo.get(), transform, g->mClipRect, Color::White, g->mDrawMode,
++				Rect(0, 0, mMenuEditionLogo->mWidth, mMenuEditionLogo->mHeight));
++		}
++	}
++
+ 	if (mSelectorState == SelectorAnimState::SELECTOR_OPEN)
+ 	{
+ 		int aBGIdx = aSelectorReanim->FindTrackIndex("SelectorScreen_BG_Right");
+@@ -735,6 +764,9 @@ void GameSelector::UpdateTooltip()
  
  void GameSelector::Update()
  {
@@ -2204,7 +2238,7 @@ index e30bd35..61e0441 100644
  	Widget::Update();
  	MarkDirty();
  	UpdateTooltip();
-@@ -744,7 +756,6 @@ void GameSelector::Update()
+@@ -744,7 +776,6 @@ void GameSelector::Update()
  		int aNewY = PvzpAnimateCurve(75, 0, mSlideCounter, mStartY, mDestY, PvzpCurves::CURVE_EASE_IN_OUT);
  		Move(aNewX, aNewY);
  
@@ -2212,7 +2246,7 @@ index e30bd35..61e0441 100644
  		mAchievementsWidget->mY = aNewY + mApp->mHeight;
  
  		mSlideCounter--;
-@@ -817,7 +828,6 @@ void GameSelector::Update()
+@@ -817,7 +848,6 @@ void GameSelector::Update()
  			mHelpButton->mBtnNoDraw = false;
  			mOptionsButton->mBtnNoDraw = false;
  			mQuitButton->mBtnNoDraw = false;
@@ -2220,7 +2254,7 @@ index e30bd35..61e0441 100644
  			mAchievementsButton->mBtnNoDraw = false;
  			mAdventureButton->mMouseVisible = true;
  			mMinigameButton->mMouseVisible = true;
-@@ -830,7 +840,6 @@ void GameSelector::Update()
+@@ -830,7 +860,6 @@ void GameSelector::Update()
  			mStoreButton->mMouseVisible = true;
  			mAlmanacButton->mMouseVisible = true;
  			mChangeUserButton->mMouseVisible = true;
@@ -2228,7 +2262,7 @@ index e30bd35..61e0441 100644
  			mAchievementsButton->mMouseVisible = true;
  
  			if (mApp->mPlayerInfo == nullptr)
-@@ -927,10 +936,8 @@ void GameSelector::Update()
+@@ -927,10 +956,8 @@ void GameSelector::Update()
  	TrackButton(mAlmanacButton, "SelectorScreen_BG_Right", 256.0f, 387.0f);
  	TrackButton(mStoreButton, "SelectorScreen_BG_Right", 334.0f, 441.0f);
  	TrackButton(mChangeUserButton, "woodsign2", 24.0f, 10.0f);
@@ -2239,7 +2273,7 @@ index e30bd35..61e0441 100644
  }
  
  void GameSelector::TrackButton(DialogButton* theButton, const char* theTrackName, float theOffsetX, float theOffsetY)
-@@ -948,7 +955,6 @@ void GameSelector::AddedToManager(WidgetManager* theWidgetManager)
+@@ -948,7 +975,6 @@ void GameSelector::AddedToManager(WidgetManager* theWidgetManager)
  {
  	Widget::AddedToManager(theWidgetManager);
  
@@ -2247,7 +2281,7 @@ index e30bd35..61e0441 100644
  	theWidgetManager->AddWidget(mAchievementsWidget.get());
  }
  
-@@ -956,14 +962,12 @@ void GameSelector::RemovedFromManager(WidgetManager* theWidgetManager)
+@@ -956,14 +982,12 @@ void GameSelector::RemovedFromManager(WidgetManager* theWidgetManager)
  {
  	Widget::RemovedFromManager(theWidgetManager);
  
@@ -2262,7 +2296,7 @@ index e30bd35..61e0441 100644
  }
  
  void GameSelector::KeyDown(KeyCode theKey)
-@@ -1116,8 +1120,7 @@ void GameSelector::ButtonMouseEnter(int theId)
+@@ -1116,8 +1140,7 @@ void GameSelector::ButtonMouseEnter(int theId)
  void GameSelector::ButtonPress(int theId)
  {
  	if (theId == GameSelector::GameSelector_Adventure || theId == GameSelector::GameSelector_Minigame ||
@@ -2272,7 +2306,7 @@ index e30bd35..61e0441 100644
  		mApp->PlaySample(Sexy::SOUND_GRAVEBUTTON);
  	else
  		mApp->PlaySample(Sexy::SOUND_TAP);
-@@ -1156,8 +1159,8 @@ void GameSelector::ClickedAdventure()
+@@ -1156,8 +1179,8 @@ void GameSelector::ClickedAdventure()
  	mAlmanacButton->SetDisabled(true);
  	mSurvivalButton->SetDisabled(true);
  	mZenGardenButton->SetDisabled(true);
@@ -2282,7 +2316,7 @@ index e30bd35..61e0441 100644
  
  	Reanimation* aHandReanim = mApp->AddReanimation(-70.0f, 10.0f, 0, ReanimationType::REANIM_ZOMBIE_HAND);
  	aHandReanim->mLoopType = ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD;
-@@ -1196,6 +1199,9 @@ void GameSelector::ButtonDepress(int theId)
+@@ -1196,6 +1219,9 @@ void GameSelector::ButtonDepress(int theId)
  
  	switch (theId)
  	{
@@ -2292,7 +2326,7 @@ index e30bd35..61e0441 100644
  	case GameSelector::GameSelector_Adventure:
  		ClickedAdventure();
  		break;
-@@ -1249,8 +1255,7 @@ void GameSelector::ButtonDepress(int theId)
+@@ -1249,8 +1275,7 @@ void GameSelector::ButtonDepress(int theId)
  			mApp->mZenGarden->SetupForZenTutorial();
  		break;
  	case GameSelector::GameSelector_Zombatar:
@@ -2302,7 +2336,7 @@ index e30bd35..61e0441 100644
  	case GameSelector::GameSelector_Achievements:
  		ShowAchievementsScreen();
  		break;
-@@ -1373,12 +1378,7 @@ void GameSelector::SlideTo(int theX, int theY)
+@@ -1373,12 +1398,7 @@ void GameSelector::SlideTo(int theX, int theY)
  
  void GameSelector::ShowZombatarScreen()
  {
@@ -2317,10 +2351,18 @@ index e30bd35..61e0441 100644
  
  void GameSelector::ShowAchievementsScreen()
 diff --git a/src/Lawn/Widget/GameSelector.h b/src/Lawn/Widget/GameSelector.h
-index d017de9..260efd1 100644
+index d017de9..69072fe 100644
 --- a/src/Lawn/Widget/GameSelector.h
 +++ b/src/Lawn/Widget/GameSelector.h
-@@ -64,7 +64,8 @@ private:
+@@ -35,6 +35,7 @@ class ZombatarWidget;
+ namespace Sexy
+ {
+ 	class DialogButton;
++	class GLImage;
+ }
+ 
+ using namespace Sexy;
+@@ -64,7 +65,8 @@ private:
  		GameSelector_ZenGarden,
  		GameSelector_Survival,
  		GameSelector_Zombatar,
@@ -2330,7 +2372,7 @@ index d017de9..260efd1 100644
  	};
  
  public:
-@@ -83,6 +84,7 @@ public:
+@@ -83,6 +85,7 @@ public:
  	NewLawnButton*              mChangeUserButton;
  	NewLawnButton*              mZombatarButton;             //+0xC0
  	NewLawnButton*              mAchievementsButton;        //+0xC4
@@ -2338,6 +2380,14 @@ index d017de9..260efd1 100644
  	Widget*                     mOverlayWidget;
  	bool                        mStartingGame;
  	int                         mStartingGameCounter;
+@@ -102,6 +105,7 @@ public:
+ 	int                         mLevel;
+ 	bool                        mLoading;
+ 	std::unique_ptr<ToolTipWidget>      mToolTip;
++	std::unique_ptr<Sexy::GLImage>      mMenuEditionLogo;
+ 	bool                        mHasTrophy;
+ 	bool                        mUnlockSelectorCheat;
+ 	int                         mSlideCounter;              //+0x154
 diff --git a/src/Lawn/Widget/SeedChooserScreen.cpp b/src/Lawn/Widget/SeedChooserScreen.cpp
 index b284e6a..0f45598 100644
 --- a/src/Lawn/Widget/SeedChooserScreen.cpp

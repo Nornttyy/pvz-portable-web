@@ -42,6 +42,7 @@
 #include "../../PvzpLib/PvzpFoley.h"
 #include "../../PvzpLib/PvzpDebug.h"
 #include "graphics/Font.h"
+#include "graphics/GLImage.h"
 #include "../../PvzpLib/Reanimator.h"
 #include "../../PvzpLib/PvzpParticle.h"
 #include "widget/Dialog.h"
@@ -561,6 +562,25 @@ void GameSelector::Draw(Graphics* g)
 	for (int i = 0; i < 6; i++)
 		mApp->ReanimationGet(mCloudReanimID[i])->Draw(g);
 	aSelectorReanim->DrawRenderGroup(g, RENDER_GROUP_NORMAL);
+
+	// Share the title's original lettering and NB badge, without another button
+	// or plaque. Widget-relative coordinates also follow the achievements slide.
+	if (mSelectorState == SELECTOR_IDLE && !mStartingGame && IMAGE_PVZ_LOGO)
+	{
+		const auto logo = SandboxUIRules::MenuLogo;
+		g->DrawImage(IMAGE_PVZ_LOGO, logo.x, logo.y, logo.w, logo.h);
+		if (!mMenuEditionLogo) mMenuEditionLogo.reset(mApp->GetImage("/addons/images/nb-edition.png"));
+		if (mMenuEditionLogo)
+		{
+			const auto badge = SandboxUIRules::MenuLogoBadge;
+			SexyTransform2D transform;
+			PvzpScaleRotateTransformMatrix(transform, badge.x + badge.w * 0.5f + g->mTransX,
+				badge.y + badge.h * 0.5f + g->mTransY, 0.10f,
+				float(badge.w) / mMenuEditionLogo->mWidth, float(badge.h) / mMenuEditionLogo->mHeight);
+			PvzpBltMatrix(g, mMenuEditionLogo.get(), transform, g->mClipRect, Color::White, g->mDrawMode,
+				Rect(0, 0, mMenuEditionLogo->mWidth, mMenuEditionLogo->mHeight));
+		}
+	}
 
 	if (mSelectorState == SelectorAnimState::SELECTOR_OPEN)
 	{

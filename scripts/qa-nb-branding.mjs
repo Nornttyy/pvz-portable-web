@@ -27,6 +27,11 @@ try{
  await page.locator('#start').click();await page.waitForTimeout(12000);await snap('native-title-logo');
  assert.ok(await page.evaluate(()=>Module.FS.readFile('/addons/images/nb-edition.png').length>1000));
  await click(400,560);await page.waitForTimeout(4500);await snap('menu-desktop');
+ // Decorative branding must not block username, almanac, or the sliding achievements page.
+ await click(170,150);await snap('change-user-dialog');await page.keyboard.press('Escape');await page.waitForTimeout(400);
+ await click(370,455);await click(208,366);await page.waitForFunction(()=>Module._pvz_almanac_data(0,0)===0,undefined,{timeout:5000});await click(690,580);
+ await click(85,525);await page.waitForTimeout(1600);await snap('achievements-no-logo-overlay');await click(185,70);await page.waitForTimeout(1600);await snap('menu-after-achievements');
+ await click(190,230);assert.equal(await page.evaluate(()=>Module.canvas.width),800,'logo is decorative, not a button');
  await click(260,348);assert.equal(await page.evaluate(()=>Module.canvas.width),800,'old menu location must not open sandbox');
  await sandbox();await snap('sandbox-desktop');await back();
  for(const [name,width,height]of [['landscape',844,390],['portrait',390,844]]){
@@ -36,6 +41,6 @@ try{
  await page.setViewportSize({width:1100,height:750});await click(560,135);await page.waitForTimeout(15000);
  assert.ok(await page.evaluate(()=>Module._pvz_adventure_power_data(-1,3)>0),'adventure still starts');
  assert.deepEqual(errors,[]);assert.deepEqual(badResponses,[]);
- await writeFile(join(out,'report.json'),JSON.stringify({webAndNativeBrand:true,embeddedBadge:true,desktopSandbox:true,phoneLandscapeTouch:true,phonePortraitTouch:true,oldHitboxRemoved:true,adventure:true,errors,badResponses},null,2));
+ await writeFile(join(out,'report.json'),JSON.stringify({webAndNativeBrand:true,mainMenuBrand:true,usernameDialog:true,almanac:true,achievementsSlide:true,embeddedBadge:true,desktopSandbox:true,phoneLandscapeTouch:true,phonePortraitTouch:true,oldHitboxRemoved:true,adventure:true,errors,badResponses},null,2));
  console.log('NB logo and compact sandbox navigation passed',out);
 }catch(e){await snap('failure').catch(()=>{});await writeFile(join(out,'failure.json'),JSON.stringify({errors,badResponses,error:e.stack},null,2));throw e;}finally{await browser.close();}
