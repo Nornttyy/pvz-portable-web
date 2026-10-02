@@ -29,7 +29,7 @@ async function waitPlant(field,value){await page.waitForFunction(([f,v])=>Module
 try{
  await boot(8);
  if(!process.env.PVZ_QA_SKIP_SANDBOX){
- await click(260,348);await page.waitForFunction(()=>Module.canvas.width===1024,{},{timeout:20000});await shot('fixed-cards');
+ await click(719,27);await page.waitForFunction(()=>Module.canvas.width===1024,{},{timeout:20000});await shot('fixed-cards');
  for(const id of [120,143,180,181,182,302,443])assert.equal(await api(1,id,1,2),-2);
  await api(21,1);assert.equal((await api(0))&64,0);
  await click(36,155);await click(460,330);assert.equal((await data())[0][0],500);

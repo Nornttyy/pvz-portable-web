@@ -85,12 +85,14 @@ for (const [name, source] of sources) buildHash.update(name).update('\0').update
 buildHash.update(await readFile(new URL('site/sandbox-engine/build.json', root)));
 // Art-only releases need fresh URLs too; otherwise an unchanged engine masks a new bundle.
 buildHash.update(await readFile(new URL('site/resource-manifest.json', root)));
+for(const name of ['original-logo.png','nb-edition.png'])
+  buildHash.update(await readFile(new URL('site/branding/'+name,root)));
 const version = buildHash.digest('hex').slice(0, 12);
 for (const [name, source] of sources) {
   let output = source;
   if (name.endsWith('.html')) {
     output = output.replace('<html lang="zh-CN">', `<html lang="zh-CN" data-version="${version}">`)
-      .replace(/((?:src|href)=")([^"?#]+\.(?:js|mjs|css))"/g, `$1$2?v=${version}"`);
+      .replace(/((?:src|href)=")([^"?#]+\.(?:js|mjs|css|png))"/g, `$1$2?v=${version}"`);
   } else if (/\.(?:js|mjs)$/.test(name)) {
     output = output.replace(/(from\s+['"])(\.\/[^'"?]+\.mjs)(['"])/g, `$1$2?v=${version}$3`);
   }

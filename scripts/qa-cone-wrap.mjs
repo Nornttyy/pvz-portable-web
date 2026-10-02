@@ -21,7 +21,7 @@ async function boot(){
   await new Promise((r,j)=>FS.syncfs(false,e=>e?j(e):r()));
  });
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);
- await click(260,348);await wait(()=>Module.canvas.width===1024);await api(7);await api(4,1);
+ await click(719,27);await wait(()=>Module.canvas.width===1024);await api(7);await api(4,1);
 }
 try{
  await boot();await click(718,24);await click(31,457);await click(784,330);

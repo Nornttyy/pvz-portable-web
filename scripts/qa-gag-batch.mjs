@@ -19,7 +19,7 @@ try{
  await page.evaluate(async()=>{const FS=Module.FS;if(!FS.analyzePath('/saves/userdata').exists)FS.mkdir('/saves/userdata');
   const name=new TextEncoder().encode('GagQA'),users=new Uint8Array(16+name.length),u=new DataView(users.buffer);u.setUint32(0,14,true);u.setUint16(4,1,true);u.setUint16(6,name.length,true);users.set(name,8);u.setUint32(8+name.length,1,true);u.setUint32(12+name.length,1,true);FS.writeFile('/saves/userdata/users.dat',users);
   const profile=new Uint8Array(4096),p=new DataView(profile.buffer);p.setUint32(0,12,true);p.setUint32(4,37,true);FS.writeFile('/saves/userdata/user1.dat',profile);await new Promise((r,j)=>FS.syncfs(false,e=>e?j(e):r()));});
- await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);await click(260,348);await wait(()=>Module.canvas.width===1024);
+ await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);await click(719,27);await wait(()=>Module.canvas.width===1024);
  await page.evaluate(()=>{window.memeAudioTrace=[];window.memeAudioRunning=true;const sample=()=>{if(!window.memeAudioRunning)return;const values=[0,1,2].map(f=>Module._pvz_meme_audio_data(f));if(values[1])window.memeAudioTrace.push(values);requestAnimationFrame(sample);};requestAnimationFrame(sample);});
 
  await fresh();for(let i=14;i<17;++i){await click(30+i%5*51,153+Math.floor(i/5)*78);await click(344+(i-14)*160,330);assert.equal(await pd(i-14,0),500+i);}await shot('three-new-native-cards');results.nativeCards=true;

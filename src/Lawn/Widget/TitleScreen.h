@@ -41,6 +41,7 @@ enum TitleState
 namespace Sexy
 {
 	class HyperlinkWidget;
+	class GLImage;
 }
 
 class LawnApp;
@@ -56,6 +57,7 @@ public:
 
 public:
 	std::unique_ptr<HyperlinkWidget>		mStartButton;
+	std::unique_ptr<Sexy::GLImage> mNbEditionLogo;
 	float					mCurBarWidth;
 	float					mTotalBarWidth;
 	float					mBarVel;

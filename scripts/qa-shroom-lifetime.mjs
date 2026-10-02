@@ -27,7 +27,7 @@ async function boot(seed=false){
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);
 }
 try{
- await boot(true);await click(260,348);await wait(()=>Module.canvas.width===1024);
+ await boot(true);await click(719,27);await wait(()=>Module.canvas.width===1024);
  await api(7);for(const [type,col] of [[33,1],[502,1],[30,1],[8,3]])assert.ok(await api(1,type,col,2)>0);
  assert.equal((await plants()).find(p=>p[0]===502)[4],6000);await api(5,4);await api(4,0);
  await wait(()=>Module._pvz_sandbox_plant_data(1,10)<5000);await api(4,1);

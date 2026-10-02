@@ -30,7 +30,7 @@ async function sd(i,f){return page.evaluate(([i,f])=>Module._pvz_adventure_seed_
 async function pauseAt(f,v){await page.waitForFunction(([f,v])=>Module._pvz_sandbox_plant_data(0,f)===v,[f,v],{timeout:18000});await api(4,1);}
 try {
  await boot(process.env.PVZ_QA_WAVE2?9:8);
- await click(260,348);await page.waitForFunction(()=>Module.canvas.width===1024,{},{timeout:20000});
+ await click(719,27);await page.waitForFunction(()=>Module.canvas.width===1024,{},{timeout:20000});
  await tap(234,153);await tap(464,330);assert.equal((await data())[0][0],504);await shot('seven-cards');
  if(process.env.PVZ_QA_WAVE2){
   await api(7);await api(1,501,3,2);await api(2,0,3,2);const hp=await zd(0,4);await shot('nut-calm');await api(4,0);await pauseAt(4,1);

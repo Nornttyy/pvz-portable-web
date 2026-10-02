@@ -24,7 +24,7 @@ try{
  });
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);
  if(!process.env.PVZ_QA_ALMANAC_ONLY){
- await click(260,348);await wait(()=>Module.canvas.width===1024);await fresh();
+ await click(719,27);await wait(()=>Module.canvas.width===1024);await fresh();
  assert.equal(await api(2,216,6,1),1);assert.equal(await api(2,217,6,3),1);
  results.spawn=await zombies();assert.equal(results.spawn[0][4],270);assert.equal(results.spawn[1][5],370);assert.equal(results.spawn[0][9],125);
  for(let row=0;row<5;++row)await api(1,0,0,row);

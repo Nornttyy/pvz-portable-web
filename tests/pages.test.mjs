@@ -1,5 +1,6 @@
 import test from 'node:test';
 import './runtime-pages.test.mjs';
+import './branding.test.mjs';
 import './sandbox-pages.test.mjs';
 import './website-loading.test.mjs';
 import './automatic-resources.test.mjs';

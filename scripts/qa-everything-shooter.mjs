@@ -53,7 +53,7 @@ try{
  {const b=await page.locator('#canvas').boundingBox();await page.screenshot({path:join(out,'new-card-detail.png'),clip:{x:b.x+182*b.width/800,y:b.y+92*b.height/600,width:50*b.width/800,height:70*b.height/600}});}
  await click(280,580);await click(415,205);await snap('almanac-nuke-325');
  await click(408,580);await click(155,127);await snap('almanac-ice-125');await click(690,580);await page.waitForTimeout(1000);
- await click(260,348);await wait(()=>Module.canvas.width===1024);await api(8,0);await api(4,1);await api(5,4);
+ await click(719,27);await wait(()=>Module.canvas.width===1024);await api(8,0);await api(4,1);await api(5,4);
  for(const row of [0,2,4])assert.equal(await api(1,529,1,row),1);
  // Slow armored targets do not throw imps onto the shooters (which would
  // invalidate the separate friendly-fire check).

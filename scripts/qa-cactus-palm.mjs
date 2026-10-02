@@ -25,7 +25,7 @@ async function fresh(){await api(7);await api(4,1);await api(5,1);}
 try{
  await boot(33);
  if(!process.env.PVZ_QA_CAMPAIGN_ONLY){
-  await click(260,348);await wait(()=>Module.canvas.width===1024);await fresh();
+  await click(719,27);await wait(()=>Module.canvas.width===1024);await fresh();
   for(let row=0;row<5;row++)assert.equal(await api(1,524,1,row),1);
   for(const [id,row] of [[2,0],[23,1],[214,2],[32,3],[16,4]])assert.equal(await api(2,id,7,row),1);
   await snap('palm-standing');await api(5,4);await api(4,0);

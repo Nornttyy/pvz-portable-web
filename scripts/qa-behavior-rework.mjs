@@ -15,7 +15,7 @@ async function fresh(){await api(7);await api(5,1);await api(12,1);await page.wa
 try{
  await page.goto(process.env.PVZ_QA_URL||'http://127.0.0.1:8097/');await wait(()=>!document.getElementById('start').disabled,undefined,90000);
  await page.evaluate(async()=>{const FS=Module.FS;if(!FS.analyzePath('/saves/userdata').exists)FS.mkdir('/saves/userdata');const name=new TextEncoder().encode('BehaviorQA'),users=new Uint8Array(16+name.length),v=new DataView(users.buffer);v.setUint32(0,14,true);v.setUint16(4,1,true);v.setUint16(6,name.length,true);users.set(name,8);v.setUint32(8+name.length,1,true);v.setUint32(12+name.length,1,true);FS.writeFile('/saves/userdata/users.dat',users);const profile=new Uint8Array(4096),p=new DataView(profile.buffer);p.setUint32(0,12,true);p.setUint32(4,49,true);FS.writeFile('/saves/userdata/user1.dat',profile);await new Promise((r,j)=>FS.syncfs(false,e=>e?j(e):r()));});
- await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);await click(260,348);await wait(()=>Module.canvas.width===1024);
+ await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);await click(719,27);await wait(()=>Module.canvas.width===1024);
  if(process.env.PVZ_QA_CASE!=='mirror'){
  await fresh();for(let i=0;i<19;i++)assert.ok(await api(1,500+i,1+i%7,Math.floor(i/7))>0);await api(4,0);await page.waitForTimeout(1200);await api(4,1);await shot('all-nineteen-native-rigs');results.all19Spawn=true;
  await page.setViewportSize({width:844,height:390});await shot('all-nineteen-phone');await page.setViewportSize({width:1100,height:750});

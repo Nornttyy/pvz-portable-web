@@ -49,7 +49,7 @@ try{
  assert.equal(await seed(0,3),results.pausedRemaining);assert.equal(await seed(0,0),523);assert.equal(await seed(5,0),519);assert.equal(await page.evaluate(()=>Module._pvz_adventure_power_data(0,3)),800);results.exactSaveResume=true;
  await click(280,371);await wait(()=>Module._pvz_adventure_seed_data(0,3)===0);assert.equal(await seed(0,4),1);
  await click(await seed(0,5)+25,await seed(0,6)+35);await click(480,430);await wait(()=>Module._pvz_adventure_power_data(1,0)===523);results.secondPlantHealth=await page.evaluate(()=>Module._pvz_adventure_power_data(1,3));assert.equal(results.secondPlantHealth,800);
- await snap('adventure-two-small-nuts');await quit();await click(260,348);await wait(()=>Module.canvas.width===1024);
+ await snap('adventure-two-small-nuts');await quit();await click(719,27);await wait(()=>Module.canvas.width===1024);
  await api(7);await api(4,1);await api(1,501,2,1);await api(1,523,3,1);await api(1,523,5,3);await api(2,0,5,3);
  assert.deepEqual(await page.evaluate(()=>[0,1,2].map(i=>Module._pvz_sandbox_plant_data(i,3))),[4000,800,800]);
  await api(13);await page.waitForTimeout(100);await snap('sandbox-size-comparison');

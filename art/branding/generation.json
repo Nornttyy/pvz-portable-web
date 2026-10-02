@@ -1,0 +1,9 @@
+{
+  "tool": "built-in image_gen",
+  "asset": "addons/images/nb-edition.png",
+  "source": "art/branding/nb-edition-source.png",
+  "webAssets": ["site/branding/nb-edition.png", "site/branding/original-logo.png"],
+  "styleReference": "images/PvZ_Logo.jpg from the unchanged original resource bundle",
+  "prompt": "Use case: logo-brand. Asset type: one production-ready transparent game-logo suffix, not a full logo or mockup. Primary request: draw ONLY the exact text \"NB版\", uppercase Latin N and B followed by the Chinese character 版, as a single compact horizontal wordmark. The accompanying PvZ_Logo.jpg is ONLY a style reference: do not reproduce its wording or the full logo. Match its playful 2009 hand-painted cartoon lettering: chunky slightly irregular block characters, dark olive/near-black outlines, restrained moss-green faces with simple pale yellow-green edge highlights and subtle painted bevels. The Chinese 版 must be correct and just as legible as N and B, all three aligned on one baseline. This will be a small suffix under the bottom-right of the original Plants vs. Zombies logo, so favor a clean bold silhouette readable at 100px wide. Genuinely transparent RGBA background, including holes inside B and negative spaces, no white/black matte, no checkerboard pattern. Center the wordmark tightly on a wide transparent canvas with modest safe padding. No plaque, no ribbon, no extra characters, no plants, no zombie faces, no sparkles, no photoreal textures, no fine cracks, no glow, no neon, no 3D render, no watermark.",
+  "preparation": "Alpha-trim and downsample to 256x100, preserving generated colors and alpha. Original web logo keeps its shipped RGB pixels and separate luminance alpha mask. Native and web layouts place the suffix at the bottom right with a small angle and a single settling motion; no perpetual animation."
+}

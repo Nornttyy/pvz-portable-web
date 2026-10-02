@@ -41,7 +41,7 @@ try{
   // 2-3 avoids 2-2's one-time shop tutorial before the native seed chooser.
   const profile=new Uint8Array(4096),p=new DataView(profile.buffer);p.setUint32(0,12,true);p.setUint32(4,13,true);FS.writeFile('/saves/userdata/user1.dat',profile);await new Promise((r,j)=>FS.syncfs(false,e=>e?j(e):r()));
  });
- await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);await click(260,348);await page.waitForFunction(()=>Module.canvas.width===1024,undefined,{timeout:20000});
+ await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);await click(719,27);await page.waitForFunction(()=>Module.canvas.width===1024,undefined,{timeout:20000});
  await api(7);await api(1,1,0,2);await api(1,503,3,2);await api(1,9,6,2);await api(5,4);await page.mouse.move(0,0);await api(4,0);
  await page.waitForFunction(()=>{const types=new Set();for(let i=0;i<1000&&Module._pvz_sun_data(i,0)>=0;++i){if(Module._pvz_sun_data(i,3)!==2)continue;const x=Module._pvz_sun_data(i,1),v=Module._pvz_sun_data(i,0);if(x<150&&v===25)types.add(1);if(x>230&&x<390&&v===25)types.add(503);if(x>470&&v===15)types.add(9);}return types.size===3;},undefined,{timeout:10000});
  await page.waitForTimeout(300);await api(4,1);results.initial=await suns();checkSizes(results.initial);await shot('native-and-replacement-25-young-shroom-15');

@@ -22,7 +22,7 @@ async function findRunner(){return page.evaluate(()=>{for(let i=0;i<160;++i)if(M
 const runnerData=i=>page.evaluate(i=>Array.from({length:21},(_,f)=>Module._pvz_sandbox_zombie_data(i,f)),i);
 async function saveQuit(){await click(400,401);await page.waitForTimeout(250);await click(305,394);await wait(()=>Module._pvz_adventure_power_data(-1,5)===-1);await sync();}
 try{
- await boot(8);await click(260,348);await wait(()=>Module.canvas.width===1024);await fresh();
+ await boot(8);await click(719,27);await wait(()=>Module.canvas.width===1024);await fresh();
  // Fifth cell in the fifth row: select the real runner card.
  await api(1,3,0,2);await api(1,1,3,2);await api(1,3,6,2);await click(718,24);await click(229,395);await click(944,330);
  assert.equal(await zd(0,0),213);assert.equal(await zd(0,14),1);assert.equal(await zd(0,4),270);results.card=true;

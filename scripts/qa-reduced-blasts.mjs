@@ -21,7 +21,7 @@ try{
   await new Promise((r,j)=>FS.syncfs(false,e=>e?j(e):r()));
  });
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);
- await click(260,348);await page.waitForFunction(()=>Module.canvas.width===1024);await api(8,0);await api(4,1);await api(5,4);
+ await click(719,27);await page.waitForFunction(()=>Module.canvas.width===1024);await api(8,0);await api(4,1);await api(5,4);
  const wanted=new Map([[334,600],[335,400],[331,600],[323,80],[325,80],[326,40],[336,80]]);
  for(let attempt=0;wanted.size&&attempt<480;++attempt){
   await api(6);await api(3,0,1,2);

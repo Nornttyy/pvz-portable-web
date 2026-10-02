@@ -20,7 +20,7 @@ async function boot(level=0){
 async function fresh(){await api(7);await api(5,1);await api(4,0);await page.waitForTimeout(700);}
 try{
  if(!process.env.PVZ_QA_ALMANAC_ONLY){
- await boot(8);await click(260,348);await wait(()=>Module.canvas.width===1024);await fresh();
+ await boot(8);await click(719,27);await wait(()=>Module.canvas.width===1024);await fresh();
  for(let id=200;id<=211;++id)assert.equal(await api(2,id,6,2),-2);
  // Select the actual last zombie card, not just the C API.
  await click(718,24);await click(181,395);await click(904,330);await api(4,1);

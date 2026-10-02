@@ -18,7 +18,7 @@ try{
   const name=new TextEncoder().encode('RageQA'),users=new Uint8Array(16+name.length),u=new DataView(users.buffer);
   u.setUint32(0,14,true);u.setUint16(4,1,true);u.setUint16(6,name.length,true);users.set(name,8);u.setUint32(8+name.length,1,true);u.setUint32(12+name.length,1,true);FS.writeFile('/saves/userdata/users.dat',users);
   const profile=new Uint8Array(4096),p=new DataView(profile.buffer);p.setUint32(0,12,true);p.setUint32(4,2,true);FS.writeFile('/saves/userdata/user1.dat',profile);await new Promise((r,j)=>FS.syncfs(false,e=>e?j(e):r()));});
- await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);await click(260,348);
+ await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);await click(719,27);
  await page.waitForFunction(()=>Module.canvas.width===1024,{},{timeout:15000});await api(7);await api(1,500,1,2);await api(2,4,8,2);await api(4,0);
  await page.waitForFunction(()=>{for(let i=0;i<128;++i){const s=Module._pvz_projectile_data(i,0);if(s<0)break;if(s>=32&&s<=287)return true;}return false;},{},{timeout:6500});await api(4,1);
  const firstMiss=(await shots()).find(s=>s[0]>=32&&s[0]<=287);let minY=999,maxY=-999,up=false,down=false,turns=0,lastVy=firstMiss[4];const trace=[];

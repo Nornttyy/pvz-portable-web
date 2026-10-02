@@ -29,7 +29,7 @@ try{
  if(!process.env.PVZ_QA_ALMANAC_ONLY){
  await boot(22);
  if(!process.env.PVZ_QA_CAMPAIGN_ONLY){
- await click(260,348);await wait(()=>Module.canvas.width===1024);await fresh();
+ await click(719,27);await wait(()=>Module.canvas.width===1024);await fresh();
  await click(718,24);await click(81,457);await click(784,330);
  results.spawn=(await zombies())[0];assert.equal(results.spawn[0],215);assert.equal(results.spawn[4],270);assert.equal(results.spawn[15],24);
  await api(2,24,6,1);await api(2,23,7,3);await snap('catalogue-native-imp-and-giant');

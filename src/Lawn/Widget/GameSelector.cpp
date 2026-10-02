@@ -63,7 +63,7 @@ GameSelectorOverlay::GameSelectorOverlay(GameSelector* theGameSelector)
 	mHasAlpha = true;
 }
 
-// Prominent native menu button. Stretch only the existing stone slices, not the label.
+// Compact upper-right entry. Keep native stone slices and the small bitmap font.
 class SandboxMenuButton final : public LawnStoneButton {
 public:
 	SandboxMenuButton(int id, ButtonListener* listener) : LawnStoneButton(nullptr, id, listener) {
@@ -71,7 +71,7 @@ public:
 	}
 	void Draw(Graphics* g) override {
 		const bool down = mIsDown && mIsOver && !mDisabled;
-		SandboxDrawButton(g,{0,0,mWidth,mHeight},mLabel,down,mIsOver,true);
+		SandboxDrawButton(g,{0,0,mWidth,mHeight},mLabel,down,mIsOver,false);
 	}
 };
 

@@ -1,13 +1,14 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 95ddcd6..be3bd41 100644
+index 95ddcd6..e29712d 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -199,12 +199,16 @@ endif()
+@@ -199,12 +199,17 @@ endif()
  if(EMSCRIPTEN)
  	set_property(TARGET pvz-portable APPEND PROPERTY LINK_DEPENDS
  		"${CMAKE_CURRENT_SOURCE_DIR}/wasm/shell.html"
 +		"${CMAKE_CURRENT_SOURCE_DIR}/addons/audio/rage-scream.wav"
 +		"${CMAKE_CURRENT_SOURCE_DIR}/addons/images/everything-poop.png"
++		"${CMAKE_CURRENT_SOURCE_DIR}/addons/images/nb-edition.png"
  	)
  	target_link_libraries(pvz-portable PRIVATE
  		SDL2_mixer_ext_Static
@@ -2082,7 +2083,7 @@ index f53e4ac..2f109fa 100644
  	void						Draw(Graphics* g) override;
  	void						GetSeedPosition(SeedType theSeedType, int& x, int& y);
 diff --git a/src/Lawn/Widget/GameSelector.cpp b/src/Lawn/Widget/GameSelector.cpp
-index e30bd35..9a281a0 100644
+index e30bd35..61e0441 100644
 --- a/src/Lawn/Widget/GameSelector.cpp
 +++ b/src/Lawn/Widget/GameSelector.cpp
 @@ -27,6 +27,9 @@
@@ -2099,7 +2100,7 @@ index e30bd35..9a281a0 100644
  	mHasAlpha = true;
  }
  
-+// Prominent native menu button. Stretch only the existing stone slices, not the label.
++// Compact upper-right entry. Keep native stone slices and the small bitmap font.
 +class SandboxMenuButton final : public LawnStoneButton {
 +public:
 +	SandboxMenuButton(int id, ButtonListener* listener) : LawnStoneButton(nullptr, id, listener) {
@@ -2107,7 +2108,7 @@ index e30bd35..9a281a0 100644
 +	}
 +	void Draw(Graphics* g) override {
 +		const bool down = mIsDown && mIsOver && !mDisabled;
-+		SandboxDrawButton(g,{0,0,mWidth,mHeight},mLabel,down,mIsOver,true);
++		SandboxDrawButton(g,{0,0,mWidth,mHeight},mLabel,down,mIsOver,false);
 +	}
 +};
 +
@@ -2575,6 +2576,63 @@ index b284e6a..0f45598 100644
  	{
  		ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
  		if (aChosenSeed.mSeedState == SEED_IN_BANK)
+diff --git a/src/Lawn/Widget/TitleScreen.cpp b/src/Lawn/Widget/TitleScreen.cpp
+index 85ab277..fd8eb66 100644
+--- a/src/Lawn/Widget/TitleScreen.cpp
++++ b/src/Lawn/Widget/TitleScreen.cpp
+@@ -23,6 +23,7 @@
+ #include "widget/HyperlinkWidget.h"
+ #include "widget/WidgetManager.h"
+ #include "graphics/ImageFont.h"
++#include "graphics/GLImage.h"
+ #include "sound/SoundManager.h"
+ #include "../../LawnApp.h"
+ #include "../../Resources.h"
+@@ -172,6 +173,24 @@ void TitleScreen::Draw(Graphics* g)
+ 		aLogoY = PvzpAnimateCurve(60, 50, mTitleStateCounter, 10, 15, CURVE_BOUNCE);
+ 	}
+ 	g->DrawImage(IMAGE_PVZ_LOGO, mWidth / 2 - IMAGE_PVZ_LOGO->mWidth / 2, aLogoY);
++	// A small, slightly crooked edition tag peeks out once; the original logo
++	// and its entrance stay intact. Do not keep bouncing while the player waits.
++	if (mTitleStateCounter <= 50)
++	{
++		if (!mNbEditionLogo) mNbEditionLogo.reset(mApp->GetImage("/addons/images/nb-edition.png"));
++		if (mNbEditionLogo)
++		{
++			const float scale = mTitleStateCounter > 30
++				? PvzpAnimateCurveFloat(50, 30, mTitleStateCounter, 0.65f, 1.08f, CURVE_EASE_IN_OUT)
++				: PvzpAnimateCurveFloat(30, 18, mTitleStateCounter, 1.08f, 1.0f, CURVE_EASE_IN_OUT);
++			const float right = (mWidth + IMAGE_PVZ_LOGO->mWidth) / 2.0f;
++			SexyTransform2D transform;
++			PvzpScaleRotateTransformMatrix(transform, right - 56 + g->mTransX,
++				aLogoY + IMAGE_PVZ_LOGO->mHeight + 12 + g->mTransY, 0.10f, scale * 0.5f, scale * 0.5f);
++			PvzpBltMatrix(g, mNbEditionLogo.get(), transform, g->mClipRect, Color::White, g->mDrawMode,
++				Rect(0, 0, mNbEditionLogo->mWidth, mNbEditionLogo->mHeight));
++		}
++	}
+ 
+ 	int aGrassX = mStartButton->mX;
+ 	int aGrassY = mStartButton->mY - 17;
+diff --git a/src/Lawn/Widget/TitleScreen.h b/src/Lawn/Widget/TitleScreen.h
+index 9f9d5b0..c8c1501 100644
+--- a/src/Lawn/Widget/TitleScreen.h
++++ b/src/Lawn/Widget/TitleScreen.h
+@@ -41,6 +41,7 @@ enum TitleState
+ namespace Sexy
+ {
+ 	class HyperlinkWidget;
++	class GLImage;
+ }
+ 
+ class LawnApp;
+@@ -56,6 +57,7 @@ public:
+ 
+ public:
+ 	std::unique_ptr<HyperlinkWidget>		mStartButton;
++	std::unique_ptr<Sexy::GLImage> mNbEditionLogo;
+ 	float					mCurBarWidth;
+ 	float					mTotalBarWidth;
+ 	float					mBarVel;
 diff --git a/src/Lawn/Zombie.cpp b/src/Lawn/Zombie.cpp
 index c140a3d..904c9fe 100644
 --- a/src/Lawn/Zombie.cpp

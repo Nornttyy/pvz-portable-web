@@ -25,7 +25,7 @@ async function boot(initial=false){
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);
 }
 try{
- await boot(true);await click(260,348);await page.waitForFunction(()=>Module.canvas.width===1024,{},{timeout:20000});
+ await boot(true);await click(719,27);await page.waitForFunction(()=>Module.canvas.width===1024,{},{timeout:20000});
  if(!process.env.PVZ_QA_CONE_ONLY){
  // The new card is reachable through the actual five-column native sidebar.
  await click(125,533);await click(130,236);await click(544,330);assert.equal(await pd(0),507);assert.equal(await pd(7),3);await shot('new-card-planted');

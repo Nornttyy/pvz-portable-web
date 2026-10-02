@@ -27,7 +27,7 @@ try{
  await boot(8);
  let combat=[];
  if(!process.env.PVZ_QA_SKIP_SANDBOX){
- await click(260,348);await page.waitForFunction(()=>Module.canvas.width===1024,{},{timeout:20000});await shot('three-powers');
+ await click(719,27);await page.waitForFunction(()=>Module.canvas.width===1024,{},{timeout:20000});await shot('three-powers');
  for(let i=0;i<5;++i)await tap(220,571);await shot('last-power-page');
  // The last page includes Cob Cannon; a real pointer click selects and plants it.
  await tap(231,361);await tap(384,230);assert.equal((await data())[0][0],47);await api(7);

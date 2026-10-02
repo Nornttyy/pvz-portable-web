@@ -7,6 +7,9 @@ bool overlaps(Box a,Box b){return a.x<b.x+b.w&&b.x<a.x+a.w&&a.y<b.y+b.h&&b.y<a.y
 int main(){
  for(int n=6;n<=10;++n){const int extra=n<=6?0:n==7?60:n==8?76:n==9?112:153;assert(!overlaps(MemeAdventureRules::Slot,{456+extra,0,82,80}));assert(!overlaps(MemeAdventureRules::Slot,{681,-10,117,46}));}
  static_assert(CanvasWidth==800+WorldOffset&&CanvasHeight==600);
+ static_assert(MenuEntry.x>=640&&MenuEntry.x+MenuEntry.w<=788&&MenuEntry.y>=8&&MenuEntry.y+MenuEntry.h<=48);
+ static_assert(MenuEntry.w>=120&&MenuEntry.w<=144&&MenuEntry.h>=36&&MenuEntry.h<=40);
+ assert(MenuEntry.Contains(719,27)&&!MenuEntry.Contains(260,348));
  for(int shake:{0,4,-3,2,-1,0}){assert(BoardX(true,shake)==WorldOffset+shake);assert(BoardX(false,shake)==shake);}
  assert(BoardX(true)==WorldOffset);assert(BoardX(false)==0);
  for(int i=0;i<35;++i){const auto a=SidebarZombie(i);assert(a.x>=0&&a.x+a.w<SidebarWidth&&a.y>=80&&a.y+a.h<=550);for(int j=0;j<i;++j)assert(!overlaps(a,SidebarZombie(j)));}

@@ -20,7 +20,7 @@ async function boot(level=0){
 }
 async function step(){await api(13);await page.waitForTimeout(45);}
 try{
- await boot(9);await click(260,348);await wait(()=>Module.canvas.width===1024);await api(7);await api(4,1);
+ await boot(9);await click(719,27);await wait(()=>Module.canvas.width===1024);await api(7);await api(4,1);
  // Select the replacement in the native Repeater's catalogue slot (index 7).
  await click(132,231);await click(384,330);assert.equal((await data(0))[0],521);
  await api(2,4,8,2);await api(5,1);

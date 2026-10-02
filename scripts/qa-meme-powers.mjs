@@ -23,7 +23,7 @@ try{
  async function shot(name){await page.waitForTimeout(80);await page.screenshot({path:join(out,name+'.png')});}
  await click(400,560);await page.waitForTimeout(4500);await click(400,312);
  await page.keyboard.type('PowerQA',{delay:50});await page.keyboard.press('Enter');await page.waitForTimeout(2500);
- await click(260,348);await page.waitForFunction(()=>Module.canvas.width===1024,{},{timeout:20000});
+ await click(719,27);await page.waitForFunction(()=>Module.canvas.width===1024,{},{timeout:20000});
  await shot('power-entry');
  // Actual UI, not only API: first ingredient -> lawn, power -> existing plant.
  await click(33,150);await click(384,130);assert.equal((await data())[0][0],0);

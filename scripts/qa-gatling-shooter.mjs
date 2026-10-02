@@ -27,7 +27,7 @@ async function boot(level=9){
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);
 }
 try{
- await boot();await click(260,348);await wait(()=>Module.canvas.width===1024);await api(7);await api(4,1);await api(5,1);
+ await boot();await click(719,27);await wait(()=>Module.canvas.width===1024);await api(7);await api(4,1);await api(5,1);
  assert.ok(await api(1,522,6,2)>0,'sandbox retains its existing free upgrade placement');
  await api(7);await api(4,1);await api(5,1);
  assert.ok(await api(1,521,6,2)>0);assert.ok(await api(1,522,6,2)>0);assert.equal((await plant())[0],522);

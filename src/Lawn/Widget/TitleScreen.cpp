@@ -23,6 +23,7 @@
 #include "widget/HyperlinkWidget.h"
 #include "widget/WidgetManager.h"
 #include "graphics/ImageFont.h"
+#include "graphics/GLImage.h"
 #include "sound/SoundManager.h"
 #include "../../LawnApp.h"
 #include "../../Resources.h"
@@ -172,6 +173,24 @@ void TitleScreen::Draw(Graphics* g)
 		aLogoY = PvzpAnimateCurve(60, 50, mTitleStateCounter, 10, 15, CURVE_BOUNCE);
 	}
 	g->DrawImage(IMAGE_PVZ_LOGO, mWidth / 2 - IMAGE_PVZ_LOGO->mWidth / 2, aLogoY);
+	// A small, slightly crooked edition tag peeks out once; the original logo
+	// and its entrance stay intact. Do not keep bouncing while the player waits.
+	if (mTitleStateCounter <= 50)
+	{
+		if (!mNbEditionLogo) mNbEditionLogo.reset(mApp->GetImage("/addons/images/nb-edition.png"));
+		if (mNbEditionLogo)
+		{
+			const float scale = mTitleStateCounter > 30
+				? PvzpAnimateCurveFloat(50, 30, mTitleStateCounter, 0.65f, 1.08f, CURVE_EASE_IN_OUT)
+				: PvzpAnimateCurveFloat(30, 18, mTitleStateCounter, 1.08f, 1.0f, CURVE_EASE_IN_OUT);
+			const float right = (mWidth + IMAGE_PVZ_LOGO->mWidth) / 2.0f;
+			SexyTransform2D transform;
+			PvzpScaleRotateTransformMatrix(transform, right - 56 + g->mTransX,
+				aLogoY + IMAGE_PVZ_LOGO->mHeight + 12 + g->mTransY, 0.10f, scale * 0.5f, scale * 0.5f);
+			PvzpBltMatrix(g, mNbEditionLogo.get(), transform, g->mClipRect, Color::White, g->mDrawMode,
+				Rect(0, 0, mNbEditionLogo->mWidth, mNbEditionLogo->mHeight));
+		}
+	}
 
 	int aGrassX = mStartButton->mX;
 	int aGrassY = mStartButton->mY - 17;

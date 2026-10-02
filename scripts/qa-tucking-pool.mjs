@@ -25,7 +25,7 @@ try{
   await new Promise((r,j)=>FS.syncfs(false,e=>e?j(e):r()));
  });
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);
- await click(260,348);await wait(()=>Module.canvas.width===1024);assert.ok(await api(8,1)>0);await api(4,1);await api(5,4);
+ await click(719,27);await wait(()=>Module.canvas.width===1024);assert.ok(await api(8,1)>0);await api(4,1);await api(5,4);
  for(const [type,col,row] of [[16,4,2],[520,4,2],[16,4,3],[520,4,3],[520,4,1]])assert.ok(await api(1,type,col,row)>0);
  assert.ok(await api(2,0,5,2)>0);await api(4,0);
  await wait(()=>Array.from({length:8},(_,i)=>i).some(i=>Module._pvz_sandbox_plant_data(i,0)===16&&Module._pvz_sandbox_plant_data(i,2)===2&&Module._pvz_sandbox_plant_data(i,3)<300));

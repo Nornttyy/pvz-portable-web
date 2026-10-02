@@ -27,7 +27,7 @@ try{
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);
  await click(370,455);await click(208,366);await click(155,205);await snap('almanac');await click(690,580);await page.waitForTimeout(1000);
  if(!process.env.PVZ_QA_ADVENTURE_ONLY){
-  await click(260,348);await wait(()=>Module.canvas.width===1024);await api(8,0);await api(4,1);await api(12,1);
+  await click(719,27);await wait(()=>Module.canvas.width===1024);await api(8,0);await api(4,1);await api(12,1);
   assert.equal(await api(1,527,2,2),1);assert.equal(await api(1,520,2,1),1);assert.equal(await api(1,520,0,0),1);
   for(let i=0;i<12;++i)assert.equal(await api(2,4,5,2),1);
   await page.evaluate(()=>{window.stinkTrace=[];let old=0;window.stinkMonitor=setInterval(()=>{

@@ -8,7 +8,7 @@ struct Box {
 constexpr Box CenterInk(Box button,Box ink,bool down=false) {
     return {button.x+(button.w-ink.w)/2-ink.x+(down?1:0),button.y+(button.h-ink.h)/2-ink.y+(down?1:0),ink.w,ink.h};
 }
-inline constexpr Box MenuEntry{140, 320, 240, 56};
+inline constexpr Box MenuEntry{650, 8, 138, 38};
 inline constexpr int CanvasWidth=1024, CanvasHeight=600, WorldOffset=224, SidebarWidth=264;
 // Screen shake is relative to the layout origin, never an absolute board position.
 constexpr int BoardX(bool sandbox,int shake=0) { return (sandbox ? WorldOffset:0)+shake; }

@@ -201,6 +201,7 @@ if(EMSCRIPTEN)
 		"${CMAKE_CURRENT_SOURCE_DIR}/wasm/shell.html"
 		"${CMAKE_CURRENT_SOURCE_DIR}/addons/audio/rage-scream.wav"
 		"${CMAKE_CURRENT_SOURCE_DIR}/addons/images/everything-poop.png"
+		"${CMAKE_CURRENT_SOURCE_DIR}/addons/images/nb-edition.png"
 	)
 	target_link_libraries(pvz-portable PRIVATE
 		SDL2_mixer_ext_Static

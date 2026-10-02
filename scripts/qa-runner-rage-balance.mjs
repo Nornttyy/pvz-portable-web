@@ -13,7 +13,7 @@ async function click(x,y){const b=await page.locator('#canvas').boundingBox(),s=
 try{
  await page.goto(process.env.PVZ_QA_URL||'http://127.0.0.1:8097/');await wait(()=>!document.getElementById('start').disabled,undefined,90000);
  await page.evaluate(async()=>{const FS=Module.FS;if(!FS.analyzePath('/saves/userdata').exists)FS.mkdir('/saves/userdata');const name=new TextEncoder().encode('BalanceQA'),users=new Uint8Array(16+name.length),u=new DataView(users.buffer);u.setUint32(0,14,true);u.setUint16(4,1,true);u.setUint16(6,name.length,true);users.set(name,8);u.setUint32(8+name.length,1,true);u.setUint32(12+name.length,1,true);FS.writeFile('/saves/userdata/users.dat',users);const profile=new Uint8Array(4096),p=new DataView(profile.buffer);p.setUint32(0,12,true);p.setUint32(4,9,true);FS.writeFile('/saves/userdata/user1.dat',profile);await new Promise((r,j)=>FS.syncfs(false,e=>e?j(e):r()));});
- await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);await click(260,348);await wait(()=>Module.canvas.width===1024);
+ await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);await click(719,27);await wait(()=>Module.canvas.width===1024);
  await api(7);await api(4,1);await api(5,1);await api(1,3,0,2);await api(1,3,6,2);await api(2,213,8,2);
  await page.evaluate(()=>{window.runnerTrace=[];const sample=()=>{const z=Module._pvz_sandbox_zombie_data;if(z(0,0)<0)return;window.runnerTrace.push({tick:z(0,10),x:z(0,2),phase:z(0,6)});requestAnimationFrame(sample);};sample();});
  await api(4,0);await wait(()=>Module._pvz_sandbox_zombie_data(0,0)===-1,undefined,6000);

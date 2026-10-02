@@ -35,7 +35,7 @@ try{
  await page.setViewportSize({width:390,height:844});await page.waitForTimeout(500);await snap('phone');await page.setViewportSize({width:1100,height:750});await page.waitForTimeout(800);
  await quit();await click(560,135);await wait(()=>Module._pvz_adventure_power_data(-1,5)===1);assert.deepEqual(await plants(),results.cluster);results.saveResume=true;await snap('resumed');
  await click(280,371);await click(480,40);await click(200,330);await page.waitForTimeout(250);assert.equal((await plants()).length,4);await place();assert.equal((await plants()).length,5);assert.deepEqual((await plants()).map(p=>p[5]).sort(),[0,1,2,3,4]);results.shovelRefill=true;
- await quit();await click(260,348);await wait(()=>Module.canvas.width===1024);await api(7);await api(8);await api(4,1);
+ await quit();await click(719,27);await wait(()=>Module.canvas.width===1024);await api(7);await api(8);await api(4,1);
  for(let i=0;i<5;++i)assert.equal(await api(1,525,3,2),1);assert.equal(await api(1,525,3,2),-4);await api(19,1);assert.equal(await api(1,525,3,2),-4);await api(19,0);
  await api(3,0,3,2);assert.equal(await api(9),4);assert.equal(await api(1,525,3,2),1);results.sandboxShovelRefill=true;
  await api(1,8,2,2); // Native-only reference for comparing the exact one-third scale.

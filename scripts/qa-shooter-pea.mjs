@@ -20,7 +20,7 @@ async function boot(seed=false){
 }
 try{
  await boot(true);
- await click(260,348);await wait(()=>Module.canvas.width===1024);await api(7);await api(5,1);await page.waitForTimeout(1600);
+ await click(719,27);await wait(()=>Module.canvas.width===1024);await api(7);await api(5,1);await page.waitForTimeout(1600);
  for(let id=502;id<=518;++id)assert.equal(await api(1,id,0,0),-2);
  assert.ok(await api(1,519,2,2)>0);assert.ok(await api(1,500,2,1)>0);assert.ok(await api(1,501,2,3)>0);
  await snap('three-plants-and-cards');

@@ -20,7 +20,7 @@ try{
   const profile=new Uint8Array(4096),p=new DataView(profile.buffer);p.setUint32(0,12,true);p.setUint32(4,37,true);FS.writeFile('/saves/userdata/user1.dat',profile);await new Promise((r,j)=>FS.syncfs(false,e=>e?j(e):r()));
  });
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);
- await click(260,348);await page.waitForFunction(()=>Module.canvas.width===1024);await fresh();
+ await click(719,27);await page.waitForFunction(()=>Module.canvas.width===1024);await fresh();
  for(const [type,col,row] of [[2,2,3],[218,4,3],[219,6,3],[214,8,3]])assert.equal(await api(2,type,col,row),1);
  results.initial=await zombies();assert.deepEqual(results.initial.map(z=>z[5]),[370,740,7400,2590]);assert.deepEqual(results.initial.map(z=>z[9]),[100,100,15,60]);
  await click(710,24);await snap('roster');await api(4,0);await page.waitForTimeout(8000);await api(4,1);results.walked=await zombies();

@@ -26,7 +26,7 @@ try{
  await snap('removed-area-clicked');await almanac();
  // Achievements use the same slide/update path that formerly moved the editor.
  await click(85,525);await page.waitForTimeout(1600);await snap('achievements');await click(185,70);await page.waitForTimeout(1600);await almanac();
- await click(260,348);await page.waitForFunction(()=>Module.canvas.width===1024,undefined,{timeout:5000});await snap('sandbox');
+ await click(719,27);await page.waitForFunction(()=>Module.canvas.width===1024,undefined,{timeout:5000});await snap('sandbox');
  // Recreating the selector can yield through Emscripten Asyncify, so observe
  // completion instead of reading a synchronous return value during the unwind.
  await page.evaluate(()=>Module._pvz_sandbox_command(15,0,0,0));await page.waitForFunction(()=>Module.canvas.width===800);await page.waitForTimeout(2200);

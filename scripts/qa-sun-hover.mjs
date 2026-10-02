@@ -30,7 +30,7 @@ try{
   window.qaMouseDowns=0;document.addEventListener('mousedown',()=>++window.qaMouseDowns);
  });
  await page.locator('#start').click();await page.waitForTimeout(12000);await click(400,560);await page.waitForTimeout(4500);
- await click(260,348);await page.waitForFunction(()=>Module.canvas.width===1024,{},{timeout:20000});
+ await click(719,27);await page.waitForFunction(()=>Module.canvas.width===1024,{},{timeout:20000});
  await api(7);await api(1,503,4,2);await shot('flower-normal');await api(2,0,4,2);await api(4,0);
  await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,4)===1,{},{timeout:18000});await page.waitForTimeout(250);await api(4,1);await shot('flower-hiding');
  await api(6);await api(4,0);await page.waitForFunction(()=>Module._pvz_sandbox_plant_data(0,4)===0,{},{timeout:1500});await api(4,1);await shot('flower-recovered');results.flowerRecovery=true;

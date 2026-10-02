@@ -27,7 +27,7 @@ try{
  await click(370,455);await click(208,366);await click(415,205);await snap('almanac');
  await click(690,580);await page.waitForTimeout(1000);
  if(!process.env.PVZ_QA_ADVENTURE_ONLY){
- await click(260,348);await wait(()=>Module.canvas.width===1024);await api(8,0);await api(4,1);await api(12,0);
+ await click(719,27);await wait(()=>Module.canvas.width===1024);await api(8,0);await api(4,1);await api(12,0);
  assert.equal(await api(1,526,4,2),1);assert.equal(await api(1,15,2,2),1);
  await api(4,0);await page.waitForTimeout(400);await api(4,1);await snap('sleeping-native-comparison');assert.equal((await holes()).length,0);
  await api(3,0,2,2);await api(12,1);await api(4,0);await page.waitForTimeout(250);await api(4,1);await snap('green-energy-windup');
