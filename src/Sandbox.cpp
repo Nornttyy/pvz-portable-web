@@ -407,8 +407,11 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_rage_audio_data(int field) {
 }
 
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_projectile_data(int index,int field) {
-    auto* board=gLawnApp?gLawnApp->mBoard:nullptr;if(!board||index<0||field<0||field>8)return -1;
+    auto* board=gLawnApp?gLawnApp->mBoard:nullptr;if(!board||index<0||field<0||field>11)return -1;
     for(auto* shot:board->mProjectiles)if(!shot->mDead&&index--==0){
+        if(field==9)return int(shot->mMotionType);
+        if(field==10)return SandboxFactions::TravelsLeft(shot)?-1:1;
+        if(field==11)return board->mProjectiles.DataArrayGetID(shot);
         return field==0?MemeCharacters::ShotStyle(shot):field==1?int(shot->mPosX):field==2?int(shot->mPosY+shot->mPosZ):field==3?int(shot->mVelX*1000):field==4?int(shot->mVelY*1000):field==5?shot->mRow:field==6?shot->mProjectileAge:field==8?int(shot->mProjectileType):SandboxPlants::SaveShot(shot);
     }return -1;
 }

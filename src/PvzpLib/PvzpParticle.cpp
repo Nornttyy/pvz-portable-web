@@ -23,6 +23,7 @@
 #include "Definition.h"
 #include "PvzpParticle.h"
 #include "EffectSystem.h"
+#include "../SandboxFactions.h"
 #include "../GameConstants.h"
 #include "graphics/Graphics.h"
 #include "graphics/GLInterface.h"
@@ -1009,6 +1010,7 @@ void RenderParticle(Graphics* g, PvzpParticle* theParticle, const Color& theColo
 			theParams->mParticleScale,
 			theParams->mParticleStretch * theParams->mParticleScale
 		);
+		SandboxFactions::ParticleMatrix(aTransform,g->mTransX);
 		theTriangleGroup->AddTriangle(g, aImage, aTransform, g->mClipRect, theColor, aDrawMode, aSrcRect);
 		if (aEmitter->mExtraAdditiveDrawOverride)
 			theTriangleGroup->AddTriangle(g, aImage, aTransform, g->mClipRect, theColor, Graphics::DRAWMODE_ADDITIVE, aSrcRect);
@@ -1047,6 +1049,7 @@ void PvzpParticleEmitter::DrawParticle(Graphics* g, PvzpParticle* theParticle, P
 
 void PvzpParticleSystem::Draw(Graphics* g)
 {
+	SandboxFactions::ParticleScope direction(this);
 	for (PvzpListNode<ParticleEmitterID>* aNode = mEmitterList.mHead; aNode != nullptr; aNode = aNode->mNext)
 		mParticleHolder->mEmitters.DataArrayGet(static_cast<unsigned int>(aNode->mValue))->Draw(g);
 }

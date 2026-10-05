@@ -1527,6 +1527,7 @@ void Zombie::UpdateZombiePogo()
 
 void Zombie::ZombieCatapultFire(Plant* thePlant)
 {
+	if(SandboxFactions::FireCatapult(this,thePlant))return;
 	float aOriginX = mPosX + 113.0f;
 	float aOriginY = mPosY - 44.0f;
 	int aTargetX, aTargetY;
@@ -1565,11 +1566,13 @@ Plant* Zombie::FindCatapultTarget()
 	{
 		if (aPlant->mDead)
 			continue;
-		if (aPlant->mRow == mRow && mX >= aPlant->mX + 100 && !aPlant->NotOnGround() && !aPlant->IsSpiky())
+		if(gSandboxEnabled&&!SandboxFactions::Enemy(this,aPlant))continue;
+		const bool backwards=gSandboxEnabled&&mMindControlled;
+		if (aPlant->mRow == mRow && (backwards?aPlant->mX>=mX+100:mX>=aPlant->mX+100) && !aPlant->NotOnGround() && !aPlant->IsSpiky())
 		{
-			if (aTarget == nullptr || aPlant->mPlantCol < aTarget->mPlantCol)
+			if (aTarget == nullptr || (backwards?aPlant->mPlantCol>aTarget->mPlantCol:aPlant->mPlantCol<aTarget->mPlantCol))
 			{
-				aTarget = mBoard->GetTopPlantAt(aPlant->mPlantCol, aPlant->mRow, PlantPriority::TOPPLANT_CATAPULT_ORDER);
+				aTarget = gSandboxEnabled?aPlant:mBoard->GetTopPlantAt(aPlant->mPlantCol, aPlant->mRow, PlantPriority::TOPPLANT_CATAPULT_ORDER);
 			}
 		}
 	}
@@ -1581,7 +1584,7 @@ void Zombie::UpdateZombieCatapult()
 {
 	if (mZombiePhase == ZombiePhase::PHASE_ZOMBIE_NORMAL)
 	{
-		if (mPosX <= 650 && FindCatapultTarget() && mSummonCounter > 0)
+		if ((gSandboxEnabled&&mMindControlled?mPosX>=100:mPosX<=650) && SandboxFactions::HasCatapultTarget(this) && mSummonCounter > 0)
 		{
 			mZombiePhase = ZombiePhase::PHASE_CATAPULT_LAUNCHING;
 			mPhaseCounter = 300;
@@ -1630,8 +1633,7 @@ void Zombie::UpdateZombieCatapult()
 	}
 	else if (mZombiePhase == ZombiePhase::PHASE_CATAPULT_RELOADING && mPhaseCounter == 0)
 	{
-		Plant* aPlant = FindCatapultTarget();
-		if (aPlant)
+		if (SandboxFactions::HasCatapultTarget(this))
 		{
 			mZombiePhase = ZombiePhase::PHASE_CATAPULT_LAUNCHING;
 			mPhaseCounter = 300;
@@ -2373,6 +2375,7 @@ void Zombie::UpdateZombiePeaHead()
 
 		float aOriginX = mPosX + aTransform.mTransX - 9.0f;
 		float aOriginY = mPosY + aTransform.mTransY + 6.0f - mAltitude;
+		if(!SandboxFactions::FireZombiePea(this)){
 #ifdef DO_FIX_BUGS
 		if (mMindControlled)  // hypnotized: fire a friendly pea instead
 		{
@@ -2389,6 +2392,7 @@ void Zombie::UpdateZombiePeaHead()
 		Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder, mRow, ProjectileType::PROJECTILE_ZOMBIE_PEA);
 		aProjectile->mMotionType = ProjectileMotion::MOTION_BACKWARDS;
 #endif
+		}
 
 		mPhaseCounter = 150;
 	}
@@ -2494,6 +2498,7 @@ void Zombie::UpdateZombieGatlingHead()
 
 		float aOriginX = mPosX + aTransform.mTransX - 9.0f;
 		float aOriginY = mPosY + aTransform.mTransY + 6.0f;
+		if(!SandboxFactions::FireZombiePea(this)){
 #ifdef DO_FIX_BUGS
 		if (mMindControlled)  // hypnotized: fire a friendly pea instead
 		{
@@ -2510,6 +2515,7 @@ void Zombie::UpdateZombieGatlingHead()
 		Projectile* aProjectile = mBoard->AddProjectile(aOriginX, aOriginY, mRenderOrder, mRow, ProjectileType::PROJECTILE_ZOMBIE_PEA);
 		aProjectile->mMotionType = ProjectileMotion::MOTION_BACKWARDS;
 #endif
+		}
 	}
 	else if (mPhaseCounter == 0)
 	{

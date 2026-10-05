@@ -902,6 +902,7 @@ bool Plant::FindStarFruitTarget()
 	int aDamageRangeFlags = GetDamageRangeFlags(PlantWeapon::WEAPON_PRIMARY);
 	int aCenterStarX = mX + 40;
 	int aCenterStarY = mY + 40;
+	const bool aReverseStar = SandboxFactions::Charmed(this);
 
 	for (Zombie* aZombie : mBoard->mZombies)
 	{
@@ -915,7 +916,7 @@ bool Plant::FindStarFruitTarget()
 
 			if (aZombie->mRow == mRow)
 			{
-				if (aZombieRect.mX + aZombieRect.mWidth < aCenterStarX)
+				if (aReverseStar?aZombieRect.mX>aCenterStarX:aZombieRect.mX+aZombieRect.mWidth<aCenterStarX)
 					return true;
 			}
 			else
@@ -930,7 +931,7 @@ bool Plant::FindStarFruitTarget()
 
 				int aCenterZombieX = aZombieHitX + aZombieRect.mWidth / 2;
 				int aCenterZombieY = aZombieRect.mY + aZombieRect.mHeight / 2;
-				float angle = RAD_TO_DEG(atan2(aCenterZombieY - aCenterStarY, aCenterZombieX - aCenterStarX));
+				float angle = RAD_TO_DEG(atan2(aCenterZombieY - aCenterStarY, (aCenterZombieX - aCenterStarX)*(aReverseStar?-1:1)));
 				if (abs(aZombie->mRow - mRow) < 2)
 				{
 					if ((angle > 20.0f && angle < 40.0f) || (angle < -25.0f && angle > -45.0f))

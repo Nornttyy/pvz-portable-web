@@ -2,6 +2,7 @@
 #include "SandboxFactions.h"
 #include "Sandbox.h"
 #include "SandboxPlants.h"
+#include "SandboxArt.h"
 #include "MemeCharacters.h"
 #include "EverythingShooterRules.h"
 #include "CoinPlantRules.h"
@@ -12,6 +13,8 @@
 #include "Lawn/Projectile.h"
 #include "PvzpLib/PvzpCommon.h"
 #include "PvzpLib/Reanimator.h"
+#include "PvzpLib/Attachment.h"
+#include "PvzpLib/PvzpParticle.h"
 #include <map>
 #include <set>
 #include <algorithm>
@@ -23,11 +26,12 @@ std::set<const Plant*> plants;
 std::set<const GridItem*> craters;
 std::map<const Plant*,std::array<unsigned,CoinPlantRules::Limit>> orbitContacts;
 std::map<const Plant*,int> frozen,melee;
-struct Shot {bool hostile;unsigned target;};
+struct Shot {bool hostile;unsigned target;bool reverse;};
 std::map<const Projectile*,Shot> shots;
 Plant* source=nullptr;
 Zombie* zombieSource=nullptr;
 const Plant* drawing=nullptr;
+float particleAxis=-1;
 bool Live(Plant* p){return p&&!p->mDead&&p->mPlantHealth>0&&!p->NotOnGround();}
 int ShotDamage(Projectile* s){
  const int style=MemeCharacters::ShotStyle(s);
@@ -72,18 +76,75 @@ bool HasTarget(Plant* p,int row,int weapon){return p->FindTargetZombie(row,stati
 void OnFired(Plant* p,Projectile* s,Zombie* z){
  if(!gSandboxEnabled||!p||!s)return;
  const bool hostile=Charmed(p);auto* target=z?nullptr:Target(p,s->mRow);
- shots[s]={hostile,target?p->mBoard->mPlants.DataArrayGetID(target):0};
+ shots[s]={hostile,target?p->mBoard->mPlants.DataArrayGetID(target):0,hostile};
  s->mDamageRangeFlags=Flags(p,s->mDamageRangeFlags);
  if(hostile){s->mPosX=2*p->mX+80-(s->mPosX+s->mWidth);s->mX=int(s->mPosX);if(s->mMotionType==MOTION_STAR)s->mVelX=-s->mVelX;}
  if(s->mMotionType==MOTION_LOBBED&&(hostile||target)){
   const float tx=target?target->mX+30:z?z->ZombieTargetLeadX(50)-30:0;
   const float ty=target?target->mY:z?z->GetZombieRect().mY:p->mY;
-  if(s->mProjectileType==PROJECTILE_COBBIG){s->mCobTargetX=std::clamp(tx-40,0.f,720.f);s->mCobTargetRow=target?target->mRow:p->mRow;}
+  if(s->mProjectileType==PROJECTILE_COBBIG){if(target||z){s->mCobTargetX=std::clamp(tx-40,0.f,720.f);s->mCobTargetRow=target?target->mRow:p->mRow;}}
   else{s->mVelX=(tx-s->mPosX)/120.f;s->mVelZ=(ty-s->mPosY)/120.f-7.f;}
  }
  if(s->mMotionType==MOTION_HOMING&&target){s->mTargetZombieID=ZOMBIEID_NULL;s->mVelX=(target->mX+40-s->mPosX)/120.f;}
+ SyncShotArt(s);
 }
-int Direction(const Projectile* s){const auto it=shots.find(s);return gSandboxEnabled&&it!=shots.end()&&it->second.hostile?-1:1;}
+void OnZombieFired(Zombie* z,Projectile* s){
+ if(!gSandboxEnabled)return;
+ // Zombie projectiles already have their native forward/backward trajectory.
+ shots[s]={!z->mMindControlled,0,false};s->mDamageRangeFlags=z->mMindControlled?1:129;
+}
+int Direction(const Projectile* s){const auto it=shots.find(s);return gSandboxEnabled&&it!=shots.end()&&it->second.reverse?-1:1;}
+bool TravelsLeft(const Projectile* s){
+ if(s->mMotionType==MOTION_STAR||s->mMotionType==MOTION_HOMING||s->mMotionType==MOTION_LOBBED)return s->mVelX<0;
+ return (s->mMotionType==MOTION_BACKWARDS||s->mMotionType==MOTION_BEE_BACKWARDS?-1:1)*Direction(s)<0;
+}
+void SyncShotArt(Projectile* s){
+ if(!gSandboxEnabled||s->mProjectileType!=PROJECTILE_FIREBALL)return;
+ auto* reanim=FindReanimAttachment(s->mAttachmentID);auto* effect=FindFirstAttachment(s->mAttachmentID);
+ if(!reanim||!effect||reanim->mReanimationType!=REANIM_FIRE_PEA)return;
+ const bool left=TravelsLeft(s);reanim->OverrideScale(left?-1.f:1.f,1.f);
+ effect->mOffset.m02=left?55.f:-25.f;
+ reanim->SetPosition(s->mPosX+effect->mOffset.m02,s->mPosY+s->mPosZ-25);
+}
+Zombie* CatapultTarget(Zombie* z){
+ if(!gSandboxEnabled)return nullptr;
+ Zombie* best=nullptr;const int direction=z->mMindControlled?1:-1;
+ for(auto* q:z->mBoard->mZombies){
+  if(q==z||q->mDead||q->IsDeadOrDying()||!q->IsOnBoard()||q->mRow!=z->mRow||q->mMindControlled==z->mMindControlled||!q->EffectedByDamage(z->mMindControlled?1:129))continue;
+  if((q->mPosX-z->mPosX)*direction<100)continue;
+  if(!best||(q->mPosX-best->mPosX)*direction>0)best=q;
+ }
+ return best;
+}
+bool HasCatapultTarget(Zombie* z){return z->FindCatapultTarget()||CatapultTarget(z);}
+bool FireCatapult(Zombie* z,Plant* p){
+ if(!gSandboxEnabled)return false;
+ auto* target=p?nullptr:CatapultTarget(z);if(!p&&!target)return true;
+ // Mirror the native throwing arm about the same local pivot as UpdateReanim.
+ const float ox=z->mPosX+(z->mMindControlled?7.f:113.f),oy=z->mPosY-44.f;
+ const float tx=p?p->mX+20.f:target->ZombieTargetLeadX(120)+20.f;
+ const float ty=p?p->mY:target->GetZombieRect().mY;
+ auto* s=z->mBoard->AddProjectile(ox,oy,z->mRenderOrder,z->mRow,PROJECTILE_BASKETBALL);
+ s->mMotionType=MOTION_LOBBED;s->mVelX=(tx-ox)/120.f;s->mVelY=0;s->mVelZ=(ty-oy)/120.f-7;s->mAccZ=.115f;
+ OnZombieFired(z,s);if(target)s->mTargetZombieID=z->mBoard->ZombieGetID(target);
+ z->mApp->PlayFoley(FOLEY_BASKETBALL);return true;
+}
+bool FireZombiePea(Zombie* z){
+ if(!gSandboxEnabled)return false;
+ float x=0,y=0;
+ auto* head=z->mApp->ReanimationTryToGet(z->mSpecialHeadReanimID);
+ const bool gatling=z->mZombieType==ZOMBIE_GATLING_HEAD;
+ if(!SandboxArt::TrackPoint(head,gatling?"GatlingPea_mouth":"idle_mouth",gatling?52:35,gatling?60:49,gatling?41:32,gatling?30:24.5f,x,y)){
+  // A temporarily hidden mouth track must never fall back to an enemy shot.
+  auto* body=z->mApp->ReanimationTryToGet(z->mBodyReanimID);
+  ReanimatorTransform pose;if(!body)return true;
+  body->GetCurrentTransform(body->FindTrackIndex("anim_head1"),&pose);
+  x=pose.mTransX+3;y=pose.mTransY+18-z->mAltitude;
+  if(z->mMindControlled)x=120*z->mScaleZombie-x;
+ }
+ auto* s=z->mBoard->AddProjectile(z->mPosX+x-12,z->mPosY+y-12,z->mRenderOrder,z->mRow,z->mMindControlled?PROJECTILE_PEA:PROJECTILE_ZOMBIE_PEA);
+ s->mMotionType=z->mMindControlled?MOTION_STRAIGHT:MOTION_BACKWARDS;OnZombieFired(z,s);return true;
+}
 void Home(Projectile* s){
  if(!gSandboxEnabled||s->mMotionType!=MOTION_HOMING)return;
  auto it=shots.find(s);if(it==shots.end()||!it->second.target)return;
@@ -116,7 +177,8 @@ bool OrbitHit(Plant* p,int slot,float x,float y,int damage){
 bool HitPlant(Projectile* s,bool lob){
  if(!gSandboxEnabled||s->mDead||!MemeCharacters::CanHit(s))return false;
  // Native zombie peas use their own plant collision and can never hit allies.
- auto it=shots.find(s);if(it==shots.end()&&s->mProjectileType!=PROJECTILE_PEA)return false;
+ auto it=shots.find(s);if(s->mProjectileType==PROJECTILE_BASKETBALL&&!EverythingShooterRules::Own(MemeCharacters::ShotStyle(s)))return false; // Keep native catapult landing/umbrella logic.
+ if(it==shots.end()&&s->mProjectileType!=PROJECTILE_PEA)return false;
  if(lob&&(s->mVelZ<0||s->mPosZ<-32))return false;
  Plant* target=nullptr;float distance=1e9f;auto r=s->GetProjectileRect();
  for(auto* p:s->mBoard->mPlants){
@@ -179,4 +241,14 @@ void DrawMatrix(Sexy::SexyMatrix3& m,Sexy::Color* colour){
  if(colour){colour->mRed=colour->mRed*160/255;colour->mGreen=colour->mGreen*105/255;}
 }
 void DrawOverlay(Sexy::SexyMatrix3& m,float x,float y){m.m02-=x;m.m12-=y;DrawMatrix(m);m.m02+=x;m.m12+=y;}
+ParticleScope::ParticleScope(const PvzpParticleSystem* system):previous(particleAxis){
+ particleAxis=-1;
+ if(!gSandboxEnabled||system->mEffectType!=PARTICLE_FUMECLOUD)return;
+ for(const auto* p:plants)if(!p->mDead&&p->mApp->ParticleTryToGet(p->mParticleID)==system){particleAxis=2*p->mX+80;break;}
+}
+ParticleScope::~ParticleScope(){particleAxis=previous;}
+void ParticleMatrix(Sexy::SexyMatrix3& m,float graphicsX){
+ if(particleAxis<0)return;
+ m.m00=-m.m00;m.m01=-m.m01;m.m02=particleAxis+2*graphicsX-m.m02;
+}
 }

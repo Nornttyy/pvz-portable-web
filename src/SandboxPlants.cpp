@@ -154,7 +154,7 @@ bool Impact(Projectile* shot,Zombie* zombie){
  zombie->TakeDamage(MemeCharacters::PalmDamage(style),shot->GetDamageFlags(zombie));
  if(!zombie->IsDeadOrDying()){
   const bool giant=zombie->mZombieType==ZOMBIE_GARGANTUAR||zombie->mZombieType==ZOMBIE_REDEYE_GARGANTUAR;
-  zombie->mPosX+=MemeCharacters::PalmPush(style,giant);zombie->mX=int(zombie->mPosX);zombie->StopEating();
+  zombie->mPosX+=MemeCharacters::PalmPush(style,giant)*(SandboxFactions::TravelsLeft(shot)?-1:1);zombie->mX=int(zombie->mPosX);zombie->StopEating();
  }
  return true; // Native armor/shields took one hit, never double-apply damage.
 }
@@ -166,6 +166,7 @@ bool DrawShot(Sexy::Graphics* g,const Projectile* shot){
  if(MemeCharacters::IsPalmShot(MemeCharacters::ShotStyle(shot))){
   auto* image=SandboxArt::Palm();if(!image)return false;
   Sexy::SexyTransform2D m;m.LoadIdentity();m.m00=40.f/image->mWidth;m.m11=27.5f/image->mHeight;
+  if(SandboxFactions::TravelsLeft(shot))m.m00=-m.m00;
   m.m02=shot->mPosX-shot->mX+12+g->mTransX;m.m12=shot->mPosY+shot->mPosZ-shot->mY+12+g->mTransY;
   PvzpBltMatrix(g,image,m,g->mClipRect,Sexy::Color(255,255,255),g->mDrawMode,Sexy::Rect(0,0,image->mWidth,image->mHeight));return true;
  }
@@ -177,6 +178,7 @@ bool DrawShot(Sexy::Graphics* g,const Projectile* shot){
  if(!shooter)return false;
  const float angle=shot->mProjectileAge*.085f,c=std::cos(angle)*.56f,s=std::sin(angle)*.56f;
  Sexy::SexyTransform2D m;m.LoadIdentity();m.m00=c;m.m01=-s;m.m10=s;m.m11=c;
+ if(SandboxFactions::TravelsLeft(shot)){m.m00=-m.m00;m.m01=-m.m01;}
  // Projectile::Draw receives an object-local Graphics frame (already moved
  // to mX/mY). Only add the fractional position, never world position twice.
  m.m02=shot->mPosX-shot->mX+12+g->mTransX;m.m12=shot->mPosY+shot->mPosZ-shot->mY+12+g->mTransY;

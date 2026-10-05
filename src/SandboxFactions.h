@@ -2,7 +2,7 @@
 #include "misc/Rect.h"
 #include "misc/SexyMatrix.h"
 #include "graphics/Color.h"
-class Plant; class Zombie; class Projectile; class Board; class GridItem;
+class Plant; class Zombie; class Projectile; class Board; class GridItem; class PvzpParticleSystem;
 namespace SandboxFactions {
 void Reset();
 bool Charmed(const Plant*);
@@ -21,7 +21,14 @@ Sexy::Rect AttackRect(const Plant*,Sexy::Rect);
 Plant* Target(Plant*,int row,int weapon=0);
 bool HasTarget(Plant*,int row,int weapon=0);
 void OnFired(Plant*,Projectile*,Zombie* target=nullptr);
+void OnZombieFired(Zombie*,Projectile*);
+Zombie* CatapultTarget(Zombie*);
+bool HasCatapultTarget(Zombie*);
+bool FireCatapult(Zombie*,Plant*);
+bool FireZombiePea(Zombie*);
 int Direction(const Projectile*);
+bool TravelsLeft(const Projectile*);
+void SyncShotArt(Projectile*);
 bool ShotEnemy(const Projectile*,const Plant*);
 bool HitPlant(Projectile*,bool lob=false);
 void Damage(Plant*,int amount,int freeze=0);
@@ -39,4 +46,6 @@ Plant* Source();
 struct DrawScope { const Plant* previous; explicit DrawScope(const Plant*); ~DrawScope(); };
 void DrawMatrix(Sexy::SexyMatrix3&,Sexy::Color* colour=nullptr);
 void DrawOverlay(Sexy::SexyMatrix3&,float x,float y);
+struct ParticleScope {float previous;explicit ParticleScope(const PvzpParticleSystem*);~ParticleScope();};
+void ParticleMatrix(Sexy::SexyMatrix3&,float graphicsX);
 }

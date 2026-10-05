@@ -11,5 +11,6 @@ inline bool Enemy(const Zombie* z,const Plant*){return !z->mMindControlled;}
 inline Plant* Target(Plant*,int,int=0){return nullptr;}
 inline bool HasTarget(Plant* p,int row,int weapon=0){return p->FindTargetZombie(row,static_cast<PlantWeapon>(weapon));}
 inline void OnFired(Plant*,Projectile*,Zombie*){}
+inline bool TravelsLeft(const Projectile*){return false;}
 inline void DrawOverlay(Sexy::SexyTransform2D&,float,float){}
 }

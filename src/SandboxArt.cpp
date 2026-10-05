@@ -1,5 +1,6 @@
 // Per-instance atlas parts; original image definitions remain untouched.
 #include "SandboxArt.h"
+#include "SandboxFactions.h"
 #include "SandboxMemeRules.h"
 #include "AbstractPhonePixels.h"
 #include "CactusPalmPixels.h"
@@ -144,6 +145,7 @@ bool PalmMatrix(Reanimation* anim,Sexy::SexyTransform2D& matrix){
 void DrawPalm(Sexy::Graphics* g,Reanimation* anim){
  Sexy::SexyTransform2D m;if(!PalmMatrix(anim,m))return;auto* image=Palm();
  m.m02+=g->mTransX;m.m12+=g->mTransY;
+ SandboxFactions::DrawOverlay(m,g->mTransX,g->mTransY);
  // Draw the wrist over the dark opening, not behind the opaque entire rim
  // image. The native body/tube/lips have already been drawn unchanged.
  PvzpBltMatrix(g,image,m,g->mClipRect,Sexy::Color(255,255,255),g->mDrawMode,Sexy::Rect(0,0,image->mWidth,image->mHeight));

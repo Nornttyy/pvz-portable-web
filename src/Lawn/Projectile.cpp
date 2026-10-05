@@ -215,11 +215,11 @@ bool Projectile::PeaAboutToHitTorchwood()
 	{
 		if (aPlant->mDead)
 			continue;
-		if (aPlant->mSeedType == SeedType::SEED_TORCHWOOD && aPlant->mRow == mRow && !aPlant->NotOnGround() && mHitTorchwoodGridX != aPlant->mPlantCol)
+		if (aPlant->mSeedType == SeedType::SEED_TORCHWOOD && aPlant->mRow == mRow && !aPlant->NotOnGround() && mHitTorchwoodGridX != aPlant->mPlantCol && (!gSandboxEnabled||!SandboxFactions::ShotEnemy(this,aPlant)))
 		{
 			Rect aPlantAttackRect = aPlant->GetPlantAttackRect(PlantWeapon::WEAPON_PRIMARY);
 			Rect aProjectileRect = GetProjectileRect();
-			aProjectileRect.mX += 40;
+			aProjectileRect.mX += 40 * SandboxFactions::Direction(this);
 
 			if (GetRectOverlap(aPlantAttackRect, aProjectileRect) > 10)
 			{
@@ -574,7 +574,7 @@ void Projectile::UpdateLobMotion()
 		}
 		else if (mProjectileType == ProjectileType::PROJECTILE_BASKETBALL && !EverythingShooterRules::Own(MemeCharacters::ShotStyle(this)))
 		{
-			aMinCollisionZ = 60.0f;
+			aMinCollisionZ = gSandboxEnabled&&mTargetZombieID!=ZOMBIEID_NULL?0.0f:60.0f;
 		}
 		else if (mProjectileType == ProjectileType::PROJECTILE_MELON || mProjectileType == ProjectileType::PROJECTILE_WINTERMELON)
 		{
@@ -604,6 +604,7 @@ void Projectile::UpdateLobMotion()
 	if ((mProjectileType == ProjectileType::PROJECTILE_BASKETBALL || mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_PEA) && !EverythingShooterRules::Own(MemeCharacters::ShotStyle(this)))
 	{
 		aPlant = FindCollisionTargetPlant();
+		if(gSandboxEnabled&&!aPlant)aZombie=FindCollisionTarget();
 	}
 	else
 	{
@@ -624,6 +625,7 @@ void Projectile::UpdateLobMotion()
 	if (aPlant)
 	{
 		Plant* aUmbrellaPlant = mBoard->FindUmbrellaPlant(aPlant->mPlantCol, aPlant->mRow);
+		if(gSandboxEnabled&&aUmbrellaPlant&&!SandboxFactions::ShotEnemy(this,aUmbrellaPlant))aUmbrellaPlant=nullptr;
 		if (aUmbrellaPlant)
 		{
 			if (aUmbrellaPlant->mState == PlantState::STATE_UMBRELLA_REFLECTING)
@@ -1086,7 +1088,7 @@ void Projectile::Draw(Graphics* g)
 		break;
 	}
 
-	bool aMirror = false;
+	bool aMirror = mProjectileType==PROJECTILE_SPIKE&&mMotionType!=MOTION_HOMING&&SandboxFactions::TravelsLeft(this);
 	if (aNativeCustomPea || MemeCharacters::ShotStyle(this)==MemeCharacters::TinyPuffProjectile) aScale *= SandboxPlants::ShotScale(this);
 	if (mMotionType == ProjectileMotion::MOTION_BEE_BACKWARDS)
 	{
@@ -1116,7 +1118,7 @@ void Projectile::Draw(Graphics* g)
 				aOffsetY = mPosY + mPosZ + SandboxVisualRules::NativePeaOffset(aCelHeight, aScale);
 			}
 			SexyTransform2D aTransform;
-			PvzpScaleRotateTransformMatrix(aTransform, aOffsetX + mBoard->mX, aOffsetY + mBoard->mY, aRotation, aScale, aScale);
+			PvzpScaleRotateTransformMatrix(aTransform, aOffsetX + mBoard->mX, aOffsetY + mBoard->mY, aRotation, aMirror?-aScale:aScale, aScale);
 			PvzpBltMatrix(g, aImage, aTransform, g->mClipRect, Color::White, g->mDrawMode, aSrcRect);
 		}
 	}
@@ -1287,6 +1289,7 @@ void Projectile::ConvertToFireball(int theGridX)
 	aFirePeaReanim->mLoopType = ReanimLoopType::REANIM_LOOP;
 	aFirePeaReanim->mAnimRate = RandRangeFloat(50.0f, 80.0f);
 	AttachReanim(mAttachmentID, aFirePeaReanim, aOffsetX, aOffsetY);
+	SandboxFactions::SyncShotArt(this);
 }
 
 void Projectile::ConvertToPea(int theGridX)
