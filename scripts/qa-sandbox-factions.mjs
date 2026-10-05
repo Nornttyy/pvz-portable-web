@@ -37,7 +37,10 @@ try{
  for(const type of [32,34,39,44,43,18,527]){await reset();await api(27,501,type===527?2:1,2);await api(28,1);assert.equal(await api(27,type,5,2),1);await run(6500);const ps=await plants();assert.ok(!ps.some(p=>p[0]===501)||ps.find(p=>p[0]===501)[3]<4000,'special shooter '+type+' hits opposing plant');}
  // Cherry bombs affect only enemies, including real plant targets.
  await reset();await api(1,501,3,2);await api(28,1);await api(1,501,5,2);await api(1,2,4,2);await run(1000);assert.equal((await plants()).find(p=>p[1]===3)[3],2200);assert.equal((await plants()).find(p=>p[1]===5)[3],4000);
- await reset();await api(1,501,0,2);await api(28,1);await api(1,23,2,2);await api(1,528,4,2);await api(2,4,8,2);await api(29,1);await api(2,4,7,2);await run(900);
+ await reset();await api(1,501,0,2);await api(28,1);await api(1,23,2,2);await api(1,528,4,2);await api(2,23,8,2);await api(29,1);await api(2,23,6,2);
+ // Survivable targets, sampled at impact: a bucket can die to the 1200 hit
+ // plus the opposing zombie before a fixed wall-clock delay finishes.
+ await api(4,0);await page.waitForFunction(()=>[0,1].some(i=>Module._pvz_sandbox_zombie_data(i,30)===1&&Module._pvz_sandbox_zombie_data(i,17)>0),undefined,{timeout:5000,polling:20});await api(4,1);
  assert.equal((await plants()).find(p=>p[0]===501)[3],2800,'hostile ice chili damages ordinary plant');assert.equal((await plants()).find(p=>p[0]===23)[3],8000,'ice chili protects allied plant');
  const frozen=await page.evaluate(()=>[0,1].map(i=>[17,30].map(f=>Module._pvz_sandbox_zombie_data(i,f))));assert.ok(frozen.some(z=>z[1]===1&&z[0]>0),'hostile ice freezes charmed zombie');assert.ok(frozen.some(z=>z[1]===0&&z[0]===0),'ice does not freeze own zombie');
  await reset();await api(1,501,0,4);await api(28,1);await api(1,23,8,4);await api(1,526,4,2);await run(3000);assert.ok(!(await plants()).some(p=>p[0]===501),'nuke pulses keep source team after caster dies');assert.equal((await plants()).find(p=>p[0]===23)[3],8000);
