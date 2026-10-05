@@ -160,6 +160,8 @@ void Projectile::ProjectileInitialize(int theX, int theY, int theRenderOrder, in
 	mY = static_cast<int>(mPosY);
 }
 
+#include "../SandboxFactions.h"
+#include "../Sandbox.h"
 Plant* Projectile::FindCollisionTargetPlant()
 {
     if (SandboxZombies::HasShot(this)) return SandboxZombies::CollisionTarget(this);
@@ -167,7 +169,7 @@ Plant* Projectile::FindCollisionTargetPlant()
 
 	for (Plant* aPlant : mBoard->mPlants)
 	{
-		if (aPlant->mDead)
+		if (aPlant->mDead || !SandboxFactions::ShotEnemy(this,aPlant))
 			continue;
 		if (aPlant->mRow != mRow)
 			continue;
@@ -186,6 +188,7 @@ Plant* Projectile::FindCollisionTargetPlant()
 		Rect aPlantRect = aPlant->GetPlantRect();
 		if (GetRectOverlap(aProjectileRect, aPlantRect) > 8)
 		{
+			if(gSandboxEnabled)return aPlant;
 			if (mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_PEA)
 			{
 				return mBoard->GetTopPlantAt(aPlant->mPlantCol, aPlant->mRow, PlantPriority::TOPPLANT_EATING_ORDER);
@@ -274,6 +277,7 @@ Zombie* Projectile::FindCollisionTarget()
 
 void Projectile::CheckForCollision()
 {
+	if(SandboxFactions::HitPlant(this))return;
 	if (mMotionType == ProjectileMotion::MOTION_PUFF && mProjectileAge >= 75)
 	{
 		Die();
@@ -319,6 +323,7 @@ void Projectile::CheckForCollision()
 
 	if (mProjectileType == ProjectileType::PROJECTILE_ZOMBIE_PEA && !EverythingShooterRules::Own(MemeCharacters::ShotStyle(this)))
 	{
+		if(gSandboxEnabled){mDamageRangeFlags=129;if(auto* enemy=FindCollisionTarget()){DoImpact(enemy);return;}}
 		Plant* aPlant = FindCollisionTargetPlant();
 		if (aPlant)
 		{
@@ -529,6 +534,7 @@ void Projectile::DoSplashDamage(Zombie* theZombie)
 
 void Projectile::UpdateLobMotion()
 {
+	if(SandboxFactions::HitPlant(this,true))return;
 	if (mProjectileType == ProjectileType::PROJECTILE_COBBIG && mPosZ < -700.0f)
 	{
 		mVelZ = 8.0f;
@@ -660,9 +666,10 @@ void Projectile::UpdateLobMotion()
 
 void Projectile::UpdateNormalMotion()
 {
+	SandboxFactions::Home(this);
 	if (mMotionType == ProjectileMotion::MOTION_BACKWARDS)
 	{
-		mPosX -= 3.33f;
+		mPosX -= 3.33f * SandboxFactions::Direction(this);
 	}
 	else if (mMotionType == ProjectileMotion::MOTION_HOMING)
 	{
@@ -706,7 +713,7 @@ void Projectile::UpdateNormalMotion()
 		{
 			mPosY -= 0.5f;
 		}
-		mPosX += 3.33f;
+		mPosX += 3.33f * SandboxFactions::Direction(this);
 	}
 	else if (mMotionType == ProjectileMotion::MOTION_FLOAT_OVER)
 	{
@@ -717,7 +724,7 @@ void Projectile::UpdateNormalMotion()
 			mPosY += mVelZ;
 			mRotation = 0.3f - 0.7f * mVelZ * PI * 0.25f;
 		}
-		mPosX += 0.4f;
+		mPosX += 0.4f * SandboxFactions::Direction(this);
 	}
 	else if (mMotionType == ProjectileMotion::MOTION_BEE_BACKWARDS)
 	{
@@ -725,18 +732,18 @@ void Projectile::UpdateNormalMotion()
 		{
 			mPosY -= 0.5f;
 		}
-		mPosX -= 3.33f;
+		mPosX -= 3.33f * SandboxFactions::Direction(this);
 	}
 	else if (mMotionType == ProjectileMotion::MOTION_THREEPEATER)
 	{
-		mPosX += 3.33f;
+		mPosX += 3.33f * SandboxFactions::Direction(this);
 		mPosY += mVelY;
 		mVelY *= 0.97f;
 		mShadowY += mVelY;
 	}
 	else
 	{
-		mPosX += 3.33f;
+		mPosX += 3.33f * SandboxFactions::Direction(this);
 	}
 
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_HIGH_GRAVITY)
@@ -1208,6 +1215,7 @@ void Projectile::DrawShadow(Graphics* g)
 
 void Projectile::Die()
 {
+	SandboxFactions::Forget(this);
     SandboxZombies::ForgetShot(this);
     SandboxPlants::ForgetShot(this);
 	mDead = true;

@@ -1,5 +1,6 @@
 // Individual character mechanics using the native rigs and seed bank.
 #include "MemeCharacters.h"
+#include "SandboxFactions.h"
 #include "CoinPlants.h"
 #include "StinkShroom.h"
 #include "MemeShooterRules.h"
@@ -32,7 +33,7 @@ void Burst(State& s){
  s.phase=1;s.heat=0;s.remaining=MemeShooterRules::BurstCount;s.delay=MemeShooterRules::BurstInterval(0);s.timer=0;s.pulse=30;
  gLawnApp->PlayRageRelease(); // Once per release, never once per pea or save restore.
 }
-bool Enemy(Zombie* z){return !z->mDead&&z->IsOnBoard()&&!z->mMindControlled&&!z->IsDeadOrDying()&&z->mHasHead&&!SandboxZombies::IsHeld(z);}
+bool Enemy(Plant* p,Zombie* z){return !z->mDead&&z->IsOnBoard()&&SandboxFactions::Enemy(p,z)&&!z->IsDeadOrDying()&&z->mHasHead&&!SandboxZombies::IsHeld(z);}
 int VisualY(const Plant* p){return p->mY+int(std::lround(PlantDrawHeightOffset(p->mBoard,const_cast<Plant*>(p),p->mSeedType,p->mPlantCol,p->mRow)));}
 void Shoot(Plant* p,Zombie* target){
  p->Fire(target,p->mRow,WEAPON_PRIMARY);
@@ -144,6 +145,8 @@ bool StarTarget(Plant*){return false;}
 void Tick(Board* b){
  if(b->mPaused)return;
  for(auto* p:b->mPlants){
+  SandboxFactions::Scope faction(p);
+  if(SandboxFactions::Frozen(p))continue;
   auto it=states.find(p);if(it==states.end())continue;if(p->mDead){states.erase(it);continue;}auto& s=it->second;
   // Hiding lets zombies chew the pad underneath, but does not make the
   // sunflower aquatic. Also repair unsupported flowers restored from saves.
@@ -173,7 +176,7 @@ void Tick(Board* b){
    // sprite origins. A wider release boundary prevents edge flicker.
    const int range=s.phase?84:60;
    for(auto* z:b->mZombies){
-    if(z->mDead||!z->IsOnBoard()||z->mMindControlled||z->IsDeadOrDying()||z->IsFlying()||z->mRow!=p->mRow)continue;
+    if(z->mDead||!z->IsOnBoard()||!SandboxFactions::Enemy(p,z)||z->IsDeadOrDying()||z->IsFlying()||z->mRow!=p->mRow)continue;
     const auto rect=z->GetZombieAttackRect();
     if(rect.mWidth>0&&rect.mX<=p->mX+70+range&&rect.mX+rect.mWidth>=p->mX+10-range){danger=true;break;}
    }
@@ -187,7 +190,7 @@ void Tick(Board* b){
      if(!s.remaining){s.phase=0;s.heat=0;s.delay=MemeShooterRules::RecoveryDelay;}
     }
    }else if(!s.delay&&room){
-    if(auto* target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY)){
+    if(auto* target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY);target||SandboxFactions::Target(p,p->mRow)){
      Shoot(p,target);s.heat+=MemeShooterRules::PerShot;s.delay=MemeShooterRules::NormalDelay;
      if(s.heat>=MemeShooterRules::MaxRage)Burst(s);
     }
@@ -195,7 +198,7 @@ void Tick(Board* b){
   }else if(s.id==CactusPalm){
    if(!s.delay&&(p->mState==STATE_CACTUS_LOW||p->mState==STATE_CACTUS_HIGH)&&b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8){
     const bool high=p->mState==STATE_CACTUS_HIGH;const auto weapon=high?WEAPON_PRIMARY:WEAPON_SECONDARY;
-    if(auto* target=p->FindTargetZombie(p->mRow,weapon)){
+    if(auto* target=p->FindTargetZombie(p->mRow,weapon);target||SandboxFactions::Target(p,p->mRow,weapon)){
      p->Fire(target,p->mRow,weapon);s.delay=PalmInterval;
      p->PlayBodyReanim(high?"anim_shootinghigh":"anim_shooting",REANIM_PLAY_ONCE_AND_HOLD,3,35);
      // 1 only runs native recovery; it cannot fire a second projectile.
@@ -205,7 +208,7 @@ void Tick(Board* b){
   }else if(s.id==GatlingShooter){
    if(s.phase&&!s.timer){s.phase=0;s.heat=0;s.delay=0;}
    if(!s.phase&&!s.delay&&b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8){
-    if(auto* target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY)){
+    if(auto* target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY);target||SandboxFactions::Target(p,p->mRow)){
      // Reuse the native multi-barrel recoil, without restarting it every pea.
      if(s.heat%10==0)Shoot(p,target);else p->Fire(target,p->mRow,WEAPON_PRIMARY);
      ++s.heat;s.delay=GatlingInterval;
@@ -214,7 +217,7 @@ void Tick(Board* b){
    }
   }else if(s.id==LongRepeater){
    const bool room=b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8;
-   if(!s.phase&&!s.delay&&room&&p->FindTargetZombie(p->mRow,WEAPON_PRIMARY)){s.phase=1;s.remaining=RepeaterCount;}
+   if(!s.phase&&!s.delay&&room&&SandboxFactions::HasTarget(p,p->mRow)){s.phase=1;s.remaining=RepeaterCount;}
    if(s.phase&&!s.delay&&room){
     // Keep one committed volley even if its first target dies. Recoil cycles
     // normally, rather than resetting the head animation every two ticks.
@@ -224,16 +227,16 @@ void Tick(Board* b){
    }
   }else if(s.id==ShooterPea||s.id==EverythingShooter){
    if(!s.delay&&b->mProjectiles.mSize<b->mProjectiles.mMaxSize-8){
-    if(auto* target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY)){Shoot(p,target);s.delay=150;s.pulse=22;}
+    if(auto* target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY);target||SandboxFactions::Target(p,p->mRow)){Shoot(p,target);s.delay=150;s.pulse=22;}
    }
   }else if(s.id==501){
    if(!s.timer&&p->mRecentlyEatenCountdown>0){
     Zombie* target=nullptr;
-    for(auto* z:b->mZombies)if(Enemy(z)&&z->mRow==p->mRow&&z->mIsEating&&z->mPosX>=p->mX-65&&z->mPosX<p->mX+35&&z->EffectedByDamage(p->GetDamageRangeFlags(WEAPON_PRIMARY))&&(!target||z->mPosX>target->mPosX))target=z;
+    for(auto* z:b->mZombies)if(Enemy(p,z)&&z->mRow==p->mRow&&z->mIsEating&&SandboxFactions::NutContact(p,z)&&z->EffectedByDamage(p->GetDamageRangeFlags(WEAPON_PRIMARY))&&(!target||z->mPosX>target->mPosX))target=z;
     if(target){s.timer=300;s.pulse=50;s.phase=1;s.heat=int(target->mPosX-p->mX+65);gLawnApp->PlayFoley(FOLEY_THROW);}
    }
    if(s.phase==1&&s.pulse==28){
-    for(auto* z:b->mZombies)if(Enemy(z)&&z->mRow==p->mRow&&z->mPosX>=p->mX-65&&z->mPosX<p->mX+40&&z->EffectedByDamage(p->GetDamageRangeFlags(WEAPON_PRIMARY))){
+    for(auto* z:b->mZombies)if(Enemy(p,z)&&z->mRow==p->mRow&&SandboxFactions::NutContact(p,z,40)&&z->EffectedByDamage(p->GetDamageRangeFlags(WEAPON_PRIMARY))){
      z->TakeDamage(80,0);break;
     }
    }

@@ -40,6 +40,7 @@ inline constexpr Box Shovel{447,4,86,74};
 constexpr Box SidebarZombie(int i) { return {8+(i%5)*50,118+(i/5)*62,46,58}; }
 constexpr Box SidebarPlant(int i) { return {5+(i%5)*51,118+(i/5)*78,50,70}; }
 inline constexpr Box NativeFilter{7,520,78,30},PowerFilter{93,520,78,30},FusionFilter{179,520,78,30};
+inline constexpr Box FactionButton(int i){return {8+i*129,520,119,30};}
 inline constexpr int RecipesPerPage=5;
 constexpr Box PowerCard(int i){return {23+i*84,126,50,70};}
 constexpr Box PowerBase(int i){return {11+(i%4)*65,252+(i/4)*80,50,70};}

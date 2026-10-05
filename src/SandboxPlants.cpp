@@ -1,5 +1,6 @@
 // Independent characters; all other plants retain native behavior.
 #include "SandboxPlants.h"
+#include "SandboxFactions.h"
 #include "SandboxArt.h"
 #include "SandboxMemeRules.h"
 #include "SandboxVisualRules.h"
@@ -58,6 +59,7 @@ void HeatBrow(Sexy::Graphics* g,Reanimation* head,int level,int alpha){
  const float y=(19.7f+0.8f*brow->mHeight/2-(17.8f+0.5f*face->mHeight/2))/0.5f;
  m.m02+=m.m00*x+m.m01*y+g->mTransX;m.m12+=m.m10*x+m.m11*y+g->mTransY;
  m.m00*=0.8f/0.555f;m.m10*=0.8f/0.555f;m.m01*=1.6f;m.m11*=1.6f;
+ SandboxFactions::DrawOverlay(m,g->mTransX,g->mTransY);
  PvzpBltMatrix(g,brow,m,g->mClipRect,Sexy::Color(255,255,255,alpha),g->mDrawMode,Sexy::Rect(0,0,brow->mWidth,brow->mHeight));
 }
 void NutBrows(Sexy::Graphics* g,Reanimation* body,int alpha){
@@ -73,6 +75,7 @@ void NutBrows(Sexy::Graphics* g,Reanimation* body,int alpha){
   m.m02+=face.m00*x+face.m01*y+g->mTransX;m.m12+=face.m10*x+face.m11*y+g->mTransY;
   m.m00=(face.m00*c+face.m01*s)*sx;m.m10=(face.m10*c+face.m11*s)*sx;
   m.m01=(-face.m00*s+face.m01*c)*sy;m.m11=(-face.m10*s+face.m11*c)*sy;
+  SandboxFactions::DrawOverlay(m,g->mTransX,g->mTransY);
   PvzpBltMatrix(g,brow,m,g->mClipRect,Sexy::Color(85,65,35,alpha),g->mDrawMode,Sexy::Rect(0,4,13,7));
  }
 }
@@ -143,7 +146,7 @@ bool HasShot(const Projectile* p){return MemeCharacters::ShotStyle(p)!=0;}
 bool UsesCustomShotArt(const Projectile* shot){return MemeCharacters::IsPalmShot(MemeCharacters::ShotStyle(shot));}
 int ShotRadius(const Projectile*){return 12;}
 int NextShot(Plant*){return 0;}
-void OnFired(Plant* p,Projectile* shot,Zombie*){MemeCharacters::OnFired(p,shot);}
+void OnFired(Plant* p,Projectile* shot,Zombie* target){MemeCharacters::OnFired(p,shot);SandboxFactions::OnFired(p,shot,target);}
 void UpdateShot(Projectile* p){MemeCharacters::UpdateShot(p);}
 bool Impact(Projectile* shot,Zombie* zombie){
  const int style=MemeCharacters::ShotStyle(shot);if(!MemeCharacters::IsPalmShot(style))return false;

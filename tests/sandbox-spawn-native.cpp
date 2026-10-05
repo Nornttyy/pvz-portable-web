@@ -20,6 +20,8 @@ struct Board {
  void MarkAllDirty(){marked=true;}
 };
 int assignedZombie=-1;
+bool charmZombies=false;
+namespace SandboxFactions {void Set(Zombie*,bool){}}
 namespace SandboxZombies {void Assign(Zombie*,int id){assignedZombie=id;}}
 namespace SandboxScenes {bool UpdateSwimmer(Zombie*){return true;}void MoveFollowers(Zombie*,float){}}
 int ZombieCount(Board* b){return b->count;}

@@ -543,6 +543,7 @@ void BlendTransform(ReanimatorTransform* theResult, const ReanimatorTransform& t
 }
 
 #include "AbstractRigVisuals.h"
+#include "SandboxFactions.h"
 void Reanimation::GetCurrentTransform(int theTrackIndex, ReanimatorTransform* theTransformCurrent, ReanimatorFrameTime* theFrameTime)
 {
 	ReanimatorFrameTime aFrameTime;
@@ -752,6 +753,7 @@ bool Reanimation::DrawTrack(Graphics* g, int theTrackIndex, [[maybe_unused]] int
 	MatrixFromTransform(aTransform, aTransformMatrix);
 	SexyMatrix3Multiply(aMatrix, aTransformMatrix, aMatrix);  // apply the track transform
 	SexyMatrix3Multiply(aMatrix, mOverlayMatrix, aMatrix);  // apply the overlay matrix
+	SandboxFactions::DrawMatrix(aMatrix,&aColor);
 	SexyMatrix3Translation(aMatrix, aTrackInstance->mShakeX + g->mTransX, aTrackInstance->mShakeY + g->mTransY);  // apply track shake and g's translation
 
 	if (aAtlasImage != nullptr)  // atlas exists, the frame has an image, and no override is set

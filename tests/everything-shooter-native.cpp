@@ -19,7 +19,8 @@ struct Board {struct {int mSize=0,mMaxSize=1024;} mProjectiles;App app;Projectil
  void KillAllZombiesInRadius(int r,float px,float py,int range,int lanes,bool b,int f,int d=1800){++blasts;row=r;x=px;y=py;radius=range;rows=lanes;burn=b;flags=f;damage=d;}
  void ShakeBoard(int,int){++shakes;}
 };
-struct Plant {Board* mBoard=nullptr;App* mApp=nullptr;int id=529,mX=120,mY=250,mRow=2,mRenderOrder=100,mHeadReanimID=1,mPlantCol=1;};
+struct Plant {Board* mBoard=nullptr;App* mApp=nullptr;int id=529,mX=120,mY=250,mRow=2,mRenderOrder=100,mHeadReanimID=1,mPlantCol=1;Zombie::Rect GetPlantRect(){return {mY};}};
+namespace SandboxFactions {Plant* Target(Plant*,int){return nullptr;}void OnFired(Plant*,Projectile*,Zombie*){}}
 bool gSandboxEnabled=false;
 namespace MemeAdventure {bool enabled=false;bool RosterEnabled(){return enabled;}}
 namespace MemeCharacters {int Type(const Plant* p){return p?p->id:0;}int ShotStyle(const Projectile* p){return p->style;}bool RestoreShotStyle(Projectile* p,int s){assert(EverythingShooterRules::Valid(s,p->mProjectileType,p->mMotionType));p->style=s;return true;}}

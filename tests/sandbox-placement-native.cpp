@@ -50,6 +50,8 @@ public:
  void MarkAllDirty(){++marks;}
 };
 bool stackPlants=false,awake=true,fusionEnabled=false;int mapType=0;
+bool charmPlants=false;
+namespace SandboxFactions {void Set(Plant*,bool){}}
 int PlantCount(Board* b){int n=0;for(auto* p:b->mPlants)if(!p->mDead)++n;return n;}
 namespace MemeCharacters {int PuffCount(Board* b,int col,int row){int n=0;for(auto* p:b->mPlants)if(!p->mDead&&!p->NotOnGround()&&p->mPlantCol==col&&p->mRow==row&&int(p->mSeedType)==8)++n;return n;}}
 // Inserted verbatim from production Sandbox.cpp by the test runner.

@@ -3,6 +3,7 @@
 #include "MemeCharacters.h"
 #include "MemeAdventure.h"
 #include "Sandbox.h"
+#include "SandboxFactions.h"
 #include "SandboxArt.h"
 #include "LawnApp.h"
 #include "Resources.h"
@@ -34,7 +35,8 @@ Sexy::Image* RareImage(int style){
 bool IsSlot(int seed){return seed==EverythingShooterRules::Base&&(gSandboxEnabled||MemeAdventure::RosterEnabled());}
 bool Fire(Plant* p,Zombie* target){
  if(MemeCharacters::Type(p)!=EverythingShooterRules::Id)return false;
- auto* b=p->mBoard;if(!b||!target||target->mDead||b->mProjectiles.mSize>=b->mProjectiles.mMaxSize-8)return true;
+ auto* b=p->mBoard;auto* plant=SandboxFactions::Target(p,p->mRow);
+ if(!b||(!target&&!plant)||(target&&target->mDead)||b->mProjectiles.mSize>=b->mProjectiles.mMaxSize-8)return true;
  const int style=EverythingShooterRules::Choose(Sexy::Rand(100),Sexy::Rand(EverythingShooterRules::OtherNativeCount));
  const int type=EverythingShooterRules::NativeType(style);
  // Use the real interpolated muzzle, including its attached moving head.
@@ -45,15 +47,16 @@ bool Fire(Plant* p,Zombie* target){
  if(EverythingShooterRules::Special(style))shot->mDamageRangeFlags=127;
  if(type==PROJECTILE_COBBIG){
   shot->mMotionType=MOTION_LOBBED;shot->mVelX=.001f;shot->mVelZ=-8;shot->mAccZ=0;
-  shot->mCobTargetX=std::clamp(target->ZombieTargetLeadX(100)-80.f,0.f,720.f);shot->mCobTargetRow=p->mRow;shot->mDamageRangeFlags=127;
+  shot->mCobTargetX=std::clamp(target?target->ZombieTargetLeadX(100)-80.f:plant->mX-40.f,0.f,720.f);shot->mCobTargetRow=p->mRow;shot->mDamageRangeFlags=127;
  }else if(EverythingShooterRules::Lob(style)){
-  const auto rect=target->GetZombieRect();const float dx=std::max(40.f,target->ZombieTargetLeadX(50)-ox-30.f);
+  const auto rect=target?target->GetZombieRect():plant->GetPlantRect();const float dx=std::max(40.f,(target?target->ZombieTargetLeadX(50):plant->mX+40.f)-ox-30.f);
   shot->mMotionType=MOTION_LOBBED;shot->mVelX=dx/120;shot->mVelY=0;shot->mVelZ=(rect.mY-oy)/120-7;shot->mAccZ=.115f;
  }else{
   shot->mMotionType=type==PROJECTILE_PUFF?MOTION_PUFF:MOTION_STRAIGHT;shot->mVelX=3.33f;shot->mVelY=0;
  }
  if(type==PROJECTILE_FIREBALL)shot->ConvertToFireball(p->mPlantCol);
  MemeCharacters::RestoreShotStyle(shot,style);++fired[style-EverythingShooterRules::First];
+ SandboxFactions::OnFired(p,shot,target);
  p->mApp->PlayFoley(type==PROJECTILE_PUFF?FOLEY_PUFF:FOLEY_THROW);return true;
 }
 bool Impact(Projectile* shot,Zombie* target){
@@ -90,6 +93,7 @@ void DrawGear(Sexy::Graphics* g,Reanimation* head){
  for(int i=0;i<2;++i){auto* image=SandboxArt::NativeImage(i?"Cornpult_kernal.png":"Cabbagepult_cabbage.png");if(!image)continue;
   Sexy::SexyTransform2D m;m.LoadIdentity();m.m00=(i?12.f:18.f)/image->mWidth;m.m11=17.f/image->mHeight;
   m.m02=x-8+i*10+g->mTransX;m.m12=y-i*2+g->mTransY;
+  SandboxFactions::DrawOverlay(m,g->mTransX,g->mTransY);
   PvzpBltMatrix(g,image,m,g->mClipRect,Sexy::Color::White,g->mDrawMode,Sexy::Rect(0,0,image->mWidth,image->mHeight));
  }
 }

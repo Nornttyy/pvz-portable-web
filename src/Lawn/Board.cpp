@@ -26,6 +26,7 @@
 #include "ZenGarden.h"
 #include "BoardInclude.h"
 #include "../Sandbox.h"
+#include "../SandboxFactions.h"
 #include "../MemeAdventure.h"
 #include "../SandboxUIRules.h"
 #include "../SandboxPlants.h"
@@ -2647,6 +2648,7 @@ Zombie* Board::AddZombieInRow(ZombieType theZombieType, int theRow, int theFromW
 			mZombies.DataArrayAlloc()->ZombieInitialize(theRow, ZombieType::ZOMBIE_BOBSLED, false, aZombie, theFromWave);
 		}
 	}
+	if(auto* parent=SandboxFactions::ZombieSource())SandboxFactions::Set(aZombie,parent->mMindControlled);
 	return aZombie;
 }
 
@@ -9028,7 +9030,7 @@ void Board::KillAllPlantsInRadius(int theX, int theY, int theRadius)
 {
 	for (Plant* aPlant : mPlants)
 	{
-		if (aPlant->mDead)
+		if (aPlant->mDead || (SandboxFactions::ZombieSource()&&!SandboxFactions::Enemy(SandboxFactions::ZombieSource(),aPlant)))
 			continue;
 		if (GetCircleRectOverlap(theX, theY, theRadius, aPlant->GetPlantRect()))
 		{
@@ -9365,6 +9367,7 @@ bool Board::PlantingRequirementsMet(SeedType theSeedType)
 
 int Board::KillAllZombiesInRadius(int theRow, int theX, int theY, int theRadius, int theRowRange, bool theBurn, int theDamageRangeFlags, int theDamage)
 {
+	SandboxFactions::Area(SandboxFactions::Source(),theX,theY,theRadius,theRowRange,theDamage);
 	int aKilledZombies = 0;
 	for (Zombie* aZombie : mZombies)
 	{

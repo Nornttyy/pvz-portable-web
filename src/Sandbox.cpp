@@ -5,6 +5,7 @@
 #include "SandboxFusion.h"
 #include "SandboxUIRules.h"
 #include "SandboxScenes.h"
+#include "SandboxFactions.h"
 #include "LawnApp.h"
 #include "Lawn/Board.h"
 #include "Lawn/Plant.h"
@@ -33,6 +34,7 @@ bool gSandboxEnabled = false;
 static bool paused = true, stepOnce = false, awake = true;
 static bool stackPlants = false, continuousZombies = false;
 static bool fusionEnabled = false;
+static bool charmPlants=false,charmZombies=false;
 static int mapType = 0, escaped = 0;
 static int sessionRevision = 0;
 static std::unique_ptr<PlayerInfo> sandboxProfile;
@@ -73,6 +75,7 @@ bool SandboxEnter() {
     stackPlants = false;
     continuousZombies = false;
     fusionEnabled = false;
+    charmPlants=charmZombies=false;
     CanvasSize(SandboxUIRules::CanvasWidth);
     SandboxStart(0);
     return true;
@@ -88,6 +91,7 @@ bool SandboxExit() {
     SandboxPlants::Reset();
     SandboxZombies::Reset();
     SandboxScenes::Reset();
+    SandboxFactions::Reset();
     app->mPlayerInfo = adventureProfile;
     adventureProfile = nullptr;
     app->mGameMode = previousMode;
@@ -114,6 +118,7 @@ void SandboxStart(int map) {
     SandboxPlants::Reset();
     SandboxZombies::Reset();
     SandboxScenes::Reset();
+    SandboxFactions::Reset();
     if (!sandboxProfile) sandboxProfile = std::make_unique<PlayerInfo>();
     auto* profile = sandboxProfile.get();
     profile->mName = "Sandbox";
@@ -231,7 +236,7 @@ static int PlacePlant(Board* board, int type, int col, int row, bool preserved=f
     const auto seed = static_cast<SeedType>(SandboxPlants::Base(type));
     if (seed == SEED_COBCANNON && col >= 8) return -4;
     if (int(seed) == 8 && MemeCharacters::PuffCount(board,col,row) >= TinyPuffRules::Limit) return -4;
-    if(preserved){Plant::PreloadPlantResources(seed);auto* plant=board->AddPlant(col,row,seed,SEED_NONE);if(!plant)return -3;SandboxPlants::Assign(plant,type);if(awake&&plant->mIsAsleep)plant->SetSleeping(false);board->MarkAllDirty();return 1;}
+    if(preserved){Plant::PreloadPlantResources(seed);auto* plant=board->AddPlant(col,row,seed,SEED_NONE);if(!plant)return -3;SandboxPlants::Assign(plant,type);SandboxFactions::Set(plant,charmPlants);if(awake&&plant->mIsAsleep)plant->SetSleeping(false);board->MarkAllDirty();return 1;}
     if (PlantCount(board) >= SandboxRules::MaxPlants) return -3;
     if (seed == SEED_CATTAIL && !board->IsPoolSquare(col, row)) return -4;
     if (stackPlants && seed != SEED_GRAVEBUSTER && seed != SEED_INSTANT_COFFEE) {
@@ -263,6 +268,7 @@ static int PlacePlant(Board* board, int type, int col, int row, bool preserved=f
     }
     auto* plant = board->AddPlant(col, row, seed, SEED_NONE);
     SandboxPlants::Assign(plant,type);
+    SandboxFactions::Set(plant,charmPlants);
     if (awake && plant->mIsAsleep) plant->SetSleeping(false);
     board->MarkAllDirty();
     return 1;
@@ -279,6 +285,7 @@ static int Spawn(Board* board, int type, int col, int row) {
     if (!zombie) return -3;
     if(zombieType!=ZOMBIE_BOSS){const float oldX=zombie->mPosX;zombie->mPosX = static_cast<float>(board->GridToPixelX(col, row) + 10);zombie->mX = static_cast<int>(zombie->mPosX);SandboxScenes::MoveFollowers(zombie,zombie->mPosX-oldX);}
     SandboxZombies::Assign(zombie,type);
+    SandboxFactions::Set(zombie,charmZombies);
     SandboxScenes::UpdateSwimmer(zombie);
     zombie->UpdateReanim();
     board->MarkAllDirty();
@@ -289,7 +296,7 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
     auto* board = ActiveBoard();
     if (!board) return -1;
     switch (command) {
-    case 0: return 1 | (paused ? 2 : 0) | (SandboxSceneRules::Pool(mapType) ? 4 : 0) | (awake ? 8 : 0) | (stackPlants ? 16 : 0) | (continuousZombies ? 32 : 0) | (fusionEnabled ? 64 : 0);
+    case 0: return 1 | (paused ? 2 : 0) | (SandboxSceneRules::Pool(mapType) ? 4 : 0) | (awake ? 8 : 0) | (stackPlants ? 16 : 0) | (continuousZombies ? 32 : 0) | (fusionEnabled ? 64 : 0) | (charmPlants?128:0) | (charmZombies?256:0);
     case 1: return PlacePlant(board, type, col, row);
     case 2: return Spawn(board, type, col, row);
     case 3: {
@@ -349,6 +356,8 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_command(int command, int type, i
     case 24: return mapType;
     case 25: if(!SandboxRules::ValidMap(type))return -2;SandboxStart(type);return 1;
     case 27: return PlacePlant(board,type,col,row,true);
+    case 28: charmPlants=type!=0;return 1;
+    case 29: charmZombies=type!=0;return 1;
     default: return -2;
     }
 }
@@ -367,7 +376,8 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_coin_data(int index, int field) {
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_zombie_data(int index,int field) {
     // Read-only diagnostics also cover adventure save/resume. Commands remain
     // sandbox-only; this cannot spawn enemies or alter campaign progress.
-    auto* board=gLawnApp?gLawnApp->mBoard:nullptr;if(!board||index<0||field<0||field>29)return -1;
+    auto* board=gLawnApp?gLawnApp->mBoard:nullptr;if(!board||index<0||field<0||field>30)return -1;
+    if(field==30){for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard())if(index--==0)return int(z->mMindControlled);return -1;}
     if(field>=25){for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard())if(index--==0)return field==25?int(SandboxZombies::IsForwardFlight(z)):field==26?z->mSummonCounter:field==27?z->mBossBungeeCounter:field==28?int(z->mPosX*1000):SandboxZombies::FlipDuration(z);return -1;}
     if(field>=21){for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard())if(index--==0)return field==21?int(z->mInPool):field==22?z->mBossHeadCounter-1:field==23?z->mBossStompCounter:z->mTargetRow;return -1;}
     if(field>=16){for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard())if(index--==0)return field==16?z->mChilledCounter:field==17?z->mIceTrapCounter:field==18?int(z->IsWalkingBackwards()):field==19?z->mTargetCol:int(z->mIsEating);return -1;}
@@ -417,7 +427,7 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_meme_audio_data(int field) {
 
 extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_plant_data(int index, int field) {
     auto* board = ActiveBoard();
-    if (!board || index < 0 || field < 0 || field > 15) return -1;
+    if (!board || index < 0 || field < 0 || field > 16) return -1;
     for (auto* plant : board->mPlants) {
         if (plant->mDead) continue;
         if (index-- == 0) {
@@ -425,6 +435,7 @@ extern "C" EMSCRIPTEN_KEEPALIVE int pvz_sandbox_plant_data(int index, int field)
             if(field==13)return plant->mX;
             if(field==14)return plant->mY;
             if(field==15)return int(plant->mIsAsleep);
+            if(field==16)return int(SandboxFactions::Charmed(plant));
             if(field==11)return plant->mLaunchCounter; // Native production progress, read-only.
             if(field==10)return MemeCharacters::Data(plant,5); // Reserved legacy diagnostic.
             if(field==7)return MemeCharacters::Data(plant,4);

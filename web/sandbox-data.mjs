@@ -219,7 +219,8 @@ export function validateLayout(value) {
     if(nativeBase(p.type)===8){const cell=`${p.col}:${p.row}`,count=(puffCounts.get(cell)??0)+1;if(count>5)throw Error('真·小喷菇每格最多5只');puffCounts.set(cell,count);}
     if (!stacked&&seen.has(key)&&nativeBase(p.type)!==8) throw Error('阵型中有重复植物');
     seen.add(key);
-    return {type:p.type,col:p.col,row:p.row};
+    if(p.charmed!==undefined&&typeof p.charmed!=='boolean')throw Error('阵营设置无效');
+    return {type:p.type,col:p.col,row:p.row,...(p.charmed?{charmed:true}:{})};
   });
   const layer = p => [16,33].includes(nativeBase(p.type))?0:[30,35].includes(nativeBase(p.type))?2:1;
   const occupied=new Map();

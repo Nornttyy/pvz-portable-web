@@ -289,13 +289,13 @@
   "files": [
     {
       "name": "pvz-portable.js",
-      "size": 280214,
-      "sha256": "4c4a88590864552dba1335da158c417d5e2b9ba27dfc213a9221f936bc1dd5bd"
+      "size": 280379,
+      "sha256": "3668cd0aa459007554b960a6c719ce5ca76d1573f9a57c45863edb8186f847c9"
     },
     {
       "name": "pvz-portable.wasm",
-      "size": 8467913,
-      "sha256": "bee2385c0d1146c1dc0224de0a60faaf50d0f0b5742b03a076dd6fddf773e2e2"
+      "size": 8504943,
+      "sha256": "c573f3789b05c8dcf6dc8bb172e746a6282a6af093ff7bb6d92ac82b04ec9f4b"
     }
   ]
 }

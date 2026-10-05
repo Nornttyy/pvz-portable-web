@@ -281,9 +281,9 @@ void SandboxDrawUI(Graphics* g) {
         Button(g,PrevPage,"<");Button(g,NextPage,">");
         PvzpDrawString(g,std::format("{}/{}",catalogPage+1,(count+24)/25),132,578,FONT_BRIANNETOD12,Color(224,187,98),DS_ALIGN_CENTER);
     }
-    if(catalog!=2){
-        Button(g,PowerFilter,"操作",tool==InteractTool);
-    }
+    const bool charmed=(Command(0)&(catalog==2?256:128))!=0;
+    Button(g,FactionButton(0),"普通",!charmed);
+    Button(g,FactionButton(1),"魅惑",charmed);
     PvzpDrawString(g,title,132,107,FONT_DWARVENTODCRAFT18,Color(92,230,40),DS_ALIGN_CENTER);
     if(!hoverName.empty())PvzpDrawString(g,hoverName,132,512,FONT_BRIANNETOD12,Color(244,215,125),DS_ALIGN_CENTER);
     if(!panel){
@@ -371,6 +371,9 @@ bool SandboxMouseDown(int x,int y,int clicks) {
     }
     if(x<SidebarWidth){
         StopPainting();
+        for(int i=0;i<2;++i)if(FactionButton(i).Contains(x,y)){
+            Command(catalog==2?29:28,i);tool=catalog==2?ZombieTool:PlantTool;return true;
+        }
         if(catalog==2){
             const int count=int(Zombies.size()+SandboxZombies::Definitions.size()),pages=(count+ZombiesPerPage-1)/ZombiesPerPage;
             if(PrevPage.Contains(x,y)||NextPage.Contains(x,y)){catalogPage=(catalogPage+(NextPage.Contains(x,y)?1:pages-1))%pages;return true;}
@@ -380,7 +383,6 @@ bool SandboxMouseDown(int x,int y,int clicks) {
                 tool=ZombieTool;gLawnApp->PlaySample(SOUND_SEEDLIFT);return true;
             }
         }else{
-            if(PowerFilter.Contains(x,y)){tool=InteractTool;return true;}
             const auto cards=CataloguePlants();const int count=int(cards.size());
             if(PrevPage.Contains(x,y)||NextPage.Contains(x,y)){const int pages=(count+24)/25;catalogPage=(catalogPage+(NextPage.Contains(x,y)?1:pages-1))%pages;return true;}
             for(int i=0;i<25&&i+catalogPage*25<count;++i)if(SidebarPlant(i).Contains(x,y)){

@@ -9,7 +9,7 @@ function snapshot() {
   const plants=[];
   for(let i=0;i<1024;i++){
     const type=Module._pvz_sandbox_plant_data(i,0);if(type<0)break;
-    plants.push({type,col:Module._pvz_sandbox_plant_data(i,1),row:Module._pvz_sandbox_plant_data(i,2)});
+    plants.push({type,col:Module._pvz_sandbox_plant_data(i,1),row:Module._pvz_sandbox_plant_data(i,2),...(Module._pvz_sandbox_plant_data(i,16)>0?{charmed:true}:{})});
   }
   const stacked=Boolean(flags&16)||requiresStacking(plants);
   return validateLayout({schema:1,map:api(24),adapted:true,stacked,fusion:!stacked&&Boolean(flags&64),plants});
@@ -18,13 +18,15 @@ function restore(value,revision) {
   const layout=validateLayout(value);
   if(api(18)!==revision||api(0)<0)return;
   const awake=Boolean(api(0)&8);
+  const charm=Boolean(api(0)&128);
   if(api(25,layout.map)<0)throw Error('Cannot reset sandbox');
   // Loading a formation is not a player fusion action, including legacy stacks.
   api(21,0);
   api(19,layout.stacked?1:0);
   api(12,0);
   let rejected=0;
-  for(const p of layout.plants)if(api(layout.adapted?27:1,p.type,p.col,p.row)<0)rejected++;
+  for(const p of layout.plants){api(28,p.charmed?1:0);if(api(layout.adapted?27:1,p.type,p.col,p.row)<0)rejected++;}
+  api(28,charm?1:0);
   api(21,layout.fusion?1:0);
   api(12,awake?1:0);
   api(16,rejected?6:2);

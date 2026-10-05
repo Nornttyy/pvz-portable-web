@@ -1,6 +1,7 @@
 #include "SandboxScenes.h"
 #include "SandboxSceneRules.h"
 #include "Sandbox.h"
+#include "SandboxFactions.h"
 #include "SandboxPlants.h"
 #include "SandboxZombies.h"
 #include "LawnApp.h"
@@ -68,7 +69,7 @@ bool Switch(Board* b,int map,bool awake){
   const int support=b->IsPoolSquare(p->mPlantCol,p->mRow)?16:Roof(map)?33:-1;
   if(support<0)continue;
   bool found=false;for(auto* q:b->mPlants)if(!q->mDead&&q->mPlantCol==p->mPlantCol&&q->mRow==p->mRow&&q->mSeedType==support){found=true;break;}
-  if(!found&&b->mPlants.mSize<b->mPlants.mMaxSize-8){Plant::PreloadPlantResources(static_cast<SeedType>(support));b->AddPlant(p->mPlantCol,p->mRow,static_cast<SeedType>(support),SEED_NONE);}
+  if(!found&&b->mPlants.mSize<b->mPlants.mMaxSize-8){Plant::PreloadPlantResources(static_cast<SeedType>(support));auto* pad=b->AddPlant(p->mPlantCol,p->mRow,static_cast<SeedType>(support),SEED_NONE);SandboxFactions::Set(pad,SandboxFactions::Charmed(p));}
  }
  for(auto* z:b->mZombies)if(!z->mDead){
   const auto key=b->mZombies.DataArrayGetID(z);

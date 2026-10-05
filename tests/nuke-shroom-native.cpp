@@ -24,6 +24,8 @@ struct Items {std::vector<std::unique_ptr<GridItem>> owned;std::vector<GridItem*
  auto begin(){return entries.begin();}auto end(){return entries.end();}GridItem* add(Board* b,int col,int row){owned.push_back(std::make_unique<GridItem>());auto* p=owned.back().get();p->mBoard=b;p->mGridX=col;p->mGridY=row;entries.push_back(p);++mSize;return p;}};
 class Board {public:App app;App* mApp=&app;bool pool=false,mPaused=false;int shakes=0;Items mGridItems;std::vector<Plant*> mPlants;std::vector<Zombie*> mZombies;
  bool StageHasPool(){return pool;}GridItem* AddACrater(int col,int row){return mGridItems.add(this,col,row);}void ShakeBoard(int,int){++shakes;}};
+bool gSandboxEnabled=false;
+namespace SandboxFactions {bool Charmed(Plant*){return false;}bool Charmed(GridItem*){return false;}void Set(GridItem*,bool){}void Damage(Plant*,int){}}
 #include "nuke-production.inc"
 void step(Board& b,int count=1){while(count--)for(auto* item:b.mGridItems)NukeShroom::UpdateCrater(item);}
 int main(){

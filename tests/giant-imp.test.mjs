@@ -63,6 +63,7 @@ test('jaw impact kills once after windup, pauses with ice, and preserves native 
 #include <cassert>
 #include <iostream>
 constexpr int DAMAGE_PER_EAT=4,SOUND_GULP=0;
+bool gSandboxEnabled=false;
 enum PlantState{STATE_NOTREADY,STATE_FLOWERPOT_INVULNERABLE,STATE_LILYPAD_INVULNERABLE,STATE_SQUASH_LOOK,STATE_SQUASH_PRE_LAUNCH};
 enum FoleyType{FOLEY_THUMP};enum ZombieAttackType{ATTACKTYPE_CHEW};
 struct Plant {SeedType mSeedType=SEED_WALLNUT;PlantState mState=STATE_NOTREADY;int mPlantHealth=4000,mPlantCol=5,mRow=0,mRecentlyEatenCountdown=0,mX=0,mY=0;bool mDead=false,mIsAsleep=false;int specials=0;void Die(){mDead=true;}void DoSpecial(){++specials;}};

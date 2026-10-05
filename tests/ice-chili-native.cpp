@@ -29,6 +29,7 @@ struct Board {
 };
 struct Plant {Board* mBoard=nullptr;bool mDead=false;int mRow=2,id=528;void Die(){mDead=true;}};
 namespace MemeCharacters {int Type(const Plant* p){return p?p->id:0;}}
+namespace SandboxFactions {bool Enemy(Plant*,Zombie* z){return !z->mMindControlled;}int Flags(Plant*,int f){return f;}void RowDamage(Plant*,int,int,int){}}
 #include "ice-production.inc"
 int main(){
  static_assert(IceChiliRules::Cost==125&&IceChiliRules::Recharge==5000&&IceChiliRules::Windup==100&&IceChiliRules::Unlock==26);

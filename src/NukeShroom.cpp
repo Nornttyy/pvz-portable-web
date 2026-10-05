@@ -1,5 +1,7 @@
 #include "NukeShroom.h"
 #include "NukeShroomRules.h"
+#include "Sandbox.h"
+#include "SandboxFactions.h"
 #include "MemeCharacters.h"
 #include "LawnApp.h"
 #include "Lawn/Board.h"
@@ -16,7 +18,9 @@ namespace {
 void Pulse(GridItem* crater){
  auto* board=crater->mBoard;
  // Never hit roadside seed-selection previews or friendly hypnotized zombies.
- for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard()&&!z->mMindControlled&&!z->IsDeadOrDying()&&z->EffectedByDamage(127))z->ApplyBurn();
+ const bool hostile=SandboxFactions::Charmed(crater);
+ for(auto* z:board->mZombies)if(!z->mDead&&z->IsOnBoard()&&z->mMindControlled==hostile&&!z->IsDeadOrDying()&&z->EffectedByDamage(127|(hostile?128:0)))z->ApplyBurn();
+ if(gSandboxEnabled)for(auto* p:board->mPlants)if(!p->mDead&&SandboxFactions::Charmed(p)!=hostile)SandboxFactions::Damage(p,1800);
  for(auto* item:board->mGridItems)if(!item->mDead&&item->mGridItemType==GRIDITEM_LADDER)item->GridItemDie();
  board->mApp->PlaySample(Sexy::SOUND_DOOMSHROOM);
  if(auto* cloud=board->mApp->AddPvzpParticle(crater->mPosX,crater->mPosY,int(RENDER_LAYER_TOP),PARTICLE_DOOM)){
@@ -35,12 +39,14 @@ bool Detonate(Plant* plant){
  if(board->mGridItems.mSize>board->mGridItems.mMaxSize-9)return false;
  const auto area=NukeShroomRules::Footprint(plant->mPlantCol,plant->mRow,board->StageHasPool()?6:5);
  const float x=plant->mX+40,y=plant->mY+40;
+ const bool hostile=SandboxFactions::Charmed(plant);
  // Clear exactly nine cells, including pads/pots/shells and either half of a cannon.
  for(auto* p:board->mPlants)if(!p->mDead&&(area.Contains(p->mPlantCol,p->mRow)||(p->mSeedType==SEED_COBCANNON&&area.Contains(p->mPlantCol+1,p->mRow))))p->Die();
  for(auto* item:board->mGridItems)if(!item->mDead&&area.Contains(item->mGridX,item->mGridY)&&item->mGridItemType==GRIDITEM_GRAVESTONE)item->GridItemDie();
  GridItem* primary=nullptr;
  for(int dy=0;dy<3;++dy)for(int dx=0;dx<3;++dx){
   auto* crater=board->AddACrater(area.col+dx,area.row+dy);
+  SandboxFactions::Set(crater,hostile);
   crater->mGridItemState=GridItemState(NukeShroomRules::CraterMarker+dy*3+dx);
   crater->mGridItemCounter=NukeShroomRules::CraterLife;
   crater->mPosX=x;crater->mPosY=y;crater->mSunCount=0;crater->mTransparentCounter=0;

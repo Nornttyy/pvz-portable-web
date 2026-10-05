@@ -38,6 +38,7 @@
 #include "../LawnApp.h"
 #include "../SandboxPlants.h"
 #include "../Sandbox.h"
+#include "../SandboxFactions.h"
 #include "../SandboxZombies.h"
 #include "../MemeAdventure.h"
 #include "../SandboxMemeRules.h"
@@ -627,6 +628,7 @@ void Plant::SetSleeping(bool theIsAsleep)
 
 int Plant::GetDamageRangeFlags(PlantWeapon thePlantWeapon)
 {
+	const int flags = [&]() -> int {
 	if (CoinPlants::ShooterSlot(mSeedType)) return 1;
 	switch (mSeedType)
 	{
@@ -661,6 +663,8 @@ int Plant::GetDamageRangeFlags(PlantWeapon thePlantWeapon)
 	default:
 		return 1;
 	}
+	}();
+	return SandboxFactions::Flags(this,flags);
 }
 
 bool Plant::IsOnHighGround()
@@ -700,6 +704,7 @@ void Plant::DoRowAreaDamage(int theDamage, unsigned int theDamageFlags)
 	theDamage = SandboxPlants::NativeDamage(this,theDamage);
 	int aDamageRangeFlags = GetDamageRangeFlags(PlantWeapon::WEAPON_PRIMARY);
 	Rect aAttackRect = GetPlantAttackRect(PlantWeapon::WEAPON_PRIMARY);
+	if(gSandboxEnabled)for(auto* p:mBoard->mPlants)if(!p->mDead&&SandboxFactions::Enemy(this,p)&&std::abs(p->mRow-mRow)<=(mSeedType==SEED_GLOOMSHROOM?1:0)&&GetRectOverlap(aAttackRect,p->GetPlantRect())>0)SandboxFactions::Damage(p,theDamage);
 
 	for (Zombie* aZombie : mBoard->mZombies)
 	{
@@ -759,7 +764,7 @@ PvzpParticleSystem* Plant::AddAttachedParticle(int thePosX, int thePosY, int the
 bool Plant::FindTargetAndFire(int theRow, PlantWeapon thePlantWeapon)
 {
 	Zombie* aZombie = FindTargetZombie(theRow, thePlantWeapon);
-	if (aZombie == nullptr)
+	if (aZombie == nullptr && !SandboxFactions::Target(this,theRow,thePlantWeapon))
 		return false;
 
 	if(mShootingCounter==0 && !(mSeedType==SEED_CATTAIL&&mLaunchCounter==50) && !(mSeedType==SEED_SPLITPEA&&mLaunchCounter==25)) SandboxPlants::NativeAction(this);
@@ -850,9 +855,9 @@ void Plant::LaunchThreepeater()
 	int rowAbove = mRow - 1;
 	int rowBelow = mRow + 1;
 
-	if ((FindTargetZombie(mRow, PlantWeapon::WEAPON_PRIMARY)) ||
-		(mBoard->RowCanHaveZombies(rowAbove) && FindTargetZombie(rowAbove, PlantWeapon::WEAPON_PRIMARY)) ||
-		(mBoard->RowCanHaveZombies(rowBelow) && FindTargetZombie(rowBelow, PlantWeapon::WEAPON_PRIMARY)))
+	if (SandboxFactions::HasTarget(this,mRow) ||
+		(mBoard->RowCanHaveZombies(rowAbove) && SandboxFactions::HasTarget(this,rowAbove)) ||
+		(mBoard->RowCanHaveZombies(rowBelow) && SandboxFactions::HasTarget(this,rowBelow)))
 	{
 		Reanimation* aHeadReanim1 = mApp->ReanimationGet(mHeadReanimID);
 		Reanimation* aHeadReanim2 = mApp->ReanimationGet(mHeadReanimID2);
@@ -885,6 +890,12 @@ void Plant::LaunchThreepeater()
 
 bool Plant::FindStarFruitTarget()
 {
+	if(gSandboxEnabled){
+		for(auto* p:mBoard->mPlants)if(!p->mDead&&!p->NotOnGround()&&SandboxFactions::Enemy(this,p)){
+			const int dx=(p->mX-mX)*(SandboxFactions::Charmed(this)?-1:1),dy=std::abs(p->mY-mY);
+			if((p->mRow==mRow&&dx<0)||std::abs(dx)<35||(dx>0&&std::abs(dy-dx*.577f)<55))return true;
+		}
+	}
 	if (mRecentlyEatenCountdown > 0)
 		return true;
 
@@ -1371,7 +1382,7 @@ void Plant::UpdateScaredyShroom()
 			continue;
 		Rect aZombieRect = aZombie->GetZombieRect();
 		int aDiffY = (aZombie->mZombieType == ZombieType::ZOMBIE_BOSS) ? 0 : (aZombie->mRow - mRow);
-		if (!aZombie->mMindControlled && !aZombie->IsDeadOrDying() && aDiffY <= 1 && aDiffY >= -1 && GetCircleRectOverlap(mX, mY + 20.0f, 120, aZombieRect))
+		if (SandboxFactions::Enemy(this,aZombie) && !aZombie->IsDeadOrDying() && aDiffY <= 1 && aDiffY >= -1 && GetCircleRectOverlap(mX, mY + 20.0f, 120, aZombieRect))
 		{
 			aHasZombieNearby = true;
 			break;
@@ -1428,7 +1439,7 @@ void Plant::UpdateTorchwood()
 
 	for (Projectile* aProjectile : mBoard->mProjectiles)
 	{
-		if (aProjectile->mDead)
+		if (aProjectile->mDead || (gSandboxEnabled&&SandboxFactions::ShotEnemy(aProjectile,this)))
 			continue;
 		if ((aProjectile->mRow == mRow) &&
 			(aProjectile->mProjectileType == ProjectileType::PROJECTILE_PEA || aProjectile->mProjectileType == ProjectileType::PROJECTILE_SNOWPEA))
@@ -2120,7 +2131,7 @@ void Plant::UpdateMagnetShroom()
 			int aDiffY = aZombie->mRow - mRow;
 			Rect aZombieRect = aZombie->GetZombieRect();
 
-			if (aZombie->mMindControlled)
+			if (!SandboxFactions::Enemy(this,aZombie))
 				continue;
 
 			if (!aZombie->mHasHead)
@@ -2570,6 +2581,8 @@ void Plant::UpdateBowling()
 
 void Plant::UpdateAbilities()
 {
+	SandboxFactions::Scope faction(this);
+	if(SandboxFactions::UpdatePlant(this))return;
 	if (!IsInPlay())
 		return;
 	StinkShroom::UpdatePlant(this);
@@ -3302,7 +3315,7 @@ void Plant::UpdateShooting()
 		if (mShootingCounter == 19)
 		{
 			Zombie* aZombie = FindTargetZombie(mRow, PlantWeapon::WEAPON_PRIMARY);
-			if (aZombie)
+			if (aZombie || SandboxFactions::Target(this,mRow))
 			{
 				Fire(aZombie, mRow, PlantWeapon::WEAPON_PRIMARY);
 			}
@@ -4001,6 +4014,7 @@ void Plant::DrawShadow(Sexy::Graphics* g, float theOffsetX, float theOffsetY)
 
 void Plant::Draw(Graphics* g)
 {
+	SandboxFactions::DrawScope faction(this);
 	AbstractRigVisuals::NauseaScope nausea(this);
 	CoinPlants::DrawOrbit(g,this,false);
 	float aOffsetX = 0.0f;
@@ -4320,9 +4334,10 @@ void Plant::MouseDown(int x, int y, int theClickCount)
 
 void Plant::IceZombies()
 {
+	if(gSandboxEnabled)for(auto* p:mBoard->mPlants)if(SandboxFactions::Enemy(this,p))SandboxFactions::Damage(p,20,300);
 	for (Zombie* aZombie : mBoard->mZombies)
 	{
-		if (aZombie->mDead)
+		if (aZombie->mDead || !SandboxFactions::Enemy(this,aZombie))
 			continue;
 		aZombie->HitIceTrap();
 	}
@@ -4343,6 +4358,7 @@ void Plant::IceZombies()
 
 void Plant::BurnRow(int theRow)
 {
+	SandboxFactions::RowDamage(this,theRow,1800);
 	int aDamageRangeFlags = GetDamageRangeFlags(PlantWeapon::WEAPON_PRIMARY);
 
 	for (Zombie* aZombie : mBoard->mZombies)
@@ -4377,7 +4393,7 @@ void Plant::BlowAwayFliers()
 {
 	for (Zombie* aZombie : mBoard->mZombies)
 	{
-		if (aZombie->mDead)
+		if (aZombie->mDead || (gSandboxEnabled&&!SandboxFactions::Enemy(this,aZombie)))
 			continue;
 		if (!aZombie->IsDeadOrDying())
 		{
@@ -4541,8 +4557,10 @@ void Plant::DoSpecial()
 void Plant::ImitaterMorph()
 {
 	const int inheritedPower=SandboxPlants::Power(this);
+	const bool inheritedCharm=SandboxFactions::Charmed(this);
 	Die();
 	Plant* aPlant = mBoard->AddPlant(mPlantCol, mRow, mImitaterType, SeedType::SEED_IMITATER);
+	SandboxFactions::Set(aPlant,inheritedCharm);
 	if(inheritedPower)SandboxPlants::Assign(aPlant,SandboxMemeRules::Result(aPlant->mSeedType,inheritedPower));
 
 	FilterEffect aFilter = FilterEffect::FILTER_EFFECT_WASHED_OUT;
@@ -4903,7 +4921,7 @@ void Plant::Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon
 	{
 		aProjectile->mVelX = 2.0f;
 		aProjectile->mMotionType = ProjectileMotion::MOTION_HOMING;
-		aProjectile->mTargetZombieID = mBoard->ZombieGetID(theTargetZombie);
+		aProjectile->mTargetZombieID = theTargetZombie ? mBoard->ZombieGetID(theTargetZombie) : ZOMBIEID_NULL;
 	}
 	else if (mSeedType == SeedType::SEED_COBCANNON)
 	{
@@ -5089,6 +5107,7 @@ int Plant::DistanceToClosestZombie()
 
 void Plant::Die()
 {
+	SandboxFactions::Forget(this);
 	StinkShroom::Forget(this);
 	SandboxPlants::Forget(this);
 	if (IsOnBoard() && mSeedType == SeedType::SEED_TANGLEKELP)
@@ -5345,7 +5364,7 @@ Rect Plant::GetPlantRect()
 
 Rect Plant::GetPlantAttackRect(PlantWeapon thePlantWeapon)
 {
-	if (MemeCharacters::Type(this) == MemeCharacters::ShooterPea) return Rect(mX + 60, mY, BOARD_WIDTH, mHeight);
+	if (MemeCharacters::Type(this) == MemeCharacters::ShooterPea) return SandboxFactions::AttackRect(this,Rect(mX + 60, mY, BOARD_WIDTH, mHeight));
 	Rect aRect;
 	if (mApp->IsWallnutBowlingLevel())
 	{
@@ -5373,7 +5392,7 @@ Rect Plant::GetPlantAttackRect(PlantWeapon thePlantWeapon)
 	default:                            aRect = Rect(mX + 60,       mY,             BOARD_WIDTH,        mHeight);               break;
 	}
 
-	return aRect;
+	return SandboxFactions::AttackRect(this,aRect);
 }
 
 void Plant::PreloadPlantResources(SeedType theSeedType)

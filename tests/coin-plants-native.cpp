@@ -30,6 +30,12 @@ namespace MemeCharacters{int Type(const Plant* p){return p->custom;}int ShotStyl
 namespace SandboxZombies{bool IsHeld(Zombie* z){return z->held;}}
 namespace SandboxArt{bool TrackPoint(Reanimation*,const char*,float,float,float,float,float& x,float& y){x=58;y=34;return true;}}
 namespace Sexy{int roll=99,calls=0;int Rand(int){++calls;return roll;}}
+namespace SandboxFactions {
+bool Enemy(const Plant*,const Zombie* z){return !z->mMindControlled;}
+int Flags(const Plant*,int f){return f;}Plant* Target(Plant*,int){return nullptr;}
+void OnFired(Plant*,Projectile*,Zombie*){}
+bool OrbitHit(Plant*,int,float,float,int){return false;}
+}
 namespace CoinPlants{
 using namespace CoinPlantRules;
 namespace {std::map<const Plant*,State> states;Save pending;int fired[3]{},hits[3]{};

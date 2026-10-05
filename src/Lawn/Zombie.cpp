@@ -29,6 +29,7 @@
 #include "../StinkShroom.h"
 #include "../SandboxScenes.h"
 #include "../Sandbox.h"
+#include "../SandboxFactions.h"
 #include "Cutscene.h"
 #include "GridItem.h"
 #include "LawnMower.h"
@@ -2066,6 +2067,7 @@ void Zombie::UpdateZombieJackInTheBox()
 			if (mMindControlled)
 			{
 				mBoard->KillAllZombiesInRadius(mRow, aPosX, aPosY, JACK_IN_THE_BOX_ZOMBIE_RADIUS, 1, true, 127);
+				if(gSandboxEnabled)mBoard->KillAllPlantsInRadius(aPosX,aPosY,JACK_IN_THE_BOX_PLANT_RADIUS);
 			}
 			else
 			{
@@ -2093,7 +2095,7 @@ void Zombie::UpdateZombieGargantuar()
 		if (aBodyReanim->ShouldTriggerTimedEvent(0.64f))
 		{
 #ifdef DO_FIX_BUGS
-			if (mMindControlled)  // hypnotized gargantuars smash zombies
+			if (mMindControlled && (!gSandboxEnabled || FindZombieTarget()))  // hypnotized gargantuars smash enemies
 			{
 				Zombie* aZombie = FindZombieTarget();
 				if (aZombie)
@@ -2241,7 +2243,7 @@ void Zombie::UpdateZombieGargantuar()
 	bool doSmash = false;
 	if (mMindControlled)
 	{
-		doSmash = FindZombieTarget() != nullptr;
+		doSmash = FindZombieTarget() != nullptr || (gSandboxEnabled&&FindPlantTarget(ZombieAttackType::ATTACKTYPE_CHEW));
 	}
 	else if (FindPlantTarget(ZombieAttackType::ATTACKTYPE_CHEW))
 	{
@@ -2299,7 +2301,7 @@ void Zombie::UpdateZombieImp()
 	{
 		// Native phase counter is saved and pauses under ice/butter. UpdateActions
 		// only reaches this function while mobile, preventing frozen impacts.
-		if (!mHasHead || mMindControlled)
+		if (!mHasHead || (mMindControlled&&!gSandboxEnabled))
 		{
 			mZombiePhase = ZombiePhase::PHASE_ZOMBIE_NORMAL;
 			mPhaseCounter = 0;
@@ -2394,11 +2396,12 @@ void Zombie::UpdateZombiePeaHead()
 
 void Zombie::BurnRow(int theRow)  // only used by the DO_FIX_BUGS jalapeno zombie fix
 {
+	if(gSandboxEnabled)for(auto* p:mBoard->mPlants)if(!p->mDead&&p->mRow==theRow&&!p->NotOnGround()&&SandboxFactions::Enemy(this,p))p->Die();
 	for (Zombie* aZombie : mBoard->mZombies)
 	{
 		if (aZombie->mDead)
 			continue;
-		if ((aZombie->mZombieType == ZombieType::ZOMBIE_BOSS || aZombie->mRow == theRow) && aZombie->EffectedByDamage(127))
+		if ((aZombie->mZombieType == ZombieType::ZOMBIE_BOSS || aZombie->mRow == theRow) && aZombie->EffectedByDamage(gSandboxEnabled&&!mMindControlled?255:127))
 		{
 			aZombie->RemoveColdEffects();
 			aZombie->ApplyBurn();
@@ -2435,7 +2438,7 @@ void Zombie::UpdateZombieJalapenoHead()
 		mBoard->ShakeBoard(3, -4);
 
 #ifdef DO_FIX_BUGS
-		if (mMindControlled)
+		if (mMindControlled || gSandboxEnabled)
 		{
 			BurnRow(mRow);
 		}
@@ -4348,6 +4351,7 @@ void Zombie::UpdateBurn()
 
 void Zombie::Update()
 {
+	SandboxFactions::ZombieScope faction(this);
 	PVZP_ASSERT(!mDead);
 
 	mZombieAge++;
@@ -4879,9 +4883,10 @@ void Zombie::AnimateChewSound()
 		{
 			mApp->PlayFoley(FoleyType::FOLEY_FLOOP);
 			SandboxPlants::OneShot(aPlant,this);
+			const bool reverse=gSandboxEnabled&&SandboxFactions::Charmed(aPlant);
 			aPlant->Die();
 
-			StartMindControlled();
+			if(reverse)SandboxFactions::Set(this,false);else StartMindControlled();
 			mApp->AddPvzpParticle(mPosX + 60.0f, mPosY + 40.0f, mRenderOrder + 1, ParticleEffect::PARTICLE_MIND_CONTROL);
 			TrySpawnLevelAward();
 
@@ -5374,7 +5379,7 @@ void Zombie::UpdateReanim()
 	}
 
 	bool anOpposite = false;
-	if (IsWalkingBackwards())
+	if (IsWalkingBackwards() && !(gSandboxEnabled && mZombieType==ZOMBIE_BOSS))
 	{
 		anOpposite = true;
 	}
@@ -6400,6 +6405,7 @@ void Zombie::Draw(Graphics* g)
 
 bool Zombie::CanTargetPlant(Plant* thePlant, ZombieAttackType theAttackType)
 {
+	if(!SandboxFactions::Enemy(this,thePlant))return false;
 	// Tucked flowers are not a mouthful or a vaulting obstacle. This does not
 	// make them immune to vehicle crushes or collateral explosions.
 	if ((theAttackType == ZombieAttackType::ATTACKTYPE_CHEW || theAttackType == ZombieAttackType::ATTACKTYPE_VAULT) && MemeCharacters::Hiding(thePlant)) return false;
@@ -6536,9 +6542,10 @@ Zombie* Zombie::FindZombieTarget()
 
 void Zombie::SquishAllInSquare(int theX, int theY, ZombieAttackType theAttackType)
 {
+	SandboxFactions::SmashZombies(this,theX,theY);
 	for (Plant* aPlant : mBoard->mPlants)
 	{
-		if (aPlant->mDead)
+		if (aPlant->mDead || !SandboxFactions::Enemy(this,aPlant))
 			continue;
 		if (aPlant->mRow == theY && aPlant->mPlantCol == theX)
 		{
@@ -6943,7 +6950,7 @@ void Zombie::CheckIfPreyCaught()
 		return;
 	}
 
-	if (!mMindControlled)
+	if (!mMindControlled || gSandboxEnabled)
 	{
 		Plant* aPlant = FindPlantTarget(ZombieAttackType::ATTACKTYPE_CHEW);
 		if (aPlant)
@@ -8141,7 +8148,7 @@ bool Zombie::CanBeChilled()
 		mZombiePhase == ZombiePhase::PHASE_DANCER_RISING)
 		return false;
 
-	if (mMindControlled)
+	if (mMindControlled && !gSandboxEnabled)
 		return false;
 
 	return
@@ -9863,9 +9870,10 @@ void Zombie::BossRVAttack()
 
 void Zombie::BossRVLanding()
 {
+	SandboxFactions::SmashZombies(this,mTargetCol,mTargetRow,3,2);
 	for (Plant* aPlant : mBoard->mPlants)
 	{
-		if (aPlant->mDead)
+		if (aPlant->mDead || !SandboxFactions::Enemy(this,aPlant))
 			continue;
 		if (aPlant->mRow >= mTargetRow && aPlant->mRow <= mTargetRow + 1 && aPlant->mPlantCol >= mTargetCol && aPlant->mPlantCol <= mTargetCol + 2)
 		{
@@ -9953,6 +9961,7 @@ void Zombie::BossSpawnContact()
 	}
 
 	Zombie* aZombie = mBoard->AddZombieInRow(aZombieType, mTargetRow, 0);
+	if(!aZombie)return;
 	aZombie->mPosX = 600.0f;
 }
 
@@ -9993,9 +10002,10 @@ void Zombie::BossStompAttack()
 
 bool Zombie::BossCanStompRow(int theRow)
 {
+	if(gSandboxEnabled)for(auto* z:mBoard->mZombies)if(!z->mDead&&z->IsOnBoard()&&!z->IsDeadOrDying()&&z->mMindControlled!=mMindControlled&&z->mRow>=theRow&&z->mRow<=theRow+1&&z->mPosX>=400)return true;
 	for (Plant* aPlant : mBoard->mPlants)
 	{
-		if (aPlant->mDead)
+		if (aPlant->mDead || !SandboxFactions::Enemy(this,aPlant))
 			continue;
 		if (!aPlant->NotOnGround() && aPlant->mRow >= theRow && aPlant->mRow <= theRow + 1 && aPlant->mPlantCol >= 5)
 		{
@@ -10007,9 +10017,10 @@ bool Zombie::BossCanStompRow(int theRow)
 
 void Zombie::BossStompContact()
 {
+	SandboxFactions::SmashZombies(this,5,mTargetRow,4,2);
 	for (Plant* aPlant : mBoard->mPlants)
 	{
-		if (aPlant->mDead)
+		if (aPlant->mDead || !SandboxFactions::Enemy(this,aPlant))
 			continue;
 		if (aPlant->mRow >= mTargetRow && aPlant->mRow <= mTargetRow + 1 && aPlant->mPlantCol >= 5)
 		{

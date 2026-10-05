@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include <vector>
+namespace SandboxFactions {void* Source(){return nullptr;}void Area(void*,int,int,int,int,int){}}
 enum ZombieType {ZOMBIE_NORMAL,ZOMBIE_BOSS};
 enum GridItemType {GRIDITEM_LADDER,GRIDITEM_OTHER};
 struct Rect {int x,y,w,h;};

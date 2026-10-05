@@ -2,6 +2,7 @@
 #include "MemeCharacters.h"
 #include "MemeAdventure.h"
 #include "Sandbox.h"
+#include "SandboxFactions.h"
 #include "SandboxArt.h"
 #include "SandboxZombies.h"
 #include "LawnApp.h"
@@ -60,6 +61,7 @@ void OnBone(Sexy::Graphics* g,Reanimation* anim,const char* track,float nativeW,
  x-=nativeW*.5f;y-=nativeH*.5f;m.m02+=bone.m00*x+bone.m01*y+g->mTransX;m.m12+=bone.m10*x+bone.m11*y+g->mTransY;
  const float c=std::cos(angle),s=std::sin(angle);m.m00=bone.m00*c+bone.m01*s;m.m10=bone.m10*c+bone.m11*s;m.m01=-bone.m00*s+bone.m01*c;m.m11=-bone.m10*s+bone.m11*c;
  auto* im=Accessory(cigarette);const auto tint=g->GetColorizeImages()?g->GetColor():Sexy::Color::White;
+ SandboxFactions::DrawOverlay(m,g->mTransX,g->mTransY);
  PvzpBltMatrix(g,im,m,g->mClipRect,tint,g->mDrawMode,Sexy::Rect(0,0,im->mWidth,im->mHeight));
 }
 }
@@ -78,7 +80,7 @@ void Update(Plant* p){
    const auto pt=Orbit(slot,s.phase,RowHeight(p));const float x=p->mX+pt.x,y=p->mY+Height(p)+pt.y;
    unsigned contact=0;
    for(auto* z:p->mBoard->mZombies){
-    if(z->mDead||!z->IsOnBoard()||z->IsDeadOrDying()||z->mMindControlled||SandboxZombies::IsHeld(z)||!z->EffectedByDamage(1))continue;
+    if(z->mDead||!z->IsOnBoard()||z->IsDeadOrDying()||!SandboxFactions::Enemy(p,z)||SandboxZombies::IsHeld(z)||!z->EffectedByDamage(SandboxFactions::Flags(p,1)))continue;
     const auto r=z->GetZombieRect();
     if(std::abs(z->mRow-p->mRow)>1||r.mX+r.mWidth*.5f<p->mX-80||r.mX+r.mWidth*.5f>=p->mX+160)continue;
     if(x+9<r.mX||x-9>r.mX+r.mWidth||y+9<r.mY||y-9>r.mY+r.mHeight)continue;
@@ -87,13 +89,14 @@ void Update(Plant* p){
     break;
    }
    s.touching[slot]=contact;
+   if(SandboxFactions::OrbitHit(p,slot,x,y,Damage(s.coins[slot]))){++hits[s.coins[slot]-1];p->mApp->PlayFoley(FOLEY_SPLAT);}
   }
  }
  if(s.delay>0)--s.delay;if(s.delay>0)return;
  auto* b=p->mBoard;Zombie* target=nullptr;
  if(id==Shooter){
   if(b->mProjectiles.mSize>=b->mProjectiles.mMaxSize-8)return;
-  target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY);if(!target)return;
+  target=p->FindTargetZombie(p->mRow,WEAPON_PRIMARY);if(!target&&!SandboxFactions::Target(p,p->mRow))return;
  }else if(Count(s)>=Limit)return;
  // Roll once per production, never reroll every frame when a rare coin is unaffordable.
  if(!gSandboxEnabled&&(!p->mApp->mPlayerInfo||p->mApp->mPlayerInfo->mCoins<1))return;
@@ -109,6 +112,7 @@ void Update(Plant* p){
  auto* shot=b->AddProjectile(p->mX+x-12,p->mY+y-12,p->mRenderOrder-1,p->mRow,PROJECTILE_SPIKE);
  shot->mMotionType=MOTION_STRAIGHT;shot->mVelX=3.33f;shot->mVelY=0;shot->mDamageRangeFlags=1;
  MemeCharacters::RestoreShotStyle(shot,Style(kind));
+ SandboxFactions::OnFired(p,shot,target);
  if(auto* head=p->mApp->ReanimationTryToGet(p->mHeadReanimID);head&&head->TrackExists("anim_shooting"))head->PlayReanim("anim_shooting",REANIM_PLAY_ONCE_AND_HOLD,3,35);
  p->mApp->PlayFoley(FOLEY_THROW);
 }
